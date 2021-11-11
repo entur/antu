@@ -1,0 +1,14 @@
+env: staging
+replicas: 1
+
+gcp:
+  blobstoreProjectId: entur-ror-test
+  pubsubProjectId: entur-ror-test
+
+  marduk:
+    bucketName: marduk-test
+
+monitoringEnabled: true
+
+ingress:
+  loadBalancerIP: 130.211.80.129

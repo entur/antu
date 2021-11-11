@@ -1,0 +1,14 @@
+env: production
+replicas: 1
+
+gcp:
+  blobstoreProjectId: entur-ror-prod
+  pubsubProjectId: entur-ror-prod
+
+  marduk:
+    bucketName: marduk-production
+
+monitoringEnabled: false
+
+ingress:
+  loadBalancerIP: 35.205.233.237

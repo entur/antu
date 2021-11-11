@@ -1,0 +1,14 @@
+env: dev
+replicas: 1
+
+gcp:
+  blobstoreProjectId: entur-ror-dev
+  pubsubProjectId: entur-ror-dev
+
+  marduk:
+    bucketName: marduk-dev
+
+monitoringEnabled: true
+
+ingress:
+  loadBalancerIP: 35.205.170.68

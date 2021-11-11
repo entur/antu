@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "antu.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "common.labels" . | indent 4 }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: antu
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: "9001"
+        prometheus.io/scrape: "true"
+        scheduler.alpha.kubernetes.io/affinity: |
+          {
+            "nodeAffinity": {
+              "requiredDuringSchedulingIgnoredDuringExecution": {
+                "nodeSelectorTerms": [
+                  { "matchExpressions":
+                    [ {"key": "track", "operator": "NotIn", "values": ["build"] } ]
+                  }
+                ]
+              }
+            }
+          }
+      labels:
+    {{- include "common.labels" . | indent 8 }}
+    spec:
+      containers:
+        - name: antu
+          image: {{ .Values.image.identifier }}
+          env:
+            - name: JAVA_OPTIONS
+              value: -server -Xmx{{ .Values.resources.xmx }} -Xss512k -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
+                -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40
+                -Dspring.config.location=/etc/application-config/application.properties
+                -Dfile.encoding=UTF-8  {{- if .Values.monitoringEnabled}} -Dcom.sun.management.jmxremote.port=9999  -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+            {{- end}}
+            - name: TZ
+              value: Europe/Oslo
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /etc/antu-service-account/credentials.json
+          ports:
+            - containerPort: {{ .Values.service.http.internalPort }}
+              name: http
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 140
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 9001
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 10
+          resources:
+            limits:
+              cpu: {{ .Values.resources.cpuLimit }}
+              memory: {{ .Values.resources.memLimit }}
+            requests:
+              cpu: {{ .Values.resources.cpuRequest }}
+              memory: {{ .Values.resources.memRequest }}
+          volumeMounts:
+            - mountPath: /etc/antu-service-account
+              name: antu-service-account
+              readOnly: true
+            - mountPath: /etc/application-config
+              name: application-config
+              readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccountName: antu-service-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: antu-service-account
+          secret:
+            defaultMode: 420
+            secretName: ror-antu-sa-key
+        - name: application-config
+          configMap:
+            defaultMode: 420
+            name: antu-config

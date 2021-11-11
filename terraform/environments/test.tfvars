@@ -1,0 +1,7 @@
+gcp_project = "entur-test-1287"
+gcp_storage_project = "entur-ror-test"
+gcp_pubsub_project = "entur-ror-test"
+gcp_resources_project = "entur-ror-test"
+kube_namespace = "staging"
+bucket_marduk_instance_name = "marduk-test"
+service_account_bucket_role = "roles/storage.admin"
