@@ -39,7 +39,7 @@ import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
-import static no.entur.antu.Constants.CODESPACE;
+import static no.entur.antu.Constants.DATASET_CODESPACE;
 
 
 /**
@@ -65,7 +65,6 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
 
         from("direct:netexValidationQueue")
                 .process(this::setCorrelationIdIfMissing)
-                .setHeader(CODESPACE, bodyAs(String.class))
                 .log(LoggingLevel.INFO, correlation() + "Received NeTEx validation request")
 
                 .setBody(constant(STATUS_VALIDATION_STARTED))
@@ -96,7 +95,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
 
         from("direct:validateNetexDataset")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx dataset")
-                .bean("authorityIdValidator", "validateAuthorityId(${body},${header." + CODESPACE + "})")
+                .bean("authorityIdValidator", "validateAuthorityId(${body},${header." + DATASET_CODESPACE + "})")
                 .routeId("validate-netex-dataset");
 
         from("direct:notifyMarduk")

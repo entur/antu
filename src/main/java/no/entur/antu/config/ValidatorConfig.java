@@ -23,10 +23,13 @@ import org.apache.camel.component.google.pubsub.GooglePubsubComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class ValidatorConfig {
 
+    @Bean
+    @Profile("!test")
     OrganisationRegistry organisationRegistry(@Value("${antu.organisation.registry.url}") String organisationRegistryUrl) {
         return new OrganisationRegistryImpl(organisationRegistryUrl);
     }

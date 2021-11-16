@@ -37,11 +37,9 @@ package no.entur.antu;
 public final class Constants {
     public static final String FILE_HANDLE = "RutebankenFileHandle";
     public static final String BLOBSTORE_MAKE_BLOB_PUBLIC = "RutebankenBlobstoreMakeBlobPublic";
-    public static final String CODESPACE = "RutebankenChouetteReferential";
+    public static final String DATASET_CODESPACE = "EnturDatasetCodespace";
 
     public static final String BLOBSTORE_PATH_INBOUND_RECEIVED = "inbound/received/";
-
-
 
     /**
      * Headers originating from Marduk that must be sent back when notifying Marduk
