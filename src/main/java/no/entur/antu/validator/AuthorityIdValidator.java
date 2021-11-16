@@ -32,12 +32,12 @@ public class AuthorityIdValidator {
                 .getAll()
                 .stream()
                 .map(EntityStructure::getId)
-                .forEach(authorityId -> checkAuthorityId(whitelistedAuthorityIds, authorityId));
+                .forEach(authorityId -> checkAuthorityId(whitelistedAuthorityIds, authorityId, codespace));
     }
 
-    private void checkAuthorityId(Set<String> whitelistedAuthorityIds, String authorityId) {
+    private void checkAuthorityId(Set<String> whitelistedAuthorityIds, String authorityId, String codespace) {
         if (!whitelistedAuthorityIds.contains(authorityId)) {
-            LOGGER.warn("Invalid Authority Id {} ", authorityId);
+            LOGGER.warn("Invalid Authority Id {} for codespace {}", authorityId, codespace);
         }
     }
 
