@@ -8,7 +8,7 @@ gcp:
   marduk:
     bucketName: marduk-test
 
-organisationRegistryUrl: https://api.staging.entur.io/organisations/v1/register/organisations/
+organisationRegistryUrl: https://api.staging.entur.io/organisations/v1/register/organisations
 
 monitoringEnabled: true
 
