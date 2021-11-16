@@ -18,6 +18,9 @@ data:
     antu.shutdown.timeout=25
     antu.camel.redelivery.max=0
 
+    # Organisation register
+    antu.organisation.registry.url={{ .Values.organisationRegistryUrl }}
+
     # PubSub
     antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}
     spring.cloud.gcp.project-id=${antu.pubsub.project.id}

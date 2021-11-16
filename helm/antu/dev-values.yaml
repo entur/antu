@@ -8,6 +8,8 @@ gcp:
   marduk:
     bucketName: marduk-dev
 
+organisationRegistryUrl: https://api.dev.entur.io/organisations/v1/register/organisations/
+
 monitoringEnabled: true
 
 ingress:
