@@ -37,6 +37,7 @@ package no.entur.antu.routes.validation;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
+import no.entur.antu.organisation.OrganisationRegistry;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -45,10 +46,14 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_INBOUND_RECEIVED;
 
@@ -64,6 +69,25 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
 
     @EndpointInject("mock:notifyMarduk")
     protected MockEndpoint notifyMarduk;
+
+    @TestConfiguration
+    static class EmployeeServiceImplTestContextConfiguration {
+        @Bean
+        public OrganisationRegistry organisationRegistry() {
+            return new OrganisationRegistry() {
+                @Override
+                public void refreshCache() {
+
+                }
+
+                @Override
+                public Set<String> getWhitelistedAuthorityIds(String codespace) {
+                    return Set.of("FLB:Authority:FLB");
+                }
+            };
+        }
+    }
+
 
     @Test
     void testValidateNetex() throws Exception {

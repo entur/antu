@@ -25,6 +25,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +72,11 @@ public class OrganisationRegistryImpl implements OrganisationRegistry {
 
     @Override
     public Set<String> getWhitelistedAuthorityIds(String codespace) {
-        return Set.copyOf(authorityIdWithelistByCodespace.get(codespace));
+        Set<String> whitelistedIds = authorityIdWithelistByCodespace.get(codespace);
+        if(whitelistedIds == null) {
+            return Collections.emptySet();
+        }
+        return Set.copyOf(whitelistedIds);
     }
 
     private RestTemplate createRestTemplate() {

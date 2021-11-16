@@ -35,12 +35,12 @@
 package no.entur.antu.routes.validation;
 
 
-import no.entur.antu.organisation.OrganisationRegistry;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
-import static no.entur.antu.Constants.DATASET_CODESPACE;
+import static no.entur.antu.Constants.CODESPACE;
+
 
 /**
  * Receive a notification when a new NeTEx export is available in the blob store and convert it into a GTFS dataset.
@@ -54,13 +54,6 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
     public static final String STATUS_VALIDATION_OK = "ok";
     public static final String STATUS_VALIDATION_FAILED = "failed";
 
-    private final OrganisationRegistry organisationRegistry;
-
-    public NeTExValidationQueueRouteBuilder(OrganisationRegistry organisationRegistry) {
-        super();
-        this.organisationRegistry = organisationRegistry;
-    }
-
     @Override
     public void configure() throws Exception {
         super.configure();
@@ -72,7 +65,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
 
         from("direct:netexValidationQueue")
                 .process(this::setCorrelationIdIfMissing)
-                .setHeader(DATASET_CODESPACE, bodyAs(String.class))
+                .setHeader(CODESPACE, bodyAs(String.class))
                 .log(LoggingLevel.INFO, correlation() + "Received NeTEx validation request")
 
                 .setBody(constant(STATUS_VALIDATION_STARTED))
@@ -103,11 +96,11 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
 
         from("direct:validateNetexDataset")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx dataset")
+                .bean("authorityIdValidator", "validateAuthorityId(${body},${header." + CODESPACE + "})")
                 .routeId("validate-netex-dataset");
 
         from("direct:notifyMarduk")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")
                 .routeId("notify-marduk");
-
     }
 }

@@ -26,6 +26,7 @@
         <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
         <camel.version>3.11.3</camel.version>
         <entur.helpers.version>1.0.61</entur.helpers.version>
+        <netex-parser-java.version>1.0.18</netex-parser-java.version>
         <commons-io.version>2.11.0</commons-io.version>
         <google.cloud.bom-version>24.0.0</google.cloud.bom-version>
 
@@ -60,7 +61,11 @@
     <dependencies>
 
         <!-- Entur -->
-
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-parser-java</artifactId>
+            <version>${netex-parser-java.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.entur.helpers</groupId>
             <artifactId>entur-google-pubsub</artifactId>
