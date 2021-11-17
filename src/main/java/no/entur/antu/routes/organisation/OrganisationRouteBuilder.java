@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Generate a GTFS stops export and upload it to the GCS bucket.
+ * Refresh the organisation register cache.
  */
 @Component
 public class OrganisationRouteBuilder extends BaseRouteBuilder {

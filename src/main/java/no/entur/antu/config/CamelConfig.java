@@ -16,10 +16,7 @@
 
 package no.entur.antu.config;
 
-import no.entur.antu.organisation.OrganisationRegistry;
-import no.entur.antu.organisation.OrganisationRegistryImpl;
 import org.apache.camel.component.google.pubsub.GooglePubsubComponent;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

@@ -22,8 +22,8 @@ import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Organisation {
-    public static final String NETEX_AUTHORITY_ID_REFEFRENCE_KEY = "netexAuthorityId";
-    public static final String NETEX_OPERATOR_ID_REFEFRENCE_KEY = "netexOperatorId";
+    public static final String NETEX_AUTHORITY_ID_REFERENCE_KEY = "netexAuthorityId";
+    public static final String NETEX_OPERATOR_ID_REFERENCE_KEY = "netexOperatorId";
     public static final String AUTHORITY_TYPE = "authority";
     public static final String OPERATOR_TYPE = "operator";
 
@@ -45,7 +45,7 @@ public class Organisation {
             return null;
         }
 
-        return references.get(NETEX_AUTHORITY_ID_REFEFRENCE_KEY);
+        return references.get(NETEX_AUTHORITY_ID_REFERENCE_KEY);
     }
 
     public String getOperatorNetexId() {
@@ -53,7 +53,7 @@ public class Organisation {
             return null;
         }
 
-        return references.get(NETEX_OPERATOR_ID_REFEFRENCE_KEY);
+        return references.get(NETEX_OPERATOR_ID_REFERENCE_KEY);
     }
 
 
