@@ -40,13 +40,13 @@ public class OrganisationRegistryImpl implements OrganisationRegistry {
     private final String organisationRegistryUrl;
     private final RestTemplate restTemplate;
 
-    private volatile Map<String, Set<String>> authorityIdWithelistByCodespace;
+    private volatile Map<String, Set<String>> authorityIdWhitelistByCodespace;
 
 
     public OrganisationRegistryImpl(String organisationRegistryUrl) {
         this.organisationRegistryUrl = organisationRegistryUrl;
         this.restTemplate = createRestTemplate();
-        this.authorityIdWithelistByCodespace = new HashMap<>();
+        this.authorityIdWhitelistByCodespace = new HashMap<>();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class OrganisationRegistryImpl implements OrganisationRegistry {
             if(organisationsResponseEntity.getBody() == null) {
                 return;
             }
-            authorityIdWithelistByCodespace = Arrays.stream(organisationsResponseEntity.getBody())
+            authorityIdWhitelistByCodespace = Arrays.stream(organisationsResponseEntity.getBody())
                     .filter(organisation -> organisation.references.containsKey(REFERENCE_CODESPACE))
                     .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST))
                     .collect(Collectors.toMap(
@@ -66,13 +66,13 @@ public class OrganisationRegistryImpl implements OrganisationRegistry {
                             organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST).split(",")).collect(Collectors.toSet())));
 
         } catch (HttpClientErrorException ex) {
-            LOGGER.warn("Exception while trying to fetch organisations: " + " : " + ex.getMessage(), ex);
+            LOGGER.warn("Exception while trying to fetch organisations: " + ex.getMessage(), ex);
         }
     }
 
     @Override
     public Set<String> getWhitelistedAuthorityIds(String codespace) {
-        Set<String> whitelistedIds = authorityIdWithelistByCodespace.get(codespace);
+        Set<String> whitelistedIds = authorityIdWhitelistByCodespace.get(codespace);
         if(whitelistedIds == null) {
             return Collections.emptySet();
         }

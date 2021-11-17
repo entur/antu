@@ -3,7 +3,6 @@ package no.entur.antu.validator;
 import no.entur.antu.netex.loader.DefaultNetexDatasetLoader;
 import no.entur.antu.netex.loader.NetexDatasetLoader;
 import no.entur.antu.organisation.OrganisationRegistry;
-import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.rutebanken.netex.model.EntityStructure;
