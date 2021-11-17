@@ -15,9 +15,6 @@
 
 package no.entur.antu.organisation;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class OrganisationRegistryImpl implements OrganisationRegistry {
+public class DefaultOrganisationRegistry implements OrganisationRegistry {
 
     private static final String REFERENCE_CODESPACE = "codeSpace";
     private static final String REFERENCE_NETEX_OPERATOR_IDS_WHITELIST = "netexOperatorIdsWhitelist";
@@ -35,7 +32,7 @@ public class OrganisationRegistryImpl implements OrganisationRegistry {
 
     private volatile Map<String, Set<String>> authorityIdWhitelistByCodespace;
 
-    public OrganisationRegistryImpl(OrganisationResource organisationResource) {
+    public DefaultOrganisationRegistry(OrganisationResource organisationResource) {
         this.organisationResource = organisationResource;
         this.authorityIdWhitelistByCodespace = new HashMap<>();
     }

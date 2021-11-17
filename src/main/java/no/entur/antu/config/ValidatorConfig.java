@@ -17,7 +17,7 @@
 package no.entur.antu.config;
 
 import no.entur.antu.organisation.OrganisationRegistry;
-import no.entur.antu.organisation.OrganisationRegistryImpl;
+import no.entur.antu.organisation.DefaultOrganisationRegistry;
 import no.entur.antu.organisation.OrganisationResource;
 import no.entur.antu.validator.AuthorityIdValidator;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +39,7 @@ public class ValidatorConfig {
     @Bean
     @Profile("!test")
     OrganisationRegistry organisationRegistry(OrganisationResource organisationResource) {
-        return new OrganisationRegistryImpl(organisationResource);
+        return new DefaultOrganisationRegistry(organisationResource);
     }
 
     @Bean("authorityIdValidator")
