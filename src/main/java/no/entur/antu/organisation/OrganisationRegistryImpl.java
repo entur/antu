@@ -66,7 +66,7 @@ public class OrganisationRegistryImpl implements OrganisationRegistry {
                             organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST).split(",")).collect(Collectors.toSet())));
 
         } catch (HttpClientErrorException ex) {
-            LOGGER.warn("Exception while trying to fetch organisations: " + " : " + ex.getMessage(), ex);
+            LOGGER.warn("Exception while trying to fetch organisations: " + ex.getMessage(), ex);
         }
     }
 
