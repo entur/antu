@@ -18,7 +18,6 @@
 
 package no.entur.antu.repository;
 
-import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage;
 import org.rutebanken.helper.gcp.BlobStoreHelper;
 import org.springframework.context.annotation.Profile;
