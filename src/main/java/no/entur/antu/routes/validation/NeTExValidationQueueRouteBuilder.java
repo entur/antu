@@ -59,7 +59,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
         super.configure();
 
 
-        from("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationQueue?synchronousPull=true")
+        from("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationQueue")
                 .to("direct:netexValidationQueue")
                 .routeId("netex-validation-queue-pubsub");
 
