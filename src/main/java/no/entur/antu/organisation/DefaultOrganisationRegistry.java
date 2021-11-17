@@ -40,16 +40,12 @@ public class DefaultOrganisationRegistry implements OrganisationRegistry {
     @Override
     public void refreshCache() {
         Collection<Organisation> organisations = organisationResource.getOrganisations();
-        if (organisations.isEmpty()) {
-            return;
-        }
         authorityIdWhitelistByCodespace = organisations.stream()
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_CODESPACE))
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST))
                 .collect(Collectors.toMap(
                         organisation -> organisation.references.get(REFERENCE_CODESPACE),
                         organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST).split(",")).collect(Collectors.toSet())));
-
     }
 
     @Override
