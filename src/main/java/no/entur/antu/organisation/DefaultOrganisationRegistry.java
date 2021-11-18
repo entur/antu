@@ -18,7 +18,6 @@ package no.entur.antu.organisation;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,11 +29,12 @@ public class DefaultOrganisationRegistry implements OrganisationRegistry {
 
     private final OrganisationResource organisationResource;
 
+    // volatile read-only access to the unmodifiable map is thread-safe as long as the values are not modified after the map creation
     private volatile Map<String, Set<String>> authorityIdWhitelistByCodespace;
 
     public DefaultOrganisationRegistry(OrganisationResource organisationResource) {
         this.organisationResource = organisationResource;
-        this.authorityIdWhitelistByCodespace = new HashMap<>();
+        this.authorityIdWhitelistByCodespace = Collections.emptyMap();
     }
 
     @Override
@@ -43,9 +43,9 @@ public class DefaultOrganisationRegistry implements OrganisationRegistry {
         authorityIdWhitelistByCodespace = organisations.stream()
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_CODESPACE))
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST))
-                .collect(Collectors.toMap(
+                .collect(Collectors.toUnmodifiableMap(
                         organisation -> organisation.references.get(REFERENCE_CODESPACE),
-                        organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST).split(",")).collect(Collectors.toSet())));
+                        organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class DefaultOrganisationRegistry implements OrganisationRegistry {
         if (whitelistedIds == null) {
             return Collections.emptySet();
         }
-        return Set.copyOf(whitelistedIds);
+        return whitelistedIds;
     }
 
 }
