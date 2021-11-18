@@ -71,7 +71,7 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
     protected MockEndpoint notifyMarduk;
 
     @TestConfiguration
-    static class EmployeeServiceImplTestContextConfiguration {
+    static class TestContextConfiguration {
         @Bean
         @Primary
         public OrganisationRegistry organisationRegistry() {

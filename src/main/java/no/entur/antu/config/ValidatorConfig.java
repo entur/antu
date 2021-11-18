@@ -17,20 +17,29 @@
 package no.entur.antu.config;
 
 import no.entur.antu.organisation.OrganisationRegistry;
-import no.entur.antu.organisation.OrganisationRegistryImpl;
+import no.entur.antu.organisation.DefaultOrganisationRegistry;
+import no.entur.antu.organisation.OrganisationResource;
 import no.entur.antu.validator.AuthorityIdValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class ValidatorConfig {
 
+
     @Bean
     @Profile("!test")
-    OrganisationRegistry organisationRegistry(@Value("${antu.organisation.registry.url}") String organisationRegistryUrl) {
-        return new OrganisationRegistryImpl(organisationRegistryUrl);
+    OrganisationResource organisationResource(@Value("${antu.organisation.registry.url}") String organisationRegistryUrl, WebClient.Builder webClientBuilder) {
+        return new OrganisationResource(organisationRegistryUrl, webClientBuilder);
+    }
+
+    @Bean
+    @Profile("!test")
+    OrganisationRegistry organisationRegistry(OrganisationResource organisationResource) {
+        return new DefaultOrganisationRegistry(organisationResource);
     }
 
     @Bean("authorityIdValidator")
