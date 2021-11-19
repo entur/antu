@@ -44,6 +44,10 @@ variable "bucket_marduk_instance_name" {
   description = "Marduk bucket name"
 }
 
+variable "bucket_antu_instance_name" {
+  description = "Antu bucket name"
+}
+
 
 
 

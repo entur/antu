@@ -92,6 +92,11 @@
         </dependency>
         <dependency>
             <groupId>org.entur.helpers</groupId>
+            <artifactId>oauth2</artifactId>
+            <version>${entur.helpers.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.entur.helpers</groupId>
             <artifactId>logging</artifactId>
             <version>${entur.helpers.version}</version>
         </dependency>
@@ -121,6 +126,10 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jersey</artifactId>
         </dependency>
 
         <!-- Camel -->
@@ -175,6 +184,10 @@
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-quartz-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-jackson-starter</artifactId>
         </dependency>
 
         <!-- Other -->

@@ -11,21 +11,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
- *
  */
 
-package no.entur.antu.config;
+package no.entur.antu.organisation;
 
-import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.AuthorityIdValidator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.Set;
 
-@Configuration
-public class ValidatorConfig {
+public interface OrganisationRepository {
 
-    @Bean("authorityIdValidator")
-    public AuthorityIdValidator authorityIdValidator(OrganisationRepository organisationRepository) {
-        return new AuthorityIdValidator(organisationRepository);
-    }
+
+    void refreshCache();
+
+    Set<String> getWhitelistedAuthorityIds(String codespace);
 }

@@ -14,7 +14,7 @@
  *
  */
 
-package no.entur.antu.routes.organisation;
+package no.entur.antu.routes.provider;
 
 
 import no.entur.antu.routes.BaseRouteBuilder;
@@ -23,14 +23,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Refresh the organisation register cache.
+ * Refresh the provider register cache.
  */
 @Component
-public class OrganisationRouteBuilder extends BaseRouteBuilder {
+public class ProviderRouteBuilder extends BaseRouteBuilder {
 
     private final String quartzTrigger;
 
-    public OrganisationRouteBuilder(@Value("${antu.organisation.refresh.interval:trigger.repeatInterval=600000&trigger.repeatCount=-1&startDelayedSeconds=10&stateful=true}") String quartzTrigger) {
+    public ProviderRouteBuilder(@Value("${antu.provider.refresh.interval:trigger.repeatInterval=600000&trigger.repeatCount=-1&startDelayedSeconds=10&stateful=true}") String quartzTrigger) {
         super();
         this.quartzTrigger = quartzTrigger;
     }
@@ -39,15 +39,15 @@ public class OrganisationRouteBuilder extends BaseRouteBuilder {
     public void configure() throws Exception {
         super.configure();
 
-        from("quartz://antu/refreshOrganisationCache?" + quartzTrigger)
-                .to("direct:refresh-organisation-cache")
-                .routeId("refresh-organisation-cache-quartz");
+        from("quartz://antu/refreshProviderCache?" + quartzTrigger)
+                .to("direct:refresh-provider-cache")
+                .routeId("refresh-provider-cache-quartz");
 
-        from("direct:refresh-organisation-cache")
-                .log(LoggingLevel.INFO, correlation() + "Refreshing organisation cache")
-                .bean("organisationRepository", "refreshCache")
-                .log(LoggingLevel.INFO, correlation() + "Refreshed organisation cache")
-                .routeId("refresh-organisation-cache");
+        from("direct:refresh-provider-cache")
+                .log(LoggingLevel.INFO, correlation() + "Refreshing provider cache")
+                .bean("providerRepository", "refreshCache")
+                .log(LoggingLevel.INFO, correlation() + "Refreshed provider cache")
+                .routeId("refresh-provider-cache");
 
 
     }

@@ -11,16 +11,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
+ *
  */
 
-package no.entur.antu.organisation;
+package no.entur.antu.security;
 
-import java.util.Set;
+public class AuthorizationClaim {
+    private final String requiredRole;
+    private Long providerId;
 
-public interface OrganisationRegistry {
+    public AuthorizationClaim(String requiredRole, Long providerId) {
+        this.requiredRole = requiredRole;
+        this.providerId = providerId;
+    }
 
+    public AuthorizationClaim(String requiredRole) {
+        this.requiredRole = requiredRole;
+    }
 
-    void refreshCache();
+    public String getRequiredRole() {
+        return requiredRole;
+    }
 
-    Set<String> getWhitelistedAuthorityIds(String codespace);
+    public Long getProviderId() {
+        return providerId;
+    }
 }

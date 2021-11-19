@@ -25,6 +25,13 @@ resource "google_storage_bucket_iam_member" "storage_marduk_bucket_iam_member" {
   member = "serviceAccount:${google_service_account.antu_service_account.email}"
 }
 
+# add service account as member to antu bucket
+resource "google_storage_bucket_iam_member" "storage_antu_bucket_iam_member" {
+  bucket = var.bucket_antu_instance_name
+  role = var.service_account_bucket_role
+  member = "serviceAccount:${google_service_account.antu_service_account.email}"
+}
+
 
 # add service account as member to pubsub service in the resources project
 resource "google_project_iam_member" "pubsub_project_iam_member_subscriber" {

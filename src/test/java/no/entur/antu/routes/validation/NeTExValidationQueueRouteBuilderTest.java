@@ -37,7 +37,9 @@ package no.entur.antu.routes.validation;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
-import no.entur.antu.organisation.OrganisationRegistry;
+import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.provider.Provider;
+import no.entur.antu.provider.ProviderRepository;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -51,6 +53,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -74,8 +77,8 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
     static class TestContextConfiguration {
         @Bean
         @Primary
-        public OrganisationRegistry organisationRegistry() {
-            return new OrganisationRegistry() {
+        public OrganisationRepository organisationRepository() {
+            return new OrganisationRepository() {
                 @Override
                 public void refreshCache() {
 
@@ -83,12 +86,43 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
 
                 @Override
                 public Set<String> getWhitelistedAuthorityIds(String codespace) {
-                    return Set.of("FLB:Authority:FLB");
+                    return Set.of("FLB:Authority:FLA");
+                }
+            };
+        }
+
+        @Bean
+        @Primary
+        public ProviderRepository providerRepository() {
+            return new ProviderRepository() {
+
+                @Override
+                public void refreshCache() {
+
+                }
+
+                @Override
+                public Collection<Provider> getProviders() {
+                    return null;
+                }
+
+                @Override
+                public Provider getProvider(Long id) {
+                    return null;
+                }
+
+                @Override
+                public String getReferential(Long id) {
+                    return null;
+                }
+
+                @Override
+                public Long getProviderId(String referential) {
+                    return null;
                 }
             };
         }
     }
-
 
     @Test
     void testValidateNetex() throws Exception {
@@ -102,13 +136,13 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         InputStream testDatasetAsStream = getClass().getResourceAsStream("/rb_flb-aggregated-netex.zip");
         Assertions.assertNotNull(testDatasetAsStream);
         String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_FILE_NAME;
-        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName,
-                testDatasetAsStream, true);
+        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
         context.start();
         Map<String, Object> headers = new HashMap<>();
         headers.put(Constants.FILE_HANDLE, datasetBlobName);
+        headers.put(Constants.DATASET_CODESPACE, "FLB");
         antuNetexValidationQueueProducerTemplate.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange ->  NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));

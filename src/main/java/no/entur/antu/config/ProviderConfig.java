@@ -16,16 +16,28 @@
 
 package no.entur.antu.config;
 
-import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.AuthorityIdValidator;
+import no.entur.antu.provider.DefaultProviderRepository;
+import no.entur.antu.provider.ProviderRepository;
+import no.entur.antu.provider.ProviderResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class ValidatorConfig {
+public class ProviderConfig {
 
-    @Bean("authorityIdValidator")
-    public AuthorityIdValidator authorityIdValidator(OrganisationRepository organisationRepository) {
-        return new AuthorityIdValidator(organisationRepository);
+
+    @Bean
+    @Profile("!test")
+    ProviderResource providerResource(@Value("${providers.api.url}") String organisationRegistryUrl, WebClient webClient) {
+        return new ProviderResource(webClient, organisationRegistryUrl);
+    }
+
+    @Bean
+    @Profile("!test")
+    ProviderRepository providerRepository(ProviderResource providerResource) {
+        return new DefaultProviderRepository(providerResource);
     }
 }

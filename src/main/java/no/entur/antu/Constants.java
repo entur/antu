@@ -20,8 +20,8 @@ package no.entur.antu;
 
 public final class Constants {
     public static final String FILE_HANDLE = "RutebankenFileHandle";
-    public static final String BLOBSTORE_MAKE_BLOB_PUBLIC = "RutebankenBlobstoreMakeBlobPublic";
     public static final String DATASET_CODESPACE = "EnturDatasetCodespace";
+    public static final String VALIDATION_REPORT_ID = "EnturValidationReportId";
 
     public static final String BLOBSTORE_PATH_INBOUND_RECEIVED = "inbound/received/";
 

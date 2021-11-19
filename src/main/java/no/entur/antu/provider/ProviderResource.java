@@ -14,18 +14,31 @@
  *
  */
 
-package no.entur.antu.config;
+package no.entur.antu.provider;
 
-import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.AuthorityIdValidator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
 
-@Configuration
-public class ValidatorConfig {
+import java.util.Collection;
 
-    @Bean("authorityIdValidator")
-    public AuthorityIdValidator authorityIdValidator(OrganisationRepository organisationRepository) {
-        return new AuthorityIdValidator(organisationRepository);
+public class ProviderResource {
+
+    private final String restServiceUrl;
+    private final WebClient webClient;
+
+
+    public ProviderResource(WebClient webClient, String restServiceUrl) {
+        this.webClient = webClient;
+        this.restServiceUrl = restServiceUrl;
     }
+
+    public Collection<Provider> getProviders() {
+
+        return webClient.get()
+                .uri(restServiceUrl)
+                .retrieve()
+                .bodyToFlux(Provider.class)
+                .collectList().block();
+
+    }
+
 }

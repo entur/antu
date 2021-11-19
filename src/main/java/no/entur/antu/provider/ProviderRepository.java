@@ -14,18 +14,19 @@
  *
  */
 
-package no.entur.antu.config;
+package no.entur.antu.provider;
 
-import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.AuthorityIdValidator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.Collection;
 
-@Configuration
-public class ValidatorConfig {
+public interface ProviderRepository {
 
-    @Bean("authorityIdValidator")
-    public AuthorityIdValidator authorityIdValidator(OrganisationRepository organisationRepository) {
-        return new AuthorityIdValidator(organisationRepository);
-    }
+    void refreshCache();
+
+    Collection<Provider> getProviders();
+
+    Provider getProvider(Long id);
+
+    String getReferential(Long id);
+
+    Long getProviderId(String referential);
 }

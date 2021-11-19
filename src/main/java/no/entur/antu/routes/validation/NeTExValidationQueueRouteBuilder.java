@@ -21,9 +21,13 @@ package no.entur.antu.routes.validation;
 
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.stereotype.Component;
 
+import static no.entur.antu.Constants.CORRELATION_ID;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
+import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 
 
 /**
@@ -59,6 +63,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "NeTEx Timetable file downloaded")
                 .setHeader(TIMETABLE_DATASET_FILE, body())
                 .to("direct:validateNetexDataset")
+                .to("direct:saveValidationReport")
                 .setBody(constant(STATUS_VALIDATION_OK))
                 .to("direct:notifyMarduk")
                 .doCatch(Exception.class)
@@ -79,8 +84,24 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
 
         from("direct:validateNetexDataset")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx dataset")
-                .bean("authorityIdValidator", "validateAuthorityId(${body},${header." + DATASET_CODESPACE + "})")
+                .setHeader(VALIDATION_REPORT_ID, header(CORRELATION_ID))
+                .bean("authorityIdValidator", "validateAuthorityId(${body},${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID + "})")
                 .routeId("validate-netex-dataset");
+
+        from("direct:saveValidationReport")
+                .log(LoggingLevel.INFO, correlation() + "Saving validation report")
+                .marshal().json(JsonLibrary.Jackson)
+                .log(LoggingLevel.INFO, correlation() + "Validation report: ${body}")
+                .to("direct:uploadValidationReport")
+                .log(LoggingLevel.INFO, correlation() + "Saved validation report")
+                .routeId("save-validation-report");
+
+        from("direct:uploadValidationReport")
+                .setHeader(FILE_HANDLE, header(DATASET_CODESPACE).append("/validation-report-").append(header(CORRELATION_ID)).append(".json"))
+                .log(LoggingLevel.INFO, correlation() + "Uploading Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
+                .to("direct:uploadAntuBlob")
+                .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + FILE_HANDLE + "}")
+                .routeId("upload-validation-report");
 
         from("direct:notifyMarduk")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")

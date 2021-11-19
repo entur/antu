@@ -8,7 +8,21 @@ gcp:
   marduk:
     bucketName: marduk-production
 
+  antu:
+    bucketName: ror-antu-production
+
 organisationRegistryUrl: https://api.entur.io/organisations/v1/register/organisations
+
+auth0:
+  ror:
+    url: https://auth2.entur.org/
+    audience: https://ror.api.entur.io
+
+oauth2:
+  client:
+    id: xxxxx
+    url: https://auth2.entur.org/oauth/token
+    audience: https://ror.api.entur.io
 
 monitoringEnabled: false
 
