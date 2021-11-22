@@ -51,10 +51,7 @@ public class AntuWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapt
                 .antMatchers("/actuator/health/readiness").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .oauth2ResourceServer().jwt().jwtAuthenticationConverter(new RorAuthenticationConverter())
-                .and()
-                .and()
-                .oauth2Client();
+                .oauth2ResourceServer().jwt().jwtAuthenticationConverter(new RorAuthenticationConverter());
 
     }
 }
