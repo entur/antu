@@ -80,6 +80,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
         from("direct:validateNetexDataset")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx dataset")
                 .bean("authorityIdValidator", "validateAuthorityId(${body},${header." + DATASET_CODESPACE + "})")
+                .log(LoggingLevel.INFO, correlation() + "Validated NeTEx dataset")
                 .routeId("validate-netex-dataset");
 
         from("direct:notifyMarduk")
