@@ -18,12 +18,6 @@ auth0:
     url: https://ror-entur-dev.eu.auth0.com/
     audience: https://ror.api.dev.entur.io
 
-oauth2:
-  client:
-    id: QJwqqzV5o19bcumOUEJDxcOh6r34wu5R
-    url: https://ror-entur-dev.eu.auth0.com/oauth/token
-    audience: https://ror.api.dev.entur.io
-
 monitoringEnabled: true
 
 ingress:

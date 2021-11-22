@@ -18,12 +18,6 @@ auth0:
     url: https://ror-entur-staging.eu.auth0.com/
     audience: https://ror.api.staging.entur.io
 
-oauth2:
-  client:
-    id: xxxxx
-    url: https://ror-entur-staging.eu.auth0.com/oauth/token
-    audience: https://ror.api.staging.entur.io
-
 monitoringEnabled: true
 
 ingress:

@@ -34,12 +34,6 @@ data:
     antu.oauth2.resourceserver.auth0.ror.jwt.audience={{ .Values.auth0.ror.audience }}
     antu.oauth2.resourceserver.auth0.ror.claim.namespace=https://ror.entur.io/
 
-    #OAuth2 Client
-    spring.security.oauth2.client.registration.antu.authorization-grant-type=client_credentials
-    spring.security.oauth2.client.registration.antu.client-id={{ .Values.oauth2.client.id }}
-    spring.security.oauth2.client.provider.antu.token-uri={{ .Values.oauth2.client.url }}
-    antu.oauth2.client.audience={{ .Values.oauth2.client.audience }}
-
     # Blobstore
     blobstore.gcs.project.id={{ .Values.gcp.blobstoreProjectId }}
     blobstore.gcs.credential.path=/etc/antu-service-account/credentials.json

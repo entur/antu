@@ -16,39 +16,18 @@
 
 package no.entur.antu.config;
 
-import org.entur.oauth2.AuthorizedWebClientBuilder;
 import org.entur.oauth2.JwtRoleAssignmentExtractor;
 import org.entur.oauth2.RoRJwtDecoderBuilder;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class OAuth2Config {
-
-    /**
-     * Return a WebClient for authorized API calls.
-     * The WebClient inserts a JWT bearer token in the Authorization HTTP header.
-     * The JWT token is obtained from the configured Authorization Server.
-     *
-     * @param properties The spring.security.oauth2.client.registration.* properties
-     * @param audience   The API audience, required for obtaining a token from Auth0
-     * @return a WebClient for authorized API calls.
-     */
-    @Bean
-    WebClient webClient(WebClient.Builder webClientBuilder, OAuth2ClientProperties properties, @Value("${antu.oauth2.client.audience}") String audience) {
-        return new AuthorizedWebClientBuilder(webClientBuilder)
-                .withOAuth2ClientProperties(properties)
-                .withAudience(audience)
-                .withClientRegistrationId("antu")
-                .build();
-    }
 
     @Bean
     public RoleAssignmentExtractor roleAssignmentExtractor() {

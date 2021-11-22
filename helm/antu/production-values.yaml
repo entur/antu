@@ -18,12 +18,6 @@ auth0:
     url: https://auth2.entur.org/
     audience: https://ror.api.entur.io
 
-oauth2:
-  client:
-    id: xxxxx
-    url: https://auth2.entur.org/oauth/token
-    audience: https://ror.api.entur.io
-
 monitoringEnabled: false
 
 ingress:

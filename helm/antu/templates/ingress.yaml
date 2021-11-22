@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
@@ -18,10 +18,12 @@ spec:
     http:
       paths:
         - backend:
-            serviceName: {{ template "nisaba.name" . }}
-            servicePort: {{ .Values.service.http.externalPort }}
+            service:
+              name: {{ template "antu.name" . }}
+              port:
+                number: {{ .Values.service.http.externalPort }}
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
@@ -41,6 +43,8 @@ spec:
       http:
         paths:
           - backend:
-              serviceName: {{ template "nisaba.name" . }}
-              servicePort: {{ .Values.service.http.externalPort }}
+              service:
+                name: {{ template "antu.name" . }}
+                port:
+                  number: {{ .Values.service.http.externalPort }}
 ---
