@@ -30,7 +30,7 @@ public class OrganisationRouteBuilder extends BaseRouteBuilder {
 
     private final String quartzTrigger;
 
-    public OrganisationRouteBuilder(@Value("${antu.organisation.refresh.interval:trigger.repeatInterval=600000&trigger.repeatCount=-1&startDelayedSeconds=10&stateful=true}") String quartzTrigger) {
+    public OrganisationRouteBuilder(@Value("${antu.organisation.refresh.interval:trigger.repeatInterval=600000&trigger.repeatCount=-1&stateful=true}") String quartzTrigger) {
         super();
         this.quartzTrigger = quartzTrigger;
     }

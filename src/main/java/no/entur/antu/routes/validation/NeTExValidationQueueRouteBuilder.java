@@ -87,6 +87,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx dataset")
                 .setHeader(VALIDATION_REPORT_ID, header(CORRELATION_ID))
                 .bean("authorityIdValidator", "validateAuthorityId(${body},${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID + "})")
+                .log(LoggingLevel.INFO, correlation() + "Validated NeTEx dataset")
                 .routeId("validate-netex-dataset");
 
         from("direct:saveValidationReport")

@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,7 +50,7 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_CODESPACE))
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST))
                 .collect(Collectors.toUnmodifiableMap(
-                        organisation -> organisation.references.get(REFERENCE_CODESPACE),
+                        organisation -> organisation.references.get(REFERENCE_CODESPACE).toLowerCase(Locale.ROOT),
                         organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
         LOGGER.debug("Updated organisation cache. Cache now has {} elements", authorityIdWhitelistByCodespace.size());
     }
