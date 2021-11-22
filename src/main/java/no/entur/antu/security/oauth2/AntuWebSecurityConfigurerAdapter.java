@@ -42,8 +42,6 @@ public class AntuWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapt
         http.cors(withDefaults())
                 .csrf().disable()
                 .authorizeRequests()
-                // TODO temporarily deactivate authorization
-                //.antMatchers("/services/validation-report/report/*").permitAll()
                 .antMatchers("/services/validation-report/swagger.json").permitAll()
                 .antMatchers("/services/swagger.json").permitAll()
                 // exposed internally only, on a different port (pod-level)
