@@ -19,7 +19,6 @@
 package no.entur.antu.netex.loader;
 
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.validator.AuthorityIdValidator;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.slf4j.Logger;
@@ -33,7 +32,7 @@ import java.util.zip.ZipInputStream;
 
 public class DefaultNetexDatasetLoader implements NetexDatasetLoader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorityIdValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultNetexDatasetLoader.class);
 
 
     protected final NetexParser netexParser;
