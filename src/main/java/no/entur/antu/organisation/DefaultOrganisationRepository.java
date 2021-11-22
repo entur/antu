@@ -50,7 +50,7 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST))
                 .collect(Collectors.toUnmodifiableMap(
                         organisation -> organisation.references.get(REFERENCE_CODESPACE),
-                        organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
+                        organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
         LOGGER.debug("Updated organisation cache. Cache now has {} elements", authorityIdWhitelistByCodespace.size());
     }
 
