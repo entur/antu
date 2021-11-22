@@ -99,8 +99,8 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         notifyMarduk.expectedMessageCount(2);
         notifyMarduk.setResultWaitTime(15000);
 
-        InputStream testDatasetAsStream = getClass().getResourceAsStream("/rb_flb-aggregated-netex.zip");
-        Assertions.assertNotNull(testDatasetAsStream);
+        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_FILE_NAME);
+        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_FILE_NAME);
         String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_FILE_NAME;
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 

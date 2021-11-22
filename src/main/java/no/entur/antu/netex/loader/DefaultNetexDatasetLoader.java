@@ -19,8 +19,11 @@
 package no.entur.antu.netex.loader;
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.validator.AuthorityIdValidator;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -29,6 +32,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class DefaultNetexDatasetLoader implements NetexDatasetLoader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorityIdValidator.class);
+
 
     protected final NetexParser netexParser;
 
@@ -56,8 +62,12 @@ public class DefaultNetexDatasetLoader implements NetexDatasetLoader {
     protected void parseDataset(ZipInputStream zipInputStream, NetexEntitiesIndex netexEntitiesIndex) throws IOException {
         ZipEntry zipEntry = zipInputStream.getNextEntry();
         while (zipEntry != null) {
-            byte[] allBytes = zipInputStream.readAllBytes();
-            netexParser.parse(new ByteArrayInputStream(allBytes), netexEntitiesIndex);
+            if (zipEntry.getName().endsWith(".xml")) {
+                byte[] allBytes = zipInputStream.readAllBytes();
+                netexParser.parse(new ByteArrayInputStream(allBytes), netexEntitiesIndex);
+            } else {
+                LOGGER.info("Ignoring non-xml file {}", zipEntry.getName());
+            }
             zipEntry = zipInputStream.getNextEntry();
         }
 
