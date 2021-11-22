@@ -16,8 +16,6 @@
 
 package no.entur.antu.security;
 
-import no.entur.antu.provider.Provider;
-import no.entur.antu.provider.ProviderRepository;
 import org.rutebanken.helper.organisation.AuthorizationConstants;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
@@ -32,12 +30,10 @@ import java.util.List;
 @Service
 public class AuthorizationService {
 
-    private final ProviderRepository providerRepository;
     private final RoleAssignmentExtractor roleAssignmentExtractor;
     protected final boolean authorizationEnabled;
 
-    public AuthorizationService(ProviderRepository providerRepository, RoleAssignmentExtractor roleAssignmentExtractor, @Value("${authorization.enabled:true}") boolean authorizationEnabled) {
-        this.providerRepository = providerRepository;
+    public AuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor, @Value("${authorization.enabled:true}") boolean authorizationEnabled) {
         this.roleAssignmentExtractor = roleAssignmentExtractor;
         this.authorizationEnabled = authorizationEnabled;
     }
@@ -50,11 +46,11 @@ public class AuthorizationService {
      * Users can edit route data if they have administrator privileges,
      * or if it has editor privileges for this provider.
      *
-     * @param providerId
+     * @param codespace
      */
-    public void verifyRouteDataEditorPrivileges(Long providerId) {
+    public void verifyRouteDataEditorPrivileges(String codespace) {
         verifyAtLeastOne(new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_ADMIN),
-                new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_EDIT, providerId));
+                new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_EDIT, codespace));
     }
 
     protected void verifyAtLeastOne(AuthorizationClaim... claims) {
@@ -67,10 +63,10 @@ public class AuthorizationService {
 
         boolean authorized = false;
         for (AuthorizationClaim claim : claims) {
-            if (claim.getProviderId() == null) {
+            if (claim.getCodespace() == null) {
                 authorized |= roleAssignments.stream().anyMatch(ra -> claim.getRequiredRole().equals(ra.getRole()));
             } else {
-                authorized |= hasRoleForProvider(roleAssignments, claim);
+                authorized |= hasRoleForCodespace(roleAssignments, claim);
             }
         }
 
@@ -80,17 +76,8 @@ public class AuthorizationService {
 
     }
 
-
-    private boolean hasRoleForProvider(List<RoleAssignment> roleAssignments, AuthorizationClaim claim) {
-
-        Provider provider = providerRepository.getProvider(claim.getProviderId());
-        if (provider == null) {
-            return false;
-        }
-
-        return roleAssignments.stream()
-                .filter(ra -> claim.getRequiredRole().equals(ra.r)).anyMatch(ra -> provider.chouetteInfo.referential.toUpperCase().equals(ra.o));
-
+    private boolean hasRoleForCodespace(List<RoleAssignment> roleAssignments, AuthorizationClaim claim) {
+        return roleAssignments.stream().anyMatch(roleAssignment -> claim.getCodespace().equals(roleAssignment.getOrganisation()) && claim.getRequiredRole().equals(roleAssignment.getRole()));
     }
 
 }

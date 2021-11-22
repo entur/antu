@@ -17,23 +17,26 @@
 package no.entur.antu.security;
 
 public class AuthorizationClaim {
-    private final String requiredRole;
-    private Long providerId;
 
-    public AuthorizationClaim(String requiredRole, Long providerId) {
+    private final String requiredRole;
+    private String codespace;
+
+    public AuthorizationClaim(String requiredRole, String codespace) {
         this.requiredRole = requiredRole;
-        this.providerId = providerId;
+        this.codespace = codespace;
     }
 
     public AuthorizationClaim(String requiredRole) {
         this.requiredRole = requiredRole;
     }
 
+    public String getCodespace() {
+        return codespace;
+    }
+
     public String getRequiredRole() {
         return requiredRole;
     }
 
-    public Long getProviderId() {
-        return providerId;
-    }
+
 }

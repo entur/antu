@@ -31,6 +31,8 @@ public final class Constants {
     public static final String CORRELATION_ID = "RutebankenCorrelationId";
     public static final String PROVIDER_ID = "RutebankenProviderId";
     public static final String ORIGINAL_PROVIDER_ID = "RutebankenOriginalProviderId";
+    public static final String CAMEL_ALL_HTTP_HEADERS = "CamelHttp*";
+    public static final String VALIDATION_REPORT_PREFIX = "/validation-report-";
 
     private Constants() {
     }

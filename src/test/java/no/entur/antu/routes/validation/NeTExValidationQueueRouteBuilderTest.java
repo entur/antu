@@ -38,8 +38,6 @@ import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.provider.Provider;
-import no.entur.antu.provider.ProviderRepository;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -53,7 +51,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -91,37 +88,6 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
             };
         }
 
-        @Bean
-        @Primary
-        public ProviderRepository providerRepository() {
-            return new ProviderRepository() {
-
-                @Override
-                public void refreshCache() {
-
-                }
-
-                @Override
-                public Collection<Provider> getProviders() {
-                    return null;
-                }
-
-                @Override
-                public Provider getProvider(Long id) {
-                    return null;
-                }
-
-                @Override
-                public String getReferential(Long id) {
-                    return null;
-                }
-
-                @Override
-                public Long getProviderId(String referential) {
-                    return null;
-                }
-            };
-        }
     }
 
     @Test
@@ -145,8 +111,8 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         headers.put(Constants.DATASET_CODESPACE, "FLB");
         antuNetexValidationQueueProducerTemplate.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange ->  NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange ->  NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
 
 
     }

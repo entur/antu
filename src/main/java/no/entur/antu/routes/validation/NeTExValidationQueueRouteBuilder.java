@@ -19,6 +19,7 @@
 package no.entur.antu.routes.validation;
 
 
+import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
@@ -97,7 +98,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .routeId("save-validation-report");
 
         from("direct:uploadValidationReport")
-                .setHeader(FILE_HANDLE, header(DATASET_CODESPACE).append("/validation-report-").append(header(CORRELATION_ID)).append(".json"))
+                .setHeader(FILE_HANDLE, header(DATASET_CODESPACE).append(Constants.VALIDATION_REPORT_PREFIX).append(header(CORRELATION_ID)).append(".json"))
                 .log(LoggingLevel.INFO, correlation() + "Uploading Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:uploadAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + FILE_HANDLE + "}")

@@ -16,9 +16,11 @@
 
 package no.entur.antu.routes.rest;
 
+import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.security.AuthorizationService;
 import org.apache.camel.Exchange;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestParamType;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +30,7 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 
-import static no.entur.antu.Constants.PROVIDER_ID;
+import static no.entur.antu.Constants.FILE_HANDLE;
 
 @Component
 public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
@@ -37,6 +39,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
     private static final String PLAIN = "text/plain";
     private static final String JSON = "application/json";
     private static final String SWAGGER_DATA_TYPE_STRING = "string";
+    private static final String CODESPACE_PARAM = "codespace";
     private static final String VALIDATION_REPORT_ID_PARAM = "id";
 
     private final AuthorizationService authorizationService;
@@ -93,8 +96,14 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
 
         rest("/validation-report")
 
-                .get("/report/{" + VALIDATION_REPORT_ID_PARAM + '}')
+                .get("/{" + CODESPACE_PARAM + "}/{" + VALIDATION_REPORT_ID_PARAM + '}')
                 .description("Return the validation report for a given validation report id")
+                .param().name(CODESPACE_PARAM)
+                .type(RestParamType.path)
+                .description("Provider Codespace")
+                .dataType(SWAGGER_DATA_TYPE_STRING)
+                .required(true)
+                .endParam()
                 .param().name(VALIDATION_REPORT_ID_PARAM)
                 .type(RestParamType.path)
                 .description("Unique Id of the validation report")
@@ -102,15 +111,18 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .required(true)
                 .endParam()
                 .consumes(PLAIN)
-                .produces(PLAIN)
+                .produces(JSON)
                 .responseMessage().code(200).endResponseMessage()
                 .responseMessage().code(404).message("Unknown codespace").endResponseMessage()
                 .responseMessage().code(500).message("Internal error").endResponseMessage()
                 .route()
-                .process(exchange -> {
-                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID_PARAM, String.class);
-
-                })
+                .to("direct:authorizeEditorRequest")
+                .setHeader(FILE_HANDLE, header(CODESPACE_PARAM).append(Constants.VALIDATION_REPORT_PREFIX).append(header(VALIDATION_REPORT_ID_PARAM)).append(".json"))
+                .log(LoggingLevel.INFO, correlation() + "Downloading NeTEx validation report ${header." + FILE_HANDLE  + "}")
+                .process(this::removeAllCamelHttpHeaders)
+                .to("direct:getAntuBlob")
+                .filter(simple("${body} == null"))
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
                 .routeId("validation-report")
                 .endRest()
 
@@ -125,7 +137,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
 
         from("direct:authorizeEditorRequest")
                 .doTry()
-                .process(e -> authorizationService.verifyRouteDataEditorPrivileges(e.getIn().getHeader(PROVIDER_ID, Long.class)))
+                .bean(authorizationService, "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})" )
                 .routeId("admin-authorize-editor-request");
     }
 
