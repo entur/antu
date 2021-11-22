@@ -17,7 +17,8 @@ spec:
   {{- end}}
     http:
       paths:
-        - backend:
+        - pathType: ImplementationSpecific
+          backend:
             service:
               name: {{ template "antu.name" . }}
               port:
@@ -42,7 +43,8 @@ spec:
             {{- end}}
       http:
         paths:
-          - backend:
+          - pathType: ImplementationSpecific
+            backend:
               service:
                 name: {{ template "antu.name" . }}
                 port:
