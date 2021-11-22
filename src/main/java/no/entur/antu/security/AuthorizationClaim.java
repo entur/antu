@@ -14,18 +14,29 @@
  *
  */
 
-package no.entur.antu.config;
+package no.entur.antu.security;
 
-import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.AuthorityIdValidator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+public class AuthorizationClaim {
 
-@Configuration
-public class ValidatorConfig {
+    private final String requiredRole;
+    private String codespace;
 
-    @Bean("authorityIdValidator")
-    public AuthorityIdValidator authorityIdValidator(OrganisationRepository organisationRepository) {
-        return new AuthorityIdValidator(organisationRepository);
+    public AuthorizationClaim(String requiredRole, String codespace) {
+        this.requiredRole = requiredRole;
+        this.codespace = codespace;
     }
+
+    public AuthorizationClaim(String requiredRole) {
+        this.requiredRole = requiredRole;
+    }
+
+    public String getCodespace() {
+        return codespace;
+    }
+
+    public String getRequiredRole() {
+        return requiredRole;
+    }
+
+
 }

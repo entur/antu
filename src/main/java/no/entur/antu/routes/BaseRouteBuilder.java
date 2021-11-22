@@ -140,4 +140,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
         }
     }
 
+    protected void removeAllCamelHttpHeaders(Exchange e) {
+        e.getIn().removeHeaders(Constants.CAMEL_ALL_HTTP_HEADERS);
+    }
 }

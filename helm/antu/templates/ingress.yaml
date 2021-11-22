@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    {{- include "common.labels" . | indent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: {{ .Values.ingress.loadBalancerIP }}
+  name: timetable-validation-v1-map
+  namespace: {{ .Release.Namespace }}
+spec:
+  rules:
+  {{- if eq .Values.env "production"}}
+  - host: timetable-validation-v1-map-{{ .Release.Namespace }}.entur.io
+  {{ else }}
+  - host: timetable-validation-v1-map-{{ .Release.Namespace }}.{{ .Release.Namespace }}.entur.io
+  {{- end}}
+    http:
+      paths:
+        - backend:
+            serviceName: {{ template "nisaba.name" . }}
+            servicePort: {{ .Values.service.http.externalPort }}
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  labels:
+        {{- include "common.labels" . | indent 4 }}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    external-dns.alpha.kubernetes.io/target: {{ .Values.ingress.loadBalancerIP }}
+  name: timetable-validation-v1-timetable
+  namespace: {{ .Release.Namespace }}
+spec:
+  rules:
+          {{- if eq .Values.env "production"}}
+    - host: timetable-validation-v1-timetable-{{ .Release.Namespace }}.entur.io
+          {{ else }}
+    - host: timetable-validation-v1-timetable-{{ .Release.Namespace }}.{{ .Release.Namespace }}.entur.io
+            {{- end}}
+      http:
+        paths:
+          - backend:
+              serviceName: {{ template "nisaba.name" . }}
+              servicePort: {{ .Values.service.http.externalPort }}
+---

@@ -17,7 +17,7 @@ package no.entur.antu.organisation;
 
 import java.util.Set;
 
-public interface OrganisationRegistry {
+public interface OrganisationRepository {
 
 
     void refreshCache();

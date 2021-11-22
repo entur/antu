@@ -16,6 +16,7 @@
 
 package no.entur.antu.config;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.camel.component.google.pubsub.GooglePubsubComponent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,5 +34,14 @@ public class CamelConfig {
         GooglePubsubComponent googlePubsubComponent = new GooglePubsubComponent();
         googlePubsubComponent.setSynchronousPullRetryableCodes("DEADLINE_EXCEEDED");
         return googlePubsubComponent;
+    }
+
+    /**
+     * Register Java Time Module for JSON serialization/deserialization of Java Time objects.
+     * @return
+     */
+    @Bean("jacksonJavaTimeModule")
+    JavaTimeModule jacksonJavaTimeModule() {
+        return new JavaTimeModule();
     }
 }

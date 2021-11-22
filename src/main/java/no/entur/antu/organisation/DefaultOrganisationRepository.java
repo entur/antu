@@ -15,6 +15,9 @@
 
 package no.entur.antu.organisation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,17 +26,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DefaultOrganisationRegistry implements OrganisationRegistry {
+public class DefaultOrganisationRepository implements OrganisationRepository {
 
     private static final String REFERENCE_CODESPACE = "codeSpace";
     private static final String REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST = "netexAuthorityIdsWhitelist";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOrganisationRepository.class);
 
     private final OrganisationResource organisationResource;
 
     // volatile read-only access to the unmodifiable map is thread-safe as long as the values are not modified after the map creation
     private volatile Map<String, Set<String>> authorityIdWhitelistByCodespace;
 
-    public DefaultOrganisationRegistry(OrganisationResource organisationResource) {
+    public DefaultOrganisationRepository(OrganisationResource organisationResource) {
         this.organisationResource = organisationResource;
         this.authorityIdWhitelistByCodespace = Collections.emptyMap();
     }
@@ -47,6 +52,7 @@ public class DefaultOrganisationRegistry implements OrganisationRegistry {
                 .collect(Collectors.toUnmodifiableMap(
                         organisation -> organisation.references.get(REFERENCE_CODESPACE).toLowerCase(Locale.ROOT),
                         organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
+        LOGGER.debug("Updated organisation cache. Cache now has {} elements", authorityIdWhitelistByCodespace.size());
     }
 
     @Override

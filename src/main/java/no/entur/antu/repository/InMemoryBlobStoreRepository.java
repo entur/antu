@@ -72,7 +72,7 @@ public class InMemoryBlobStoreRepository implements BlobStoreRepository {
     }
 
     @Override
-    public void uploadBlob(String objectName, InputStream inputStream, boolean makePublic) {
+    public void uploadBlob(String objectName, InputStream inputStream) {
         try {
             LOGGER.debug("upload blob called in in-memory blob store");
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

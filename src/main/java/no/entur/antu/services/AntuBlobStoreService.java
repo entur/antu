@@ -16,27 +16,20 @@
  *
  */
 
-package no.entur.antu.repository;
+package no.entur.antu.services;
 
-import java.io.InputStream;
+import no.entur.antu.repository.BlobStoreRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
- * Repository interface for managing binary files.
- * The main implementation {@link GcsBlobStoreRepository} targets Google Cloud Storage.
- * A simple implementation {@link LocalDiskBlobStoreRepository} is available for testing in a local environment.
+ * Operations on blobs in the main antu bucket.
  */
-public interface BlobStoreRepository {
+@Service
+public class AntuBlobStoreService extends AbstractBlobStoreService {
 
-    InputStream getBlob(String objectName);
-
-  /**
-     * Upload a blob.
-     * @param objectName the name of the blob in GCS
-     * @param inputStream the blob data
-     * @param makePublic makes the blob publicly accessible
-     */
-    void uploadBlob(String objectName, InputStream inputStream);
-
-    void setContainerName(String containerName);
-
+    public AntuBlobStoreService(@Value("${blobstore.gcs.antu.container.name}") String containerName, @Autowired BlobStoreRepository repository) {
+        super(containerName, repository);
+    }
 }

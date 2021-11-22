@@ -1,0 +1,46 @@
+package no.entur.antu.validator;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ValidationReport {
+
+    private final String codespace;
+    private final String validationReportId;
+    private final LocalDateTime creationDate;
+    private final Collection<ValidationReportEntry> validationReportEntries;
+
+
+
+    public ValidationReport(String codespace, String validationReportId, Collection<ValidationReportEntry> validationReportEntries) {
+        this.codespace = codespace;
+        this.validationReportId = validationReportId;
+        this.creationDate = LocalDateTime.now();
+        this.validationReportEntries = validationReportEntries;
+    }
+
+    public void addValidationReportEntry(ValidationReportEntry validationReportEntry) {
+        validationReportEntries.add(validationReportEntry);
+    }
+
+    public Collection<ValidationReportEntry> getValidationReportEntries() {
+        return validationReportEntries;
+    }
+
+    public String getCodespace() {
+        return codespace;
+    }
+
+    public String getValidationReportId() {
+        return validationReportId;
+    }
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+}

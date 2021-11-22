@@ -45,7 +45,7 @@ public class OrganisationRouteBuilder extends BaseRouteBuilder {
 
         from("direct:refresh-organisation-cache")
                 .log(LoggingLevel.INFO, correlation() + "Refreshing organisation cache")
-                .bean("organisationRegistry", "refreshCache")
+                .bean("organisationRepository", "refreshCache")
                 .log(LoggingLevel.INFO, correlation() + "Refreshed organisation cache")
                 .routeId("refresh-organisation-cache");
 
