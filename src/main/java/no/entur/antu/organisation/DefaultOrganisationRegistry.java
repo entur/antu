@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class DefaultOrganisationRegistry implements OrganisationRegistry {
 
     private static final String REFERENCE_CODESPACE = "codeSpace";
-    private static final String REFERENCE_NETEX_OPERATOR_IDS_WHITELIST = "netexOperatorIdsWhitelist";
+    private static final String REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST = "netexAuthorityIdsWhitelist";
 
     private final OrganisationResource organisationResource;
 
@@ -42,10 +42,10 @@ public class DefaultOrganisationRegistry implements OrganisationRegistry {
         Collection<Organisation> organisations = organisationResource.getOrganisations();
         authorityIdWhitelistByCodespace = organisations.stream()
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_CODESPACE))
-                .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST))
+                .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST))
                 .collect(Collectors.toUnmodifiableMap(
                         organisation -> organisation.references.get(REFERENCE_CODESPACE),
-                        organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_OPERATOR_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
+                        organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
     }
 
     @Override
