@@ -2,6 +2,7 @@ package no.entur.antu.validator.schema;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
+import no.entur.antu.validator.ValidationReportEntrySeverity;
 import org.rutebanken.netex.validation.NeTExValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,11 @@ import java.util.zip.ZipInputStream;
 public class NetexSchemaValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetexSchemaValidator.class);
+    private final int maxValidationReportEntries;
+
+    public NetexSchemaValidator(int maxValidationReportEntries) {
+        this.maxValidationReportEntries = maxValidationReportEntries;
+    }
 
 
     public List<ValidationReportEntry> validateSchema(InputStream timetableDataset) {
@@ -46,7 +52,7 @@ public class NetexSchemaValidator {
                 zipEntry = zipInputStream.getNextEntry();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new AntuException("Error while loading the NeTEx archive", e);
         }
 
         return validationReportEntries;
@@ -61,20 +67,37 @@ public class NetexSchemaValidator {
             neTExValidator = NeTExValidator.getNeTExValidator();
             Validator validator = neTExValidator.getSchema().newValidator();
             validator.setErrorHandler(new ErrorHandler() {
+
+                private int errorCount;
+
                 @Override
-                public void warning(SAXParseException exception) {
-                    validationReportEntries.add(createValidationReportEntry(fileName, exception, "WARNING"));
+                public void warning(SAXParseException exception) throws SAXParseException {
+                    addValidationReportEntry(fileName, exception, ValidationReportEntrySeverity.WARNING);
+                    errorCount++;
                 }
 
                 @Override
-                public void error(SAXParseException exception) {
-                    validationReportEntries.add(createValidationReportEntry(fileName, exception, "ERROR"));
+                public void error(SAXParseException exception) throws SAXParseException {
+                    addValidationReportEntry(fileName, exception, ValidationReportEntrySeverity.ERROR);
+                    errorCount++;
                 }
 
                 @Override
-                public void fatalError(SAXParseException exception) {
-                    validationReportEntries.add(createValidationReportEntry(fileName, exception, "ERROR"));
+                public void fatalError(SAXParseException exception) throws SAXParseException {
+                    error(exception);
                 }
+
+                private void addValidationReportEntry(String fileName, SAXParseException saxParseException, ValidationReportEntrySeverity severity) throws SAXParseException {
+                    if(errorCount < maxValidationReportEntries) {
+                        String message = "Line " + saxParseException.getLineNumber() + ", Column " + saxParseException.getColumnNumber() + ": " + saxParseException.getMessage();
+                        validationReportEntries.add(new ValidationReportEntry(message, "NeTEx Schema Validation", severity, fileName));
+                    } else {
+                        LOGGER.warn("File {} has too many schema validation errors (max is {}). Additional errors will not be reported.", fileName, maxValidationReportEntries);
+                        throw saxParseException;
+                    }
+
+                }
+
             });
 
             validator.validate(new StreamSource(new ByteArrayInputStream(allBytes)));
@@ -85,11 +108,6 @@ public class NetexSchemaValidator {
         }
 
         return validationReportEntries;
-    }
-
-    private ValidationReportEntry createValidationReportEntry(String fileName, SAXParseException saxParseException, String severity) {
-        String message = saxParseException.getLineNumber() + ":" + saxParseException.getColumnNumber() + " " + saxParseException.getMessage();
-        return new ValidationReportEntry(message, "NeTEx Schema Validation", severity, fileName);
     }
 
 

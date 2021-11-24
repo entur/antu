@@ -58,11 +58,13 @@ import java.util.Set;
 import static no.entur.antu.Constants.BLOBSTORE_PATH_INBOUND_RECEIVED;
 
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class, properties = {
+        "antu.netex.validation.entries.max=1"})
 class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
 
     private static final String TEST_DATASET_CODESPACE = "flb";
-    private static final String TEST_DATASET_FILE_NAME = "rb_flb-aggregated-netex.zip";
+    private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex.zip";
+    private static final String TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex-schema-error.zip";
 
     @Produce("direct:netexValidationQueue")
     protected ProducerTemplate antuNetexValidationQueueProducerTemplate;
@@ -91,7 +93,7 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
     }
 
     @Test
-    void testValidateNetex() throws Exception {
+    void testValidateAuthority() throws Exception {
 
         AdviceWith.adviceWith(context, "netex-validation-queue", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
                 .to("mock:notifyMarduk"));
@@ -99,9 +101,9 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         notifyMarduk.expectedMessageCount(2);
         notifyMarduk.setResultWaitTime(15000);
 
-        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_FILE_NAME);
-        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_FILE_NAME;
+        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
+        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
+        String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME;
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
@@ -113,6 +115,33 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         notifyMarduk.assertIsSatisfied();
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
+
+
+    }
+
+    @Test
+    void testValidateSchemaMoreThanMaxError() throws Exception {
+
+        AdviceWith.adviceWith(context, "netex-validation-queue", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
+                .to("mock:notifyMarduk"));
+
+        notifyMarduk.expectedMessageCount(2);
+        notifyMarduk.setResultWaitTime(15000);
+
+        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
+        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
+        String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
+        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+
+
+        context.start();
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(Constants.FILE_HANDLE, datasetBlobName);
+        headers.put(Constants.DATASET_CODESPACE, "FLB");
+        antuNetexValidationQueueProducerTemplate.sendBodyAndHeaders(" ", headers);
+        notifyMarduk.assertIsSatisfied();
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
 
 
     }

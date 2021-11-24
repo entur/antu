@@ -33,6 +33,7 @@ import java.util.Collection;
 import static no.entur.antu.Constants.DATASET_AUTHORITY_ID_VALIDATION_REPORT_ENTRIES;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_SCHEMA_VALIDATION_REPORT_ENTRIES;
+import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.DATASET_STREAM;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
@@ -72,7 +73,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .setHeader(TIMETABLE_DATASET_FILE, body())
                 .to("direct:validateNetexDataset")
                 .to("direct:saveValidationReport")
-                .setBody(constant(STATUS_VALIDATION_OK))
+                .setBody(header(DATASET_STATUS))
                 .to("direct:notifyMarduk")
                 .doCatch(Exception.class)
                 .log(LoggingLevel.ERROR, correlation() + "Dataset processing failed: ${exception.message} stacktrace: ${exception.stacktrace}")
@@ -103,6 +104,12 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 // do not run subsequent validators if the schema validation failed
                 .filter(PredicateBuilder.not(simple("${body.hasError()}")))
                 .to("direct:validateAuthorityId")
+                .end()
+                .choice()
+                .when(simple("${body.hasError()}"))
+                .setHeader(DATASET_STATUS, () -> STATUS_VALIDATION_FAILED)
+                .otherwise()
+                .setHeader(DATASET_STATUS, () -> STATUS_VALIDATION_OK)
                 .end()
                 .log(LoggingLevel.INFO, correlation() + "Validated NeTEx dataset")
                 .routeId("validate-netex-dataset");

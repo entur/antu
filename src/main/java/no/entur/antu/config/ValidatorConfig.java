@@ -19,6 +19,7 @@ package no.entur.antu.config;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.authority.AuthorityIdValidator;
 import no.entur.antu.validator.schema.NetexSchemaValidator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,7 +32,7 @@ public class ValidatorConfig {
     }
 
     @Bean("netexSchemaValidator")
-    public NetexSchemaValidator netexSchemaValidator() {
-        return new NetexSchemaValidator();
+    public NetexSchemaValidator netexSchemaValidator(@Value("${antu.netex.validation.entries.max:100}") int maxValidationError) {
+        return new NetexSchemaValidator(maxValidationError);
     }
 }

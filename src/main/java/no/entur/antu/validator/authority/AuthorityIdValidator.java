@@ -4,6 +4,7 @@ import no.entur.antu.netex.loader.DefaultNetexDatasetLoader;
 import no.entur.antu.netex.loader.NetexDatasetLoader;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.ValidationReportEntry;
+import no.entur.antu.validator.ValidationReportEntrySeverity;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.rutebanken.netex.model.EntityStructure;
@@ -46,7 +47,7 @@ public class AuthorityIdValidator {
     private ValidationReportEntry checkAuthorityId(Set<String> whitelistedAuthorityIds, String authorityId, String codespace) {
         if (!whitelistedAuthorityIds.contains(authorityId)) {
             LOGGER.warn("Invalid Authority Id {} for codespace {}", authorityId, codespace);
-            return new ValidationReportEntry(String.format("Invalid Authority Id %s", authorityId), "Invalid authority ID", "ERROR");
+            return new ValidationReportEntry(String.format("Invalid Authority Id %s", authorityId), "Invalid authority ID", ValidationReportEntrySeverity.ERROR);
         }
         return null;
     }

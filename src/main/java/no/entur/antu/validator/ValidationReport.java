@@ -31,7 +31,7 @@ public class ValidationReport {
     }
 
     public boolean hasError() {
-        return validationReportEntries.stream().anyMatch(validationReportEntry -> "ERROR".equals(validationReportEntry.getSeverity()));
+        return validationReportEntries.stream().anyMatch(validationReportEntry -> ValidationReportEntrySeverity.ERROR == validationReportEntry.getSeverity());
     }
 
     public void addValidationReportEntry(ValidationReportEntry validationReportEntry) {
