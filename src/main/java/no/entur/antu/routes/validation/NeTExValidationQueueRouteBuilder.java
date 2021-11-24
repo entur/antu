@@ -21,12 +21,19 @@ package no.entur.antu.routes.validation;
 
 import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.validator.ValidationReport;
+import no.entur.antu.validator.ValidationReportEntry;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.stereotype.Component;
 
-import static no.entur.antu.Constants.CORRELATION_ID;
+import java.util.Collection;
+
+import static no.entur.antu.Constants.DATASET_AUTHORITY_ID_VALIDATION_REPORT_ENTRIES;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
+import static no.entur.antu.Constants.DATASET_SCHEMA_VALIDATION_REPORT_ENTRIES;
+import static no.entur.antu.Constants.DATASET_STREAM;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 
@@ -83,10 +90,20 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .end()
                 .routeId("download-netex-timetable-dataset");
 
-        from("direct:validateNetexDataset")
+        from("direct:validateNetexDataset").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx dataset")
-                .setHeader(VALIDATION_REPORT_ID, header(CORRELATION_ID))
-                .bean("authorityIdValidator", "validateAuthorityId(${body},${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID + "})")
+                .setHeader(DATASET_STREAM, body())
+                .process(exchange -> {
+                    String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
+                    ValidationReport validationReport = new ValidationReport(codespace, String.valueOf(System.currentTimeMillis()));
+                    exchange.getIn().setBody(validationReport);
+                })
+                .setHeader(VALIDATION_REPORT_ID, simple("${body.validationReportId}"))
+                .to("direct:validateSchema")
+                // do not run subsequent validators if the schema validation failed
+                .filter(PredicateBuilder.not(simple("${body.hasError()}")))
+                .to("direct:validateAuthorityId")
+                .end()
                 .log(LoggingLevel.INFO, correlation() + "Validated NeTEx dataset")
                 .routeId("validate-netex-dataset");
 
@@ -99,7 +116,7 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .routeId("save-validation-report");
 
         from("direct:uploadValidationReport")
-                .setHeader(FILE_HANDLE, header(DATASET_CODESPACE).append(Constants.VALIDATION_REPORT_PREFIX).append(header(CORRELATION_ID)).append(".json"))
+                .setHeader(FILE_HANDLE, header(DATASET_CODESPACE).append(Constants.VALIDATION_REPORT_PREFIX).append(header(VALIDATION_REPORT_ID)).append(".json"))
                 .log(LoggingLevel.INFO, correlation() + "Uploading Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:uploadAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + FILE_HANDLE + "}")
@@ -108,5 +125,30 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
         from("direct:notifyMarduk")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")
                 .routeId("notify-marduk");
+
+
+        from("direct:validateSchema")
+                .log(LoggingLevel.INFO, correlation() + "Validating NeTEx schema")
+                .setProperty(DATASET_SCHEMA_VALIDATION_REPORT_ENTRIES, method("netexSchemaValidator", "validateSchema(${header." + DATASET_STREAM + "},)"))
+                .process(exchange -> {
+                    ValidationReport validationReport = exchange.getIn().getBody(ValidationReport.class);
+                    Collection<ValidationReportEntry> netexSchemaValidationReportEntries = exchange.getProperty(DATASET_SCHEMA_VALIDATION_REPORT_ENTRIES, Collection.class);
+                    validationReport.addAllValidationReportEntries(netexSchemaValidationReportEntries);
+                })
+                .log(LoggingLevel.INFO, correlation() + "Validated NeTEx schema")
+                .routeId("validate-schema");
+
+        from("direct:validateAuthorityId")
+                .log(LoggingLevel.INFO, correlation() + "Validating Authority IDs")
+                .setProperty(DATASET_AUTHORITY_ID_VALIDATION_REPORT_ENTRIES, method("authorityIdValidator", "validateAuthorityId(${header." + DATASET_STREAM + "},${header." + DATASET_CODESPACE + "})"))
+                .process(exchange -> {
+                    ValidationReport validationReport = exchange.getIn().getBody(ValidationReport.class);
+                    Collection<ValidationReportEntry> authorityIdValidationReportEntries = exchange.getProperty(DATASET_AUTHORITY_ID_VALIDATION_REPORT_ENTRIES, Collection.class);
+                    validationReport.addAllValidationReportEntries(authorityIdValidationReportEntries);
+                })
+                .log(LoggingLevel.INFO, correlation() + "Validated Authority IDs")
+                .routeId("validate-authority-id");
+
+
     }
 }

@@ -17,7 +17,8 @@
 package no.entur.antu.config;
 
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.AuthorityIdValidator;
+import no.entur.antu.validator.authority.AuthorityIdValidator;
+import no.entur.antu.validator.schema.NetexSchemaValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,5 +28,10 @@ public class ValidatorConfig {
     @Bean("authorityIdValidator")
     public AuthorityIdValidator authorityIdValidator(OrganisationRepository organisationRepository) {
         return new AuthorityIdValidator(organisationRepository);
+    }
+
+    @Bean("netexSchemaValidator")
+    public NetexSchemaValidator netexSchemaValidator() {
+        return new NetexSchemaValidator();
     }
 }
