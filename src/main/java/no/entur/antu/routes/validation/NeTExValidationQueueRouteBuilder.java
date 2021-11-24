@@ -107,9 +107,9 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .end()
                 .choice()
                 .when(simple("${body.hasError()}"))
-                .setHeader(DATASET_STATUS, () -> STATUS_VALIDATION_FAILED)
+                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
                 .otherwise()
-                .setHeader(DATASET_STATUS, () -> STATUS_VALIDATION_OK)
+                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
                 .end()
                 .log(LoggingLevel.INFO, correlation() + "Validated NeTEx dataset")
                 .routeId("validate-netex-dataset");
