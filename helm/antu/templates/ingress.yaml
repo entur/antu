@@ -23,4 +23,3 @@ spec:
                 name: {{ template "antu.name" . }}
                 port:
                   number: {{ .Values.service.http.externalPort }}
----
