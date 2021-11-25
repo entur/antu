@@ -21,8 +21,8 @@ data:
     # Organisation register
     antu.organisation.registry.url={{ .Values.organisationRegistryUrl }}
 
-    # Provider
-    providers.api.url=http://baba/services/providers/
+    # Validators
+    antu.schema.validation.enabled=false
 
     # PubSub
     antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}

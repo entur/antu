@@ -100,11 +100,15 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                     exchange.getIn().setBody(validationReport);
                 })
                 .setHeader(VALIDATION_REPORT_ID, simple("${body.validationReportId}"))
+                .filter(simple("${properties:antu.schema.validation.enabled:true}"))
                 .to("direct:validateSchema")
+                // end filter
+                .end()
                 // do not run subsequent validators if the schema validation failed
                 .filter(PredicateBuilder.not(simple("${body.hasError()}")))
                 .to("direct:validateAuthorityId")
                 .end()
+                // end filter
                 .choice()
                 .when(simple("${body.hasError()}"))
                 .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
