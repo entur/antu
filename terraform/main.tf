@@ -46,6 +46,43 @@ resource "google_project_iam_member" "pubsub_project_iam_member_publisher" {
   member = "serviceAccount:${google_service_account.antu_service_account.email}"
 }
 
+# Create pubsub topics and subscriptions
+resource "google_pubsub_topic" "AntuJobQueue" {
+  name = "AntuJobQueue"
+  project = var.gcp_pubsub_project
+  labels = var.labels
+}
+
+resource "google_pubsub_subscription" "AntuJobQueue" {
+  name = "AntuJobQueue"
+  topic = google_pubsub_topic.AntuJobQueue.name
+  project = var.gcp_pubsub_project
+  labels = var.labels
+  ack_deadline_seconds = 600
+  retry_policy {
+    minimum_backoff = "10s"
+  }
+}
+
+resource "google_pubsub_topic" "AntuReportAggregationQueue" {
+  name = "AntuReportAggregationQueue"
+  project = var.gcp_pubsub_project
+  labels = var.labels
+}
+
+resource "google_pubsub_subscription" "AntuReportAggregationQueue" {
+  name = "AntuReportAggregationQueue"
+  topic = google_pubsub_topic.AntuReportAggregationQueue.name
+  project = var.gcp_pubsub_project
+  labels = var.labels
+  retry_policy {
+    minimum_backoff = "10s"
+  }
+}
+
+
+
+
 # create key for service account
 resource "google_service_account_key" "antu_service_account_key" {
   service_account_id = google_service_account.antu_service_account.name

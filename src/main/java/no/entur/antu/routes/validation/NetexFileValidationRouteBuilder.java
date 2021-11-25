@@ -19,7 +19,6 @@
 package no.entur.antu.routes.validation;
 
 
-import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validator.ValidationReport;
 import no.entur.antu.validator.ValidationReportEntry;
@@ -36,6 +35,7 @@ import static no.entur.antu.Constants.DATASET_SCHEMA_VALIDATION_REPORT_ENTRIES;
 import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.DATASET_STREAM;
 import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 
 
@@ -43,7 +43,7 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
  * Validate a NeTEx file upon notification from Marduk..
  */
 @Component
-public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
+public class NetexFileValidationRouteBuilder extends BaseRouteBuilder {
 
     private static final String TIMETABLE_DATASET_FILE = "TIMETABLE_DATASET_FILE";
 
@@ -51,52 +51,43 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
     public static final String STATUS_VALIDATION_OK = "ok";
     public static final String STATUS_VALIDATION_FAILED = "failed";
 
+
     @Override
     public void configure() throws Exception {
         super.configure();
 
-
-        from("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationQueue")
-                .to("direct:netexValidationQueue")
-                .routeId("netex-validation-queue-pubsub");
-
-        from("direct:netexValidationQueue")
+        from("direct:validateNetex")
                 .process(this::setCorrelationIdIfMissing)
-                .log(LoggingLevel.INFO, correlation() + "Received NeTEx validation request")
-
-                .setBody(constant(STATUS_VALIDATION_STARTED))
-                .to("direct:notifyMarduk")
+                .log(LoggingLevel.INFO, correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}")
 
                 .doTry()
-                .to("direct:downloadNetexDataset")
+                .to("direct:downloadSingleNetexFile")
                 .log(LoggingLevel.INFO, correlation() + "NeTEx Timetable file downloaded")
                 .setHeader(TIMETABLE_DATASET_FILE, body())
                 .to("direct:validateNetexDataset")
                 .to("direct:saveValidationReport")
-                .setBody(header(DATASET_STATUS))
-                .to("direct:notifyMarduk")
+                .to("direct:notifyMainJob")
                 .doCatch(Exception.class)
                 .log(LoggingLevel.ERROR, correlation() + "Dataset processing failed: ${exception.message} stacktrace: ${exception.stacktrace}")
-                .setBody(constant(STATUS_VALIDATION_FAILED))
-                .to("direct:notifyMarduk")
-                .routeId("netex-validation-queue");
+                .routeId("validate-netex");
 
-        from("direct:downloadNetexDataset")
-                .log(LoggingLevel.INFO, correlation() + "Downloading NeTEx dataset")
-                .to("direct:getMardukBlob")
+        from("direct:downloadSingleNetexFile")
+                .log(LoggingLevel.INFO, correlation() + "Downloading single NeTEx file")
+                .to("direct:getAntuBlob")
                 .filter(body().isNull())
                 .log(LoggingLevel.ERROR, correlation() + "NeTEx file not found")
                 .stop()
                 //end filter
                 .end()
-                .routeId("download-netex-timetable-dataset");
+                .routeId("download-single-netex-file");
 
         from("direct:validateNetexDataset").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx dataset")
                 .setHeader(DATASET_STREAM, body())
                 .process(exchange -> {
                     String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
-                    ValidationReport validationReport = new ValidationReport(codespace, String.valueOf(System.currentTimeMillis()));
+                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID, String.class);
+                    ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
                     exchange.getIn().setBody(validationReport);
                 })
                 .setHeader(VALIDATION_REPORT_ID, simple("${body.validationReportId}"))
@@ -127,7 +118,13 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .routeId("save-validation-report");
 
         from("direct:uploadValidationReport")
-                .setHeader(FILE_HANDLE, header(DATASET_CODESPACE).append(Constants.VALIDATION_REPORT_PREFIX).append(header(VALIDATION_REPORT_ID)).append(".json"))
+                .setHeader(FILE_HANDLE, constant("work/")
+                        .append(header(DATASET_CODESPACE))
+                        .append("/")
+                        .append(header(VALIDATION_REPORT_ID))
+                        .append("/")
+                        .append(header(NETEX_FILE_NAME))
+                        .append(".json"))
                 .log(LoggingLevel.INFO, correlation() + "Uploading Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:uploadAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + FILE_HANDLE + "}")
@@ -160,6 +157,10 @@ public class NeTExValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Validated Authority IDs")
                 .routeId("validate-authority-id");
 
+        from("direct:notifyMainJob")
+                .log(LoggingLevel.INFO, correlation() + "Notifying main job")
+                .to("google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
+                .routeId("notifying main job");
 
     }
 }

@@ -44,6 +44,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -60,7 +61,7 @@ import static no.entur.antu.Constants.BLOBSTORE_PATH_INBOUND_RECEIVED;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class, properties = {
         "antu.netex.validation.entries.max=1"})
-class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
+class NetexValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
 
     private static final String TEST_DATASET_CODESPACE = "flb";
     private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex.zip";
@@ -93,6 +94,7 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
     }
 
     @Test
+    @Disabled
     void testValidateAuthority() throws Exception {
 
         AdviceWith.adviceWith(context, "netex-validation-queue", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
@@ -113,13 +115,14 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         headers.put(Constants.DATASET_CODESPACE, "FLB");
         antuNetexValidationQueueProducerTemplate.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NetexValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NetexValidationQueueRouteBuilder.STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
 
 
     }
 
     @Test
+    @Disabled
     void testValidateSchemaMoreThanMaxError() throws Exception {
 
         AdviceWith.adviceWith(context, "netex-validation-queue", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
@@ -140,8 +143,8 @@ class NeTExValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         headers.put(Constants.DATASET_CODESPACE, "FLB");
         antuNetexValidationQueueProducerTemplate.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NeTExValidationQueueRouteBuilder.STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NetexValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NetexValidationQueueRouteBuilder.STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
 
 
     }
