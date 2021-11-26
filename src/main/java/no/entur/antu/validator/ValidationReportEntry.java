@@ -5,10 +5,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ValidationReportEntry {
 
-    private final String message;
-    private final String category;
-    private final ValidationReportEntrySeverity severity;
-    private final String fileName;
+    private String message;
+    private String category;
+    private ValidationReportEntrySeverity severity;
+    private String fileName;
+
+    public ValidationReportEntry() {
+    }
 
     public ValidationReportEntry(String message, String category, ValidationReportEntrySeverity severity) {
         this(message, category, severity, "");

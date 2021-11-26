@@ -57,18 +57,21 @@ import java.util.Map;
 import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_INBOUND_RECEIVED;
+import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
+import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
+import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class, properties = {
         "antu.netex.validation.entries.max=1"})
-class NetexValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
+class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
 
     private static final String TEST_DATASET_CODESPACE = "flb";
     private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex.zip";
     private static final String TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex-schema-error.zip";
 
-    @Produce("direct:netexValidationQueue")
-    protected ProducerTemplate antuNetexValidationQueueProducerTemplate;
+    @Produce("direct:initDatasetValidation")
+    protected ProducerTemplate initDatasetValidation;
 
     @EndpointInject("mock:notifyMarduk")
     protected MockEndpoint notifyMarduk;
@@ -113,10 +116,10 @@ class NetexValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         Map<String, Object> headers = new HashMap<>();
         headers.put(Constants.FILE_HANDLE, datasetBlobName);
         headers.put(Constants.DATASET_CODESPACE, "FLB");
-        antuNetexValidationQueueProducerTemplate.sendBodyAndHeaders(" ", headers);
+        initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NetexValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NetexValidationQueueRouteBuilder.STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
 
 
     }
@@ -141,11 +144,35 @@ class NetexValidationQueueRouteBuilderTest extends AntuRouteBuilderIntegrationTe
         Map<String, Object> headers = new HashMap<>();
         headers.put(Constants.FILE_HANDLE, datasetBlobName);
         headers.put(Constants.DATASET_CODESPACE, "FLB");
-        antuNetexValidationQueueProducerTemplate.sendBodyAndHeaders(" ", headers);
+        initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NetexValidationQueueRouteBuilder.STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> NetexValidationQueueRouteBuilder.STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
 
+
+    }
+
+
+    @Test
+    @Disabled
+    void testValidateSchema() throws Exception {
+
+        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
+        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
+        String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
+        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+
+        notifyMarduk.expectedMessageCount(2);
+        notifyMarduk.setResultWaitTime(15000);
+
+
+        context.start();
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(Constants.FILE_HANDLE, datasetBlobName);
+        headers.put(Constants.DATASET_CODESPACE, "FLB");
+        initDatasetValidation.sendBodyAndHeaders(" ", headers);
+
+        notifyMarduk.assertIsSatisfied();
 
     }
 

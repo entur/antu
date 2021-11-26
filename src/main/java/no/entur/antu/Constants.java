@@ -25,6 +25,9 @@ public final class Constants {
 
     public static final String DATASET_CODESPACE = "EnturDatasetCodespace";
     public static final String DATASET_STREAM = "EnturDatasetStream";
+    public static final String DATASET_NB_NETEX_FILES = "EnturDatasetNbNetexFiles";
+    public static final String DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
+
     public static final String DATASET_AUTHORITY_ID_VALIDATION_REPORT_ENTRIES = "EnturDatasetAuthorityValidationReport";
     public static final String DATASET_SCHEMA_VALIDATION_REPORT_ENTRIES = "EnturDatasetSchemaValidationReport";
     public static final String DATASET_STATUS = "EnturDatasetStatus";
@@ -34,8 +37,13 @@ public final class Constants {
     public static final String JOB_TYPE_VALIDATE = "VALIDATE";
     public static final String JOB_TYPE_AGGREGATE = "AGGREGATE";
 
+    public static final String STATUS_VALIDATION_STARTED = "started";
+    public static final String STATUS_VALIDATION_OK = "ok";
+    public static final String STATUS_VALIDATION_FAILED = "failed";
+
 
     public static final String VALIDATION_REPORT_ID = "EnturValidationReportId";
+    public static final String GCS_BUCKET_FILE_NAME = "work/${header." + DATASET_CODESPACE + "}/${header." + VALIDATION_REPORT_ID + "}/${header." + NETEX_FILE_NAME + "}.zip";
 
     public static final String BLOBSTORE_PATH_INBOUND_RECEIVED = "inbound/received/";
 
@@ -45,8 +53,12 @@ public final class Constants {
     public static final String CORRELATION_ID = "RutebankenCorrelationId";
     public static final String PROVIDER_ID = "RutebankenProviderId";
     public static final String ORIGINAL_PROVIDER_ID = "RutebankenOriginalProviderId";
+
+
     public static final String CAMEL_ALL_HTTP_HEADERS = "CamelHttp*";
     public static final String VALIDATION_REPORT_PREFIX = "/validation-report-";
+
+    public static final String AGGREGATED_VALIDATION_REPORT = "AGGREGATED_VALIDATION_REPORT";
 
 
     private Constants() {

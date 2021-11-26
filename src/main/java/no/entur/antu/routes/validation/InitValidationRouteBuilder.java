@@ -28,18 +28,14 @@ import static no.entur.antu.Constants.JOB_TYPE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE;
 import static no.entur.antu.Constants.JOB_TYPE_SPLIT;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
+import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 
 
 /**
  * Process NeTEX validation requests from Marduk.
  */
 @Component
-public class NetexValidationQueueRouteBuilder extends BaseRouteBuilder {
-
-    public static final String STATUS_VALIDATION_STARTED = "started";
-    public static final String STATUS_VALIDATION_OK = "ok";
-    public static final String STATUS_VALIDATION_FAILED = "failed";
-
+public class InitValidationRouteBuilder extends BaseRouteBuilder {
 
     @Override
     public void configure() throws Exception {
@@ -47,12 +43,16 @@ public class NetexValidationQueueRouteBuilder extends BaseRouteBuilder {
 
 
         from("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationQueue")
+                .to("direct:initDatasetValidation")
+                .routeId("netex-validation-queue-pubsub");
+
+        from("direct:initDatasetValidation")
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyMarduk")
                 .setHeader(Constants.VALIDATION_REPORT_ID, simple("${date:now:yyyyMMddHHmmssSSS}"))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
-                .routeId("netex-validation-queue-pubsub");
+                .routeId("init-dataset-validation");
 
         // pulling synchronously with one consumer to ensure that jobs are processed one by one.
         from("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue?synchronousPull=true")
@@ -70,6 +70,10 @@ public class NetexValidationQueueRouteBuilder extends BaseRouteBuilder {
                 .otherwise()
                 .log(LoggingLevel.ERROR, correlation() + "Unknown job type ${header." + Constants.JOB_TYPE + " } ")
                 .routeId("process-job");
+
+        from("direct:notifyMarduk")
+                .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")
+                .routeId("notify-marduk");
 
 
     }

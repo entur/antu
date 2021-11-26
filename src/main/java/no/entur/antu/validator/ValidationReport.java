@@ -10,11 +10,13 @@ import java.util.Collection;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ValidationReport {
 
-    private final String codespace;
-    private final String validationReportId;
-    private final LocalDateTime creationDate;
-    private final Collection<ValidationReportEntry> validationReportEntries;
+    private  String codespace;
+    private  String validationReportId;
+    private  LocalDateTime creationDate;
+    private  Collection<ValidationReportEntry> validationReportEntries;
 
+    public ValidationReport() {
+    }
 
     public ValidationReport(String codespace, String validationReportId) {
         this.codespace = codespace;

@@ -80,9 +80,6 @@ resource "google_pubsub_subscription" "AntuReportAggregationQueue" {
   }
 }
 
-
-
-
 # create key for service account
 resource "google_service_account_key" "antu_service_account_key" {
   service_account_id = google_service_account.antu_service_account.name

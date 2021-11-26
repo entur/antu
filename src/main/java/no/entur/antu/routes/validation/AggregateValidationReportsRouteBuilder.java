@@ -1,0 +1,157 @@
+/*
+ *
+ *  * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
+ *  * the European Commission - subsequent versions of the EUPL (the "Licence");
+ *  * You may not use this work except in compliance with the Licence.
+ *  * You may obtain a copy of the Licence at:
+ *  *
+ *  *   https://joinup.ec.europa.eu/software/page/eupl
+ *  *
+ *  * Unless required by applicable law or agreed to in writing, software
+ *  * distributed under the Licence is distributed on an "AS IS" basis,
+ *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  * See the Licence for the specific language governing permissions and
+ *  * limitations under the Licence.
+ *  *
+ *
+ */
+
+package no.entur.antu.routes.validation;
+
+
+import no.entur.antu.Constants;
+import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.validator.ValidationReport;
+import org.apache.camel.Exchange;
+import org.apache.camel.LoggingLevel;
+import org.apache.camel.Message;
+import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
+import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+
+import static no.entur.antu.Constants.DATASET_CODESPACE;
+import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
+import static no.entur.antu.Constants.DATASET_NETEX_FILE_NAMES;
+import static no.entur.antu.Constants.DATASET_STATUS;
+import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.GCS_BUCKET_FILE_NAME;
+import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE;
+import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
+import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
+
+
+/**
+ * Aggregate validation reports.
+ */
+@Component
+public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
+
+    @Override
+    public void configure() throws Exception {
+        super.configure();
+
+        from("master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
+                .process(this::removeSynchronizationForAggregatedExchange)
+                .aggregate(header(VALIDATION_REPORT_ID)).aggregationStrategy(new ValidationReportAggregationStrategy()).completionTimeout(2000)
+                .process(this::addSynchronizationForAggregatedExchange)
+                .process(this::setNewCorrelationId)
+                .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} validation reports (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
+
+                .setBody(constant(""))
+                .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE))
+                .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
+                .routeId("aggregate-reports-pubsub");
+
+        from("direct:aggregateReports")
+                .log(LoggingLevel.INFO, correlation() + "Merging individual reports for validation report id ${header." + VALIDATION_REPORT_ID + "}")
+
+                .process(exchange -> {
+                    String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
+                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID, String.class);
+                    ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
+                    exchange.getIn().setHeader(Constants.AGGREGATED_VALIDATION_REPORT, validationReport);
+                })
+
+                .split(header(DATASET_NETEX_FILE_NAMES)).delimiter(",")
+                .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
+                .setHeader(NETEX_FILE_NAME, body())
+                .setHeader(FILE_HANDLE, simple(GCS_BUCKET_FILE_NAME))
+                .to("direct:downLoadValidationReport")
+                .unmarshal().json(JsonLibrary.Jackson, ValidationReport.class)
+                .process( exchange -> {
+                    ValidationReport validationReport = exchange.getIn().getBody(ValidationReport.class);
+                    ValidationReport aggregatedValidationReport =  exchange.getIn().getHeader(Constants.AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
+                    aggregatedValidationReport.addAllValidationReportEntries(validationReport.getValidationReportEntries());
+
+                })
+                // end splitter
+                .end()
+                .setBody(header(Constants.AGGREGATED_VALIDATION_REPORT))
+                .choice()
+                .when(simple("${body.hasError()}"))
+                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
+                .otherwise()
+                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
+                .end()
+                .marshal().json(JsonLibrary.Jackson)
+                .to("direct:uploadAggregatedValidationReport")
+                .setBody(header(DATASET_STATUS))
+                .to("direct:notifyMarduk")
+                .routeId("aggregate-reports");
+
+        from("direct:downLoadValidationReport")
+                .setHeader(FILE_HANDLE, constant("work/")
+                        .append(header(DATASET_CODESPACE))
+                        .append("/")
+                        .append(header(VALIDATION_REPORT_ID))
+                        .append("/")
+                        .append(header(NETEX_FILE_NAME))
+                        .append(".json"))
+                .log(LoggingLevel.INFO, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
+                .to("direct:getAntuBlob")
+                .log(LoggingLevel.INFO, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
+                .routeId("download-validation-report");
+
+
+        from("direct:uploadAggregatedValidationReport")
+                .setHeader(FILE_HANDLE, constant("reports/")
+                        .append(header(DATASET_CODESPACE))
+                        .append("/validation-report-")
+                        .append(header(VALIDATION_REPORT_ID))
+                        .append(".json"))
+                .log(LoggingLevel.INFO, correlation() + "Uploading aggregated Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
+                .to("direct:uploadAntuBlob")
+                .log(LoggingLevel.INFO, correlation() + "Uploaded aggregated Validation Report to GCS file ${header." + FILE_HANDLE + "}")
+                .routeId("upload-aggregated-validation-report");
+
+    }
+
+    /**
+     * Complete the aggregation when all the individual reports have been received.
+     * The total number of reports to process is stored in a header that is included in every incoming message.
+     */
+    private static class ValidationReportAggregationStrategy extends GroupedMessageAggregationStrategy {
+        @Override
+        public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+            Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
+            aggregatedExchange.getIn().setHeader(VALIDATION_REPORT_ID, newExchange.getIn().getHeader(VALIDATION_REPORT_ID));
+            aggregatedExchange.getIn().setHeader(DATASET_CODESPACE, newExchange.getIn().getHeader(DATASET_CODESPACE));
+            String currentNetexFileNameList = aggregatedExchange.getIn().getHeader(DATASET_NETEX_FILE_NAMES, String.class);
+            if(currentNetexFileNameList == null) {
+                currentNetexFileNameList="";
+            }
+            aggregatedExchange.getIn().setHeader(DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + ',' + newExchange.getIn().getHeader(NETEX_FILE_NAME));
+            Collection<Message> messages = aggregatedExchange.getIn().getBody(Collection.class);
+            Long nbNetexFiles = newExchange.getIn().getHeader(DATASET_NB_NETEX_FILES, Long.class);
+            if(messages.size() >= nbNetexFiles) {
+                aggregatedExchange.setProperty(Exchange.AGGREGATION_COMPLETE_CURRENT_GROUP, true);
+
+            }
+            return aggregatedExchange;
+        }
+    }
+}

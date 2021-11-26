@@ -32,7 +32,6 @@ import java.util.Collection;
 import static no.entur.antu.Constants.DATASET_AUTHORITY_ID_VALIDATION_REPORT_ENTRIES;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_SCHEMA_VALIDATION_REPORT_ENTRIES;
-import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.DATASET_STREAM;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
@@ -40,16 +39,12 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 
 
 /**
- * Validate a NeTEx file upon notification from Marduk..
+ * Validate NeTEx files.
  */
 @Component
-public class NetexFileValidationRouteBuilder extends BaseRouteBuilder {
+public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final String TIMETABLE_DATASET_FILE = "TIMETABLE_DATASET_FILE";
-
-    public static final String STATUS_VALIDATION_STARTED = "started";
-    public static final String STATUS_VALIDATION_OK = "ok";
-    public static final String STATUS_VALIDATION_FAILED = "failed";
 
 
     @Override
@@ -100,12 +95,6 @@ public class NetexFileValidationRouteBuilder extends BaseRouteBuilder {
                 .to("direct:validateAuthorityId")
                 .end()
                 // end filter
-                .choice()
-                .when(simple("${body.hasError()}"))
-                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
-                .otherwise()
-                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
-                .end()
                 .log(LoggingLevel.INFO, correlation() + "Validated NeTEx dataset")
                 .routeId("validate-netex-dataset");
 
@@ -129,11 +118,6 @@ public class NetexFileValidationRouteBuilder extends BaseRouteBuilder {
                 .to("direct:uploadAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + FILE_HANDLE + "}")
                 .routeId("upload-validation-report");
-
-        from("direct:notifyMarduk")
-                .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")
-                .routeId("notify-marduk");
-
 
         from("direct:validateSchema")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx schema")
