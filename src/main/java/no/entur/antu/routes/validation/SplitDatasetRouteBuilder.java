@@ -85,6 +85,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
                 .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                 .setHeader(NETEX_FILE_NAME, body())
+                .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 //end split
                 .end()
@@ -103,20 +104,24 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
         public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
             if (oldExchange == null) {
                 Set<String> netexFileNames = new HashSet<>();
+                newExchange.getIn().setHeader(ALL_NETEX_FILE_NAMES, netexFileNames);
                 String currentFileName = newExchange.getIn().getHeader(Exchange.FILE_NAME, String.class);
                 if (currentFileName.endsWith(".xml.zip")) {
-                    netexFileNames.add(currentFileName);
+                    netexFileNames.add(removeZipExtension(currentFileName));
                 }
-                newExchange.getIn().setHeader(ALL_NETEX_FILE_NAMES, netexFileNames);
                 return newExchange;
             }
             String currentFileName = newExchange.getIn().getHeader(Exchange.FILE_NAME, String.class);
             if (currentFileName.endsWith(".xml.zip")) {
                 Set<String> netexFileNames = oldExchange.getIn().getHeader(ALL_NETEX_FILE_NAMES, Set.class);
-                netexFileNames.add(currentFileName);
+                netexFileNames.add(removeZipExtension(currentFileName));
             }
 
             return oldExchange;
+        }
+
+        private String removeZipExtension(String currentFileName) {
+            return currentFileName.substring(0, currentFileName.length() - 4);
         }
     }
 }

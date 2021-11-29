@@ -56,7 +56,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static no.entur.antu.Constants.BLOBSTORE_PATH_INBOUND_RECEIVED;
+import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
@@ -108,7 +108,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME;
+        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME;
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
@@ -136,7 +136,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
+        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
@@ -164,7 +164,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
+        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
         notifyMarduk.expectedMessageCount(2);

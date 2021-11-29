@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 
-import static no.entur.antu.Constants.BLOBSTORE_PATH_REPORTS_SUBDIR;
+import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
 import static no.entur.antu.Constants.FILE_HANDLE;
 
 @Component
@@ -118,7 +118,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .responseMessage().code(500).message("Internal error").endResponseMessage()
                 .route()
                 .to("direct:authorizeEditorRequest")
-                .setHeader(FILE_HANDLE, constant(BLOBSTORE_PATH_REPORTS_SUBDIR)
+                .setHeader(FILE_HANDLE, constant(BLOBSTORE_PATH_ANTU_REPORTS)
                         .append(header(CODESPACE_PARAM))
                         .append(Constants.VALIDATION_REPORT_PREFIX)
                         .append(header(VALIDATION_REPORT_ID_PARAM))

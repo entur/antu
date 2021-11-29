@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
+import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_WORK;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
@@ -138,7 +139,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .routeId("save-validation-report");
 
         from("direct:uploadValidationReport")
-                .setHeader(FILE_HANDLE, constant("work/")
+                .setHeader(FILE_HANDLE, constant(BLOBSTORE_PATH_ANTU_WORK)
                         .append(header(DATASET_CODESPACE))
                         .append("/")
                         .append(header(VALIDATION_REPORT_ID))

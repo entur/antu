@@ -42,10 +42,11 @@ public final class Constants {
 
 
     public static final String VALIDATION_REPORT_ID = "EnturValidationReportId";
-    public static final String GCS_BUCKET_FILE_NAME = "work/${header." + DATASET_CODESPACE + "}/${header." + VALIDATION_REPORT_ID + "}/${header." + NETEX_FILE_NAME + "}.zip";
 
-    public static final String BLOBSTORE_PATH_REPORTS_SUBDIR = "reports/";
-    public static final String BLOBSTORE_PATH_INBOUND_RECEIVED = "inbound/received/";
+    public static final String BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED = "inbound/received/";
+    public static final String BLOBSTORE_PATH_ANTU_REPORTS = "reports/";
+    public static final String BLOBSTORE_PATH_ANTU_WORK = "work/";
+    public static final String GCS_BUCKET_FILE_NAME = BLOBSTORE_PATH_ANTU_WORK + "${header." + DATASET_CODESPACE + "}/${header." + VALIDATION_REPORT_ID + "}/${header." + NETEX_FILE_NAME + "}.zip";
 
     /**
      * Headers originating from Marduk that must be sent back when notifying Marduk
@@ -59,6 +60,7 @@ public final class Constants {
     public static final String VALIDATION_REPORT_PREFIX = "/validation-report-";
 
     public static final String AGGREGATED_VALIDATION_REPORT = "AGGREGATED_VALIDATION_REPORT";
+
 
     private Constants() {
     }

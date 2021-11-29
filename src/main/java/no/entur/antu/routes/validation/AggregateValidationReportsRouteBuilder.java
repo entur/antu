@@ -106,7 +106,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .routeId("aggregate-reports");
 
         from("direct:downLoadValidationReport")
-                .setHeader(FILE_HANDLE, constant("work/")
+                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
                         .append(header(DATASET_CODESPACE))
                         .append("/")
                         .append(header(VALIDATION_REPORT_ID))
@@ -120,7 +120,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
 
         from("direct:uploadAggregatedValidationReport")
-                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_REPORTS_SUBDIR)
+                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
                         .append(header(DATASET_CODESPACE))
                         .append("/validation-report-")
                         .append(header(VALIDATION_REPORT_ID))
