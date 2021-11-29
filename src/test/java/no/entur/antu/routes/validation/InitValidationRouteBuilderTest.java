@@ -157,6 +157,11 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
     @Disabled
     void testValidateSchema() throws Exception {
 
+        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
+                .to("mock:notifyMarduk"));
+        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
+                .to("mock:notifyMarduk"));
+
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
         String datasetBlobName = BLOBSTORE_PATH_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;

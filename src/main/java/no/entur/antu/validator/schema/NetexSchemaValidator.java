@@ -42,12 +42,12 @@ public class NetexSchemaValidator {
             while (zipEntry != null) {
                 String zipEntryName = zipEntry.getName();
                 if (zipEntryName.endsWith(".xml")) {
-                    LOGGER.info("Validating NeTEx file {}", zipEntryName);
+                    LOGGER.info("Validating entry {}", zipEntryName);
                     byte[] allBytes = zipInputStream.readAllBytes();
                     validationReportEntries.addAll(validateNetexFile(zipEntryName, allBytes));
 
                 } else {
-                    LOGGER.info("Ignoring non-xml file {}", zipEntryName);
+                    LOGGER.info("Ignoring non-xml entry {}", zipEntryName);
                 }
                 zipEntry = zipInputStream.getNextEntry();
             }

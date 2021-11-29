@@ -47,6 +47,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .routeId("netex-validation-queue-pubsub");
 
         from("direct:initDatasetValidation")
+                .process(this::setCorrelationIdIfMissing)
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyMarduk")
                 .setHeader(Constants.VALIDATION_REPORT_ID, simple("${date:now:yyyyMMddHHmmssSSS}"))

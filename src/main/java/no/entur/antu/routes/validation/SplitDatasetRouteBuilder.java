@@ -68,7 +68,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
         from("direct:uploadSingleNetexFiles")
                 .split(new ZipSplitter()).aggregationStrategy(new SingleNetexFileAggregationStrategy())
                 .streaming()
-                .log(LoggingLevel.INFO, correlation() + "Processing NeTEx file ${header." + FILE_HANDLE + "}")
+                .log(LoggingLevel.INFO, correlation() + "Processing NeTEx file ${header." + Exchange.FILE_NAME + "}")
                 .filter(header(Exchange.FILE_NAME).not().endsWith(".xml"))
                 .log(LoggingLevel.INFO, correlation() + "Ignoring non-XML file ${header." + Exchange.FILE_NAME + "}")
                 // skip this file

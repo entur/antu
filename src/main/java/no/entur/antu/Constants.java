@@ -24,7 +24,6 @@ public final class Constants {
 
 
     public static final String DATASET_CODESPACE = "EnturDatasetCodespace";
-    public static final String DATASET_STREAM = "EnturDatasetStream";
     public static final String DATASET_NB_NETEX_FILES = "EnturDatasetNbNetexFiles";
     public static final String DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
 
@@ -45,6 +44,7 @@ public final class Constants {
     public static final String VALIDATION_REPORT_ID = "EnturValidationReportId";
     public static final String GCS_BUCKET_FILE_NAME = "work/${header." + DATASET_CODESPACE + "}/${header." + VALIDATION_REPORT_ID + "}/${header." + NETEX_FILE_NAME + "}.zip";
 
+    public static final String BLOBSTORE_PATH_REPORTS_SUBDIR = "reports/";
     public static final String BLOBSTORE_PATH_INBOUND_RECEIVED = "inbound/received/";
 
     /**
@@ -59,7 +59,6 @@ public final class Constants {
     public static final String VALIDATION_REPORT_PREFIX = "/validation-report-";
 
     public static final String AGGREGATED_VALIDATION_REPORT = "AGGREGATED_VALIDATION_REPORT";
-
 
     private Constants() {
     }

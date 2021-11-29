@@ -50,6 +50,8 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 @Component
 public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
+    private static final String FILENAME_DELIMITER = "§";
+
     @Override
     public void configure() throws Exception {
         super.configure();
@@ -76,7 +78,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                     exchange.getIn().setHeader(Constants.AGGREGATED_VALIDATION_REPORT, validationReport);
                 })
 
-                .split(header(DATASET_NETEX_FILE_NAMES)).delimiter(",")
+                .split(header(DATASET_NETEX_FILE_NAMES)).delimiter(FILENAME_DELIMITER)
                 .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
                 .setHeader(NETEX_FILE_NAME, body())
                 .setHeader(FILE_HANDLE, simple(GCS_BUCKET_FILE_NAME))
@@ -118,7 +120,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
 
         from("direct:uploadAggregatedValidationReport")
-                .setHeader(FILE_HANDLE, constant("reports/")
+                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_REPORTS_SUBDIR)
                         .append(header(DATASET_CODESPACE))
                         .append("/validation-report-")
                         .append(header(VALIDATION_REPORT_ID))
@@ -135,6 +137,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
      * The total number of reports to process is stored in a header that is included in every incoming message.
      */
     private static class ValidationReportAggregationStrategy extends GroupedMessageAggregationStrategy {
+
         @Override
         public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
             Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
@@ -144,7 +147,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             if(currentNetexFileNameList == null) {
                 currentNetexFileNameList="";
             }
-            aggregatedExchange.getIn().setHeader(DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + ',' + newExchange.getIn().getHeader(NETEX_FILE_NAME));
+            aggregatedExchange.getIn().setHeader(DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + FILENAME_DELIMITER + newExchange.getIn().getHeader(NETEX_FILE_NAME));
             Collection<Message> messages = aggregatedExchange.getIn().getBody(Collection.class);
             Long nbNetexFiles = newExchange.getIn().getHeader(DATASET_NB_NETEX_FILES, Long.class);
             if(messages.size() >= nbNetexFiles) {
