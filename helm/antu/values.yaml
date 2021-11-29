@@ -9,7 +9,12 @@ service:
 
 resources:
   cpuLimit: 2000m
-  memLimit: 15000Mi
+  memLimit: 1800Mi
   cpuRequest: 2000m
-  memRequest: 10000Mi
-  xmx: 9000m
+  memRequest: 1300Mi
+  xmx: 1000m
+
+horizontalPodAutoscaler:
+  maxReplicas: 10
+  minReplicas: 2
+  targetCPUUtilizationPercentage: 70
