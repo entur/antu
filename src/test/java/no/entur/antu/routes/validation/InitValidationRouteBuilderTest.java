@@ -168,7 +168,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
         notifyMarduk.expectedMessageCount(2);
-        notifyMarduk.setResultWaitTime(15000);
+        notifyMarduk.setResultWaitTime(1500000);
 
 
         context.start();

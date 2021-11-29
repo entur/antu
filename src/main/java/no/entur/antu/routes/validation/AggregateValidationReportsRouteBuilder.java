@@ -23,13 +23,16 @@ import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validator.ValidationReport;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
@@ -58,7 +61,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         from("master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
                 .process(this::removeSynchronizationForAggregatedExchange)
-                .aggregate(header(VALIDATION_REPORT_ID)).aggregationStrategy(new ValidationReportAggregationStrategy()).completionTimeout(2000)
+                .aggregate(header(VALIDATION_REPORT_ID)).aggregationStrategy(new ValidationReportAggregationStrategy()).completionTimeout(1800000)
                 .process(this::addSynchronizationForAggregatedExchange)
                 .process(this::setNewCorrelationId)
                 .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} validation reports (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
@@ -84,9 +87,9 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .setHeader(FILE_HANDLE, simple(GCS_BUCKET_FILE_NAME))
                 .to("direct:downLoadValidationReport")
                 .unmarshal().json(JsonLibrary.Jackson, ValidationReport.class)
-                .process( exchange -> {
+                .process(exchange -> {
                     ValidationReport validationReport = exchange.getIn().getBody(ValidationReport.class);
-                    ValidationReport aggregatedValidationReport =  exchange.getIn().getHeader(Constants.AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
+                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(Constants.AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
                     aggregatedValidationReport.addAllValidationReportEntries(validationReport.getValidationReportEntries());
 
                 })
@@ -144,15 +147,18 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             aggregatedExchange.getIn().setHeader(VALIDATION_REPORT_ID, newExchange.getIn().getHeader(VALIDATION_REPORT_ID));
             aggregatedExchange.getIn().setHeader(DATASET_CODESPACE, newExchange.getIn().getHeader(DATASET_CODESPACE));
             String currentNetexFileNameList = aggregatedExchange.getIn().getHeader(DATASET_NETEX_FILE_NAMES, String.class);
-            if(currentNetexFileNameList == null) {
-                currentNetexFileNameList="";
+            if (currentNetexFileNameList == null) {
+                aggregatedExchange.getIn().setHeader(DATASET_NETEX_FILE_NAMES, newExchange.getIn().getHeader(NETEX_FILE_NAME));
+            } else {
+                aggregatedExchange.getIn().setHeader(DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + FILENAME_DELIMITER + newExchange.getIn().getHeader(NETEX_FILE_NAME));
             }
-            aggregatedExchange.getIn().setHeader(DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + FILENAME_DELIMITER + newExchange.getIn().getHeader(NETEX_FILE_NAME));
-            Collection<Message> messages = aggregatedExchange.getIn().getBody(Collection.class);
+            // check if all individual reports have been received
+            // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.
             Long nbNetexFiles = newExchange.getIn().getHeader(DATASET_NB_NETEX_FILES, Long.class);
-            if(messages.size() >= nbNetexFiles) {
+            List<Message> aggregatedMessages = aggregatedExchange.getProperty(ExchangePropertyKey.GROUPED_EXCHANGE, List.class);
+            Set<String> aggregatedFileNames = aggregatedMessages.stream().map(message -> message.getHeader(NETEX_FILE_NAME, String.class)).collect(Collectors.toSet());
+            if (aggregatedFileNames.size() >= nbNetexFiles) {
                 aggregatedExchange.setProperty(Exchange.AGGREGATION_COMPLETE_CURRENT_GROUP, true);
-
             }
             return aggregatedExchange;
         }
