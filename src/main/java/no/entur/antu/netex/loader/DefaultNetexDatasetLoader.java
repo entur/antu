@@ -18,22 +18,12 @@
 
 package no.entur.antu.netex.loader;
 
-import no.entur.antu.exception.AntuException;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public class DefaultNetexDatasetLoader implements NetexDatasetLoader {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultNetexDatasetLoader.class);
-
 
     protected final NetexParser netexParser;
 
@@ -42,33 +32,9 @@ public class DefaultNetexDatasetLoader implements NetexDatasetLoader {
     }
 
     @Override
-    public void load(InputStream timetableDataset, NetexEntitiesIndex netexEntitiesIndex) {
-        try (ZipInputStream zipInputStream = new ZipInputStream(timetableDataset)) {
-            parseDataset(zipInputStream, netexEntitiesIndex);
-        } catch (IOException e) {
-            throw new AntuException("Error while parsing the NeTEx timetable dataset", e);
-        }
-    }
-
-
-    /**
-     * Parse a zip file containing a NeTEx archive.
-     *
-     * @param zipInputStream     a stream on a NeTEx zip archive.
-     * @param netexEntitiesIndex the NeTEx dataset index to be updated with the content of the NeTEx archive.
-     * @throws IOException if the zip file cannot be read.
-     */
-    protected void parseDataset(ZipInputStream zipInputStream, NetexEntitiesIndex netexEntitiesIndex) throws IOException {
-        ZipEntry zipEntry = zipInputStream.getNextEntry();
-        while (zipEntry != null) {
-            if (zipEntry.getName().endsWith(".xml")) {
-                byte[] allBytes = zipInputStream.readAllBytes();
-                netexParser.parse(new ByteArrayInputStream(allBytes), netexEntitiesIndex);
-            } else {
-                LOGGER.info("Ignoring non-xml file {}", zipEntry.getName());
-            }
-            zipEntry = zipInputStream.getNextEntry();
-        }
+    public void load(byte[] content, NetexEntitiesIndex netexEntitiesIndex) {
+        netexParser.parse(new ByteArrayInputStream(content), netexEntitiesIndex);
 
     }
+
 }

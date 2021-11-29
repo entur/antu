@@ -89,7 +89,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
                 @Override
                 public Set<String> getWhitelistedAuthorityIds(String codespace) {
-                    return Set.of("FLB:Authority:FLA");
+                    return Set.of("FLB:Authority:FLB");
                 }
             };
         }
@@ -97,10 +97,11 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
     }
 
     @Test
-    @Disabled
     void testValidateAuthority() throws Exception {
 
-        AdviceWith.adviceWith(context, "netex-validation-queue", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
+        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
+                .to("mock:notifyMarduk"));
+        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
                 .to("mock:notifyMarduk"));
 
         notifyMarduk.expectedMessageCount(2);
@@ -154,7 +155,6 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
 
     @Test
-    @Disabled
     void testValidateSchema() throws Exception {
 
         AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
@@ -168,7 +168,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
         notifyMarduk.expectedMessageCount(2);
-        notifyMarduk.setResultWaitTime(1500000);
+        notifyMarduk.setResultWaitTime(15000);
 
 
         context.start();

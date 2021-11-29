@@ -76,7 +76,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .setHeader(VALIDATION_REPORT_ID, simple("${exchangeProperty." + PROP_VALIDATION_REPORT + ".validationReportId}"))
                 .routeId("init-validation-report");
 
-        from("direct:downloadSingleNetexFile")
+        from("direct:downloadSingleNetexFile").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Downloading single NeTEx file ${header." + FILE_HANDLE + "}")
                 .to("direct:getAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Downloaded single NeTEx file ${header." + FILE_HANDLE + "}")
@@ -85,6 +85,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .stop()
                 //end filter
                 .end()
+                .unmarshal().zipFile()
                 .routeId("download-single-netex-file");
 
         from("direct:runNetexValidators").streamCaching()
@@ -101,9 +102,9 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");
 
-        from("direct:validateSchema")
+        from("direct:validateSchema").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx schema")
-                .setBody(method("netexSchemaValidator", "validateSchema(${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "},)"))
+                .setBody(method("netexSchemaValidator", "validateSchema(${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})"))
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
                     validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
@@ -111,9 +112,9 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Validated NeTEx schema")
                 .routeId("validate-schema");
 
-        from("direct:validateAuthorityId")
+        from("direct:validateAuthorityId").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Validating Authority IDs")
-                .setBody(method("authorityIdValidator", "validateAuthorityId(${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "},${header." + DATASET_CODESPACE + "})"))
+                .setBody(method("authorityIdValidator", "validateAuthorityId(${header." + DATASET_CODESPACE + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})"))
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
                     validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
