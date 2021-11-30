@@ -44,7 +44,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -126,10 +125,11 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
     }
 
     @Test
-    @Disabled
     void testValidateSchemaMoreThanMaxError() throws Exception {
 
-        AdviceWith.adviceWith(context, "netex-validation-queue", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
+        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
+                .to("mock:notifyMarduk"));
+        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
                 .to("mock:notifyMarduk"));
 
         notifyMarduk.expectedMessageCount(2);
@@ -150,36 +150,8 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
 
-
     }
 
-
-    @Test
-    void testValidateSchema() throws Exception {
-
-        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
-                .to("mock:notifyMarduk"));
-        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
-                .to("mock:notifyMarduk"));
-
-        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
-        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
-        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
-
-        notifyMarduk.expectedMessageCount(2);
-        notifyMarduk.setResultWaitTime(15000);
-
-
-        context.start();
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.FILE_HANDLE, datasetBlobName);
-        headers.put(Constants.DATASET_CODESPACE, "FLB");
-        initDatasetValidation.sendBodyAndHeaders(" ", headers);
-
-        notifyMarduk.assertIsSatisfied();
-
-    }
 
 
 }
