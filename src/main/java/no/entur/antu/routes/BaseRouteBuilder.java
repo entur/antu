@@ -23,9 +23,13 @@ import com.google.pubsub.v1.ModifyAckDeadlineRequest;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import no.entur.antu.Constants;
 import org.apache.camel.Exchange;
+import org.apache.camel.ExtendedExchange;
+import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.google.pubsub.GooglePubsubConstants;
 import org.apache.camel.component.google.pubsub.GooglePubsubEndpoint;
+import org.apache.camel.component.google.pubsub.consumer.AcknowledgeAsync;
+import org.apache.camel.support.DefaultExchange;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
@@ -33,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * Defines common route behavior.
@@ -40,6 +45,7 @@ import java.util.UUID;
 public abstract class BaseRouteBuilder extends RouteBuilder {
 
     private static final int ACK_DEADLINE_EXTENSION = 500;
+    private static final String SYNCHRONIZATION_HOLDER = "SYNCHRONIZATION_HOLDER";
 
     @Value("${quartz.lenient.fire.time.ms:180000}")
     private int lenientFireTimeMs;
@@ -66,13 +72,17 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
 
 
         // Copy all PubSub headers except the internal Camel PubSub headers from the PubSub message into the Camel message headers.
-
-        interceptFrom("*")
-                .filter(exchange -> exchange.getFromEndpoint() instanceof GooglePubsubEndpoint)
+        interceptFrom(".*google-pubsub:.*")
                 .process(exchange ->
                 {
                     Map<String, String> pubSubAttributes = exchange.getIn().getHeader(GooglePubsubConstants.ATTRIBUTES, Map.class);
-                    pubSubAttributes.entrySet().stream().filter(entry -> !entry.getKey().startsWith("CamelGooglePubsub")).forEach(entry -> exchange.getIn().setHeader(entry.getKey(), entry.getValue()));
+                    if (pubSubAttributes == null) {
+                        throw new IllegalStateException("Missing PubSub attribute maps in Exchange");
+                    }
+                    pubSubAttributes.entrySet()
+                            .stream()
+                            .filter(entry -> !entry.getKey().startsWith("CamelGooglePubsub"))
+                            .forEach(entry -> exchange.getIn().setHeader(entry.getKey(), entry.getValue()));
                 });
 
         // Copy only the correlationId and codespace headers from the Camel message into the PubSub message by default.
@@ -80,21 +90,12 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
                 exchange -> {
                     Map<String, String> pubSubAttributes = new HashMap<>(exchange.getIn().getHeader(GooglePubsubConstants.ATTRIBUTES, new HashMap<>(), Map.class));
 
-                    if (exchange.getIn().getHeader(Constants.CORRELATION_ID) != null) {
-                        pubSubAttributes.put(Constants.CORRELATION_ID, exchange.getIn().getHeader(Constants.CORRELATION_ID, String.class));
-                    }
-                    if (exchange.getIn().getHeader(Constants.DATASET_CODESPACE) != null) {
-                        pubSubAttributes.put(Constants.DATASET_CODESPACE, exchange.getIn().getHeader(Constants.DATASET_CODESPACE, String.class));
-                    }
-
-                    if (exchange.getIn().getHeader(Constants.PROVIDER_ID) != null) {
-                        pubSubAttributes.put(Constants.PROVIDER_ID, exchange.getIn().getHeader(Constants.PROVIDER_ID, String.class));
-                    }
-
-                    if (exchange.getIn().getHeader(Constants.ORIGINAL_PROVIDER_ID) != null) {
-                        pubSubAttributes.put(Constants.ORIGINAL_PROVIDER_ID, exchange.getIn().getHeader(Constants.ORIGINAL_PROVIDER_ID, String.class));
-                    }
-
+                    Stream.of(Constants.CORRELATION_ID, Constants.DATASET_CODESPACE, Constants.DATASET_NB_NETEX_FILES, Constants.DATASET_NETEX_FILE_NAMES, Constants.FILE_HANDLE,Constants.NETEX_FILE_NAME, Constants.JOB_TYPE, Constants.VALIDATION_REPORT_ID).forEach(header -> {
+                                if (exchange.getIn().getHeader(header) != null) {
+                                    pubSubAttributes.put(header, exchange.getIn().getHeader(header, String.class));
+                                }
+                            }
+                    );
 
                     exchange.getIn().setHeader(GooglePubsubConstants.ATTRIBUTES, pubSubAttributes);
                 });
@@ -123,7 +124,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
     }
 
     protected String correlation() {
-        return "[codespace=${header." + Constants.DATASET_CODESPACE + "} correlationId=${header." + Constants.CORRELATION_ID + "}] ";
+        return "[codespace=${header." + Constants.DATASET_CODESPACE + "} reportId=${header." + Constants.VALIDATION_REPORT_ID + "} correlationId=${header." + Constants.CORRELATION_ID + "}] ";
     }
 
     public void extendAckDeadline(Exchange exchange) throws IOException {
@@ -137,6 +138,37 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
                 .build();
         try (SubscriberStub subscriberStub = fromEndpoint.getComponent().getSubscriberStub(fromEndpoint.getServiceAccountKey())) {
             subscriberStub.modifyAckDeadlineCallable().call(modifyAckDeadlineRequest);
+        }
+    }
+
+    /**
+     * Remove the PubSub synchronization.
+     * This prevents an aggregator from acknowledging the aggregated PubSub messages before the end of the route.
+     * In case of failure during the routing this would make it impossible to retry the messages.
+     * The synchronization is stored temporarily in a header and is applied again after the aggregation is complete
+     *
+     * @param e
+     * @see #addSynchronizationForAggregatedExchange(Exchange)
+     */
+    public void removeSynchronizationForAggregatedExchange(Exchange e) {
+        DefaultExchange temporaryExchange = new DefaultExchange(e.getContext());
+        e.getUnitOfWork().handoverSynchronization(temporaryExchange, AcknowledgeAsync.class::isInstance);
+        e.getIn().setHeader(SYNCHRONIZATION_HOLDER, temporaryExchange);
+    }
+
+    /**
+     * Add back the PubSub synchronization.
+     *
+     * @see #removeSynchronizationForAggregatedExchange(Exchange)
+     */
+    protected void addSynchronizationForAggregatedExchange(Exchange aggregatedExchange) {
+        List<Message> messages = aggregatedExchange.getIn().getBody(List.class);
+        for (Message m : messages) {
+            Exchange temporaryExchange = m.getHeader(SYNCHRONIZATION_HOLDER, Exchange.class);
+            if (temporaryExchange == null) {
+                throw new IllegalStateException("Synchronization holder not found");
+            }
+            temporaryExchange.adapt(ExtendedExchange.class).handoverCompletions(aggregatedExchange);
         }
     }
 

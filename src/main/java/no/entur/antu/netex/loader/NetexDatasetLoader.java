@@ -20,8 +20,6 @@ package no.entur.antu.netex.loader;
 
 import org.entur.netex.index.api.NetexEntitiesIndex;
 
-import java.io.InputStream;
-
 /**
  * Load a NeTEx dataset into memory.
  */
@@ -30,8 +28,8 @@ public interface NetexDatasetLoader {
     /**
      * Load a NeTEX dataset archive into an in-memory repository
      *
-     * @param timetableDataset   a ZIP file containing the NeTEx dataset
+     * @param content binary content of the NeTEx file.
      * @param netexEntitiesIndex an in-memory repository containing the NeTEx entities.
      */
-    void load(InputStream timetableDataset, NetexEntitiesIndex netexEntitiesIndex);
+    void load(byte[] content, NetexEntitiesIndex netexEntitiesIndex);
 }

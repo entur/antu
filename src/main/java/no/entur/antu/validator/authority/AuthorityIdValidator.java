@@ -11,7 +11,6 @@ import org.rutebanken.netex.model.EntityStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -30,24 +29,24 @@ public class AuthorityIdValidator {
         this.organisationRepository = organisationRepository;
     }
 
-    public List<ValidationReportEntry> validateAuthorityId(InputStream timetableDataset, String codespace) {
+    public List<ValidationReportEntry> validateAuthorityId(String codespace, String fileName, byte[] content) {
         Set<String> whitelistedAuthorityIds = organisationRepository.getWhitelistedAuthorityIds(codespace);
         NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
         NetexDatasetLoader netexDatasetLoader = new DefaultNetexDatasetLoader();
-        netexDatasetLoader.load(timetableDataset, netexEntitiesIndex);
+        netexDatasetLoader.load(content, netexEntitiesIndex);
         return netexEntitiesIndex.getAuthorityIndex()
                 .getAll()
                 .stream()
                 .map(EntityStructure::getId)
-                .map(authorityId -> checkAuthorityId(whitelistedAuthorityIds, authorityId, codespace))
+                .map(authorityId -> checkAuthorityId(whitelistedAuthorityIds, authorityId, codespace, fileName))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private ValidationReportEntry checkAuthorityId(Set<String> whitelistedAuthorityIds, String authorityId, String codespace) {
+    private ValidationReportEntry checkAuthorityId(Set<String> whitelistedAuthorityIds, String authorityId, String codespace, String fileName) {
         if (!whitelistedAuthorityIds.contains(authorityId)) {
             LOGGER.warn("Invalid Authority Id {} for codespace {}", authorityId, codespace);
-            return new ValidationReportEntry(String.format("Invalid Authority Id %s", authorityId), "Invalid authority ID", ValidationReportEntrySeverity.ERROR);
+            return new ValidationReportEntry(String.format("Invalid Authority Id %s", authorityId), "Invalid authority ID", ValidationReportEntrySeverity.ERROR, fileName);
         }
         return null;
     }

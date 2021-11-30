@@ -1,0 +1,37 @@
+<configuration>
+    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+    
+    <!-- default console pattern plus marker -->
+    <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %marker%n}"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="CONSOLE-ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- https://logback.qos.ch/manual/appenders.html#AsyncAppender -->
+        <discardingThreshold>0</discardingThreshold>
+        <maxFlushTime>0</maxFlushTime>
+        <appender-ref ref="CONSOLE" />
+    </appender>    
+
+    <logger name="com" level="INFO"/>
+    <logger name="no" level="INFO"/>
+    <logger name="org" level="INFO"/>
+    <logger name="io" level="INFO"/>
+    <logger name="org.apache.camel" level="INFO"/>
+
+    <logger name="org.apache.camel.builder.AdviceWith" level="WARN"/>
+    <logger name="org.apache.processor.DefaultErrorHandler" level="INFO"/>
+    <logger name="org.apache.camel.component.jackson.JacksonDataFormat" level="WARN"/>
+    <logger name="com.google.cloud.spring.core.DefaultCredentialsProvider" level="ERROR"/>
+    <logger name="com.google.auth.oauth2.DefaultCredentialsProvider" level="ERROR"/>
+
+
+    <root level="DEBUG">
+        <appender-ref ref="CONSOLE-ASYNC" />
+    </root>
+
+</configuration>

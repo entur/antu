@@ -14,11 +14,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Validator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * Validate that NeTEX files are valid according to the XML schema.
@@ -33,32 +30,7 @@ public class NetexSchemaValidator {
     }
 
 
-    public List<ValidationReportEntry> validateSchema(InputStream timetableDataset) {
-
-        List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
-
-        try (ZipInputStream zipInputStream = new ZipInputStream(timetableDataset)) {
-            ZipEntry zipEntry = zipInputStream.getNextEntry();
-            while (zipEntry != null) {
-                String zipEntryName = zipEntry.getName();
-                if (zipEntryName.endsWith(".xml")) {
-                    LOGGER.info("Validating NeTEx file {}", zipEntryName);
-                    byte[] allBytes = zipInputStream.readAllBytes();
-                    validationReportEntries.addAll(validateNetexFile(zipEntryName, allBytes));
-
-                } else {
-                    LOGGER.info("Ignoring non-xml file {}", zipEntryName);
-                }
-                zipEntry = zipInputStream.getNextEntry();
-            }
-        } catch (IOException e) {
-            throw new AntuException("Error while loading the NeTEx archive", e);
-        }
-
-        return validationReportEntries;
-    }
-
-    private List<ValidationReportEntry> validateNetexFile(String fileName, byte[] allBytes) {
+    public List<ValidationReportEntry> validateSchema(String fileName, byte[] content) {
 
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
 
@@ -88,7 +60,7 @@ public class NetexSchemaValidator {
                 }
 
                 private void addValidationReportEntry(String fileName, SAXParseException saxParseException, ValidationReportEntrySeverity severity) throws SAXParseException {
-                    if(errorCount < maxValidationReportEntries) {
+                    if (errorCount < maxValidationReportEntries) {
                         String message = "Line " + saxParseException.getLineNumber() + ", Column " + saxParseException.getColumnNumber() + ": " + saxParseException.getMessage();
                         validationReportEntries.add(new ValidationReportEntry(message, "NeTEx Schema Validation", severity, fileName));
                     } else {
@@ -100,7 +72,7 @@ public class NetexSchemaValidator {
 
             });
 
-            validator.validate(new StreamSource(new ByteArrayInputStream(allBytes)));
+            validator.validate(new StreamSource(new ByteArrayInputStream(content)));
         } catch (IOException e) {
             throw new AntuException(e);
         } catch (SAXException saxException) {
