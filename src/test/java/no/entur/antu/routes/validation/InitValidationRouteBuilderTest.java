@@ -88,7 +88,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
                 @Override
                 public Set<String> getWhitelistedAuthorityIds(String codespace) {
-                    return Set.of("FLB:Authority:FLB");
+                    return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
                 }
             };
         }
@@ -151,7 +151,6 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
 
     }
-
 
 
 }
