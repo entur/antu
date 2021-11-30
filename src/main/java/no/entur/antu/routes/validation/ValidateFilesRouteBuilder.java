@@ -125,7 +125,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         from("direct:reportSystemError")
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
-                    ValidationReportEntry validationReportEntry = new ValidationReportEntry("System error while validating the  file " + exchange.getIn().getHeader(NETEX_FILE_NAME), "System error", ValidationReportEntrySeverity.ERROR);
+                    ValidationReportEntry validationReportEntry = new ValidationReportEntry("System error while validating the  file " + exchange.getIn().getHeader(NETEX_FILE_NAME), "System error", ValidationReportEntrySeverity.ERROR, exchange.getIn().getHeader(NETEX_FILE_NAME, String.class));
                     validationReport.addValidationReportEntry(validationReportEntry);
                 })
                 .routeId("report-system-error");

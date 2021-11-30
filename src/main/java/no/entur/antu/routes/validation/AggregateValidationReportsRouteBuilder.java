@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
-import static no.entur.antu.Constants.DATASET_NETEX_FILE_NAMES;
 import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.GCS_BUCKET_FILE_NAME;
@@ -54,6 +53,8 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
     private static final String FILENAME_DELIMITER = "§";
+    private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
+
 
     @Override
     public void configure() throws Exception {
@@ -66,7 +67,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .process(this::setNewCorrelationId)
                 .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} validation reports (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
 
-                .setBody(constant(""))
+                .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("aggregate-reports-pubsub");
@@ -80,8 +81,8 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                     ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
                     exchange.getIn().setHeader(Constants.AGGREGATED_VALIDATION_REPORT, validationReport);
                 })
-
-                .split(header(DATASET_NETEX_FILE_NAMES)).delimiter(FILENAME_DELIMITER)
+                .convertBodyTo(String.class)
+                .split(body()).delimiter(FILENAME_DELIMITER)
                 .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
                 .setHeader(NETEX_FILE_NAME, body())
                 .setHeader(FILE_HANDLE, simple(GCS_BUCKET_FILE_NAME))
@@ -146,11 +147,11 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
             aggregatedExchange.getIn().setHeader(VALIDATION_REPORT_ID, newExchange.getIn().getHeader(VALIDATION_REPORT_ID));
             aggregatedExchange.getIn().setHeader(DATASET_CODESPACE, newExchange.getIn().getHeader(DATASET_CODESPACE));
-            String currentNetexFileNameList = aggregatedExchange.getIn().getHeader(DATASET_NETEX_FILE_NAMES, String.class);
+            String currentNetexFileNameList = aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES, String.class);
             if (currentNetexFileNameList == null) {
-                aggregatedExchange.getIn().setHeader(DATASET_NETEX_FILE_NAMES, newExchange.getIn().getHeader(NETEX_FILE_NAME));
+                aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getHeader(NETEX_FILE_NAME));
             } else {
-                aggregatedExchange.getIn().setHeader(DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + FILENAME_DELIMITER + newExchange.getIn().getHeader(NETEX_FILE_NAME));
+                aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + FILENAME_DELIMITER + newExchange.getIn().getHeader(NETEX_FILE_NAME));
             }
             // check if all individual reports have been received
             // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.

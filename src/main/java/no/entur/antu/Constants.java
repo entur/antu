@@ -25,10 +25,7 @@ public final class Constants {
 
     public static final String DATASET_CODESPACE = "EnturDatasetCodespace";
     public static final String DATASET_NB_NETEX_FILES = "EnturDatasetNbNetexFiles";
-    public static final String DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
 
-    public static final String DATASET_AUTHORITY_ID_VALIDATION_REPORT_ENTRIES = "EnturDatasetAuthorityValidationReport";
-    public static final String DATASET_SCHEMA_VALIDATION_REPORT_ENTRIES = "EnturDatasetSchemaValidationReport";
     public static final String DATASET_STATUS = "EnturDatasetStatus";
 
     public static final String JOB_TYPE = "JOB_TYPE";

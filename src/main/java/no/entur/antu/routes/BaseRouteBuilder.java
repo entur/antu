@@ -90,7 +90,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
                 exchange -> {
                     Map<String, String> pubSubAttributes = new HashMap<>(exchange.getIn().getHeader(GooglePubsubConstants.ATTRIBUTES, new HashMap<>(), Map.class));
 
-                    Stream.of(Constants.CORRELATION_ID, Constants.DATASET_CODESPACE, Constants.DATASET_NB_NETEX_FILES, Constants.DATASET_NETEX_FILE_NAMES, Constants.FILE_HANDLE,Constants.NETEX_FILE_NAME, Constants.JOB_TYPE, Constants.VALIDATION_REPORT_ID).forEach(header -> {
+                    Stream.of(Constants.CORRELATION_ID, Constants.DATASET_CODESPACE, Constants.DATASET_NB_NETEX_FILES, Constants.FILE_HANDLE, Constants.NETEX_FILE_NAME, Constants.JOB_TYPE, Constants.VALIDATION_REPORT_ID).forEach(header -> {
                                 if (exchange.getIn().getHeader(header) != null) {
                                     pubSubAttributes.put(header, exchange.getIn().getHeader(header, String.class));
                                 }
