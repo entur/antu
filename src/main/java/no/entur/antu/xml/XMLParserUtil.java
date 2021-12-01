@@ -5,7 +5,9 @@ import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.WhitespaceStrippingPolicy;
 import net.sf.saxon.s9api.XPathCompiler;
+import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XdmValue;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -57,6 +59,12 @@ public final class XMLParserUtil {
         XMLInputFactory factory = getSecureXmlInputFactory();
         XMLStreamReader xmlStreamReader = factory.createXMLStreamReader(new ByteArrayInputStream(content));
         return builder.build(new StAXSource(xmlStreamReader));
+    }
+
+    public static XdmValue selectNodeSet(String expression, XPathCompiler xpath, XdmNode document) throws SaxonApiException {
+        XPathSelector selector = xpath.compile(expression).load();
+        selector.setContextItem(document);
+        return selector.evaluate();
     }
 
 }

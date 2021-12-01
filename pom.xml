@@ -30,6 +30,7 @@
         <commons-io.version>2.11.0</commons-io.version>
         <google.cloud.bom-version>24.0.0</google.cloud.bom-version>
         <saxon.version>10.6</saxon.version>
+        <zt-zip.version>1.14</zt-zip.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
@@ -240,6 +241,12 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-spring-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.zeroturnaround</groupId>
+            <artifactId>zt-zip</artifactId>
+            <version>${zt-zip.version}</version>
             <scope>test</scope>
         </dependency>
 

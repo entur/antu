@@ -1,4 +1,4 @@
-package no.entur.antu.validator.authority;
+package no.entur.antu.validator.xpath;
 
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -13,34 +13,31 @@ import no.entur.antu.xml.XMLParserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Validate that NeTEx Authority identifier are valid according to the Organisation register.
- */
-public class AuthorityIdValidator {
+public class ValidateAuthorityId implements ValidationRule {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthorityIdValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateAuthorityId.class);
+    private static final String MESSAGE = "Invalid Authority Id";
 
     private final OrganisationRepository organisationRepository;
 
-    public AuthorityIdValidator(OrganisationRepository organisationRepository) {
+    public ValidateAuthorityId(OrganisationRepository organisationRepository) {
         this.organisationRepository = organisationRepository;
     }
 
-    public List<ValidationReportEntry> validateAuthorityId(String codespace, String fileName, byte[] content) throws XMLStreamException, SaxonApiException {
-        Set<String> whitelistedAuthorityIds = organisationRepository.getWhitelistedAuthorityIds(codespace);
+    @Override
+    public List<ValidationReportEntry> validate(ValidationContext validationContext) throws SaxonApiException {
+        Set<String> whitelistedAuthorityIds = organisationRepository.getWhitelistedAuthorityIds(validationContext.getCodespace());
         if (whitelistedAuthorityIds.isEmpty()) {
             return Collections.emptyList();
         } else {
-            XdmNode document = XMLParserUtil.parseFileToXdmNode(content);
             String xpath = "//ResourceFrame/organisations/Authority[not(@id=('" + String.join("','", whitelistedAuthorityIds) + "'))]";
             XPathSelector selector = XMLParserUtil.getXPathCompiler().compile(xpath).load();
-            selector.setContextItem(document);
+            selector.setContextItem(validationContext.getXmlNode());
             XdmValue nodes = selector.evaluate();
             List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
             for (XdmItem item : nodes) {
@@ -50,12 +47,17 @@ public class AuthorityIdValidator {
                 int columnNumber = xdmNode.getColumnNumber();
                 String netexId = xdmNode.getAttributeValue(new QName("id"));
 
-                String message = "Line " + lineNumber + ", Column " + columnNumber + ": Invalid Authority ID " + netexId;
+                String message = "Line " + lineNumber + ", Column " + columnNumber + ", NeTEx id " + netexId + ": " +  MESSAGE ;
                 LOGGER.warn(message);
-                validationReportEntries.add(new ValidationReportEntry(message, "Invalid Authority Id", ValidationReportEntrySeverity.WARNING, fileName));
+                validationReportEntries.add(new ValidationReportEntry(message, MESSAGE, ValidationReportEntrySeverity.WARNING, validationContext.getFileName()));
             }
             return validationReportEntries;
         }
+
     }
 
+    @Override
+    public String getMessage() {
+        return MESSAGE;
+    }
 }
