@@ -4,6 +4,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathExecutable;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmValue;
+import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 
@@ -25,15 +26,19 @@ public class ValidateExist implements ValidationRule {
     }
 
     @Override
-    public List<ValidationReportEntry> validate(ValidationContext validationContext) throws SaxonApiException {
-        XPathExecutable compile = validationContext.getxPathCompiler().compile(xpath);
-        XPathSelector selector = compile.load();
-        selector.setContextItem(validationContext.getXmlNode());
-        XdmValue nodes = selector.evaluate();
-        if (nodes.isEmpty()) {
-            return List.of(new ValidationReportEntry(message, category, severity, validationContext.getFileName()));
+    public List<ValidationReportEntry> validate(ValidationContext validationContext)  {
+        try {
+            XPathExecutable compile = validationContext.getxPathCompiler().compile(xpath);
+            XPathSelector selector = compile.load();
+            selector.setContextItem(validationContext.getXmlNode());
+            XdmValue nodes = selector.evaluate();
+            if (nodes.isEmpty()) {
+                return List.of(new ValidationReportEntry(message, category, severity, validationContext.getFileName()));
+            }
+            return Collections.emptyList();
+        } catch (SaxonApiException e) {
+            throw new AntuException("Error while validating rule " + xpath, e);
         }
-        return Collections.emptyList();
     }
 
     @Override

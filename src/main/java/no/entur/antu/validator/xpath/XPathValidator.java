@@ -8,7 +8,6 @@ import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.xml.XMLParserUtil;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.xpath.XPathExpressionException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class XPathValidator {
         this.lineFileValidationTree = getLineFileValidationTree();
     }
 
-    public List<ValidationReportEntry> validate(String codespace, String fileName, byte[] content) throws XMLStreamException, SaxonApiException, XPathExpressionException {
+    public List<ValidationReportEntry> validate(String codespace, String fileName, byte[] content) throws XMLStreamException, SaxonApiException {
         XdmNode document = XMLParserUtil.parseFileToXdmNode(content);
         ValidationContext validationContext = new ValidationContext(document, XMLParserUtil.getXPathCompiler(), codespace, fileName);
         if (fileName.startsWith("_")) {
@@ -40,36 +39,86 @@ public class XPathValidator {
 
     private ValidationTree getCommonFileValidationTree() {
         ValidationTree validationTree = new ValidationTree("/");
-        validationTree.addSubTree(getCompositeFrameForCommonFileValidationTree());
+        validationTree.addSubTree(getCompositeFrameValidationTreeForCommonFile());
+        validationTree.addSubTree(getSingleFramesValidationTreeForCommonFile());
+
+        return validationTree;
+    }
+
+    private ValidationTree getSingleFramesValidationTreeForCommonFile() {
+        ValidationTree validationTree = new ValidationTree("PublicationDelivery/dataObjects");
+
+        validationTree.addValidationRule(new ValidateNotExist("SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
+        validationTree.addValidationRule(new ValidateNotExist("TimetableFrame", "Timetable frame not allowed in common files", "Composite Frame", ValidationReportEntrySeverity.ERROR));
+
+        validationTree.addValidationRule(new ValidateExist("ServiceFrame[validityConditions] | ServiceCalendarFrame[validityConditions]", "Neither ServiceFrame nor ServiceCalendarFrame defines ValidityConditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+
+        validationTree.addValidationRule(new ValidateNotExist("ResourceFrame[not(validityConditions) and count(//ResourceFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("ServiceFrame[not(validityConditions) and count(//ServiceFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("ServiceCalendarFrame[not(validityConditions) and count(//ServiceCalendarFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+
+
+        validationTree.addSubTree(getResourceFrameValidationTree("ResourceFrame"));
+        validationTree.addSubTree(getServiceFrameForCommonFileValidationTree("ServiceFrame"));
+        validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
+
         return validationTree;
     }
 
     private ValidationTree getLineFileValidationTree() {
         ValidationTree validationTree = new ValidationTree("/");
-        validationTree.addSubTree(getCompositeFrameForLineFileValidationTree());
+        validationTree.addSubTree(getCompositeFrameValidationTreeForLineFile());
+        validationTree.addSubTree(getSingleFramesValidationTreeForLineFile());
         return validationTree;
     }
 
-    private ValidationTree getCompositeFrameForLineFileValidationTree() {
+    private ValidationTree getCompositeFrameValidationTreeForLineFile() {
         ValidationTree compositeFrameValidationTree = new ValidationTree("PublicationDelivery/dataObjects/CompositeFrame");
 
         compositeFrameValidationTree.addValidationRules(getCompositeFrameValidationRules());
 
-        compositeFrameValidationTree.addSubTree(getResourceFrameValidationTree());
-        compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree());
+        compositeFrameValidationTree.addSubTree(getResourceFrameValidationTree("frames/ResourceFrame"));
+        compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree("frames/ServiceCalendarFrame"));
         compositeFrameValidationTree.addSubTree(getServiceFrameForLineFileValidationTree());
 
         return compositeFrameValidationTree;
     }
 
-    private ValidationTree getCompositeFrameForCommonFileValidationTree() {
+    private ValidationTree getSingleFramesValidationTreeForLineFile() {
+        ValidationTree validationTree = new ValidationTree("PublicationDelivery/dataObjects");
+
+        validationTree.addValidationRule(new ValidateNotExist("SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
+
+        validationTree.addValidationRule(new ValidateExist("ServiceFrame[validityConditions] | ServiceCalendarFrame[validityConditions] | TimetableFrame[validityConditions]", "Neither ServiceFrame, ServiceCalendarFrame nor TimetableFrame defines ValidityConditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+
+        validationTree.addValidationRule(new ValidateNotExist("ServiceFrame[not(validityConditions) and count(//ServiceFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("ServiceCalendarFrame[not(validityConditions) and count(//ServiceCalendarFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("TimetableFrame[not(validityConditions) and count(//TimetableFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("VehicleScheduleFrame[not(validityConditions) and count(//VehicleScheduleFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+
+
+        validationTree.addSubTree(getResourceFrameValidationTree("ResourceFrame"));
+        validationTree.addSubTree(getServiceFrameForCommonFileValidationTree("ServiceFrame"));
+        validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
+        validationTree.addSubTree(getTimetableFrameValidationTree("TimetableFrame"));
+
+        return validationTree;
+    }
+
+    private ValidationTree getTimetableFrameValidationTree(String path) {
+        ValidationTree validationTree = new ValidationTree(path);
+        return validationTree;
+    }
+
+    private ValidationTree getCompositeFrameValidationTreeForCommonFile() {
         ValidationTree compositeFrameValidationTree = new ValidationTree("PublicationDelivery/dataObjects/CompositeFrame");
 
         compositeFrameValidationTree.addValidationRules(getCompositeFrameValidationRules());
+        compositeFrameValidationTree.addValidationRule(new ValidateNotExist("frames/TimetableFrame", "Timetable frame not allowed in common files", "Composite Frame", ValidationReportEntrySeverity.ERROR));
 
-        compositeFrameValidationTree.addSubTree(getResourceFrameValidationTree());
-        compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree());
-        compositeFrameValidationTree.addSubTree(getServiceFrameForCommonFileValidationTree());
+        compositeFrameValidationTree.addSubTree(getResourceFrameValidationTree("frames/ResourceFrame"));
+        compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree("frames/ServiceCalendarFrame"));
+        compositeFrameValidationTree.addSubTree(getServiceFrameForCommonFileValidationTree("frames/ServiceFrame"));
 
         return compositeFrameValidationTree;
     }
@@ -92,8 +141,8 @@ public class XPathValidator {
 
     }
 
-    private ValidationTree getServiceFrameForCommonFileValidationTree() {
-        ValidationTree serviceFrameValidationTree = new ValidationTree("frames/ServiceFrame");
+    private ValidationTree getServiceFrameForCommonFileValidationTree(String path) {
+        ValidationTree serviceFrameValidationTree = new ValidationTree(path);
 
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/Line", "Line not allowed in  common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route", "Route not allowed in common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
@@ -111,8 +160,8 @@ public class XPathValidator {
     }
 
 
-    private ValidationTree getResourceFrameValidationTree() {
-        ValidationTree resourceFrameValidationTree = new ValidationTree("frames/ResourceFrame");
+    private ValidationTree getResourceFrameValidationTree(String path) {
+        ValidationTree resourceFrameValidationTree = new ValidationTree(path);
 
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator[not(CompanyNumber) or normalize-space(CompanyNumber) = '']", "Missing CompanyNumber element on Operator", "Resource Frame", ValidationReportEntrySeverity.INFO));
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator[not(Name) or normalize-space(Name) = '']", "Missing Name on Operator", "Resource Frame", ValidationReportEntrySeverity.ERROR));
@@ -134,8 +183,8 @@ public class XPathValidator {
     }
 
 
-    private ValidationTree getServiceCalendarFrameValidationTree() {
-        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("frames/ServiceCalendarFrame");
+    private ValidationTree getServiceCalendarFrameValidationTree(String path) {
+        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree(path);
 
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//DayType[not(//DayTypeAssignment/DayTypeRef/@ref = @id)]", "DayType %{source_objectid} is not assigned to any calendar dates or periods", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(dayTypes) and not(dayTypeAssignments)]", "ServiceCalendar does not contain neither DayTypes nor DayTypeAssignments", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));

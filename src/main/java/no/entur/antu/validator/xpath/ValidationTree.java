@@ -55,12 +55,14 @@ public class ValidationTree {
         this.validationRules.addAll(validationRules);
     }
 
-    public void addSubTree(ValidationTree validationContext) {
-        subTrees.add(validationContext);
+    public void addSubTree(ValidationTree validationTree) {
+        subTrees.add(validationTree);
     }
+
 
     public String getContext() {
         return context;
     }
+
 
 }
