@@ -262,7 +262,7 @@ public class XPathValidator {
 
     private ValidationTree getNoticeAssignmentsValidationTree() {
         ValidationTree noticesAssignmentsValidationTree = new ValidationTree("Notices Assignments", "noticeAssignments");
-        noticesAssignmentsValidationTree.addValidationRule(new ValidateExist("noticeAssignments/NoticeAssignment[for $a in following-sibling::NoticeAssignment return if(NoticeRef/@ref= $a/NoticeRef/@ref and NoticedObjectRef/@ref= $a/NoticedObjectRef/@ref) then $a else ()]", "The notice is assigned multiple times to the same object", "Notices", ValidationReportEntrySeverity.WARNING));
+        noticesAssignmentsValidationTree.addValidationRule(new ValidateExist("NoticeAssignment[for $a in following-sibling::NoticeAssignment return if(NoticeRef/@ref= $a/NoticeRef/@ref and NoticedObjectRef/@ref= $a/NoticedObjectRef/@ref) then $a else ()]", "The notice is assigned multiple times to the same object", "Notices", ValidationReportEntrySeverity.WARNING));
 
         return noticesAssignmentsValidationTree;
     }
