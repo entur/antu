@@ -42,7 +42,7 @@ spec:
         - name: antu
           image: {{ .Values.image.identifier }}
           env:
-            - name: JAVA_OPTIONS
+            - name: JDK_JAVA_OPTIONS
               value: -server -Xmx{{ .Values.resources.xmx }} -Xss512k -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
                 -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40
                 -Dspring.config.location=/etc/application-config/application.properties
