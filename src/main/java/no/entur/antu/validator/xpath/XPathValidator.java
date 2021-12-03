@@ -251,7 +251,7 @@ public class XPathValidator {
     private ValidationTree getNoticesValidationTree() {
         ValidationTree noticesValidationTree = new ValidationTree("Notices", "notices");
 
-        noticesValidationTree.addValidationRule(new ValidateExist("Notice[not(Text) or normalize-space(Text/text()) = '']", "Missing element Text for Notice", "Notices", ValidationReportEntrySeverity.ERROR));
+        noticesValidationTree.addValidationRule(new ValidateNotExist("Notice[not(Text) or normalize-space(Text/text()) = '']", "Missing element Text for Notice", "Notices", ValidationReportEntrySeverity.ERROR));
         noticesValidationTree.addValidationRule(new ValidateNotExist("Notice/alternativeTexts/AlternativeText[not(Text) or normalize-space(Text/text()) = '']", "Missing or empty element Text for Notice Alternative Text", "Notices", ValidationReportEntrySeverity.ERROR));
         noticesValidationTree.addValidationRule(new ValidateNotExist("Notice/alternativeTexts/AlternativeText/Text[not(@lang)]", "Missing element Lang for Notice Alternative Text", "Notices", ValidationReportEntrySeverity.ERROR));
         noticesValidationTree.addValidationRule(new ValidateNotExist("Notice/alternativeTexts/AlternativeText[Text/@lang = following-sibling::AlternativeText/Text/@lang or Text/@lang = preceding-sibling::AlternativeText/Text/@lang]", "The Notice has two Alternative Texts with the same language", "Notices", ValidationReportEntrySeverity.ERROR));
@@ -262,7 +262,7 @@ public class XPathValidator {
 
     private ValidationTree getNoticeAssignmentsValidationTree() {
         ValidationTree noticesAssignmentsValidationTree = new ValidationTree("Notices Assignments", "noticeAssignments");
-        noticesAssignmentsValidationTree.addValidationRule(new ValidateExist("NoticeAssignment[for $a in following-sibling::NoticeAssignment return if(NoticeRef/@ref= $a/NoticeRef/@ref and NoticedObjectRef/@ref= $a/NoticedObjectRef/@ref) then $a else ()]", "The notice is assigned multiple times to the same object", "Notices", ValidationReportEntrySeverity.WARNING));
+        noticesAssignmentsValidationTree.addValidationRule(new ValidateNotExist("NoticeAssignment[for $a in following-sibling::NoticeAssignment return if(NoticeRef/@ref= $a/NoticeRef/@ref and NoticedObjectRef/@ref= $a/NoticedObjectRef/@ref) then $a else ()]", "The notice is assigned multiple times to the same object", "Notices", ValidationReportEntrySeverity.WARNING));
 
         return noticesAssignmentsValidationTree;
     }
