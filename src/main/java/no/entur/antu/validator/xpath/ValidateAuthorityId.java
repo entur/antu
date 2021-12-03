@@ -51,7 +51,7 @@ public class ValidateAuthorityId implements ValidationRule {
 
                     String message = "Line " + lineNumber + ", Column " + columnNumber + ", NeTEx id " + netexId + ": " +  MESSAGE ;
                     LOGGER.warn(message);
-                    validationReportEntries.add(new ValidationReportEntry(message, MESSAGE, ValidationReportEntrySeverity.WARNING, validationContext.getFileName()));
+                    validationReportEntries.add(new ValidationReportEntry(message, "Resource Frame", ValidationReportEntrySeverity.WARNING, validationContext.getFileName()));
                 }
                 return validationReportEntries;
             }

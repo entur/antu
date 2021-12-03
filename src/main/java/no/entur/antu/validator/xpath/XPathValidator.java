@@ -82,7 +82,9 @@ public class XPathValidator {
 
         compositeFrameValidationTree.addSubTree(getResourceFrameValidationTree("frames/ResourceFrame"));
         compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree("frames/ServiceCalendarFrame"));
-        compositeFrameValidationTree.addSubTree(getServiceFrameForLineFileValidationTree());
+        compositeFrameValidationTree.addSubTree(getVehicleScheduleFrameValidationTree("frames/VehicleScheduleFrame"));
+
+        compositeFrameValidationTree.addSubTree(getServiceFrameForLineFileValidationTree("frames/ServiceFrame"));
 
         return compositeFrameValidationTree;
     }
@@ -104,9 +106,10 @@ public class XPathValidator {
 
 
         validationTree.addSubTree(getResourceFrameValidationTree("ResourceFrame"));
-        validationTree.addSubTree(getServiceFrameForCommonFileValidationTree("ServiceFrame"));
         validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
         validationTree.addSubTree(getTimetableFrameValidationTree("TimetableFrame"));
+
+        validationTree.addSubTree(getServiceFrameForLineFileValidationTree("ServiceFrame"));
 
         return validationTree;
     }
@@ -124,6 +127,8 @@ public class XPathValidator {
 
         compositeFrameValidationTree.addSubTree(getResourceFrameValidationTree("frames/ResourceFrame"));
         compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree("frames/ServiceCalendarFrame"));
+        compositeFrameValidationTree.addSubTree(getVehicleScheduleFrameValidationTree("frames/VehicleScheduleFrame"));
+
         compositeFrameValidationTree.addSubTree(getServiceFrameForCommonFileValidationTree("frames/ServiceFrame"));
 
         return compositeFrameValidationTree;
@@ -149,6 +154,7 @@ public class XPathValidator {
 
     private ValidationTree getServiceFrameForCommonFileValidationTree(String path) {
         ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in common file", path);
+        serviceFrameValidationTree.addValidationRules(getServiceFrameValidationRules());
 
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/Line", "Line not allowed in  common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route", "Route not allowed in common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
@@ -160,8 +166,9 @@ public class XPathValidator {
     }
 
 
-    private ValidationTree getServiceFrameForLineFileValidationTree() {
-        ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", "frames/ServiceFrame");
+    private ValidationTree getServiceFrameForLineFileValidationTree(String path) {
+        ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", path);
+        serviceFrameValidationTree.addValidationRules(getServiceFrameValidationRules());
         return serviceFrameValidationTree;
     }
 
@@ -194,12 +201,45 @@ public class XPathValidator {
 
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//DayType[not(//DayTypeAssignment/DayTypeRef/@ref = @id)]", "DayType %{source_objectid} is not assigned to any calendar dates or periods", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(dayTypes) and not(dayTypeAssignments)]", "ServiceCalendar does not contain neither DayTypes nor DayTypeAssignments", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
-        serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(ToDate)]", " Missing ToDate on ServiceCalendar", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
+        serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(ToDate)]", "Missing ToDate on ServiceCalendar", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(FromDate)]", "Missing FromDate on ServiceCalendar", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[FromDate and ToDate and ToDate < FromDate]", "FromDate cannot be after ToDate on ServiceCalendar", "Service Calendar Frame", ValidationReportEntrySeverity.ERROR));
 
         return serviceCalendarFrameValidationTree;
+    }
+
+    private ValidationTree getVehicleScheduleFrameValidationTree(String path) {
+        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("Service Calendar frame", path);
+
+        serviceCalendarFrameValidationTree.addValidationRule(new ValidateExist("blocks/Block", "At least one Block required in VehicleScheduleFrame", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
+        serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("blocks/Block[not(journeys)]", "At least one Journey must be defined for Block", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
+        serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("blocks/Block[not(dayTypes)]", " At least one DayType must be defined for Block", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
+
+        return serviceCalendarFrameValidationTree;
+    }
+
+    private List<ValidationRule> getServiceFrameValidationRules() {
+        List<ValidationRule> validationRules = new ArrayList<>();
+        validationRules.add(new ValidateNotExist("Network[not(AuthorityRef)]", "Missing AuthorityRef on Network", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("routePoints/RoutePoint[not(projections)]", "Missing Projection on RoutePoint", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("Network[not(Name) or normalize-space(Name) = '']", "Missing Name element on Network", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("Network/groupsOfLines/GroupOfLines[not(Name)  or normalize-space(Name) = '']", "Missing Name element on GroupOfLines", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("groupsOfLines", "Unexpected element groupsOfLines outside of Network", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("timingPoints", "Unexpected element timingPoints. Content ignored", "Service Frame", ValidationReportEntrySeverity.WARNING));
+
+        validationRules.add(new ValidateNotExist("stopAssignments/PassengerStopAssignment[not(ScheduledStopPointRef)]", "Missing ScheduledStopPointRef on PassengerStopAssignment", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("stopAssignments/PassengerStopAssignment[not(QuayRef)]", "Missing QuayRef on PassengerStopAssignment","Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("stopAssignments/PassengerStopAssignment[QuayRef/@ref = following-sibling::PassengerStopAssignment/QuayRef/@ref]", "The same quay is assigned more than once in PassengerStopAssignments", "Service Frame", ValidationReportEntrySeverity.WARNING));
+
+        validationRules.add(new ValidateNotExist("serviceLinks/ServiceLink[not(FromPointRef)]", "Missing FromPointRef on ServiceLink", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("serviceLinks/ServiceLink[not(ToPointRef)]", "Missing ToPointRef on ServiceLink", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("serviceLinks/ServiceLink/projections/LinkSequenceProjection/g:LineString/g:posList[not(normalize-space(text()))]", "Missing projections element on ServiceLink", "Service Frame", ValidationReportEntrySeverity.ERROR));
+
+
+        return validationRules;
 
     }
 
 }
+
+
