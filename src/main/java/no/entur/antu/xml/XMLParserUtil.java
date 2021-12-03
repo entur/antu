@@ -8,6 +8,7 @@ import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
+import no.entur.antu.exception.AntuException;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -61,10 +62,14 @@ public final class XMLParserUtil {
         return builder.build(new StAXSource(xmlStreamReader));
     }
 
-    public static XdmValue selectNodeSet(String expression, XPathCompiler xpath, XdmNode document) throws SaxonApiException {
-        XPathSelector selector = xpath.compile(expression).load();
-        selector.setContextItem(document);
-        return selector.evaluate();
+    public static XdmValue selectNodeSet(String expression, XPathCompiler xpath, XdmNode document) {
+        try {
+            XPathSelector selector = xpath.compile(expression).load();
+            selector.setContextItem(document);
+            return selector.evaluate();
+        } catch (SaxonApiException e) {
+            throw new AntuException("Exception while selecting node with xpath " + expression, e);
+        }
     }
 
 }

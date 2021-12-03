@@ -11,6 +11,8 @@ import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static no.entur.antu.xml.XMLParserUtil.selectNodeSet;
+
 /**
  * Run XPath validation rules against the dataset.
  */
@@ -38,7 +40,7 @@ public class XPathValidator {
 
 
     private ValidationTree getCommonFileValidationTree() {
-        ValidationTree validationTree = new ValidationTree("/");
+        ValidationTree validationTree = new ValidationTree("Common file", "/");
         validationTree.addSubTree(getCompositeFrameValidationTreeForCommonFile());
         validationTree.addSubTree(getSingleFramesValidationTreeForCommonFile());
 
@@ -46,7 +48,8 @@ public class XPathValidator {
     }
 
     private ValidationTree getSingleFramesValidationTreeForCommonFile() {
-        ValidationTree validationTree = new ValidationTree("PublicationDelivery/dataObjects");
+        ValidationTree validationTree = new ValidationTree("Single frames in common file", "PublicationDelivery/dataObjects",
+                validationContext -> selectNodeSet("CompositeFrame", validationContext.getxPathCompiler(), validationContext.getXmlNode()).isEmpty());
 
         validationTree.addValidationRule(new ValidateNotExist("SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
         validationTree.addValidationRule(new ValidateNotExist("TimetableFrame", "Timetable frame not allowed in common files", "Composite Frame", ValidationReportEntrySeverity.ERROR));
@@ -66,14 +69,14 @@ public class XPathValidator {
     }
 
     private ValidationTree getLineFileValidationTree() {
-        ValidationTree validationTree = new ValidationTree("/");
+        ValidationTree validationTree = new ValidationTree("Line file", "/");
         validationTree.addSubTree(getCompositeFrameValidationTreeForLineFile());
         validationTree.addSubTree(getSingleFramesValidationTreeForLineFile());
         return validationTree;
     }
 
     private ValidationTree getCompositeFrameValidationTreeForLineFile() {
-        ValidationTree compositeFrameValidationTree = new ValidationTree("PublicationDelivery/dataObjects/CompositeFrame");
+        ValidationTree compositeFrameValidationTree = new ValidationTree("Composite frame in line file", "PublicationDelivery/dataObjects/CompositeFrame");
 
         compositeFrameValidationTree.addValidationRules(getCompositeFrameValidationRules());
 
@@ -85,7 +88,10 @@ public class XPathValidator {
     }
 
     private ValidationTree getSingleFramesValidationTreeForLineFile() {
-        ValidationTree validationTree = new ValidationTree("PublicationDelivery/dataObjects");
+        ValidationTree validationTree = new ValidationTree("Single frames in line file", "PublicationDelivery/dataObjects",
+                validationContext ->
+                        selectNodeSet("CompositeFrame", validationContext.getxPathCompiler(), validationContext.getXmlNode()).isEmpty());
+
 
         validationTree.addValidationRule(new ValidateNotExist("SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
 
@@ -106,12 +112,12 @@ public class XPathValidator {
     }
 
     private ValidationTree getTimetableFrameValidationTree(String path) {
-        ValidationTree validationTree = new ValidationTree(path);
+        ValidationTree validationTree = new ValidationTree("Timetable frame", path);
         return validationTree;
     }
 
     private ValidationTree getCompositeFrameValidationTreeForCommonFile() {
-        ValidationTree compositeFrameValidationTree = new ValidationTree("PublicationDelivery/dataObjects/CompositeFrame");
+        ValidationTree compositeFrameValidationTree = new ValidationTree("Composite frame in common file", "PublicationDelivery/dataObjects/CompositeFrame");
 
         compositeFrameValidationTree.addValidationRules(getCompositeFrameValidationRules());
         compositeFrameValidationTree.addValidationRule(new ValidateNotExist("frames/TimetableFrame", "Timetable frame not allowed in common files", "Composite Frame", ValidationReportEntrySeverity.ERROR));
@@ -142,7 +148,7 @@ public class XPathValidator {
     }
 
     private ValidationTree getServiceFrameForCommonFileValidationTree(String path) {
-        ValidationTree serviceFrameValidationTree = new ValidationTree(path);
+        ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in common file", path);
 
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/Line", "Line not allowed in  common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route", "Route not allowed in common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
@@ -155,13 +161,13 @@ public class XPathValidator {
 
 
     private ValidationTree getServiceFrameForLineFileValidationTree() {
-        ValidationTree serviceFrameValidationTree = new ValidationTree("frames/ServiceFrame");
+        ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", "frames/ServiceFrame");
         return serviceFrameValidationTree;
     }
 
 
     private ValidationTree getResourceFrameValidationTree(String path) {
-        ValidationTree resourceFrameValidationTree = new ValidationTree(path);
+        ValidationTree resourceFrameValidationTree = new ValidationTree("Resource frame", path);
 
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator[not(CompanyNumber) or normalize-space(CompanyNumber) = '']", "Missing CompanyNumber element on Operator", "Resource Frame", ValidationReportEntrySeverity.INFO));
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator[not(Name) or normalize-space(Name) = '']", "Missing Name on Operator", "Resource Frame", ValidationReportEntrySeverity.ERROR));
@@ -184,7 +190,7 @@ public class XPathValidator {
 
 
     private ValidationTree getServiceCalendarFrameValidationTree(String path) {
-        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree(path);
+        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("Service Calendar frame", path);
 
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//DayType[not(//DayTypeAssignment/DayTypeRef/@ref = @id)]", "DayType %{source_objectid} is not assigned to any calendar dates or periods", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(dayTypes) and not(dayTypeAssignments)]", "ServiceCalendar does not contain neither DayTypes nor DayTypeAssignments", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
