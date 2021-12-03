@@ -116,6 +116,9 @@ public class XPathValidator {
 
     private ValidationTree getTimetableFrameValidationTree(String path) {
         ValidationTree validationTree = new ValidationTree("Timetable frame", path);
+        validationTree.addSubTree(getNoticesValidationTree());
+        validationTree.addSubTree(getNoticeAssignmentsValidationTree());
+
         return validationTree;
     }
 
@@ -162,6 +165,8 @@ public class XPathValidator {
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("destinationDisplays/DestinationDisplay[not(FrontText) or normalize-space(FrontText) = '']", "Missing FrontText on DestinationDisplay", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("destinationDisplays/DestinationDisplay/vias/Via[not(DestinationDisplayRef)]", "Missing DestinationDisplayRef on Via", "Service Frame", ValidationReportEntrySeverity.ERROR));
 
+        serviceFrameValidationTree.addSubTree(getNoticesValidationTree());
+
         return serviceFrameValidationTree;
     }
 
@@ -169,6 +174,8 @@ public class XPathValidator {
     private ValidationTree getServiceFrameForLineFileValidationTree(String path) {
         ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", path);
         serviceFrameValidationTree.addValidationRules(getServiceFrameValidationRules());
+        serviceFrameValidationTree.addSubTree(getNoticesValidationTree());
+        serviceFrameValidationTree.addSubTree(getNoticeAssignmentsValidationTree());
         return serviceFrameValidationTree;
     }
 
@@ -239,6 +246,27 @@ public class XPathValidator {
         return validationRules;
 
     }
+
+
+    private ValidationTree getNoticesValidationTree() {
+        ValidationTree noticesValidationTree = new ValidationTree("Notices", "notices");
+
+        noticesValidationTree.addValidationRule(new ValidateExist("Notice[not(Text) or normalize-space(Text/text()) = '']", "Missing element Text for Notice", "Notices", ValidationReportEntrySeverity.ERROR));
+        noticesValidationTree.addValidationRule(new ValidateNotExist("Notice/alternativeTexts/AlternativeText[not(Text) or normalize-space(Text/text()) = '']", "Missing or empty element Text for Notice Alternative Text", "Notices", ValidationReportEntrySeverity.ERROR));
+        noticesValidationTree.addValidationRule(new ValidateNotExist("Notice/alternativeTexts/AlternativeText/Text[not(@lang)]", "Missing element Lang for Notice Alternative Text", "Notices", ValidationReportEntrySeverity.ERROR));
+        noticesValidationTree.addValidationRule(new ValidateNotExist("Notice/alternativeTexts/AlternativeText[Text/@lang = following-sibling::AlternativeText/Text/@lang or Text/@lang = preceding-sibling::AlternativeText/Text/@lang]", "The Notice has two Alternative Texts with the same language", "Notices", ValidationReportEntrySeverity.ERROR));
+
+        return noticesValidationTree;
+    }
+
+
+    private ValidationTree getNoticeAssignmentsValidationTree() {
+        ValidationTree noticesAssignmentsValidationTree = new ValidationTree("Notices Assignments", "noticeAssignments");
+        noticesAssignmentsValidationTree.addValidationRule(new ValidateExist("noticeAssignments/NoticeAssignment[for $a in following-sibling::NoticeAssignment return if(NoticeRef/@ref= $a/NoticeRef/@ref and NoticedObjectRef/@ref= $a/NoticedObjectRef/@ref) then $a else ()]", "The notice is assigned multiple times to the same object", "Notices", ValidationReportEntrySeverity.WARNING));
+
+        return noticesAssignmentsValidationTree;
+    }
+
 
 }
 
