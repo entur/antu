@@ -171,15 +171,6 @@ public class XPathValidator {
     }
 
 
-    private ValidationTree getServiceFrameForLineFileValidationTree(String path) {
-        ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", path);
-        serviceFrameValidationTree.addValidationRules(getServiceFrameValidationRules());
-        serviceFrameValidationTree.addSubTree(getNoticesValidationTree());
-        serviceFrameValidationTree.addSubTree(getNoticeAssignmentsValidationTree());
-        return serviceFrameValidationTree;
-    }
-
-
     private ValidationTree getResourceFrameValidationTree(String path) {
         ValidationTree resourceFrameValidationTree = new ValidationTree("Resource frame", path);
 
@@ -235,7 +226,7 @@ public class XPathValidator {
         validationRules.add(new ValidateNotExist("timingPoints", "Unexpected element timingPoints. Content ignored", "Service Frame", ValidationReportEntrySeverity.WARNING));
 
         validationRules.add(new ValidateNotExist("stopAssignments/PassengerStopAssignment[not(ScheduledStopPointRef)]", "Missing ScheduledStopPointRef on PassengerStopAssignment", "Service Frame", ValidationReportEntrySeverity.ERROR));
-        validationRules.add(new ValidateNotExist("stopAssignments/PassengerStopAssignment[not(QuayRef)]", "Missing QuayRef on PassengerStopAssignment","Service Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("stopAssignments/PassengerStopAssignment[not(QuayRef)]", "Missing QuayRef on PassengerStopAssignment", "Service Frame", ValidationReportEntrySeverity.ERROR));
         validationRules.add(new ValidateNotExist("stopAssignments/PassengerStopAssignment[QuayRef/@ref = following-sibling::PassengerStopAssignment/QuayRef/@ref]", "The same quay is assigned more than once in PassengerStopAssignments", "Service Frame", ValidationReportEntrySeverity.WARNING));
 
         validationRules.add(new ValidateNotExist("serviceLinks/ServiceLink[not(FromPointRef)]", "Missing FromPointRef on ServiceLink", "Service Frame", ValidationReportEntrySeverity.ERROR));
@@ -265,6 +256,23 @@ public class XPathValidator {
         noticesAssignmentsValidationTree.addValidationRule(new ValidateNotExist("NoticeAssignment[for $a in following-sibling::NoticeAssignment return if(NoticeRef/@ref= $a/NoticeRef/@ref and NoticedObjectRef/@ref= $a/NoticedObjectRef/@ref) then $a else ()]", "The notice is assigned multiple times to the same object", "Notices", ValidationReportEntrySeverity.WARNING));
 
         return noticesAssignmentsValidationTree;
+    }
+
+    private ValidationTree getServiceFrameForLineFileValidationTree(String path) {
+        ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", path);
+        serviceFrameValidationTree.addValidationRules(getServiceFrameValidationRules());
+
+        serviceFrameValidationTree.addValidationRule(new ValidateExist("lines/*[self::Line or self::FlexibleLine]", "There must be at least one Line or Flexible Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(Name) or normalize-space(Name) = '']", "Missing Name on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(PublicCode) or normalize-space(PublicCode) = '']", "Missing PublicCode on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportMode)]", "Missing TransportMode on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportSubmode)]", "Missing TransportSubmode on Line", "Service Frame", ValidationReportEntrySeverity.WARNING));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine]/routes/Route", "Routes should not be defined within a Line or FlexibleLine", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(RepresentedByGroupRef)]", " A Line must refer to a GroupOfLines or a Network through element RepresentedByGroupRef", "Service Frame", ValidationReportEntrySeverity.ERROR));
+
+        serviceFrameValidationTree.addSubTree(getNoticesValidationTree());
+        serviceFrameValidationTree.addSubTree(getNoticeAssignmentsValidationTree());
+        return serviceFrameValidationTree;
     }
 
 
