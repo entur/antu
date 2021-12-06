@@ -57,6 +57,7 @@ import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
+import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 
 
@@ -118,7 +119,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
 
 
     }
