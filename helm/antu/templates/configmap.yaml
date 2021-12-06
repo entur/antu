@@ -22,7 +22,7 @@ data:
     antu.organisation.registry.url={{ .Values.organisationRegistryUrl }}
 
     # Validators
-    antu.schema.validation.enabled=false
+    antu.schema.validation.enabled=true
 
     # PubSub
     antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}
