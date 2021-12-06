@@ -118,6 +118,50 @@ public class XPathValidator {
 
     private ValidationTree getTimetableFrameValidationTree(String path) {
         ValidationTree validationTree = new ValidationTree("Timetable frame", path);
+
+        validationTree.addValidationRule(new ValidateAtLeastOne("vehicleJourneys/ServiceJourney", "There should be at least one ServiceJourney", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney/calls", "Element Call not allowed", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[not(passingTimes)]", "The ServiceJourney does not specify any TimetabledPassingTimes", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[not(DepartureTime) and not(ArrivalTime)]", "TimetabledPassingTime contains neither DepartureTime nor ArrivalTime", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[not(passingTimes/TimetabledPassingTime[1]/DepartureTime)]", "All TimetabledPassingTime except last call must have DepartureTime", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[count(passingTimes/TimetabledPassingTime[last()]/ArrivalTime) = 0]", "Last TimetabledPassingTime must have ArrivalTime", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[DepartureTime = ArrivalTime]", "ArrivalTime is identical to DepartureTime", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[not(@id)]", "Missing id on TimetabledPassingTime", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[not(@version)]", "Missing version on TimetabledPassingTime", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+
+
+
+
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[not(JourneyPatternRef)]", "The ServiceJourney does not refer to a JourneyPattern", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[(TransportMode and not(TransportSubmode))  or (not(TransportMode) and TransportSubmode)]", "If overriding Line TransportMode or TransportSubmode on a ServiceJourney, both elements must be present", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[not(OperatorRef) and not(//ServiceFrame/lines/*[self::Line or self::FlexibleLine]/OperatorRef)]", "Missing OperatorRef on ServiceJourney (not defined on Line)", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[not(dayTypes/DayTypeRef) and not(@id=//TimetableFrame/vehicleJourneys/DatedServiceJourney/ServiceJourneyRef/@ref)]", "The ServiceJourney does not refer to DayTypes nor DatedServiceJourneys", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[dayTypes/DayTypeRef and @id=//TimetableFrame/vehicleJourneys/DatedServiceJourney/ServiceJourneyRef/@ref]", "The ServiceJourney references both DayTypes and DatedServiceJourneys", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("for $a in vehicleJourneys/ServiceJourney return if(count(//ServiceFrame/journeyPatterns/*[@id = $a/JourneyPatternRef/@ref]/pointsInSequence/StopPointInJourneyPattern) != count($a/passingTimes/TimetabledPassingTime)) then $a else ()", "ServiceJourney %{source_objectid} does not specify passing time for all StopPointInJourneyPattern", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[@id = preceding-sibling::ServiceJourney/@id]", "ServiceJourney is repeated with a different version", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/DatedServiceJourney[not(OperatingDayRef)]", "Missing OperatingDayRef on DatedServiceJourney", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/DatedServiceJourney[not(ServiceJourneyRef)]", "Missing ServiceJourneyRef on DatedServiceJourney", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/DatedServiceJourney[count(ServiceJourneyRef) > 1]", "Multiple ServiceJourneyRef on DatedServiceJourney", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/DatedServiceJourney[@id = preceding-sibling::DatedServiceJourney/@id]", "DatedServiceJourney is repeated with a different version", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/DeadRun[not(passingTimes)]", "The Dead run does not reference passing times", "Timetable Frame", ValidationReportEntrySeverity.INFO));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/DeadRun[not(JourneyPatternRef)]", "The Dead run does not reference a journey pattern", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/DeadRun[not(dayTypes/DayTypeRef)]", "The Dead run does not reference day types", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney/FlexibleServiceProperties[not(@id)]", "Missing id on FlexibleServiceProperties", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney/FlexibleServiceProperties[not(@version)]", "Missing version on FlexibleServiceProperties", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+
+        validationTree.addValidationRule(new ValidateAllowedFlexibleServiceType());
+        validationTree.addValidationRule(new ValidateAllowedBookingWhenProperty("vehicleJourneys/ServiceJourney/FlexibleServiceProperties"));
+        validationTree.addValidationRule(new ValidateAllowedBuyWhenProperty("vehicleJourneys/ServiceJourney/FlexibleServiceProperties"));
+        validationTree.addValidationRule(new ValidateAllowedBookingMethodProperty("vehicleJourneys/ServiceJourney/FlexibleServiceProperties"));
+        validationTree.addValidationRule(new ValidateAllowedBookingAccessProperty("vehicleJourneys/ServiceJourney/FlexibleServiceProperties"));
+
+        validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[Advertised or Planned]", "The 'Planned' and 'Advertised' properties of an Interchange should not be specified", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+        validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[Guaranteed='true' and  (MaximumWaitTime='PT0S' or MaximumWaitTime='PT0M') ]", "Guaranted Interchange should not have a maximum wait time value of zero", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+        validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[MaximumWaitTime > xs:dayTimeDuration('PT1H')]", "The maximum waiting time after planned departure for the interchange consumer journey (MaximumWaitTime) should not be longer than one hour", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+
         validationTree.addSubTree(getNoticesValidationTree());
         validationTree.addSubTree(getNoticeAssignmentsValidationTree());
 
