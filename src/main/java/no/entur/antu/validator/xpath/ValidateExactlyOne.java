@@ -1,26 +1,23 @@
 package no.entur.antu.validator.xpath;
 
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
-import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class ValidateNotExist implements ValidationRule {
+public class ValidateExactlyOne implements ValidationRule {
 
     private final String xpath;
     private final String message;
     private final String category;
     private final ValidationReportEntrySeverity severity;
 
-    public ValidateNotExist(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
+    public ValidateExactlyOne(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
         this.xpath = xpath;
         this.message = message;
         this.category = category;
@@ -28,21 +25,15 @@ public class ValidateNotExist implements ValidationRule {
     }
 
     @Override
-    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+    public List<ValidationReportEntry> validate(ValidationContext validationContext)  {
         try {
             XPathSelector selector = validationContext.getxPathCompiler().compile(xpath).load();
             selector.setContextItem(validationContext.getXmlNode());
             XdmValue nodes = selector.evaluate();
-            List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
-            for (XdmItem item : nodes) {
-                XdmNode xdmNode = (XdmNode) item;
-                int lineNumber = xdmNode.getLineNumber();
-                int columnNumber = xdmNode.getColumnNumber();
-                String netexId = xdmNode.getAttributeValue(new QName("id"));
-                String validationReportEntryMessage = "[Line " + lineNumber + ", Column " + columnNumber + ", Id " + netexId + "] " + message;
-                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, category, severity, validationContext.getFileName()));
+            if (nodes.size() != 1) {
+                return List.of(new ValidationReportEntry(message, category, severity, validationContext.getFileName()));
             }
-            return validationReportEntries;
+            return Collections.emptyList();
         } catch (SaxonApiException e) {
             throw new AntuException("Error while validating rule " + xpath, e);
         }

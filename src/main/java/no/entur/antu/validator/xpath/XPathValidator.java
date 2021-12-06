@@ -51,10 +51,12 @@ public class XPathValidator {
         ValidationTree validationTree = new ValidationTree("Single frames in common file", "PublicationDelivery/dataObjects",
                 validationContext -> selectNodeSet("CompositeFrame", validationContext.getxPathCompiler(), validationContext.getXmlNode()).isEmpty());
 
+
+
         validationTree.addValidationRule(new ValidateNotExist("SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
         validationTree.addValidationRule(new ValidateNotExist("TimetableFrame", "Timetable frame not allowed in common files", "Composite Frame", ValidationReportEntrySeverity.ERROR));
 
-        validationTree.addValidationRule(new ValidateExist("ServiceFrame[validityConditions] | ServiceCalendarFrame[validityConditions]", "Neither ServiceFrame nor ServiceCalendarFrame defines ValidityConditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateAtLeastOne("ServiceFrame[validityConditions] | ServiceCalendarFrame[validityConditions]", "Neither ServiceFrame nor ServiceCalendarFrame defines ValidityConditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
 
         validationTree.addValidationRule(new ValidateNotExist("ResourceFrame[not(validityConditions) and count(//ResourceFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
         validationTree.addValidationRule(new ValidateNotExist("ServiceFrame[not(validityConditions) and count(//ServiceFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
@@ -78,7 +80,7 @@ public class XPathValidator {
     private ValidationTree getCompositeFrameValidationTreeForLineFile() {
         ValidationTree compositeFrameValidationTree = new ValidationTree("Composite frame in line file", "PublicationDelivery/dataObjects/CompositeFrame");
 
-        compositeFrameValidationTree.addValidationRules(getCompositeFrameValidationRules());
+        compositeFrameValidationTree.addValidationRules(getCompositeFrameBaseValidationRules());
 
         compositeFrameValidationTree.addSubTree(getResourceFrameValidationTree("frames/ResourceFrame"));
         compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree("frames/ServiceCalendarFrame"));
@@ -94,10 +96,10 @@ public class XPathValidator {
                 validationContext ->
                         selectNodeSet("CompositeFrame", validationContext.getxPathCompiler(), validationContext.getXmlNode()).isEmpty());
 
+        validationTree.addValidationRule(new ValidateExactlyOne("ResourceFrame", "Exactly one ResourceFrame should be present", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Single Frames", ValidationReportEntrySeverity.WARNING));
 
-        validationTree.addValidationRule(new ValidateNotExist("SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
-
-        validationTree.addValidationRule(new ValidateExist("ServiceFrame[validityConditions] | ServiceCalendarFrame[validityConditions] | TimetableFrame[validityConditions]", "Neither ServiceFrame, ServiceCalendarFrame nor TimetableFrame defines ValidityConditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateAtLeastOne("ServiceFrame[validityConditions] | ServiceCalendarFrame[validityConditions] | TimetableFrame[validityConditions]", "Neither ServiceFrame, ServiceCalendarFrame nor TimetableFrame defines ValidityConditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
 
         validationTree.addValidationRule(new ValidateNotExist("ServiceFrame[not(validityConditions) and count(//ServiceFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
         validationTree.addValidationRule(new ValidateNotExist("ServiceCalendarFrame[not(validityConditions) and count(//ServiceCalendarFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
@@ -125,7 +127,7 @@ public class XPathValidator {
     private ValidationTree getCompositeFrameValidationTreeForCommonFile() {
         ValidationTree compositeFrameValidationTree = new ValidationTree("Composite frame in common file", "PublicationDelivery/dataObjects/CompositeFrame");
 
-        compositeFrameValidationTree.addValidationRules(getCompositeFrameValidationRules());
+        compositeFrameValidationTree.addValidationRules(getCompositeFrameBaseValidationRules());
         compositeFrameValidationTree.addValidationRule(new ValidateNotExist("frames/TimetableFrame", "Timetable frame not allowed in common files", "Composite Frame", ValidationReportEntrySeverity.ERROR));
 
         compositeFrameValidationTree.addSubTree(getResourceFrameValidationTree("frames/ResourceFrame"));
@@ -137,13 +139,17 @@ public class XPathValidator {
         return compositeFrameValidationTree;
     }
 
-    private List<ValidationRule> getCompositeFrameValidationRules() {
+    /**
+     * CompositeFrame validation rules that apply both to Line files and common files.
+     * @return
+     */
+    private List<ValidationRule> getCompositeFrameBaseValidationRules() {
         List<ValidationRule> validationRules = new ArrayList<>();
         validationRules.add(new ValidateNotExist("frames/SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
 
         validationRules.add(new ValidateNotExist(".[not(validityConditions)]", "A CompositeFrame must define a ValidityCondition valid for all data within the CompositeFrame", "Composite Frame", ValidationReportEntrySeverity.ERROR));
         validationRules.add(new ValidateNotExist("frames//validityConditions", "ValidityConditions defined inside a frame inside a CompositeFrame", "Composite Frame", ValidationReportEntrySeverity.ERROR));
-        validationRules.add(new ValidateNSRCodespaceExist());
+        validationRules.add(new ValidateNSRCodespace());
 
         validationRules.add(new ValidateNotExist("//ValidBetween[not(FromDate) and not(ToDate)]", "ValidBetween missing either or both of FromDate/ToDate", "Composite Frame", ValidationReportEntrySeverity.ERROR));
         validationRules.add(new ValidateNotExist("//ValidBetween[FromDate and ToDate and ToDate < FromDate]", "FromDate cannot be after ToDate on ValidBetween", "Composite Frame", ValidationReportEntrySeverity.ERROR));
@@ -157,13 +163,11 @@ public class XPathValidator {
 
     private ValidationTree getServiceFrameForCommonFileValidationTree(String path) {
         ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in common file", path);
-        serviceFrameValidationTree.addValidationRules(getServiceFrameValidationRules());
+        serviceFrameValidationTree.addValidationRules(getServiceFrameBaseValidationRules());
 
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/Line", "Line not allowed in  common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route", "Route not allowed in common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("journeyPatterns/JourneyPattern | journeyPatterns/ServiceJourneyPattern", "JourneyPattern not allowed in common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("destinationDisplays/DestinationDisplay[not(FrontText) or normalize-space(FrontText) = '']", "Missing FrontText on DestinationDisplay", "Service Frame", ValidationReportEntrySeverity.ERROR));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("destinationDisplays/DestinationDisplay/vias/Via[not(DestinationDisplayRef)]", "Missing DestinationDisplayRef on Via", "Service Frame", ValidationReportEntrySeverity.ERROR));
 
         serviceFrameValidationTree.addSubTree(getNoticesValidationTree());
 
@@ -209,14 +213,18 @@ public class XPathValidator {
     private ValidationTree getVehicleScheduleFrameValidationTree(String path) {
         ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("Service Calendar frame", path);
 
-        serviceCalendarFrameValidationTree.addValidationRule(new ValidateExist("blocks/Block", "At least one Block required in VehicleScheduleFrame", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
+        serviceCalendarFrameValidationTree.addValidationRule(new ValidateAtLeastOne("blocks/Block", "At least one Block required in VehicleScheduleFrame", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("blocks/Block[not(journeys)]", "At least one Journey must be defined for Block", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("blocks/Block[not(dayTypes)]", " At least one DayType must be defined for Block", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
 
         return serviceCalendarFrameValidationTree;
     }
 
-    private List<ValidationRule> getServiceFrameValidationRules() {
+    /**
+     * Validation rules that apply both to Line files and Common files.
+     * @return
+     */
+    private List<ValidationRule> getServiceFrameBaseValidationRules() {
         List<ValidationRule> validationRules = new ArrayList<>();
         validationRules.add(new ValidateNotExist("Network[not(AuthorityRef)]", "Missing AuthorityRef on Network", "Service Frame", ValidationReportEntrySeverity.ERROR));
         validationRules.add(new ValidateNotExist("routePoints/RoutePoint[not(projections)]", "Missing Projection on RoutePoint", "Service Frame", ValidationReportEntrySeverity.ERROR));
@@ -232,6 +240,9 @@ public class XPathValidator {
         validationRules.add(new ValidateNotExist("serviceLinks/ServiceLink[not(FromPointRef)]", "Missing FromPointRef on ServiceLink", "Service Frame", ValidationReportEntrySeverity.ERROR));
         validationRules.add(new ValidateNotExist("serviceLinks/ServiceLink[not(ToPointRef)]", "Missing ToPointRef on ServiceLink", "Service Frame", ValidationReportEntrySeverity.ERROR));
         validationRules.add(new ValidateNotExist("serviceLinks/ServiceLink/projections/LinkSequenceProjection/g:LineString/g:posList[not(normalize-space(text()))]", "Missing projections element on ServiceLink", "Service Frame", ValidationReportEntrySeverity.ERROR));
+
+        validationRules.add((new ValidateNotExist("destinationDisplays/DestinationDisplay[not(FrontText) or normalize-space(FrontText) = '']", "Missing FrontText on DestinationDisplay", "Service Frame", ValidationReportEntrySeverity.ERROR)));
+        validationRules.add((new ValidateNotExist("destinationDisplays/DestinationDisplay/vias/Via[not(DestinationDisplayRef)]",  "Missing DestinationDisplayRef on Via", "Service Frame", ValidationReportEntrySeverity.ERROR)));
 
 
         return validationRules;
@@ -260,15 +271,49 @@ public class XPathValidator {
 
     private ValidationTree getServiceFrameForLineFileValidationTree(String path) {
         ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", path);
-        serviceFrameValidationTree.addValidationRules(getServiceFrameValidationRules());
+        serviceFrameValidationTree.addValidationRules(getServiceFrameBaseValidationRules());
 
-        serviceFrameValidationTree.addValidationRule(new ValidateExist("lines/*[self::Line or self::FlexibleLine]", "There must be at least one Line or Flexible Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateExactlyOne("lines/*[self::Line or self::FlexibleLine]", "There must be either Lines or Flexible Lines", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(Name) or normalize-space(Name) = '']", "Missing Name on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(PublicCode) or normalize-space(PublicCode) = '']", "Missing PublicCode on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportMode)]", "Missing TransportMode on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportSubmode)]", "Missing TransportSubmode on Line", "Service Frame", ValidationReportEntrySeverity.WARNING));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine]/routes/Route", "Routes should not be defined within a Line or FlexibleLine", "Service Frame", ValidationReportEntrySeverity.ERROR));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(RepresentedByGroupRef)]", " A Line must refer to a GroupOfLines or a Network through element RepresentedByGroupRef", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(RepresentedByGroupRef)]", "A Line must refer to a GroupOfLines or a Network through element RepresentedByGroupRef", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidatedAllowedTransportMode());
+        serviceFrameValidationTree.addValidationRule(new ValidatedAllowedTransportSubMode());
+
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/FlexibleLine[not(FlexibleLineType)]", "Missing FlexibleLineType on FlexibleLine", "Flexible Line", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateMandatoryBookingProperty("BookingMethods"));
+        serviceFrameValidationTree.addValidationRule(new ValidateMandatoryBookingProperty("BookingContact"));
+        serviceFrameValidationTree.addValidationRule(new ValidateMandatoryBookingProperty("BookWhen"));
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedFlexibleLineType());
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedBookingWhenProperty("lines/FlexibleLine"));
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedBuyWhenProperty("lines/FlexibleLine"));
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedBookingMethodProperty("lines/FlexibleLine"));
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedBookingAccessProperty("lines/FlexibleLine"));
+
+        serviceFrameValidationTree.addValidationRule((new ValidateAtLeastOne("routes/Route", "There should be at least one Route", "Service Frame", ValidationReportEntrySeverity.ERROR)));
+
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route[not(Name) or normalize-space(Name) = '']", "Missing Name on Route", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route[not(LineRef) and not(FlexibleLineRef)]", "Missing lineRef on Route", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route[not(pointsInSequence)]", "Missing pointsInSequence on Route", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route/DirectionRef", "DirectionRef not allowed on Route (use DirectionType)", "Service Frame", ValidationReportEntrySeverity.WARNING));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route/pointsInSequence/PointOnRoute[@order = preceding-sibling::PointOnRoute/@order]", "Several points on route have the same order", "Service Frame", ValidationReportEntrySeverity.WARNING));
+
+        serviceFrameValidationTree.addValidationRule((new ValidateNotExist("journeyPatterns/ServiceJourneyPattern", "ServiceJourneyPattern not allowed", "Service Frame", ValidationReportEntrySeverity.ERROR)));
+        serviceFrameValidationTree.addValidationRule((new ValidateAtLeastOne("journeyPatterns/JourneyPattern", "No JourneyPattern defined in the Service Frame", "Service Frame", ValidationReportEntrySeverity.ERROR)));
+
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("journeyPatterns/JourneyPattern[not(RouteRef)]", "Missing RouteRef on JourneyPattern", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("journeyPatterns/JourneyPattern/pointsInSequence/StopPointInJourneyPattern[1][not(DestinationDisplayRef)]", "Missing DestinationDisplayRef on first StopPointInJourneyPattern", "Service Frame", ValidationReportEntrySeverity.WARNING));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("journeyPatterns/JourneyPattern/pointsInSequence/StopPointInJourneyPattern[last()][DestinationDisplayRef]", "DestinationDisplayRef not allowed on last StopPointInJourneyPattern", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("journeyPatterns/JourneyPattern/pointsInSequence/StopPointInJourneyPattern[ForAlighting = 'false' and ForBoarding = 'false']", "StopPointInJourneyPattern neither allows boarding nor alighting", "Stop point in journey pattern", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("journeyPatterns/JourneyPattern/pointsInSequence/StopPointInJourneyPattern[DestinationDisplayRef/@ref = preceding-sibling::StopPointInJourneyPattern[1]/DestinationDisplayRef/@ref and number(@order) >  number(preceding-sibling::StopPointInJourneyPattern[1]/@order)]", "StopPointInJourneyPattern declares reference to the same DestinationDisplay as previous StopPointInJourneyPattern", "Stop point in journey pattern", ValidationReportEntrySeverity.ERROR));
+
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedBookingWhenProperty("journeyPatterns/JourneyPattern/pointsInSequence/StopPointInJourneyPattern"));
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedBuyWhenProperty("journeyPatterns/JourneyPattern/pointsInSequence/StopPointInJourneyPattern"));
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedBookingMethodProperty("journeyPatterns/JourneyPattern/pointsInSequence/StopPointInJourneyPattern"));
+        serviceFrameValidationTree.addValidationRule(new ValidateAllowedBookingAccessProperty("journeyPatterns/JourneyPattern/pointsInSequence/StopPointInJourneyPattern"));
 
         serviceFrameValidationTree.addSubTree(getNoticesValidationTree());
         serviceFrameValidationTree.addSubTree(getNoticeAssignmentsValidationTree());
@@ -277,5 +322,3 @@ public class XPathValidator {
 
 
 }
-
-
