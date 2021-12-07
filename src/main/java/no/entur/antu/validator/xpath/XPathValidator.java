@@ -41,6 +41,7 @@ public class XPathValidator {
 
     private ValidationTree getCommonFileValidationTree() {
         ValidationTree validationTree = new ValidationTree("Common file", "/");
+        validationTree.addValidationRule(new ValidateAllowedCodespaces());
         validationTree.addSubTree(getCompositeFrameValidationTreeForCommonFile());
         validationTree.addSubTree(getSingleFramesValidationTreeForCommonFile());
 
@@ -64,7 +65,7 @@ public class XPathValidator {
 
 
         validationTree.addSubTree(getResourceFrameValidationTree("ResourceFrame"));
-        validationTree.addSubTree(getServiceFrameForCommonFileValidationTree("ServiceFrame"));
+        validationTree.addSubTree(getServiceFrameValidationTreeForCommonFile("ServiceFrame"));
         validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
 
         return validationTree;
@@ -72,6 +73,7 @@ public class XPathValidator {
 
     private ValidationTree getLineFileValidationTree() {
         ValidationTree validationTree = new ValidationTree("Line file", "/");
+        validationTree.addValidationRule(new ValidateAllowedCodespaces());
         validationTree.addSubTree(getCompositeFrameValidationTreeForLineFile());
         validationTree.addSubTree(getSingleFramesValidationTreeForLineFile());
         return validationTree;
@@ -86,7 +88,8 @@ public class XPathValidator {
         compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree("frames/ServiceCalendarFrame"));
         compositeFrameValidationTree.addSubTree(getVehicleScheduleFrameValidationTree("frames/VehicleScheduleFrame"));
 
-        compositeFrameValidationTree.addSubTree(getServiceFrameForLineFileValidationTree("frames/ServiceFrame"));
+        compositeFrameValidationTree.addSubTree(getServiceFrameValidationTreeForLineFile("frames/ServiceFrame"));
+        compositeFrameValidationTree.addSubTree(getTimetableFrameValidationTree("frames/TimetableFrame"));
 
         return compositeFrameValidationTree;
     }
@@ -111,7 +114,7 @@ public class XPathValidator {
         validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
         validationTree.addSubTree(getTimetableFrameValidationTree("TimetableFrame"));
 
-        validationTree.addSubTree(getServiceFrameForLineFileValidationTree("ServiceFrame"));
+        validationTree.addSubTree(getServiceFrameValidationTreeForLineFile("ServiceFrame"));
 
         return validationTree;
     }
@@ -178,7 +181,7 @@ public class XPathValidator {
         compositeFrameValidationTree.addSubTree(getServiceCalendarFrameValidationTree("frames/ServiceCalendarFrame"));
         compositeFrameValidationTree.addSubTree(getVehicleScheduleFrameValidationTree("frames/VehicleScheduleFrame"));
 
-        compositeFrameValidationTree.addSubTree(getServiceFrameForCommonFileValidationTree("frames/ServiceFrame"));
+        compositeFrameValidationTree.addSubTree(getServiceFrameValidationTreeForCommonFile("frames/ServiceFrame"));
 
         return compositeFrameValidationTree;
     }
@@ -192,7 +195,7 @@ public class XPathValidator {
         validationRules.add(new ValidateNotExist("frames/SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
 
         validationRules.add(new ValidateNotExist(".[not(validityConditions)]", "A CompositeFrame must define a ValidityCondition valid for all data within the CompositeFrame", "Composite Frame", ValidationReportEntrySeverity.ERROR));
-        validationRules.add(new ValidateNotExist("frames//validityConditions", "ValidityConditions defined inside a frame inside a CompositeFrame", "Composite Frame", ValidationReportEntrySeverity.ERROR));
+        validationRules.add(new ValidateNotExist("frames//validityConditions", "ValidityConditions defined inside a frame inside a CompositeFrame", "Composite Frame", ValidationReportEntrySeverity.WARNING));
         validationRules.add(new ValidateNSRCodespace());
 
         validationRules.add(new ValidateNotExist("//ValidBetween[not(FromDate) and not(ToDate)]", "ValidBetween missing either or both of FromDate/ToDate", "Composite Frame", ValidationReportEntrySeverity.ERROR));
@@ -205,7 +208,7 @@ public class XPathValidator {
 
     }
 
-    private ValidationTree getServiceFrameForCommonFileValidationTree(String path) {
+    private ValidationTree getServiceFrameValidationTreeForCommonFile(String path) {
         ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in common file", path);
         serviceFrameValidationTree.addValidationRules(getServiceFrameBaseValidationRules());
 
@@ -313,7 +316,7 @@ public class XPathValidator {
         return noticesAssignmentsValidationTree;
     }
 
-    private ValidationTree getServiceFrameForLineFileValidationTree(String path) {
+    private ValidationTree getServiceFrameValidationTreeForLineFile(String path) {
         ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", path);
         serviceFrameValidationTree.addValidationRules(getServiceFrameBaseValidationRules());
 
