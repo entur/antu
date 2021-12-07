@@ -63,7 +63,7 @@ public class ValidateAllowedCodespaces implements ValidationRule {
 
 
     private NetexCodespace getCurrentNetexCodespace(String codespace) {
-        return new NetexCodespace(codespace, "http://www.rutebanken.org/ns/" + codespace.toLowerCase(Locale.ROOT));
+        return new NetexCodespace(codespace.toUpperCase(Locale.ROOT), "http://www.rutebanken.org/ns/" + codespace.toLowerCase(Locale.ROOT));
     }
 
     @Override
