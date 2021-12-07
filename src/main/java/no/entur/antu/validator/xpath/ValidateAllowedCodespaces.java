@@ -10,31 +10,23 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.codespace.NetexCodespace;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static no.entur.antu.Constants.NETEX_NAMESPACE;
-import static no.entur.antu.Constants.NSR_XMLNS;
-import static no.entur.antu.Constants.NSR_XMLNSURL;
-import static no.entur.antu.Constants.PEN_XMLNS;
-import static no.entur.antu.Constants.PEN_XMLNSURL;
 
 public class ValidateAllowedCodespaces implements ValidationRule {
 
-    private static final NetexCodespace NSR_NETEX_CODESPACE = new NetexCodespace(NSR_XMLNS, NSR_XMLNSURL);
-    private static final NetexCodespace PEN_NETEX_CODESPACE = new NetexCodespace(PEN_XMLNS, PEN_XMLNSURL);
     private static final String MESSAGE_FORMAT = " Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s";
 
     @Override
     public List<ValidationReportEntry> validate(ValidationContext validationContext) {
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
-        NetexCodespace currentCodespace = getCurrentNetexCodespace(validationContext.getCodespace());
-        Set<NetexCodespace> validCodespaces = Set.of(NSR_NETEX_CODESPACE, PEN_NETEX_CODESPACE, currentCodespace);
+        Set<NetexCodespace> validCodespaces = NetexCodespace.getValidNetexCodespacesFor(validationContext.getCodespace());
         try {
             XPathSelector selector = validationContext.getxPathCompiler().compile("PublicationDelivery/dataObjects/*/codespaces/Codespace | PublicationDelivery/dataObjects/CompositeFrame/frames/*/codespaces/Codespace").load();
             selector.setContextItem(validationContext.getXmlNode());
@@ -61,48 +53,9 @@ public class ValidateAllowedCodespaces implements ValidationRule {
         }
     }
 
-
-    private NetexCodespace getCurrentNetexCodespace(String codespace) {
-        return new NetexCodespace(codespace.toUpperCase(Locale.ROOT), "http://www.rutebanken.org/ns/" + codespace.toLowerCase(Locale.ROOT));
-    }
-
     @Override
     public String getMessage() {
         return MESSAGE_FORMAT;
-    }
-
-
-    private static class NetexCodespace {
-
-        private final String xmlns;
-        private final String xmlnsUrl;
-
-        private NetexCodespace(String xmlns, String xmlnsUrl) {
-            this.xmlns = xmlns;
-            this.xmlnsUrl = xmlnsUrl;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            NetexCodespace netexCodespace = (NetexCodespace) o;
-            return Objects.equals(xmlns, netexCodespace.xmlns) && Objects.equals(xmlnsUrl, netexCodespace.xmlnsUrl);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(xmlns, xmlnsUrl);
-        }
-
-        @Override
-        public String toString() {
-            return "{" +
-                    "xmlns='" + xmlns + '\'' +
-                    ", xmlnsUrl='" + xmlnsUrl + '\'' +
-                    '}';
-        }
-
     }
 
 
