@@ -55,8 +55,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("init-dataset-validation");
 
-        // pulling synchronously with one consumer to ensure that jobs are processed one by one.
-        from("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue?synchronousPull=true")
+        from("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue?synchronousPull=true&concurrentConsumers={{antu.netex.job.consumers:1}}")
                 .to("direct:processJob")
                 .routeId("process-job-queue-pubsub");
 

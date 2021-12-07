@@ -103,23 +103,23 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .routeId("run-netex-validators");
 
         from("direct:validateSchema").streamCaching()
-                .log(LoggingLevel.INFO, correlation() + "Validating NeTEx schema")
+                .log(LoggingLevel.INFO, correlation() + "Running NeTEx schema validation")
                 .setBody(method("netexSchemaValidator", "validateSchema(${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})"))
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
                     validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
                 })
-                .log(LoggingLevel.INFO, correlation() + "Validated NeTEx schema")
+                .log(LoggingLevel.INFO, correlation() + "NeTEx schema validation complete")
                 .routeId("validate-schema");
 
         from("direct:validateXPath").streamCaching()
-                .log(LoggingLevel.INFO, correlation() + "Validating Authority IDs")
+                .log(LoggingLevel.INFO, correlation() + "Running XPath validation")
                 .setBody(method("xpathValidator", "validate(${header." + DATASET_CODESPACE + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})"))
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
                     validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
                 })
-                .log(LoggingLevel.INFO, correlation() + "Validated Authority IDs")
+                .log(LoggingLevel.INFO, correlation() + "XPath validation complete")
                 .routeId("validate-xpath");
 
         from("direct:reportSystemError")

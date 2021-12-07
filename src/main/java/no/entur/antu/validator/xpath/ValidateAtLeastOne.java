@@ -1,7 +1,6 @@
 package no.entur.antu.validator.xpath;
 
 import net.sf.saxon.s9api.SaxonApiException;
-import net.sf.saxon.s9api.XPathExecutable;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
@@ -11,14 +10,14 @@ import no.entur.antu.validator.ValidationReportEntrySeverity;
 import java.util.Collections;
 import java.util.List;
 
-public class ValidateExist implements ValidationRule {
+public class ValidateAtLeastOne implements ValidationRule {
 
     private final String xpath;
     private final String message;
     private final String category;
     private final ValidationReportEntrySeverity severity;
 
-    public ValidateExist(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
+    public ValidateAtLeastOne(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
         this.xpath = xpath;
         this.message = message;
         this.category = category;
@@ -28,8 +27,7 @@ public class ValidateExist implements ValidationRule {
     @Override
     public List<ValidationReportEntry> validate(ValidationContext validationContext)  {
         try {
-            XPathExecutable compile = validationContext.getxPathCompiler().compile(xpath);
-            XPathSelector selector = compile.load();
+            XPathSelector selector = validationContext.getxPathCompiler().compile(xpath).load();
             selector.setContextItem(validationContext.getXmlNode());
             XdmValue nodes = selector.evaluate();
             if (nodes.isEmpty()) {
