@@ -1,6 +1,5 @@
 package no.entur.antu.validator.xpath;
 
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
@@ -13,7 +12,7 @@ import no.entur.antu.validator.ValidationReportEntrySeverity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ValidateNotExist implements ValidationRule {
+public class ValidateNotExist extends AbstractXPathValidationRule {
 
     private final String xpath;
     private final String message;
@@ -36,10 +35,7 @@ public class ValidateNotExist implements ValidationRule {
             List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
             for (XdmItem item : nodes) {
                 XdmNode xdmNode = (XdmNode) item;
-                int lineNumber = xdmNode.getLineNumber();
-                int columnNumber = xdmNode.getColumnNumber();
-                String netexId = xdmNode.getAttributeValue(new QName("id"));
-                String validationReportEntryMessage = "[Line " + lineNumber + ", Column " + columnNumber + ", Id " + netexId + "] " + message;
+                String validationReportEntryMessage = getXdmNodeLocation(xdmNode) + message;
                 validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, category, severity, validationContext.getFileName()));
             }
             return validationReportEntries;
@@ -52,4 +48,16 @@ public class ValidateNotExist implements ValidationRule {
     public String getMessage() {
         return message;
     }
+
+    @Override
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public ValidationReportEntrySeverity getSeverity() {
+        return severity;
+    }
+
+
 }

@@ -37,13 +37,13 @@ public class NetexIdValidator {
         for (IdVersion id : localIds) {
             Matcher m = PATTERN_VALID_ID.matcher(id.getId());
             if (!m.matches()) {
-                String validationReportEntryMessage = idVersionLocation(id) + MESSAGE_FORMAT_INVALID_ID_STRUCTURE;
+                String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_INVALID_ID_STRUCTURE;
                 validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR));
                 LOGGER.debug("Id {} in line file have an invalid format. Correct format is {}", id, REGEXP_VALID_ID);
             } else {
                 if (!m.group(2).equals(id.getElementName())) {
                     String expectedId = m.group(1) + ":" + id.getElementName() + ":" + m.group(3);
-                    String validationReportEntryMessage = idVersionLocation(id) + String.format(MESSAGE_FORMAT_INVALID_ID_NAME, id.getId(), expectedId);
+                    String validationReportEntryMessage = getIdVersionLocation(id) + String.format(MESSAGE_FORMAT_INVALID_ID_NAME, id.getId(), expectedId);
                     validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR));
                     LOGGER.debug("Id {} in file have an invalid format for the name part. Expected {}", id, expectedId);
                 }
@@ -51,7 +51,7 @@ public class NetexIdValidator {
                 String prefix = m.group(1);
                 if (!validNetexCodespaces.contains(prefix)) {
 
-                    String validationReportEntryMessage = idVersionLocation(id) + String.format(MESSAGE_FORMAT_UNAPPROVED_CODESPACE, validNetexCodespaceList);
+                    String validationReportEntryMessage = getIdVersionLocation(id) + String.format(MESSAGE_FORMAT_UNAPPROVED_CODESPACE, validNetexCodespaceList);
                     validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR));
                     LOGGER.debug("Id {} in file have an invalid format for the name part. Expected {}", id, validNetexCodespaceList);
                 }
@@ -63,7 +63,7 @@ public class NetexIdValidator {
 
     }
 
-    private String idVersionLocation(IdVersion id) {
+    private String getIdVersionLocation(IdVersion id) {
         return "[Line " + id.getLineNumber() + ", Column " + id.getColumnNumber() + ", Id " + id.getId() + "] ";
     }
 

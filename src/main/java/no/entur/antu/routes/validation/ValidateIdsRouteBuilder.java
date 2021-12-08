@@ -20,7 +20,10 @@ package no.entur.antu.routes.validation;
 
 
 import net.sf.saxon.s9api.XdmNode;
+import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.validator.ValidationReport;
+import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.id.IdVersion;
 import no.entur.antu.validator.id.NetexIdExtractorHelper;
 import no.entur.antu.validator.id.NetexIdValidator;
@@ -35,6 +38,7 @@ import java.util.Set;
 
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.GCS_BUCKET_FILE_NAME;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 
 
@@ -49,7 +53,9 @@ public class ValidateIdsRouteBuilder extends BaseRouteBuilder {
         super.configure();
 
         from("direct:validateIds")
+                .setHeader(FILE_HANDLE, simple(GCS_BUCKET_FILE_NAME))
                 .log(LoggingLevel.INFO, correlation() + "Validating Ids for NeTEx file ${header." + FILE_HANDLE + "}")
+                .to("direct:downloadSingleNetexFile")
                 .process(exchange -> {
                     byte[] content = exchange.getIn().getBody(byte[].class);
                     String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
@@ -63,6 +69,11 @@ public class ValidateIdsRouteBuilder extends BaseRouteBuilder {
 
                     NetexIdValidator netexIdValidator = new NetexIdValidator();
                     exchange.getIn().setBody(netexIdValidator.validateIdStructure(validationContext, localIds));
+                })
+                .process(exchange -> {
+                    List<ValidationReportEntry> validationReportEntries = exchange.getIn().getBody(List.class);
+                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(Constants.AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
+                    aggregatedValidationReport.addAllValidationReportEntries(validationReportEntries);
                 })
                 .routeId("validate-ids");
 

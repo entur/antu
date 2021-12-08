@@ -22,7 +22,6 @@ package no.entur.antu.routes.validation;
 import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validator.ValidationReport;
-import no.entur.antu.validator.ValidationReportEntry;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
@@ -41,7 +40,6 @@ import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
 import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.GCS_BUCKET_FILE_NAME;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
@@ -96,14 +94,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                     aggregatedValidationReport.addAllValidationReportEntries(validationReport.getValidationReportEntries());
 
                 })
-                .setHeader(FILE_HANDLE, simple(GCS_BUCKET_FILE_NAME))
-                .to("direct:downloadSingleNetexFile")
-                .to("direct:validateIds")
-                .process(exchange -> {
-                    List<ValidationReportEntry> validationReportEntries = exchange.getIn().getBody(List.class);
-                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(Constants.AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
-                    aggregatedValidationReport.addAllValidationReportEntries(validationReportEntries);
-                })
+                //.to("direct:validateIds")
                 // end splitter
                 .end()
                 .setBody(header(Constants.AGGREGATED_VALIDATION_REPORT))

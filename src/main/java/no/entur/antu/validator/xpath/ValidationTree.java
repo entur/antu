@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,8 +21,8 @@ public class ValidationTree {
 
     private final String name;
     private final String context;
-    private final Set<ValidationTree> subTrees;
-    private final Set<ValidationRule> validationRules;
+    private final List<ValidationTree> subTrees;
+    private final List<ValidationRule> validationRules;
     private final Predicate<ValidationContext> executionCondition;
 
     public ValidationTree(String name, String context) {
@@ -32,8 +33,8 @@ public class ValidationTree {
         this.name = name;
         this.context = context;
         this.executionCondition = executionCondition;
-        this.validationRules = new HashSet<>();
-        this.subTrees = new HashSet<>();
+        this.validationRules = new ArrayList<>();
+        this.subTrees = new ArrayList<>();
     }
 
     public List<ValidationReportEntry> validate(ValidationContext validationContext) {
@@ -59,6 +60,42 @@ public class ValidationTree {
         return validationReportEntries;
 
 
+    }
+
+    public String describe() {
+        return describe(0);
+    }
+
+    private String describe(int indentation) {
+        StringBuilder builder = new StringBuilder();
+        char[] spaces = new char[indentation];
+        Arrays.fill(spaces, ' ');
+        for (ValidationRule validationRule : validationRules) {
+            builder.append(spaces)
+                    .append("[")
+                    .append(validationRule.getCategory())
+                    .append("] ")
+                    .append("[")
+                    .append(validationRule.getSeverity())
+                    .append("] ")
+                    .append(validationRule.getMessage())
+                    .append("\n");
+        }
+        for (ValidationTree validationTree : subTrees) {
+            builder.append(validationTree.describe(indentation + 2));
+        }
+        return builder.toString();
+    }
+
+    public Set<String> getRuleMessages() {
+        Set<String> rules = new HashSet<>();
+        for (ValidationRule validationRule : validationRules) {
+            rules.add("[" + validationRule.getCategory() + "] " + validationRule.getMessage());
+        }
+        for (ValidationTree validationTree : subTrees) {
+            rules.addAll(validationTree.getRuleMessages());
+        }
+        return rules;
     }
 
     public void addValidationRule(ValidationRule validationRule) {

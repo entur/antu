@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -49,6 +50,18 @@ class XpathValidatorTest {
             }
             Assertions.assertFalse(validationReportEntries.isEmpty());
         }
+    }
+
+    @Test
+    void testValidationTreeDescription() {
+        XPathValidator xPathValidator = new XPathValidator(null);
+        System.out.println(xPathValidator.describe());
+    }
+
+    @Test
+    void testValidationTreeMessages() {
+        XPathValidator xPathValidator = new XPathValidator(null);
+        System.out.println(xPathValidator.getRuleMessages().stream().sorted().collect(Collectors.joining("\n")));
     }
 
 

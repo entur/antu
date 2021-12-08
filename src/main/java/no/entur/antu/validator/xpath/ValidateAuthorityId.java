@@ -22,7 +22,10 @@ import java.util.Set;
 public class ValidateAuthorityId implements ValidationRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateAuthorityId.class);
+
     private static final String MESSAGE = "Invalid Authority Id";
+    private static final String CATEGORY = "Resource Frame";
+    private static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.WARNING;
 
     private final OrganisationRepository organisationRepository;
 
@@ -51,7 +54,7 @@ public class ValidateAuthorityId implements ValidationRule {
 
                     String message = "Line " + lineNumber + ", Column " + columnNumber + ", NeTEx id " + netexId + ": " +  MESSAGE ;
                     LOGGER.warn(message);
-                    validationReportEntries.add(new ValidationReportEntry(message, "Resource Frame", ValidationReportEntrySeverity.WARNING, validationContext.getFileName()));
+                    validationReportEntries.add(new ValidationReportEntry(message, CATEGORY, SEVERITY, validationContext.getFileName()));
                 }
                 return validationReportEntries;
             }
@@ -64,5 +67,15 @@ public class ValidateAuthorityId implements ValidationRule {
     @Override
     public String getMessage() {
         return MESSAGE;
+    }
+
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    @Override
+    public ValidationReportEntrySeverity getSeverity() {
+        return SEVERITY;
     }
 }
