@@ -218,10 +218,10 @@ public class GooglePubsubConsumer extends DefaultConsumer {
                 } catch (CancellationException e) {
                     localLog.info("PubSub synchronous pull request cancelled", e);
                 } catch (IOException e) {
-                    localLog.error("Failure getting messages from PubSub", e);
-                } catch (ApiException e) {
-                    if (e.isRetryable()) {
-                        localLog.error("Retryable API exception in getting messages from PubSub", e);
+                    localLog.error("I/O exception while getting messages from PubSub. Reconnecting.", e);
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof ApiException && ((ApiException)(e.getCause())).isRetryable()) {
+                        localLog.error("Retryable API exception in getting messages from PubSub", e.getCause());
                     } else {
                         throw e;
                     }
