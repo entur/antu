@@ -80,6 +80,17 @@ resource "google_pubsub_subscription" "AntuReportAggregationQueue" {
   }
 }
 
+# Redis server
+module "redis" {
+  source = "github.com/entur/terraform//modules/redis?ref=v0.0.23"
+  gcp_project = var.redis_project
+  labels = var.labels
+  kubernetes_namespace = var.kube_namespace
+  zone = var.redis_zone
+  reserved_ip_range = var.redis_reserved_ip_range
+  prevent_destroy = var.redis_prevent_destroy
+}
+
 # create key for service account
 resource "google_service_account_key" "antu_service_account_key" {
   service_account_id = google_service_account.antu_service_account.name

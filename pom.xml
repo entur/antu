@@ -31,6 +31,8 @@
         <google.cloud.bom-version>24.0.0</google.cloud.bom-version>
         <saxon.version>10.6</saxon.version>
         <zt-zip.version>1.14</zt-zip.version>
+        <redisson.version>3.16.4</redisson.version>
+        <embedded-redis.version>0.8.1</embedded-redis.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
@@ -193,6 +195,24 @@
             <artifactId>camel-jackson-starter</artifactId>
         </dependency>
 
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>${redisson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-data-23</artifactId>
+            <version>${redisson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redisson.version}</version>
+        </dependency>
+
+
         <!-- Other -->
 
         <dependency>
@@ -247,6 +267,12 @@
             <groupId>org.zeroturnaround</groupId>
             <artifactId>zt-zip</artifactId>
             <version>${zt-zip.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.signal</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>${embedded-redis.version}</version>
             <scope>test</scope>
         </dependency>
 

@@ -52,6 +52,9 @@ spec:
               value: Europe/Oslo
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /etc/antu-service-account/credentials.json
+          envFrom:
+            - configMapRef:
+                name: antu-redis-configmap
           ports:
             - containerPort: {{ .Values.service.http.internalPort }}
               name: http
