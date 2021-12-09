@@ -19,19 +19,23 @@ import java.util.stream.Collectors;
  */
 public class NetexIdValidator {
 
-    public static final String REGEXP_VALID_ID = "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$";
-    public static final Pattern PATTERN_VALID_ID = Pattern.compile(REGEXP_VALID_ID);
-
     private static final Logger LOGGER = LoggerFactory.getLogger(NetexIdValidator.class);
-    public static final String MESSAGE_FORMAT_INVALID_ID_STRUCTURE = "Invalid id structure on element";
-    public static final String MESSAGE_FORMAT_INVALID_ID_NAME = "Invalid structure on id %s. Expected %s";
-    public static final String MESSAGE_FORMAT_UNAPPROVED_CODESPACE = "Use of unapproved codespace. Approved codespaces are %s";
 
-    public List<ValidationReportEntry> validateIdStructure(ValidationContext validationContext, Set<IdVersion> localIds) {
+    private static final String REGEXP_VALID_ID = "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$";
+    private static final Pattern PATTERN_VALID_ID = Pattern.compile(REGEXP_VALID_ID);
+
+    private static final String MESSAGE_FORMAT_INVALID_ID_STRUCTURE = "Invalid id structure on element";
+    private static final String MESSAGE_FORMAT_INVALID_ID_NAME = "Invalid structure on id %s. Expected %s";
+    private static final String MESSAGE_FORMAT_UNAPPROVED_CODESPACE = "Use of unapproved codespace. Approved codespaces are %s";
+
+    public List<ValidationReportEntry> validate(ValidationContext validationContext, Set<IdVersion> localIds) {
 
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
 
-        Set<String> validNetexCodespaces = NetexCodespace.getValidNetexCodespacesFor(validationContext.getCodespace()).stream().map(NetexCodespace::getXmlns).collect(Collectors.toSet());
+        Set<String> validNetexCodespaces = NetexCodespace.getValidNetexCodespacesFor(validationContext.getCodespace())
+                .stream()
+                .map(NetexCodespace::getXmlns)
+                .collect(Collectors.toSet());
         String validNetexCodespaceList = String.join(",", validNetexCodespaces);
 
         for (IdVersion id : localIds) {
@@ -39,21 +43,20 @@ public class NetexIdValidator {
             if (!m.matches()) {
                 String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_INVALID_ID_STRUCTURE;
                 validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR));
-                LOGGER.debug("Id {} in line file have an invalid format. Correct format is {}", id, REGEXP_VALID_ID);
+                LOGGER.debug("Id {} has an invalid format. Valid format is {}", id, REGEXP_VALID_ID);
             } else {
                 if (!m.group(2).equals(id.getElementName())) {
                     String expectedId = m.group(1) + ":" + id.getElementName() + ":" + m.group(3);
                     String validationReportEntryMessage = getIdVersionLocation(id) + String.format(MESSAGE_FORMAT_INVALID_ID_NAME, id.getId(), expectedId);
                     validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR));
-                    LOGGER.debug("Id {} in file have an invalid format for the name part. Expected {}", id, expectedId);
+                    LOGGER.debug("Id {} has an invalid format for the name part. Expected {}", id, expectedId);
                 }
 
                 String prefix = m.group(1);
                 if (!validNetexCodespaces.contains(prefix)) {
-
                     String validationReportEntryMessage = getIdVersionLocation(id) + String.format(MESSAGE_FORMAT_UNAPPROVED_CODESPACE, validNetexCodespaceList);
                     validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR));
-                    LOGGER.debug("Id {} in file have an invalid format for the name part. Expected {}", id, validNetexCodespaceList);
+                    LOGGER.debug("Id {} uses an unapproved codespace prefix. Approved codespaces are: {}", id, validNetexCodespaceList);
                 }
 
             }

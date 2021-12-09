@@ -30,8 +30,12 @@ public class XPathValidator {
     public List<ValidationReportEntry> validate(String codespace, String fileName, byte[] content) throws XMLStreamException, SaxonApiException {
         XdmNode document = XMLParserUtil.parseFileToXdmNode(content);
         ValidationContext validationContext = new ValidationContext(document, XMLParserUtil.getXPathCompiler(), codespace, fileName);
-        return topLevelValidationTree.validate(validationContext);
+        return this.validate(validationContext);
 
+    }
+
+    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+        return topLevelValidationTree.validate(validationContext);
     }
 
     private ValidationTree getTopLevelValidationTree() {
@@ -76,6 +80,7 @@ public class XPathValidator {
         validationTree.addSubTree(getResourceFrameValidationTree("ResourceFrame"));
         validationTree.addSubTree(getServiceFrameValidationTreeForCommonFile("ServiceFrame"));
         validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
+        validationTree.addSubTree(getVehicleScheduleFrameValidationTree("VehicleScheduleFrame"));
 
         return validationTree;
     }
@@ -114,6 +119,7 @@ public class XPathValidator {
         validationTree.addSubTree(getResourceFrameValidationTree("ResourceFrame"));
         validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
         validationTree.addSubTree(getTimetableFrameValidationTree("TimetableFrame"));
+        validationTree.addSubTree(getVehicleScheduleFrameValidationTree("VehicleScheduleFrame"));
 
         validationTree.addSubTree(getServiceFrameValidationTreeForLineFile("ServiceFrame"));
 
@@ -161,7 +167,7 @@ public class XPathValidator {
         validationTree.addValidationRule(new ValidateAllowedBookingAccessProperty("vehicleJourneys/ServiceJourney/FlexibleServiceProperties"));
 
         validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[Advertised or Planned]", "The 'Planned' and 'Advertised' properties of an Interchange should not be specified", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
-        validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[Guaranteed='true' and  (MaximumWaitTime='PT0S' or MaximumWaitTime='PT0M') ]", "Guaranted Interchange should not have a maximum wait time value of zero", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+        validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[Guaranteed='true' and  (MaximumWaitTime='PT0S' or MaximumWaitTime='PT0M') ]", "Guaranteed Interchange should not have a maximum wait time value of zero", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
         validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[MaximumWaitTime > xs:dayTimeDuration('PT1H')]", "The maximum waiting time after planned departure for the interchange consumer journey (MaximumWaitTime) should not be longer than one hour", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
 
         validationTree.addSubTree(getNoticesValidationTree());
@@ -258,7 +264,7 @@ public class XPathValidator {
     }
 
     private ValidationTree getVehicleScheduleFrameValidationTree(String path) {
-        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("Service Calendar frame", path);
+        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("Vehicle Schedule frame", path);
 
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateAtLeastOne("blocks/Block", "At least one Block required in VehicleScheduleFrame", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("blocks/Block[not(journeys)]", "At least one Journey must be defined for Block", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));

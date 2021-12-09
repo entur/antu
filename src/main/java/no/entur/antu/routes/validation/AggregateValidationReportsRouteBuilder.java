@@ -94,7 +94,6 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                     aggregatedValidationReport.addAllValidationReportEntries(validationReport.getValidationReportEntries());
 
                 })
-                //.to("direct:validateIds")
                 // end splitter
                 .end()
                 .setBody(header(Constants.AGGREGATED_VALIDATION_REPORT))
