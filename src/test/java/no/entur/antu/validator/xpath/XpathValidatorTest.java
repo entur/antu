@@ -52,17 +52,4 @@ class XpathValidatorTest {
         }
     }
 
-    @Test
-    void testValidationTreeDescription() {
-        XPathValidator xPathValidator = new XPathValidator(null);
-        System.out.println(xPathValidator.describe());
-    }
-
-    @Test
-    void testValidationTreeMessages() {
-        XPathValidator xPathValidator = new XPathValidator(null);
-        System.out.println(xPathValidator.getRuleMessages().stream().sorted().collect(Collectors.joining("\n")));
-    }
-
-
 }
