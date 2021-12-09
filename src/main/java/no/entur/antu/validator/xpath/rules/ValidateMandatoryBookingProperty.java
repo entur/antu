@@ -1,4 +1,4 @@
-package no.entur.antu.validator.xpath;
+package no.entur.antu.validator.xpath.rules;
 
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -9,6 +9,8 @@ import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.xpath.AbstractXPathValidationRule;
+import no.entur.antu.validator.xpath.ValidationContext;
 
 import java.util.ArrayList;
 import java.util.List;

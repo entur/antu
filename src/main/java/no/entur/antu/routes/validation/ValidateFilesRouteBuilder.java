@@ -55,6 +55,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
     private static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
     public static final String PROP_VALIDATION_CONTEXT = "VALIDATION_CONTEXT";
     public static final String PROP_LOCAL_IDS = "LOCAL_IDS";
+    public static final String PROP_LOCAL_REFS = "LOCAL_REFS";
 
     @Override
     public void configure() throws Exception {
@@ -115,7 +116,21 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                     exchange.setProperty(PROP_VALIDATION_CONTEXT, validationContext);
                 })
                 .to("direct:validateXPath")
+                .process(exchange -> {
+                    ValidationContext validationContext = exchange.getProperty(PROP_VALIDATION_CONTEXT, ValidationContext.class);
+                    List<IdVersion> localIdList = NetexIdExtractorHelper.collectEntityIdentificators(validationContext, Set.of("Codespace"));
+                    Set<IdVersion> localIds = new HashSet<>(localIdList);
+                    exchange.setProperty(PROP_LOCAL_IDS, localIds);
+                })
                 .to("direct:validateIds")
+                .to("direct:validateVersionOnLocalIds")
+                .process(exchange -> {
+                    ValidationContext validationContext = exchange.getProperty(PROP_VALIDATION_CONTEXT, ValidationContext.class);
+                    List<IdVersion> localRefs = NetexIdExtractorHelper.collectEntityReferences(validationContext, null);
+                    exchange.setProperty(PROP_LOCAL_REFS, localRefs);
+                })
+                .to("direct:validateVersionOnRefToLocalIds")
+                .to("direct:validateReferenceToValidEntityType")
                 // end filter
                 .end()
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
@@ -141,15 +156,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "XPath validation complete")
                 .routeId("validate-xpath");
 
-
         from("direct:validateIds")
                 .log(LoggingLevel.INFO, correlation() + "Running IDs validation")
-                .process(exchange -> {
-                    ValidationContext validationContext = exchange.getProperty(PROP_VALIDATION_CONTEXT, ValidationContext.class);
-                    List<IdVersion> localIdList = NetexIdExtractorHelper.collectEntityIdentificators(validationContext, Set.of("Codespace"));
-                    Set<IdVersion> localIds = new HashSet<>(localIdList);
-                    exchange.setProperty(PROP_LOCAL_IDS, localIds);
-                })
                 .setBody(method("netexIdValidator", "validate(${exchangeProperty." + PROP_VALIDATION_CONTEXT + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})"))
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
@@ -157,6 +165,37 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 })
                 .log(LoggingLevel.INFO, correlation() + "IDs validation complete")
                 .routeId("validate-ids");
+
+        from("direct:validateVersionOnLocalIds")
+                .log(LoggingLevel.INFO, correlation() + "Running validation of version on local IDs")
+                .setBody(method("versionOnLocalNetexIdValidator", "validate(${exchangeProperty." + PROP_LOCAL_IDS + "})"))
+                .process(exchange -> {
+                    ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
+                    validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
+                })
+                .log(LoggingLevel.INFO, correlation() + "validation of version on local IDs complete")
+                .routeId("validate-version-on-local-ids");
+
+        from("direct:validateVersionOnRefToLocalIds")
+                .log(LoggingLevel.INFO, correlation() + "Running validation of version on ref to local IDs")
+                .setBody(method("versionOnRefToLocalNetexIdValidator", "validate(${exchangeProperty." + PROP_LOCAL_IDS + "}, ${exchangeProperty." + PROP_LOCAL_REFS + "})"))
+                .process(exchange -> {
+                    ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
+                    validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
+                })
+                .log(LoggingLevel.INFO, correlation() + "Validation of version on ref to local IDs complete")
+                .routeId("validate-version-on-ref-to-local-ids");
+
+        from("direct:validateReferenceToValidEntityType")
+                .log(LoggingLevel.INFO, correlation() + "Running validation of reference entity type")
+                .setBody(method("refToValidEntityTypeValidator", "validate(${exchangeProperty." + PROP_LOCAL_REFS + "})"))
+                .process(exchange -> {
+                    ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
+                    validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
+                })
+                .log(LoggingLevel.INFO, correlation() + "Validation of reference entity type complete")
+                .routeId("validate-ref-entity-type");
+
 
         from("direct:reportSystemError")
                 .process(exchange -> {

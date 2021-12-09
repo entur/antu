@@ -18,8 +18,11 @@ package no.entur.antu.config;
 
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.id.NetexIdValidator;
-import no.entur.antu.validator.xpath.XPathValidator;
+import no.entur.antu.validator.id.ReferenceToValidEntityTypeValidator;
+import no.entur.antu.validator.id.VersionOnLocalNetexIdValidator;
+import no.entur.antu.validator.id.VersionOnRefToLocalNetexIdValidator;
 import no.entur.antu.validator.schema.NetexSchemaValidator;
+import no.entur.antu.validator.xpath.XPathValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,5 +43,20 @@ public class ValidatorConfig {
     @Bean("netexIdValidator")
     public NetexIdValidator netexIdValidator() {
         return new NetexIdValidator();
+    }
+
+    @Bean("versionOnLocalNetexIdValidator")
+    public VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator() {
+        return new VersionOnLocalNetexIdValidator();
+    }
+
+    @Bean("versionOnRefToLocalNetexIdValidator")
+    public VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator() {
+        return new VersionOnRefToLocalNetexIdValidator();
+    }
+
+    @Bean("refToValidEntityTypeValidator")
+    public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator() {
+        return new ReferenceToValidEntityTypeValidator();
     }
 }

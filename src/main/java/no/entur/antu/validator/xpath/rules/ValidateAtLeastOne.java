@@ -1,4 +1,4 @@
-package no.entur.antu.validator.xpath;
+package no.entur.antu.validator.xpath.rules;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
@@ -6,18 +6,20 @@ import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.xpath.ValidationContext;
+import no.entur.antu.validator.xpath.ValidationRule;
 
 import java.util.Collections;
 import java.util.List;
 
-public class ValidateExactlyOne implements ValidationRule {
+public class ValidateAtLeastOne implements ValidationRule {
 
     private final String xpath;
     private final String message;
     private final String category;
     private final ValidationReportEntrySeverity severity;
 
-    public ValidateExactlyOne(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
+    public ValidateAtLeastOne(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
         this.xpath = xpath;
         this.message = message;
         this.category = category;
@@ -30,7 +32,7 @@ public class ValidateExactlyOne implements ValidationRule {
             XPathSelector selector = validationContext.getxPathCompiler().compile(xpath).load();
             selector.setContextItem(validationContext.getXmlNode());
             XdmValue nodes = selector.evaluate();
-            if (nodes.size() != 1) {
+            if (nodes.isEmpty()) {
                 return List.of(new ValidationReportEntry(message, category, severity, validationContext.getFileName()));
             }
             return Collections.emptyList();

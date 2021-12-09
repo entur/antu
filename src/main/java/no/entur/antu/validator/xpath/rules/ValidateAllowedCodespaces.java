@@ -1,4 +1,4 @@
-package no.entur.antu.validator.xpath;
+package no.entur.antu.validator.xpath.rules;
 
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
@@ -11,6 +11,8 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.validator.codespace.NetexCodespace;
+import no.entur.antu.validator.xpath.ValidationContext;
+import no.entur.antu.validator.xpath.ValidationRule;
 
 import java.util.ArrayList;
 import java.util.List;
