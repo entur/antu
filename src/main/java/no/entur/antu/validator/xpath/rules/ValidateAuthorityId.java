@@ -1,4 +1,4 @@
-package no.entur.antu.validator.xpath;
+package no.entur.antu.validator.xpath.rules;
 
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -10,6 +10,8 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.xpath.ValidationContext;
+import no.entur.antu.validator.xpath.ValidationRule;
 import no.entur.antu.xml.XMLParserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

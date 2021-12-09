@@ -1,25 +1,25 @@
-package no.entur.antu.validator.xpath;
+package no.entur.antu.validator.xpath.rules;
 
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
-import net.sf.saxon.s9api.XdmItem;
-import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.xpath.ValidationContext;
+import no.entur.antu.validator.xpath.ValidationRule;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class ValidateNotExist extends AbstractXPathValidationRule {
+public class ValidateExactlyOne implements ValidationRule {
 
     private final String xpath;
     private final String message;
     private final String category;
     private final ValidationReportEntrySeverity severity;
 
-    public ValidateNotExist(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
+    public ValidateExactlyOne(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
         this.xpath = xpath;
         this.message = message;
         this.category = category;
@@ -27,18 +27,15 @@ public class ValidateNotExist extends AbstractXPathValidationRule {
     }
 
     @Override
-    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+    public List<ValidationReportEntry> validate(ValidationContext validationContext)  {
         try {
             XPathSelector selector = validationContext.getxPathCompiler().compile(xpath).load();
             selector.setContextItem(validationContext.getXmlNode());
             XdmValue nodes = selector.evaluate();
-            List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
-            for (XdmItem item : nodes) {
-                XdmNode xdmNode = (XdmNode) item;
-                String validationReportEntryMessage = getXdmNodeLocation(xdmNode) + message;
-                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, category, severity, validationContext.getFileName()));
+            if (nodes.size() != 1) {
+                return List.of(new ValidationReportEntry(message, category, severity, validationContext.getFileName()));
             }
-            return validationReportEntries;
+            return Collections.emptyList();
         } catch (SaxonApiException e) {
             throw new AntuException("Error while validating rule " + xpath, e);
         }
@@ -58,6 +55,4 @@ public class ValidateNotExist extends AbstractXPathValidationRule {
     public ValidationReportEntrySeverity getSeverity() {
         return severity;
     }
-
-
 }

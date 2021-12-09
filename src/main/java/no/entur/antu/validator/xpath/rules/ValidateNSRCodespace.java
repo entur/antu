@@ -1,4 +1,4 @@
-package no.entur.antu.validator.xpath;
+package no.entur.antu.validator.xpath.rules;
 
 import no.entur.antu.Constants;
 import no.entur.antu.validator.ValidationReportEntrySeverity;

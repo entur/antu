@@ -1,4 +1,4 @@
-package no.entur.antu.validator.xpath;
+package no.entur.antu.validator.xpath.rules;
 
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 import org.rutebanken.netex.model.FlexibleServiceEnumeration;
@@ -12,7 +12,7 @@ public class ValidateAllowedFlexibleServiceType extends ValidateNotExist {
             FlexibleServiceEnumeration.NOT_FLEXIBLE.value())
             + "'";
 
-    public static final String MESSAGE = "Illegal FlexibleServiceType on ServiceJoruney";
+    public static final String MESSAGE = "Illegal FlexibleServiceType on ServiceJourney";
 
     public ValidateAllowedFlexibleServiceType() {
         super("vehicleJourneys/ServiceJourney/FlexibleServiceProperties/FlexibleServiceType[not(. = (" + VALID_FLEXIBLE_SERVICE_TYPES + "))]", MESSAGE, "Service Frame", ValidationReportEntrySeverity.ERROR);
