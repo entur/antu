@@ -14,7 +14,7 @@ public class ValidateAllowedBookingAccessProperty extends ValidateNotExist {
             BookingMethodEnumeration.TEXT.value())
             + "'";
 
-    private static final String MESSAGE = "Illegal BookingAccess";
+    private static final String MESSAGE = "Illegal value for BookingAccess";
 
     public ValidateAllowedBookingAccessProperty(String context) {
         super(context + "/BookingAccess[not(. = (" + VALID_BOOKING_ACCESS_PROPERTIES + "))]", MESSAGE, "Booking", ValidationReportEntrySeverity.ERROR);

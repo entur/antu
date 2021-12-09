@@ -13,9 +13,11 @@ import no.entur.antu.validator.ValidationReportEntrySeverity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ValidateMandatoryBookingProperty implements ValidationRule {
+public class ValidateMandatoryBookingProperty extends AbstractXPathValidationRule {
 
-    private static final String MESSAGE = "[Line %s, Column %s, Id %s] Mandatory booking property %s not specified on FlexibleServiceProperties, FlexibleLine or on all StopPointInJourneyPatterns";
+    private static final String MESSAGE_FORMAT = "Mandatory booking property %s not specified on FlexibleServiceProperties, FlexibleLine or on all StopPointInJourneyPatterns";
+    public static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.ERROR;
+    public static final String CATEGORY = "Flexible Line";
 
     private final String bookingProperty;
 
@@ -55,14 +57,10 @@ public class ValidateMandatoryBookingProperty implements ValidationRule {
             for (XdmValue errorNode : errorNodes) {
                 for (XdmItem item : errorNode) {
                     XdmNode xdmNode = (XdmNode) item;
-                    String formattedMessage = String.format(MESSAGE,
-                            xdmNode.getLineNumber(),
-                            xdmNode.getColumnNumber(),
-                            xdmNode.getAttributeValue(new QName("id")),
-                            bookingProperty);
-                    validationReportEntries.add(new ValidationReportEntry(formattedMessage,
-                            "Flexible Line",
-                            ValidationReportEntrySeverity.ERROR,
+                    String message = getXdmNodeLocation(xdmNode) + String.format(MESSAGE_FORMAT, bookingProperty);
+                    validationReportEntries.add(new ValidationReportEntry(message,
+                            CATEGORY,
+                            SEVERITY,
                             validationContext.getFileName()));
                 }
 
@@ -76,6 +74,16 @@ public class ValidateMandatoryBookingProperty implements ValidationRule {
 
     @Override
     public String getMessage() {
-        return MESSAGE;
+        return MESSAGE_FORMAT;
+    }
+
+    @Override
+    public String getCategory() {
+        return CATEGORY;
+    }
+
+    @Override
+    public ValidationReportEntrySeverity getSeverity() {
+        return SEVERITY;
     }
 }

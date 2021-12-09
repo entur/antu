@@ -19,16 +19,24 @@
 package no.entur.antu.routes.validation;
 
 
+import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validator.ValidationReport;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.id.IdVersion;
+import no.entur.antu.validator.id.NetexIdExtractorHelper;
+import no.entur.antu.validator.xpath.ValidationContext;
+import no.entur.antu.xml.XMLParserUtil;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_WORK;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
@@ -45,6 +53,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
     private static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
+    public static final String PROP_VALIDATION_CONTEXT = "VALIDATION_CONTEXT";
+    public static final String PROP_LOCAL_IDS = "LOCAL_IDS";
 
     @Override
     public void configure() throws Exception {
@@ -96,9 +106,18 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .end()
                 // do not run subsequent validators if the schema validation failed
                 .filter(PredicateBuilder.not(simple("${exchangeProperty." + PROP_VALIDATION_REPORT + ".hasError()}")))
+                .process(exchange -> {
+                    byte[] content = exchange.getProperty(PROP_NETEX_FILE_CONTENT, byte[].class);
+                    String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
+                    String fileName = exchange.getIn().getHeader(NETEX_FILE_NAME, String.class);
+                    XdmNode document = XMLParserUtil.parseFileToXdmNode(content);
+                    ValidationContext validationContext = new ValidationContext(document, XMLParserUtil.getXPathCompiler(), codespace, fileName);
+                    exchange.setProperty(PROP_VALIDATION_CONTEXT, validationContext);
+                })
                 .to("direct:validateXPath")
-                .end()
+                .to("direct:validateIds")
                 // end filter
+                .end()
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");
 
@@ -114,13 +133,30 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:validateXPath").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Running XPath validation")
-                .setBody(method("xpathValidator", "validate(${header." + DATASET_CODESPACE + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})"))
+                .setBody(method("xpathValidator", "validate(${exchangeProperty." + PROP_VALIDATION_CONTEXT + "})"))
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
                     validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
                 })
                 .log(LoggingLevel.INFO, correlation() + "XPath validation complete")
                 .routeId("validate-xpath");
+
+
+        from("direct:validateIds")
+                .log(LoggingLevel.INFO, correlation() + "Running IDs validation")
+                .process(exchange -> {
+                    ValidationContext validationContext = exchange.getProperty(PROP_VALIDATION_CONTEXT, ValidationContext.class);
+                    List<IdVersion> localIdList = NetexIdExtractorHelper.collectEntityIdentificators(validationContext, Set.of("Codespace"));
+                    Set<IdVersion> localIds = new HashSet<>(localIdList);
+                    exchange.setProperty(PROP_LOCAL_IDS, localIds);
+                })
+                .setBody(method("netexIdValidator", "validate(${exchangeProperty." + PROP_VALIDATION_CONTEXT + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})"))
+                .process(exchange -> {
+                    ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
+                    validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
+                })
+                .log(LoggingLevel.INFO, correlation() + "IDs validation complete")
+                .routeId("validate-ids");
 
         from("direct:reportSystemError")
                 .process(exchange -> {

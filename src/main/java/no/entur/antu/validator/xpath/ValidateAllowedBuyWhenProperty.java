@@ -12,7 +12,7 @@ public class ValidateAllowedBuyWhenProperty extends ValidateNotExist {
             PurchaseMomentEnumeration.ON_CHECK_OUT.value())
             + "'";
 
-    private static final String MESSAGE = "Illegal BuyWhen";
+    private static final String MESSAGE = "Illegal value for BuyWhen";
 
     public ValidateAllowedBuyWhenProperty(String context) {
         super(context + "/BuyWhen[tokenize(.,' ')[not(. = (" + VALID_BUY_WHEN_PROPERTIES + "))]]", MESSAGE, "Booking", ValidationReportEntrySeverity.ERROR);

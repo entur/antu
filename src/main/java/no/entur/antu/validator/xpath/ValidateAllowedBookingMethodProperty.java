@@ -14,7 +14,7 @@ public class ValidateAllowedBookingMethodProperty extends ValidateNotExist {
             BookingMethodEnumeration.TEXT.value())
             + "'";
 
-    private static final String MESSAGE = "Illegal BookingMethod";
+    private static final String MESSAGE = "Illegal value for BookingMethod";
 
     public ValidateAllowedBookingMethodProperty(String context) {
         super(context + "/BookingMethods[tokenize(.,' ')[not(. = (" + VALID_BOOKING_METHOD_PROPERTIES + "))]]", MESSAGE, "Booking", ValidationReportEntrySeverity.ERROR);

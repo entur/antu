@@ -43,4 +43,14 @@ public class ValidateAtLeastOne implements ValidationRule {
     public String getMessage() {
         return message;
     }
+
+    @Override
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public ValidationReportEntrySeverity getSeverity() {
+        return severity;
+    }
 }

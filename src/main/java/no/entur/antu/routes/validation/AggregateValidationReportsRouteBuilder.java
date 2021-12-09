@@ -30,6 +30,8 @@ import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,7 +40,6 @@ import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
 import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.GCS_BUCKET_FILE_NAME;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
@@ -82,11 +83,10 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                     exchange.getIn().setHeader(Constants.AGGREGATED_VALIDATION_REPORT, validationReport);
                 })
                 .convertBodyTo(String.class)
-                .split(body()).delimiter(FILENAME_DELIMITER)
+                .split(method(ReverseSortedFileNameSplitter.class, "split")).delimiter(FILENAME_DELIMITER)
                 .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
                 .setHeader(NETEX_FILE_NAME, body())
-                .setHeader(FILE_HANDLE, simple(GCS_BUCKET_FILE_NAME))
-                .to("direct:downLoadValidationReport")
+                .to("direct:downloadValidationReport")
                 .unmarshal().json(JsonLibrary.Jackson, ValidationReport.class)
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getIn().getBody(ValidationReport.class);
@@ -109,7 +109,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .to("direct:notifyMarduk")
                 .routeId("aggregate-reports");
 
-        from("direct:downLoadValidationReport")
+        from("direct:downloadValidationReport")
                 .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
                         .append(header(DATASET_CODESPACE))
                         .append("/")
@@ -162,6 +162,17 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 aggregatedExchange.setProperty(Exchange.AGGREGATION_COMPLETE_CURRENT_GROUP, true);
             }
             return aggregatedExchange;
+        }
+    }
+
+    /**
+     * Sort the list in reverse order to get the common files first.
+     */
+    private static class ReverseSortedFileNameSplitter {
+
+        public static List<String> split(Exchange exchange) {
+            String fileNameList = exchange.getMessage().getBody(String.class);
+            return Arrays.stream(fileNameList.split(FILENAME_DELIMITER)).sorted(Collections.reverseOrder()).collect(Collectors.toList());
         }
     }
 }

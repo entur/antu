@@ -13,7 +13,7 @@ public class ValidateAllowedBookingWhenProperty extends ValidateNotExist {
             PurchaseWhenEnumeration.ADVANCE_AND_DAY_OF_TRAVEL.value())
             + "'";
 
-    private static final String MESSAGE = "Illegal BookWhen";
+    private static final String MESSAGE = "Illegal value for BookWhen";
 
     public ValidateAllowedBookingWhenProperty(String context) {
         super(context + "/BookWhen[not(. = (" + VALID_BOOKING_WHEN_PROPERTIES + "))]", MESSAGE, "Booking", ValidationReportEntrySeverity.ERROR);

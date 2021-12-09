@@ -10,6 +10,7 @@ import no.entur.antu.xml.XMLParserUtil;
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static no.entur.antu.xml.XMLParserUtil.selectNodeSet;
 
@@ -19,33 +20,46 @@ import static no.entur.antu.xml.XMLParserUtil.selectNodeSet;
 public class XPathValidator {
 
     private final OrganisationRepository organisationRepository;
-    private final ValidationTree commonFileValidationTree;
-    private final ValidationTree lineFileValidationTree;
+    private final ValidationTree topLevelValidationTree;
 
     public XPathValidator(OrganisationRepository organisationRepository) {
         this.organisationRepository = organisationRepository;
-        this.commonFileValidationTree = getCommonFileValidationTree();
-        this.lineFileValidationTree = getLineFileValidationTree();
+        this.topLevelValidationTree = getTopLevelValidationTree();
     }
 
     public List<ValidationReportEntry> validate(String codespace, String fileName, byte[] content) throws XMLStreamException, SaxonApiException {
         XdmNode document = XMLParserUtil.parseFileToXdmNode(content);
         ValidationContext validationContext = new ValidationContext(document, XMLParserUtil.getXPathCompiler(), codespace, fileName);
-        if (fileName.startsWith("_")) {
-            return commonFileValidationTree.validate(validationContext);
-        } else {
-            return lineFileValidationTree.validate(validationContext);
-        }
+        return this.validate(validationContext);
+
     }
 
+    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+        return topLevelValidationTree.validate(validationContext);
+    }
+
+    private ValidationTree getTopLevelValidationTree() {
+        ValidationTree validationTree = new ValidationTree("PublicationDelivery", "/");
+        validationTree.addSubTree(getCommonFileValidationTree());
+        validationTree.addSubTree(getLineFileValidationTree());
+        return validationTree;
+    }
 
     private ValidationTree getCommonFileValidationTree() {
-        ValidationTree validationTree = new ValidationTree("Common file", "/");
-        validationTree.addValidationRule(new ValidateAllowedCodespaces());
-        validationTree.addSubTree(getCompositeFrameValidationTreeForCommonFile());
-        validationTree.addSubTree(getSingleFramesValidationTreeForCommonFile());
+        ValidationTree commonFileValidationTree = new ValidationTree("Common file", "/", validationContext -> validationContext.getFileName().startsWith("_"));
+        commonFileValidationTree.addValidationRule(new ValidateAllowedCodespaces());
+        commonFileValidationTree.addSubTree(getCompositeFrameValidationTreeForCommonFile());
+        commonFileValidationTree.addSubTree(getSingleFramesValidationTreeForCommonFile());
 
-        return validationTree;
+        return commonFileValidationTree;
+    }
+
+    private ValidationTree getLineFileValidationTree() {
+        ValidationTree lineFileValidationTree = new ValidationTree("Line file", "/", validationContext -> !validationContext.getFileName().startsWith("_"));
+        lineFileValidationTree.addValidationRule(new ValidateAllowedCodespaces());
+        lineFileValidationTree.addSubTree(getCompositeFrameValidationTreeForLineFile());
+        lineFileValidationTree.addSubTree(getSingleFramesValidationTreeForLineFile());
+        return lineFileValidationTree;
     }
 
     private ValidationTree getSingleFramesValidationTreeForCommonFile() {
@@ -53,29 +67,21 @@ public class XPathValidator {
                 validationContext -> selectNodeSet("CompositeFrame", validationContext.getxPathCompiler(), validationContext.getXmlNode()).isEmpty());
 
 
-
         validationTree.addValidationRule(new ValidateNotExist("SiteFrame", "Unexpected element SiteFrame. It will be ignored", "Composite Frame", ValidationReportEntrySeverity.WARNING));
         validationTree.addValidationRule(new ValidateNotExist("TimetableFrame", "Timetable frame not allowed in common files", "Composite Frame", ValidationReportEntrySeverity.ERROR));
 
         validationTree.addValidationRule(new ValidateAtLeastOne("ServiceFrame[validityConditions] | ServiceCalendarFrame[validityConditions]", "Neither ServiceFrame nor ServiceCalendarFrame defines ValidityConditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
 
-        validationTree.addValidationRule(new ValidateNotExist("ResourceFrame[not(validityConditions) and count(//ResourceFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
-        validationTree.addValidationRule(new ValidateNotExist("ServiceFrame[not(validityConditions) and count(//ServiceFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
-        validationTree.addValidationRule(new ValidateNotExist("ServiceCalendarFrame[not(validityConditions) and count(//ServiceCalendarFrame) > 1]", "Multiple frames of same type without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("ResourceFrame[not(validityConditions) and count(//ResourceFrame) > 1]", "Multiple ResourceFrames without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("ServiceFrame[not(validityConditions) and count(//ServiceFrame) > 1]", "Multiple ServiceFrames without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("ServiceCalendarFrame[not(validityConditions) and count(//ServiceCalendarFrame) > 1]", "Multiple ServiceCalendarFrames without validity conditions", "Single Frames", ValidationReportEntrySeverity.ERROR));
 
 
         validationTree.addSubTree(getResourceFrameValidationTree("ResourceFrame"));
         validationTree.addSubTree(getServiceFrameValidationTreeForCommonFile("ServiceFrame"));
         validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
+        validationTree.addSubTree(getVehicleScheduleFrameValidationTree("VehicleScheduleFrame"));
 
-        return validationTree;
-    }
-
-    private ValidationTree getLineFileValidationTree() {
-        ValidationTree validationTree = new ValidationTree("Line file", "/");
-        validationTree.addValidationRule(new ValidateAllowedCodespaces());
-        validationTree.addSubTree(getCompositeFrameValidationTreeForLineFile());
-        validationTree.addSubTree(getSingleFramesValidationTreeForLineFile());
         return validationTree;
     }
 
@@ -113,6 +119,7 @@ public class XPathValidator {
         validationTree.addSubTree(getResourceFrameValidationTree("ResourceFrame"));
         validationTree.addSubTree(getServiceCalendarFrameValidationTree("ServiceCalendarFrame"));
         validationTree.addSubTree(getTimetableFrameValidationTree("TimetableFrame"));
+        validationTree.addSubTree(getVehicleScheduleFrameValidationTree("VehicleScheduleFrame"));
 
         validationTree.addSubTree(getServiceFrameValidationTreeForLineFile("ServiceFrame"));
 
@@ -133,14 +140,12 @@ public class XPathValidator {
         validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney/passingTimes/TimetabledPassingTime[not(@version)]", "Missing version on TimetabledPassingTime", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
 
 
-
-
         validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[not(JourneyPatternRef)]", "The ServiceJourney does not refer to a JourneyPattern", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
         validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[(TransportMode and not(TransportSubmode))  or (not(TransportMode) and TransportSubmode)]", "If overriding Line TransportMode or TransportSubmode on a ServiceJourney, both elements must be present", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
         validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[not(OperatorRef) and not(//ServiceFrame/lines/*[self::Line or self::FlexibleLine]/OperatorRef)]", "Missing OperatorRef on ServiceJourney (not defined on Line)", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
         validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[not(dayTypes/DayTypeRef) and not(@id=//TimetableFrame/vehicleJourneys/DatedServiceJourney/ServiceJourneyRef/@ref)]", "The ServiceJourney does not refer to DayTypes nor DatedServiceJourneys", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
         validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[dayTypes/DayTypeRef and @id=//TimetableFrame/vehicleJourneys/DatedServiceJourney/ServiceJourneyRef/@ref]", "The ServiceJourney references both DayTypes and DatedServiceJourneys", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
-        validationTree.addValidationRule(new ValidateNotExist("for $a in vehicleJourneys/ServiceJourney return if(count(//ServiceFrame/journeyPatterns/*[@id = $a/JourneyPatternRef/@ref]/pointsInSequence/StopPointInJourneyPattern) != count($a/passingTimes/TimetabledPassingTime)) then $a else ()", "ServiceJourney %{source_objectid} does not specify passing time for all StopPointInJourneyPattern", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
+        validationTree.addValidationRule(new ValidateNotExist("for $a in vehicleJourneys/ServiceJourney return if(count(//ServiceFrame/journeyPatterns/*[@id = $a/JourneyPatternRef/@ref]/pointsInSequence/StopPointInJourneyPattern) != count($a/passingTimes/TimetabledPassingTime)) then $a else ()", "ServiceJourney does not specify passing time for all StopPointInJourneyPattern", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
         validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/ServiceJourney[@id = preceding-sibling::ServiceJourney/@id]", "ServiceJourney is repeated with a different version", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
 
         validationTree.addValidationRule(new ValidateNotExist("vehicleJourneys/DatedServiceJourney[not(OperatingDayRef)]", "Missing OperatingDayRef on DatedServiceJourney", "Timetable Frame", ValidationReportEntrySeverity.ERROR));
@@ -162,7 +167,7 @@ public class XPathValidator {
         validationTree.addValidationRule(new ValidateAllowedBookingAccessProperty("vehicleJourneys/ServiceJourney/FlexibleServiceProperties"));
 
         validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[Advertised or Planned]", "The 'Planned' and 'Advertised' properties of an Interchange should not be specified", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
-        validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[Guaranteed='true' and  (MaximumWaitTime='PT0S' or MaximumWaitTime='PT0M') ]", "Guaranted Interchange should not have a maximum wait time value of zero", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
+        validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[Guaranteed='true' and  (MaximumWaitTime='PT0S' or MaximumWaitTime='PT0M') ]", "Guaranteed Interchange should not have a maximum wait time value of zero", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
         validationTree.addValidationRule(new ValidateNotExist("journeyInterchanges/ServiceJourneyInterchange[MaximumWaitTime > xs:dayTimeDuration('PT1H')]", "The maximum waiting time after planned departure for the interchange consumer journey (MaximumWaitTime) should not be longer than one hour", "Timetable Frame", ValidationReportEntrySeverity.WARNING));
 
         validationTree.addSubTree(getNoticesValidationTree());
@@ -188,6 +193,7 @@ public class XPathValidator {
 
     /**
      * CompositeFrame validation rules that apply both to Line files and common files.
+     *
      * @return
      */
     private List<ValidationRule> getCompositeFrameBaseValidationRules() {
@@ -212,7 +218,7 @@ public class XPathValidator {
         ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in common file", path);
         serviceFrameValidationTree.addValidationRules(getServiceFrameBaseValidationRules());
 
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/Line", "Line not allowed in  common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/Line", "Line not allowed in common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("routes/Route", "Route not allowed in common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("journeyPatterns/JourneyPattern | journeyPatterns/ServiceJourneyPattern", "JourneyPattern not allowed in common files", "Service Frame", ValidationReportEntrySeverity.ERROR));
 
@@ -229,7 +235,7 @@ public class XPathValidator {
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator[not(Name) or normalize-space(Name) = '']", "Missing Name on Operator", "Resource Frame", ValidationReportEntrySeverity.ERROR));
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator[not(LegalName) or normalize-space(LegalName) = '']", "Missing LegalName element on Operator", "Resource Frame", ValidationReportEntrySeverity.INFO));
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator[not(ContactDetails)]", "Missing ContactDetails element on Operator", "Resource Frame", ValidationReportEntrySeverity.WARNING));
-        resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator/ContactDetails[(not(Email) or normalize-space(Email) = '') and (not(Phone) or normalize-space(Phone) = '') and (not(Url) or normalize-space(Url) = '')]", "At least one of Url, Phone or Email must be defined for ContactDetails on Operator", "Resource Frame", ValidationReportEntrySeverity.ERROR));
+        resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator/ContactDetails[(not(Email) or normalize-space(Email) = '') and (not(Phone) or normalize-space(Phone) = '') and (not(Url) or normalize-space(Url) = '')]", "At least one of Url, Phone or Email must be defined for ContactDetails on Operator", "Resource Frame", ValidationReportEntrySeverity.WARNING));
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator[not(CustomerServiceContactDetails)]", "Missing CustomerServiceContactDetails element on Operator", "Resource Frame", ValidationReportEntrySeverity.WARNING));
         resourceFrameValidationTree.addValidationRule(new ValidateNotExist("organisations/Operator/CustomerServiceContactDetails[not(Url) or normalize-space(Url) = '']", "Missing Url element for CustomerServiceContactDetails on Operator", "Resource Frame", ValidationReportEntrySeverity.WARNING));
 
@@ -248,7 +254,7 @@ public class XPathValidator {
     private ValidationTree getServiceCalendarFrameValidationTree(String path) {
         ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("Service Calendar frame", path);
 
-        serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//DayType[not(//DayTypeAssignment/DayTypeRef/@ref = @id)]", "DayType %{source_objectid} is not assigned to any calendar dates or periods", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
+        serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//DayType[not(//DayTypeAssignment/DayTypeRef/@ref = @id)]", "The DayType is not assigned to any calendar dates or periods", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(dayTypes) and not(dayTypeAssignments)]", "ServiceCalendar does not contain neither DayTypes nor DayTypeAssignments", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(ToDate)]", "Missing ToDate on ServiceCalendar", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("//ServiceCalendar[not(FromDate)]", "Missing FromDate on ServiceCalendar", "Service Calendar Frame", ValidationReportEntrySeverity.WARNING));
@@ -258,17 +264,18 @@ public class XPathValidator {
     }
 
     private ValidationTree getVehicleScheduleFrameValidationTree(String path) {
-        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("Service Calendar frame", path);
+        ValidationTree serviceCalendarFrameValidationTree = new ValidationTree("Vehicle Schedule frame", path);
 
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateAtLeastOne("blocks/Block", "At least one Block required in VehicleScheduleFrame", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
         serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("blocks/Block[not(journeys)]", "At least one Journey must be defined for Block", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
-        serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("blocks/Block[not(dayTypes)]", " At least one DayType must be defined for Block", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
+        serviceCalendarFrameValidationTree.addValidationRule(new ValidateNotExist("blocks/Block[not(dayTypes)]", "At least one DayType must be defined for Block", "VehicleSchedule Frame", ValidationReportEntrySeverity.ERROR));
 
         return serviceCalendarFrameValidationTree;
     }
 
     /**
      * Validation rules that apply both to Line files and Common files.
+     *
      * @return
      */
     private List<ValidationRule> getServiceFrameBaseValidationRules() {
@@ -289,7 +296,7 @@ public class XPathValidator {
         validationRules.add(new ValidateNotExist("serviceLinks/ServiceLink/projections/LinkSequenceProjection/g:LineString/g:posList[not(normalize-space(text()))]", "Missing projections element on ServiceLink", "Service Frame", ValidationReportEntrySeverity.ERROR));
 
         validationRules.add((new ValidateNotExist("destinationDisplays/DestinationDisplay[not(FrontText) or normalize-space(FrontText) = '']", "Missing FrontText on DestinationDisplay", "Service Frame", ValidationReportEntrySeverity.ERROR)));
-        validationRules.add((new ValidateNotExist("destinationDisplays/DestinationDisplay/vias/Via[not(DestinationDisplayRef)]",  "Missing DestinationDisplayRef on Via", "Service Frame", ValidationReportEntrySeverity.ERROR)));
+        validationRules.add((new ValidateNotExist("destinationDisplays/DestinationDisplay/vias/Via[not(DestinationDisplayRef)]", "Missing DestinationDisplayRef on Via", "Service Frame", ValidationReportEntrySeverity.ERROR)));
 
 
         return validationRules;
@@ -322,7 +329,7 @@ public class XPathValidator {
 
         serviceFrameValidationTree.addValidationRule(new ValidateExactlyOne("lines/*[self::Line or self::FlexibleLine]", "There must be either Lines or Flexible Lines", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(Name) or normalize-space(Name) = '']", "Missing Name on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(PublicCode) or normalize-space(PublicCode) = '']", "Missing PublicCode on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(PublicCode) or normalize-space(PublicCode) = '']", "Missing PublicCode on Line", "Service Frame", ValidationReportEntrySeverity.WARNING));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportMode)]", "Missing TransportMode on Line", "Service Frame", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportSubmode)]", "Missing TransportSubmode on Line", "Service Frame", ValidationReportEntrySeverity.WARNING));
         serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine]/routes/Route", "Routes should not be defined within a Line or FlexibleLine", "Service Frame", ValidationReportEntrySeverity.ERROR));
@@ -365,6 +372,14 @@ public class XPathValidator {
         serviceFrameValidationTree.addSubTree(getNoticesValidationTree());
         serviceFrameValidationTree.addSubTree(getNoticeAssignmentsValidationTree());
         return serviceFrameValidationTree;
+    }
+
+    public String describe() {
+        return topLevelValidationTree.describe();
+    }
+
+    public Set<String> getRuleMessages() {
+        return topLevelValidationTree.getRuleMessages();
     }
 
 
