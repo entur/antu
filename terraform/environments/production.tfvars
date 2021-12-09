@@ -6,4 +6,6 @@ kube_namespace = "production"
 bucket_marduk_instance_name = "marduk-production"
 bucket_antu_instance_name = "ror-antu-production"
 service_account_bucket_role = "roles/storage.admin"
-
+redis_project = "entur-1287"
+redis_reserved_ip_range = "10.110.1.0/29"
+redis_prevent_destroy = true

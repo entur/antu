@@ -21,6 +21,9 @@ data:
     # Organisation register
     antu.organisation.registry.url={{ .Values.organisationRegistryUrl }}
 
+    # Stop place register
+    antu.stop.registry.id.url=http://tiamat/services/stop_places/id
+
     # Validators
     antu.schema.validation.enabled=true
 
@@ -39,6 +42,10 @@ data:
     blobstore.gcs.credential.path=/etc/antu-service-account/credentials.json
     blobstore.gcs.marduk.container.name={{ .Values.gcp.marduk.bucketName }}
     blobstore.gcs.antu.container.name={{ .Values.gcp.antu.bucketName }}
+
+    # Redis
+    spring.redis.host=${REDIS_HOST}
+    spring.redis.port=6379
 
     # Actuator
     management.server.port=9001
