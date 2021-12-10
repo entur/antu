@@ -15,37 +15,36 @@
 
 package no.entur.antu.stop;
 
-import java.util.Collections;
+import javax.cache.Cache;
 import java.util.Set;
 
 public class DefaultStopPlaceRepository implements StopPlaceRepository {
 
+    public static final String STOP_PLACE_CACHE_KEY = "stopPlaceCache";
+    public static final String QUAY_CACHE_KEY = "quayCache";
+
     private final StopPlaceResource stopPlaceResource;
+    private final Cache<String, Set<String>> stopPlaceCache;
 
-    private Set<String> stopPlaceIds;
-    private Set<String> quayIds;
-
-    public DefaultStopPlaceRepository(StopPlaceResource stopPlaceResource) {
+    public DefaultStopPlaceRepository(StopPlaceResource stopPlaceResource, Cache<String, Set<String>> stopPlaceCache) {
         this.stopPlaceResource = stopPlaceResource;
-        this.stopPlaceIds = Collections.emptySet();
-        this.quayIds = Collections.emptySet();
+        this.stopPlaceCache = stopPlaceCache;
     }
 
     @Override
     public Set<String> getStopPlaceIds() {
-        return stopPlaceIds;
+        return stopPlaceCache.get(STOP_PLACE_CACHE_KEY);
     }
 
     @Override
     public Set<String> getQuayIds() {
-        return quayIds;
+        return stopPlaceCache.get(QUAY_CACHE_KEY);
     }
 
     @Override
     public void refreshCache() {
-        stopPlaceIds = stopPlaceResource.getStopPlaceIds();
-        quayIds = stopPlaceResource.getQuayIds();
-
+        stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceResource.getStopPlaceIds());
+        stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
     }
 
 
