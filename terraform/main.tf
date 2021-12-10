@@ -5,6 +5,7 @@ terraform {
 
 provider "google" {
   version = "~> 3.74.0"
+  region  = var.gcp_region
 }
 provider "kubernetes" {
   load_config_file = var.load_config_file

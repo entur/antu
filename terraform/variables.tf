@@ -3,6 +3,11 @@ variable "gcp_project" {
   description = "The GCP project hosting the workloads"
 }
 
+variable "gcp_region" {
+  description = "The GCP region"
+  default     = "europe-west1"
+}
+
 variable "gcp_storage_project" {
   description = "The GCP project hosting the Google Storage resources"
 }
