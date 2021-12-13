@@ -9,17 +9,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 /**
  * Retrieve the NeTEx ids of all stop places and quays in the stop registry.
  * This includes both the official stop and quay ids (NSR:StopPlace:* and NSR:Quay:*) and the "local references" that are unofficial, provider-specific ids (example: RUT:StopPlace:* and RUT:Quay:*)
- *
  */
 public class StopPlaceResource {
 
-    private static final int MAX_DOWNLOAD_BUFFER_SIZE = 20 * 1024 * 1024;
+    private static final int MAX_DOWNLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
 
     private final WebClient webClient;
 
@@ -33,8 +31,8 @@ public class StopPlaceResource {
     }
 
     public Set<String> getQuayIds() {
-        List<String> nsrIds = getNsrIds("/id/quay?includeFuture=true");
-        List<String> localReferences = getLocalReferences("/mapping/quay?recordsPerRoundTrip=500000&includeFuture=true");
+        List<String> nsrIds = getNetexIds("/id/quay?includeFuture=true");
+        List<String> localReferences = getNetexIds("/local_reference/quay?recordsPerRoundTrip=500000&includeFuture=true");
         Set<String> ids = new HashSet<>(nsrIds.size() + localReferences.size());
         ids.addAll(nsrIds);
         ids.addAll(localReferences);
@@ -42,8 +40,8 @@ public class StopPlaceResource {
     }
 
     public Set<String> getStopPlaceIds() {
-        List<String> nsrIds = getNsrIds("/id/stop_place?includeFuture=true");
-        List<String> localReferences = getLocalReferences("/mapping/stop_place?recordsPerRoundTrip=220000&includeFuture=true");
+        List<String> nsrIds = getNetexIds("/id/stop_place?includeFuture=true");
+        List<String> localReferences = getNetexIds("/local_reference/stop_place?recordsPerRoundTrip=220000&includeFuture=true");
         Set<String> ids = new HashSet<>(nsrIds.size() + localReferences.size());
         ids.addAll(nsrIds);
         ids.addAll(localReferences);
@@ -51,38 +49,22 @@ public class StopPlaceResource {
     }
 
     /**
-     * Return the list of NSR Ids.
-     * The id service returns a plain-text payload containing one NSR ID per line.
+     * Return the list of NetEX Ids.
+     * The id service and local_reference service return a plain-text payload containing one NeTEx ID per line.
+     *
      * @param uri
      * @return
      */
-    private List<String> getNsrIds(String uri) {
+    private List<String> getNetexIds(String uri) {
         String allIds = getPayload(uri);
         if (allIds == null) {
             throw new AntuException("The endpoint " + uri + " did not return any id");
         }
-        return Arrays.stream(allIds.split("\n")).collect(Collectors.toList());
-    }
-
-    /**
-     * Return the list of local references.
-     * The mapping service returns a plain-text payload containing for each line one pair (Local reference, NSR id) followed by the validity period.
-     * Only the first field (Local reference) is collected here since the id is already collected in {@link #getNsrIds(String)}
-     * @param uri
-     * @return
-     */
-    private List<String> getLocalReferences(String uri) {
-        String allMappings = getPayload(uri);
-        if (allMappings == null) {
-            throw new AntuException("The endpoint " + uri + " did not return any id");
-        }
-        return Arrays.stream(allMappings.split("\n"))
-                .map(line -> line.substring(0, line.indexOf(',')))
-                .collect(Collectors.toList());
+        return Arrays.asList(allIds.split("\n"));
     }
 
     private String getPayload(String uri) {
-        // the payload is less than 20Mb, so the ids can be retrieved without streaming
+        // the payload is less than 10Mb, ids can be retrieved without streaming
         return webClient.get()
                 .uri(uri)
                 .accept(MediaType.TEXT_PLAIN)
