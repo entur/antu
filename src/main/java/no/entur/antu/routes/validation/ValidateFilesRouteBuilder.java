@@ -31,6 +31,7 @@ import no.entur.antu.xml.XMLParserUtil;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.redisson.api.RSetMultimap;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -132,6 +133,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:validateVersionOnRefToLocalIds")
                 .to("direct:validateReferenceToValidEntityType")
                 .to("direct:validateReferenceToNsr")
+                .to("direct:cacheNetexIds")
                 // end filter
                 .end()
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
@@ -206,6 +208,12 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 })
                 .log(LoggingLevel.INFO, correlation() + "Validation of NSR reference complete")
                 .routeId("validate-ref-nsr");
+
+        from("direct:cacheNetexIds")
+                .log(LoggingLevel.INFO, correlation() + "Caching NeTEx Ids")
+                .bean("localIdCache", "addAll(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})")
+                .log(LoggingLevel.INFO, correlation() + "Cached NeTEx Ids")
+                .routeId("cache-netex-ids");
 
 
         from("direct:reportSystemError")

@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.rutebanken.superpom</groupId>
         <artifactId>superpom</artifactId>
-        <version>1.0.30</version>
+        <version>1.0.31-SNAPSHOT</version>
     </parent>
 
     <groupId>no.entur.antu</groupId>
@@ -32,6 +32,7 @@
         <saxon.version>10.6</saxon.version>
         <zt-zip.version>1.14</zt-zip.version>
         <redisson.version>3.16.6</redisson.version>
+        <kryo.version>5.2.1</kryo.version>
         <embedded-redis.version>0.8.1</embedded-redis.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
@@ -210,6 +211,11 @@
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
             <version>${redisson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>${kryo.version}</version>
         </dependency>
 
 

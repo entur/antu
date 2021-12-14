@@ -6,13 +6,17 @@ import java.util.Objects;
 
 public class IdVersion {
 
-    private final String id;
-    private final String version;
-    private final String elementName;
-    private final List<String> parentElementNames;
-    private final String filename;
-    private final int lineNumber;
-    private final int columnNumber;
+    private String id;
+    private String version;
+    private String elementName;
+    private List<String> parentElementNames;
+    private String filename;
+    private int lineNumber;
+    private int columnNumber;
+
+    public IdVersion() {
+
+    }
 
     public IdVersion(String id, String version, String elementName, List<String> parentElementNames, String filename, int lineNumber, int columnNumber) {
         this.id = id;
