@@ -67,7 +67,7 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
 
     private static final String TEST_DATASET_CODESPACE = "flb";
-    private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex-duplicated-id.zip";
+    private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex.zip";
     private static final String TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex-schema-error.zip";
 
     @Produce("direct:initDatasetValidation")

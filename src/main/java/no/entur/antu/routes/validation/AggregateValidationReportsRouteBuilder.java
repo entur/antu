@@ -22,9 +22,6 @@ package no.entur.antu.routes.validation;
 import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validator.ValidationReport;
-import no.entur.antu.validator.ValidationReportEntry;
-import no.entur.antu.validator.ValidationReportEntrySeverity;
-import no.entur.antu.validator.id.IdVersion;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
@@ -37,10 +34,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static no.entur.antu.Constants.AGGREGATED_VALIDATION_REPORT;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
 import static no.entur.antu.Constants.DATASET_STATUS;
@@ -60,8 +57,8 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
     private static final String FILENAME_DELIMITER = "§";
     private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
-    public static final String ACCUMULATED_FILE_LOCAL_IDS = "ACCUMULATED_FILE_LOCAL_IDS";
-    public static final String NETEX_FILE_LOCAL_IDS = "NETEX_FILE_LOCAL_IDS";
+    public static final String ACCUMULATED_NETEX_LOCAL_IDS = "ACCUMULATED_FILE_LOCAL_IDS";
+    public static final String NETEX_LOCAL_IDS = "NETEX_FILE_LOCAL_IDS";
 
 
     @Override
@@ -87,39 +84,31 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                     String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
                     String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID, String.class);
                     ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
-                    exchange.getIn().setHeader(Constants.AGGREGATED_VALIDATION_REPORT, validationReport);
-                    exchange.setProperty(ACCUMULATED_FILE_LOCAL_IDS, new HashSet<String>());
+                    exchange.getIn().setHeader(AGGREGATED_VALIDATION_REPORT, validationReport);
+                    exchange.setProperty(ACCUMULATED_NETEX_LOCAL_IDS, new HashSet<String>());
                 })
                 .convertBodyTo(String.class)
                 .split(method(ReverseSortedFileNameSplitter.class, "split")).delimiter(FILENAME_DELIMITER)
                 .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
                 .setHeader(NETEX_FILE_NAME, body())
-                .setProperty(NETEX_FILE_LOCAL_IDS, method("localIdCache", "get(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "})"))
+                .setProperty(NETEX_LOCAL_IDS, method("localIdCache", "get(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "})"))
+                .bean("netexIdUniquenessValidator", "validate(${exchangeProperty." + ACCUMULATED_NETEX_LOCAL_IDS + "},${exchangeProperty." + NETEX_LOCAL_IDS + "}, ,${header." + NETEX_FILE_NAME + "})")
                 .process(exchange -> {
-                    String fileName = exchange.getIn().getHeader(NETEX_FILE_NAME, String.class);
-                    Set<String> accumulatedLocalIds = exchange.getProperty(ACCUMULATED_FILE_LOCAL_IDS, Set.class);
-                    Map<String, IdVersion> netexFileLocalIds = exchange.getProperty(NETEX_FILE_LOCAL_IDS, Map.class);
-                    Set<String> intersection = new HashSet<String>(netexFileLocalIds.keySet());
-                    intersection.retainAll(accumulatedLocalIds);
-                    if (!intersection.isEmpty()) {
-                        ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(Constants.AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
-                        for (String id : intersection) {
-                            aggregatedValidationReport.addValidationReportEntry(new ValidationReportEntry("Duplicate element identifiers across line and common files", "NeTEx ID Consistency", ValidationReportEntrySeverity.ERROR, fileName));
-                        }
-                    }
-                    accumulatedLocalIds.addAll(netexFileLocalIds.keySet());
+                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
+                    aggregatedValidationReport.addAllValidationReportEntries(exchange.getIn().getBody(List.class));
+
                 })
                 .to("direct:downloadValidationReport")
                 .unmarshal().json(JsonLibrary.Jackson, ValidationReport.class)
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getIn().getBody(ValidationReport.class);
-                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(Constants.AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
+                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
                     aggregatedValidationReport.addAllValidationReportEntries(validationReport.getValidationReportEntries());
 
                 })
                 // end splitter
                 .end()
-                .setBody(header(Constants.AGGREGATED_VALIDATION_REPORT))
+                .setBody(header(AGGREGATED_VALIDATION_REPORT))
                 .choice()
                 .when(simple("${body.hasError()}"))
                 .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))

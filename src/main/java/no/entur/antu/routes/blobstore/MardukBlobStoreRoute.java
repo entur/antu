@@ -39,17 +39,13 @@ public class MardukBlobStoreRoute extends BaseRouteBuilder {
     public void configure() {
 
         from("direct:getMardukBlob")
-                .to(logDebugShowAll())
                 .bean(mardukBlobStoreService, "getBlob")
-                .to(logDebugShowAll())
                 .log(LoggingLevel.INFO, correlation() + "Returning from fetching file ${header." + FILE_HANDLE + "} from Marduk bucket.")
                 .routeId("blobstore-marduk-download");
 
         from("direct:uploadMardukBlob")
-                .to(logDebugShowAll())
                 .bean(mardukBlobStoreService, "uploadBlob")
                 .setBody(simple(""))
-                .to(logDebugShowAll())
                 .log(LoggingLevel.INFO, correlation() + "Stored file ${header." + FILE_HANDLE + "} in Marduk bucket.")
                 .routeId("blobstore-marduk-upload");
     }
