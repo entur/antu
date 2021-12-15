@@ -16,6 +16,7 @@
 
 package no.entur.antu.config;
 
+import no.entur.antu.stop.CompatibilityStopPlaceResource;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.StopPlaceResource;
@@ -36,7 +37,7 @@ public class StopPlaceConfig {
     @Bean
     @Profile("!test")
     StopPlaceResource stopPlaceResource(@Value("${antu.stop.registry.id.url}") String stopIdsEndpoint, WebClient.Builder webClientBuilder) {
-        return new StopPlaceResource(stopIdsEndpoint, webClientBuilder);
+        return new CompatibilityStopPlaceResource(stopIdsEndpoint, webClientBuilder);
     }
 
     @Bean
