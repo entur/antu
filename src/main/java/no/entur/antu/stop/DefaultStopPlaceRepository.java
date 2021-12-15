@@ -15,6 +15,8 @@
 
 package no.entur.antu.stop;
 
+import no.entur.antu.exception.AntuException;
+
 import javax.cache.Cache;
 import java.util.Set;
 
@@ -33,12 +35,20 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
 
     @Override
     public Set<String> getStopPlaceIds() {
-        return stopPlaceCache.get(STOP_PLACE_CACHE_KEY);
+        Set<String> stopPlaceIds = stopPlaceCache.get(STOP_PLACE_CACHE_KEY);
+        if(stopPlaceIds == null) {
+            throw new AntuException("Stop place ids cache not found");
+        }
+        return stopPlaceIds;
     }
 
     @Override
     public Set<String> getQuayIds() {
-        return stopPlaceCache.get(QUAY_CACHE_KEY);
+        Set<String> quayIds = stopPlaceCache.get(QUAY_CACHE_KEY);
+        if(quayIds == null) {
+            throw new AntuException("Quay ids cache not found");
+        }
+        return quayIds;
     }
 
     @Override
