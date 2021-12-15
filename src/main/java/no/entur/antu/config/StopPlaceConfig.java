@@ -16,14 +16,19 @@
 
 package no.entur.antu.config;
 
+import no.entur.antu.stop.CompatibilityStopPlaceResource;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.StopPlaceResource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import javax.cache.Cache;
+import java.util.Set;
 
 @Configuration
 public class StopPlaceConfig {
@@ -32,13 +37,13 @@ public class StopPlaceConfig {
     @Bean
     @Profile("!test")
     StopPlaceResource stopPlaceResource(@Value("${antu.stop.registry.id.url}") String stopIdsEndpoint, WebClient.Builder webClientBuilder) {
-        return new StopPlaceResource(stopIdsEndpoint, webClientBuilder);
+        return new CompatibilityStopPlaceResource(stopIdsEndpoint, webClientBuilder);
     }
 
     @Bean
     @Profile("!test")
-    StopPlaceRepository stopPlaceRepository(StopPlaceResource stopPlaceResource) {
-        return new DefaultStopPlaceRepository(stopPlaceResource);
+    StopPlaceRepository stopPlaceRepository(StopPlaceResource stopPlaceResource, @Qualifier("stopPlaceCache") Cache<String, Set<String>> stopPlaceCache) {
+        return new DefaultStopPlaceRepository(stopPlaceResource, stopPlaceCache);
     }
 
 }

@@ -38,6 +38,7 @@ import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -51,13 +52,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
-import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 
 
@@ -93,6 +94,25 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
             };
         }
 
+        @Bean
+        @Primary
+        public StopPlaceRepository stopPlaceRepository() {
+            return new StopPlaceRepository() {
+                @Override
+                public Set<String> getStopPlaceIds() {
+                    return Collections.emptySet();
+                }
+
+                @Override
+                public Set<String> getQuayIds() {
+                    return Collections.emptySet();
+                }
+
+                @Override
+                public void refreshCache() {
+                }
+            };
+        }
     }
 
     @Test
@@ -119,7 +139,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
 
 
     }

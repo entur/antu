@@ -39,17 +39,13 @@ public class AntuBlobStoreRoute extends BaseRouteBuilder {
     public void configure() {
 
         from("direct:getAntuBlob")
-                .to(logDebugShowAll())
                 .bean(antuBlobStoreService, "getBlob")
-                .to(logDebugShowAll())
                 .log(LoggingLevel.INFO, correlation() + "Returning from fetching file ${header." + FILE_HANDLE + "} from Antu bucket.")
                 .routeId("blobstore-antu-download");
 
         from("direct:uploadAntuBlob")
-                .to(logDebugShowAll())
                 .bean(antuBlobStoreService, "uploadBlob")
                 .setBody(simple(""))
-                .to(logDebugShowAll())
                 .log(LoggingLevel.INFO, correlation() + "Stored file ${header." + FILE_HANDLE + "} in Antu bucket.")
                 .routeId("blobstore-antu-upload");
     }

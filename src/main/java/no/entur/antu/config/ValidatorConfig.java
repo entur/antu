@@ -17,7 +17,10 @@
 package no.entur.antu.config;
 
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validator.id.NetexIdUniquenessValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
+import no.entur.antu.validator.id.ReferenceToNsrValidator;
 import no.entur.antu.validator.id.ReferenceToValidEntityTypeValidator;
 import no.entur.antu.validator.id.VersionOnLocalNetexIdValidator;
 import no.entur.antu.validator.id.VersionOnRefToLocalNetexIdValidator;
@@ -59,4 +62,17 @@ public class ValidatorConfig {
     public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator() {
         return new ReferenceToValidEntityTypeValidator();
     }
+
+    @Bean("nsrRefValidator")
+    public ReferenceToNsrValidator referenceToNsrValidator(StopPlaceRepository stopPlaceRepository) {
+        return new ReferenceToNsrValidator(stopPlaceRepository);
+    }
+
+    @Bean("netexIdUniquenessValidator")
+    public NetexIdUniquenessValidator netexIdUniquenessValidator() {
+        return new NetexIdUniquenessValidator();
+    }
+
+
+
 }

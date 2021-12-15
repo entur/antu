@@ -22,7 +22,9 @@ data:
     antu.organisation.registry.url={{ .Values.organisationRegistryUrl }}
 
     # Stop place register
-    antu.stop.registry.id.url=http://tiamat/services/stop_places/id
+    antu.stop.registry.id.url=http://tiamat/services/stop_places
+    antu.stop.refresh.interval=fireNow=true&startDelayedSeconds=1&stateful=true&trigger.repeatCount=0
+
 
     # Validators
     antu.schema.validation.enabled=true

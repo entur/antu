@@ -25,13 +25,14 @@
     <properties>
         <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
         <camel.version>3.11.3</camel.version>
-        <entur.helpers.version>1.0.62</entur.helpers.version>
+        <entur.helpers.version>1.0.61</entur.helpers.version>
         <netex-java-model.version>1.0.13</netex-java-model.version>
         <commons-io.version>2.11.0</commons-io.version>
         <google.cloud.bom-version>24.0.0</google.cloud.bom-version>
         <saxon.version>10.6</saxon.version>
         <zt-zip.version>1.14</zt-zip.version>
         <redisson.version>3.16.6</redisson.version>
+        <kryo.version>5.2.1</kryo.version>
         <embedded-redis.version>0.8.1</embedded-redis.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
@@ -210,6 +211,11 @@
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
             <version>${redisson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>${kryo.version}</version>
         </dependency>
 
 
