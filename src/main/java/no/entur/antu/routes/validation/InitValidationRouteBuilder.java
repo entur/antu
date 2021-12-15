@@ -72,6 +72,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .routeId("process-job");
 
         from("direct:notifyMarduk")
+                .log(LoggingLevel.INFO, correlation() + "Notifying Marduk")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")
                 .routeId("notify-marduk");
 
