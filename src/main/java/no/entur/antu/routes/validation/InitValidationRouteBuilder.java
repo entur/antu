@@ -25,7 +25,8 @@ import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
 import static no.entur.antu.Constants.JOB_TYPE;
-import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE;
+import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
+import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
 import static no.entur.antu.Constants.JOB_TYPE_SPLIT;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
@@ -65,7 +66,9 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .to("direct:splitDataset")
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE))
                 .to("direct:validateNetex")
-                .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE))
+                .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_COMMON_FILES))
+                .to("direct:aggregateCommonFiles")
+                .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_REPORTS))
                 .to("direct:aggregateReports")
                 .otherwise()
                 .log(LoggingLevel.ERROR, correlation() + "Unknown job type ${header." + Constants.JOB_TYPE + " } ")

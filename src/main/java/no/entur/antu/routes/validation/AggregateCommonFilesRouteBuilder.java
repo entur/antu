@@ -53,7 +53,7 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
  * Aggregate validation reports.
  */
 @Component
-public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
+public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final String FILENAME_DELIMITER = "§";
     private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
@@ -65,12 +65,12 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
     public void configure() throws Exception {
         super.configure();
 
-        from("master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
+        from("master:lockOnAntuCommonFilesAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue")
                 .process(this::removeSynchronizationForAggregatedExchange)
-                .aggregate(header(VALIDATION_REPORT_ID)).aggregationStrategy(new ValidationReportAggregationStrategy()).completionTimeout(1800000)
+                .aggregate(header(VALIDATION_REPORT_ID)).aggregationStrategy(new CommonFilesAggregationStrategy()).completionTimeout(1800000)
                 .process(this::addSynchronizationForAggregatedExchange)
                 .process(this::setNewCorrelationId)
-                .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} validation reports (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
+                .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} common files (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
 
                 .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_REPORTS))
@@ -153,7 +153,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
      * Complete the aggregation when all the individual reports have been received.
      * The total number of reports to process is stored in a header that is included in every incoming message.
      */
-    private static class ValidationReportAggregationStrategy extends GroupedMessageAggregationStrategy {
+    private static class CommonFilesAggregationStrategy extends GroupedMessageAggregationStrategy {
 
         @Override
         public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
