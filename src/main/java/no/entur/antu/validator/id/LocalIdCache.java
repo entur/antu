@@ -1,6 +1,5 @@
 package no.entur.antu.validator.id;
 
-import no.entur.antu.exception.AntuException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +51,8 @@ public class LocalIdCache {
         LOGGER.debug("Retrieving local ids cache entry {}", cacheKey);
         Map<String, IdVersion> localIds = cache.get(cacheKey);
         if (localIds == null) {
-            throw new AntuException("Cache entry not found: " + cacheKey);
+            LOGGER.warn("No local ids found for cache entry {}", cacheKey);
+            localIds = Collections.emptyMap();
         }
         return localIds;
     }
