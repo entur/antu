@@ -23,7 +23,7 @@ data:
 
     # Stop place register
     antu.stop.registry.id.url=http://tiamat/services/stop_places
-    antu.stop.refresh.interval=fireNow=true&startDelayedSeconds=10&stateful=true&trigger.repeatCount=0
+    antu.stop.refresh.interval=fireNow=true&startDelayedSeconds=10&stateful=true&trigger.repeatInterval=30000&trigger.repeatCount=3
 
 
     # Validators
