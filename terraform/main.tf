@@ -112,7 +112,7 @@ resource "google_redis_instance" "antu-redis" {
 
 resource "kubernetes_config_map" "antu-redis-config" {
   metadata {
-    name =  "antu-cache-config-${var.kube_namespace}"
+    name =  "antu-redis-configmap"
     namespace = var.kube_namespace
     labels    = var.labels
   }
