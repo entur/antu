@@ -16,6 +16,10 @@ provider "kubernetes" {
   version = "~> 1.13.4"
 }
 
+provider "random" {
+  version = "~> 3.1.0"
+}
+
 # create service account
 resource "google_service_account" "antu_service_account" {
   account_id = "${var.labels.team}-${var.labels.app}-sa"
