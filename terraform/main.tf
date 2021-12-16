@@ -7,6 +7,10 @@ provider "google" {
   version = "~> 3.74.0"
   region  = var.gcp_region
 }
+provider "google-beta" {
+  version = "~> 4.3.0"
+  region  = var.gcp_region
+}
 provider "kubernetes" {
   load_config_file = var.load_config_file
   version = "~> 1.13.4"
@@ -82,16 +86,35 @@ resource "google_pubsub_subscription" "AntuReportAggregationQueue" {
 }
 
 # Redis server
-module "redis" {
-  source = "github.com/entur/terraform//modules/redis?ref=v0.0.32"
-  gcp_project = var.redis_project
-  labels = var.labels
-  kubernetes_namespace = var.kube_namespace
-  zone = var.redis_zone
-  reserved_ip_range = var.redis_reserved_ip_range
-  prevent_destroy = var.redis_prevent_destroy
+resource "google_redis_instance" "antu-redis" {
+  name = "${var.labels.app}-${var.kube_namespace}"
+  project                 = var.redis_project
+  memory_size_gb          = 5
+  redis_version           = "REDIS_6_X"
+  authorized_network      = "default-network"
+  reserved_ip_range       = var.redis_reserved_ip_range
+  tier                    = "STANDARD_HA"
+  location_id             = var.redis_zone
+  labels                  = var.labels
   redis_configs           = {
-    maxmemory-gb = "5"
+    maxmemory-gb = "4.8",
+    maxmemory-policy = "volatile-ttl"
+    activedefrag = "yes"
+  }
+  timeouts {
+    update = "25m"
+  }
+}
+
+resource "kubernetes_config_map" "antu-redis-config" {
+  metadata {
+    name =  "antu-cache-config-${var.kube_namespace}"
+    namespace = var.kube_namespace
+    labels    = var.labels
+  }
+
+  data = {
+    "REDIS_HOST" = "${google_redis_instance.antu-redis.host}"
   }
 
 }
