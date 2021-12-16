@@ -108,6 +108,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 })
                 // end splitter
                 .end()
+                .log(LoggingLevel.INFO, correlation() + "Completed reports merging")
                 .setBody(header(AGGREGATED_VALIDATION_REPORT))
                 .choice()
                 .when(simple("${body.hasError()}"))
@@ -131,7 +132,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                         .append(".json"))
                 .log(LoggingLevel.INFO, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:getAntuBlob")
-                .log(LoggingLevel.INFO, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
+                .log(LoggingLevel.INFO, correlation() + "Downloaded Validation Report from GCS file ${header." + FILE_HANDLE + "}")
                 .routeId("download-validation-report");
 
 
