@@ -90,6 +90,10 @@ module "redis" {
   zone = var.redis_zone
   reserved_ip_range = var.redis_reserved_ip_range
   prevent_destroy = var.redis_prevent_destroy
+  redis_configs           = {
+    maxmemory-gb = "5"
+  }
+
 }
 
 # create key for service account

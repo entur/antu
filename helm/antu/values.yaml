@@ -17,4 +17,4 @@ resources:
 horizontalPodAutoscaler:
   maxReplicas: 10
   minReplicas: 2
-  targetCPUUtilizationPercentage: 70
+  targetCPUUtilizationPercentage: 50
