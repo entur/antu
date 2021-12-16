@@ -109,13 +109,15 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 // end splitter
                 .end()
                 .log(LoggingLevel.INFO, correlation() + "Completed reports merging")
-                .to("direct:uploadAggregatedValidationReport")
+                .setBody(header(AGGREGATED_VALIDATION_REPORT))
                 .choice()
                 .when(simple("${body.hasError()}"))
                 .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
                 .otherwise()
                 .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
                 .end()
+                .marshal().json(JsonLibrary.Jackson)
+                .to("direct:uploadAggregatedValidationReport")
                 .setBody(header(DATASET_STATUS))
                 .to("direct:notifyMarduk")
                 .routeId("aggregate-reports");
@@ -135,8 +137,6 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
 
         from("direct:uploadAggregatedValidationReport")
-                .setBody(header(AGGREGATED_VALIDATION_REPORT))
-                .marshal().json(JsonLibrary.Jackson)
                 .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
                         .append(header(DATASET_CODESPACE))
                         .append("/validation-report-")
