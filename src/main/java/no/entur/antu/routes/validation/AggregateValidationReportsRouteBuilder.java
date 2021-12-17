@@ -91,7 +91,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .split(method(ReverseSortedFileNameSplitter.class, "split")).delimiter(FILENAME_DELIMITER)
                 .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
                 .setHeader(NETEX_FILE_NAME, body())
-                .setProperty(NETEX_LOCAL_IDS, method("localIdCache", "get(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "})"))
+                .setProperty(NETEX_LOCAL_IDS, method("netexIdRepository", "get(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "})"))
                 .bean("netexIdUniquenessValidator", "validate(${exchangeProperty." + ACCUMULATED_NETEX_LOCAL_IDS + "},${exchangeProperty." + NETEX_LOCAL_IDS + "}, ,${header." + NETEX_FILE_NAME + "})")
                 .process(exchange -> {
                     ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(AGGREGATED_VALIDATION_REPORT, ValidationReport.class);

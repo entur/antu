@@ -211,7 +211,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:cacheNetexLocalIds")
                 .log(LoggingLevel.INFO, correlation() + "Caching NeTEx Local Ids")
-                .bean("localIdCache", "addAll(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})")
+                .bean("netexIdRepository", "addAll(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})")
                 .log(LoggingLevel.INFO, correlation() + "Cached NeTEx Local Ids")
                 .routeId("cache-netex-local-ids");
 
