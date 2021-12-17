@@ -80,16 +80,18 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .to("direct:uploadSingleNetexFile")
                 .routeId("upload-single-netex-files");
 
-        from("direct:createValidationJobs")
+        from("direct:createCommonFilesValidationJobs")
                 .split(header(ALL_NETEX_FILE_NAMES))
+                .filter(body().startsWith("_"))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
                 .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                 .setHeader(NETEX_FILE_NAME, body())
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
+                .setBody(header(ALL_NETEX_FILE_NAMES))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 //end split
                 .end()
-                .routeId("create-validation-jobs");
+                .routeId("create-common-files-validation-jobs");
 
         from("direct:uploadSingleNetexFile")
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))

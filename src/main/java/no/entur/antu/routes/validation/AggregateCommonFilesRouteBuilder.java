@@ -43,6 +43,7 @@ import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
 import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
+import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
@@ -122,31 +123,16 @@ public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:notifyMarduk")
                 .routeId("aggregate-reports");
 
-        from("direct:downloadValidationReport")
-                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
-                        .append(header(DATASET_CODESPACE))
-                        .append("/")
-                        .append(header(VALIDATION_REPORT_ID))
-                        .append("/")
-                        .append(header(NETEX_FILE_NAME))
-                        .append(".json"))
-                .log(LoggingLevel.INFO, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
-                .to("direct:getAntuBlob")
-                .log(LoggingLevel.INFO, correlation() + "Downloaded Validation Report from GCS file ${header." + FILE_HANDLE + "}")
-                .routeId("download-validation-report");
-
-
-        from("direct:uploadAggregatedValidationReport")
-                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
-                        .append(header(DATASET_CODESPACE))
-                        .append("/validation-report-")
-                        .append(header(VALIDATION_REPORT_ID))
-                        .append(".json"))
-                .log(LoggingLevel.INFO, correlation() + "Uploading aggregated Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
-                .to("direct:uploadAntuBlob")
-                .log(LoggingLevel.INFO, correlation() + "Uploaded aggregated Validation Report to GCS file ${header." + FILE_HANDLE + "}")
-                .routeId("upload-aggregated-validation-report");
-
+        from("direct:createValidationJobs")
+                .split(header(ALL_NETEX_FILE_NAMES))
+                .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
+                .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
+                .setHeader(NETEX_FILE_NAME, body())
+                .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
+                .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
+                //end split
+                .end()
+                .routeId("create-validation-jobs");
     }
 
     /**

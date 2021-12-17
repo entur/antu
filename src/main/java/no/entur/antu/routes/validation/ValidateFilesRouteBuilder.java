@@ -249,6 +249,11 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         from("direct:notifyValidationReportAggregator")
                 .log(LoggingLevel.INFO, correlation() + "Notifying validation report aggregator")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
+                .filter(header(NETEX_FILE_NAME).startsWith("_"))
+                .log(LoggingLevel.INFO, correlation() + "Notifying common files aggregator")
+                .to("google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue")
+                //end filter
+                .end()
                 .routeId("notify-validation-report-aggregator");
 
     }
