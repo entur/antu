@@ -132,10 +132,9 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:validateVersionOnRefToLocalIds")
                 .to("direct:validateReferenceToValidEntityType")
                 .to("direct:validateReferenceToNsr")
-
+                .to("direct:validateDuplicatedNetexIds")
                 // end filter
                 .end()
-                .to("direct:cacheNetexLocalIds")
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");
 
@@ -209,11 +208,15 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Validation of NSR reference complete")
                 .routeId("validate-ref-nsr");
 
-        from("direct:cacheNetexLocalIds")
-                .log(LoggingLevel.INFO, correlation() + "Caching NeTEx Local Ids")
-                .bean("localIdCache", "addAll(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})")
-                .log(LoggingLevel.INFO, correlation() + "Cached NeTEx Local Ids")
-                .routeId("cache-netex-local-ids");
+        from("direct:validateDuplicatedNetexIds")
+                .log(LoggingLevel.INFO, correlation() + "Running validation of duplicated NeTEx Ids")
+                .bean("netexIdUniquenessValidator", "validate(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})")
+                .process(exchange -> {
+                    ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
+                    validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
+                })
+                .log(LoggingLevel.INFO, correlation() + "validation of duplicated NeTEx Ids complete")
+                .routeId("validate-duplicated-netex-ids");
 
 
         from("direct:reportSystemError")
@@ -228,7 +231,6 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Saving validation report")
                 .setBody(exchangeProperty(PROP_VALIDATION_REPORT))
                 .marshal().json(JsonLibrary.Jackson)
-                .log(LoggingLevel.INFO, correlation() + "Validation report: ${body}")
                 .to("direct:uploadValidationReport")
                 .log(LoggingLevel.INFO, correlation() + "Saved validation report")
                 .routeId("save-validation-report");

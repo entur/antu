@@ -12,7 +12,6 @@ import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.validator.xpath.ValidationContext;
 import no.entur.antu.validator.xpath.ValidationRule;
-import no.entur.antu.xml.XMLParserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,7 @@ public class ValidateAuthorityId implements ValidationRule {
                 return Collections.emptyList();
             } else {
                 String xpath = "//ResourceFrame/organisations/Authority[not(@id=('" + String.join("','", whitelistedAuthorityIds) + "'))]";
-                XPathSelector selector = XMLParserUtil.getXPathCompiler().compile(xpath).load();
+                XPathSelector selector = validationContext.getxPathCompiler().compile(xpath).load();
                 selector.setContextItem(validationContext.getXmlNode());
                 XdmValue nodes = selector.evaluate();
                 List<ValidationReportEntry> validationReportEntries = new ArrayList<>();

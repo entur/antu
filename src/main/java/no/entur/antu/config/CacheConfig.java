@@ -1,7 +1,9 @@
 package no.entur.antu.config;
 
-import no.entur.antu.validator.id.IdVersion;
-import no.entur.antu.validator.id.LocalIdCache;
+import no.entur.antu.validator.id.NetexIdRepository;
+import no.entur.antu.validator.id.RedisNetexIdRepository;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.codec.Kryo5Codec;
 import org.redisson.config.Config;
@@ -9,22 +11,17 @@ import org.redisson.jcache.configuration.RedissonConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
-import javax.cache.configuration.Factory;
 import javax.cache.configuration.MutableConfiguration;
-import javax.cache.expiry.CreatedExpiryPolicy;
-import javax.cache.expiry.Duration;
-import javax.cache.expiry.ExpiryPolicy;
-import java.util.Map;
 import java.util.Set;
 
 @Configuration
 public class CacheConfig {
 
-    public static final String STOP_PLACE_CACHE_KEY = "stopPlaceCache";
-    public static final String ID_VERSION_CACHE_KEY = "idVersionCache";
+    public static final String STOP_PLACE_AND_QUAY_CACHE_KEY = "stopPlaceAndQuayCache";
 
     @Bean
     public Config redissonConfig(RedisProperties redisProperties) {
@@ -43,25 +40,22 @@ public class CacheConfig {
         return redissonConfig;
     }
 
+    @Bean(destroyMethod = "shutdown")
+    @Profile("!test")
+    public RedissonClient redissonClient(Config redissonConfig) {
+        return Redisson.create(redissonConfig);
+    }
+
     @Bean
     public Cache<String, Set<String>> stopPlaceCache(Config redissonConfig) {
         MutableConfiguration<String, Set<String>> cacheConfig = new MutableConfiguration<>();
         var redissonCacheConfig = RedissonConfiguration.fromConfig(redissonConfig, cacheConfig);
         var manager = Caching.getCachingProvider().getCacheManager();
-        return manager.createCache(STOP_PLACE_CACHE_KEY, redissonCacheConfig);
+        return manager.createCache(STOP_PLACE_AND_QUAY_CACHE_KEY, redissonCacheConfig);
     }
 
     @Bean
-    public Cache<String, Map<String, IdVersion>> idVersionCache(Config redissonConfig) {
-        MutableConfiguration<String, Map<String, IdVersion>> cacheConfig = new MutableConfiguration<>();
-        var redissonCacheConfig = RedissonConfiguration.fromConfig(redissonConfig, cacheConfig);
-        cacheConfig.setExpiryPolicyFactory((Factory<ExpiryPolicy>) () -> new CreatedExpiryPolicy(Duration.ONE_HOUR));
-        var manager = Caching.getCachingProvider().getCacheManager();
-        return manager.createCache(ID_VERSION_CACHE_KEY, redissonCacheConfig);
-    }
-
-    @Bean
-    public LocalIdCache localIdCache(Cache<String, Map<String, IdVersion>> idVersionCache) {
-        return new LocalIdCache(idVersionCache);
+    public NetexIdRepository netexIdRepository(RedissonClient redissonClient) {
+        return new RedisNetexIdRepository(redissonClient);
     }
 }

@@ -66,6 +66,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .routeId("download-netex-dataset");
 
         from("direct:uploadSingleNetexFiles")
+                .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx files")
                 .split(new ZipSplitter()).aggregationStrategy(new SingleNetexFileAggregationStrategy())
                 .streaming()
                 .log(LoggingLevel.INFO, correlation() + "Processing NeTEx file ${header." + Exchange.FILE_NAME + "}")
@@ -78,6 +79,9 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .setHeader(NETEX_FILE_NAME, header(Exchange.FILE_NAME))
                 .marshal().zipFile()
                 .to("direct:uploadSingleNetexFile")
+                // end split
+                .end()
+                .log(LoggingLevel.INFO, correlation() + "Uploaded NeTEx files")
                 .routeId("upload-single-netex-files");
 
         from("direct:createCommonFilesValidationJobs")

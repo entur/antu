@@ -8,13 +8,16 @@ import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
+import no.entur.antu.Constants;
 import no.entur.antu.exception.AntuException;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stax.StAXSource;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.util.Set;
 
 public final class XMLParserUtil {
 
@@ -57,9 +60,9 @@ public final class XMLParserUtil {
         DocumentBuilder builder = getProcessor().newDocumentBuilder();
         builder.setLineNumbering(true);
         builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
-        XMLInputFactory factory = getSecureXmlInputFactory();
-        XMLStreamReader xmlStreamReader = factory.createXMLStreamReader(new ByteArrayInputStream(content));
-        return builder.build(new StAXSource(xmlStreamReader));
+        // ignore SiteFrame
+        Set<QName> elementsToSkip = Set.of(new QName(Constants.NETEX_NAMESPACE, "SiteFrame"));
+        return builder.build(new StAXSource(SkippingXMLStreamReaderFactory.newXMLStreamReader(new BufferedInputStream(new ByteArrayInputStream(content)), elementsToSkip)));
     }
 
     public static XdmValue selectNodeSet(String expression, XPathCompiler xpath, XdmNode document) {
