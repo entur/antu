@@ -3,6 +3,7 @@ package no.entur.antu.validator.schema;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.xml.NetexSchemaRepository;
 import org.rutebanken.netex.validation.NeTExValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,27 +18,34 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * Validate that NeTEX files are valid according to the XML schema.
  */
 public class NetexSchemaValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetexSchemaValidator.class);
+
+    private final NetexSchemaRepository netexSchemaRepository;
     private final int maxValidationReportEntries;
 
+
     public NetexSchemaValidator(int maxValidationReportEntries) {
+        this.netexSchemaRepository = new NetexSchemaRepository();
         this.maxValidationReportEntries = maxValidationReportEntries;
     }
-
 
     public List<ValidationReportEntry> validateSchema(String fileName, byte[] content) {
 
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
 
-        NeTExValidator neTExValidator;
         try {
-            neTExValidator = NeTExValidator.getNeTExValidator();
-            Validator validator = neTExValidator.getSchema().newValidator();
+            NeTExValidator.NetexVersion schemaVersion = NetexSchemaRepository.detectNetexSchemaVersion(content);
+            if (schemaVersion == null) {
+                schemaVersion = NeTExValidator.LATEST;
+                LOGGER.warn("Could not detect schema version for file {}, defaulting to latest ({}})", fileName, schemaVersion);
+            }
+            Validator validator = netexSchemaRepository.getNetexSchema(schemaVersion).newValidator();
             validator.setErrorHandler(new ErrorHandler() {
 
                 private int errorCount;
