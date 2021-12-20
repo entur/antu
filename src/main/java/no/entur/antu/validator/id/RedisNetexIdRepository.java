@@ -6,6 +6,7 @@ import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -34,8 +35,10 @@ public class RedisNetexIdRepository implements NetexIdRepository {
             // protect against multiple run due to retry logic
             throw new AntuException("Duplicate check already run for this file");
         }
+        localNetexIds.expire(1, TimeUnit.HOURS);
         localNetexIds.addAll(localIds);
         RSet<String> accumulatedNetexIds = redissonClient.getSet(accumulatedNetexIdsKey);
+        accumulatedNetexIds.expire(1, TimeUnit.HOURS);
         RLock lock = redissonClient.getLock(ACCUMULATED_NETEX_ID_LOCK_PREFIX);
         try {
             lock.lock();
