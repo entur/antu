@@ -1,6 +1,6 @@
 package no.entur.antu.config;
 
-import no.entur.antu.validator.id.NetexIdRepository;
+import no.entur.antu.validator.id.RedisNetexIdRepository;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
@@ -20,8 +20,7 @@ import java.util.Set;
 @Configuration
 public class CacheConfig {
 
-    public static final String STOP_PLACE_CACHE_KEY = "stopPlaceCache";
-    public static final String ID_VERSION_CACHE_KEY = "idVersionCache";
+    public static final String STOP_PLACE_AND_QUAY_CACHE_KEY = "stopPlaceAndQuayCache";
 
     @Bean
     public Config redissonConfig(RedisProperties redisProperties) {
@@ -51,11 +50,11 @@ public class CacheConfig {
         MutableConfiguration<String, Set<String>> cacheConfig = new MutableConfiguration<>();
         var redissonCacheConfig = RedissonConfiguration.fromConfig(redissonConfig, cacheConfig);
         var manager = Caching.getCachingProvider().getCacheManager();
-        return manager.createCache(STOP_PLACE_CACHE_KEY, redissonCacheConfig);
+        return manager.createCache(STOP_PLACE_AND_QUAY_CACHE_KEY, redissonCacheConfig);
     }
 
     @Bean
-    public NetexIdRepository netexIdRepository(RedissonClient redissonClient) {
-        return new NetexIdRepository(redissonClient);
+    public RedisNetexIdRepository netexIdRepository(RedissonClient redissonClient) {
+        return new RedisNetexIdRepository(redissonClient);
     }
 }
