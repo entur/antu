@@ -18,7 +18,7 @@ package no.entur.antu.config;
 
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validator.id.RedisNetexIdRepository;
+import no.entur.antu.validator.id.NetexIdRepository;
 import no.entur.antu.validator.id.NetexIdUniquenessValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.id.ReferenceToNsrValidator;
@@ -70,10 +70,9 @@ public class ValidatorConfig {
     }
 
     @Bean("netexIdUniquenessValidator")
-    public NetexIdUniquenessValidator netexIdUniquenessValidator(RedisNetexIdRepository netexIdRepository) {
+    public NetexIdUniquenessValidator netexIdUniquenessValidator(NetexIdRepository netexIdRepository) {
         return new NetexIdUniquenessValidator(netexIdRepository);
     }
-
 
 
 }

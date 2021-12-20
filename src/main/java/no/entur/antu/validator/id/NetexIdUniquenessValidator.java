@@ -31,9 +31,9 @@ public class NetexIdUniquenessValidator {
     private static final Logger LOGGER = LoggerFactory.getLogger(NetexIdUniquenessValidator.class);
 
 
-    private final RedisNetexIdRepository netexIdRepository;
+    private final NetexIdRepository netexIdRepository;
 
-    public NetexIdUniquenessValidator(RedisNetexIdRepository netexIdRepository) {
+    public NetexIdUniquenessValidator(NetexIdRepository netexIdRepository) {
         this.netexIdRepository = netexIdRepository;
     }
 

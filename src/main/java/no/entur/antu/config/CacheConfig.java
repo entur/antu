@@ -1,5 +1,6 @@
 package no.entur.antu.config;
 
+import no.entur.antu.validator.id.NetexIdRepository;
 import no.entur.antu.validator.id.RedisNetexIdRepository;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -54,7 +55,7 @@ public class CacheConfig {
     }
 
     @Bean
-    public RedisNetexIdRepository netexIdRepository(RedissonClient redissonClient) {
+    public NetexIdRepository netexIdRepository(RedissonClient redissonClient) {
         return new RedisNetexIdRepository(redissonClient);
     }
 }
