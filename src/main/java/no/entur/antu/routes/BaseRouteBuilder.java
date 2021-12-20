@@ -46,8 +46,9 @@ import static no.entur.antu.Constants.NETEX_FILE_NAME;
  */
 public abstract class BaseRouteBuilder extends RouteBuilder {
 
-    private static final int ACK_DEADLINE_EXTENSION = 500;
+    private static final int ACK_DEADLINE_EXTENSION = 30;
     private static final String SYNCHRONIZATION_HOLDER = "SYNCHRONIZATION_HOLDER";
+    private static final String[] PUBSUB_OUTBOUND_HEADERS_WHITELIST = {Constants.CORRELATION_ID, Constants.DATASET_CODESPACE, Constants.DATASET_NB_NETEX_FILES, Constants.FILE_HANDLE, NETEX_FILE_NAME, Constants.JOB_TYPE, Constants.VALIDATION_REPORT_ID};
 
     @Value("${quartz.lenient.fire.time.ms:180000}")
     private int lenientFireTimeMs;
@@ -87,12 +88,12 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
                             .forEach(entry -> exchange.getIn().setHeader(entry.getKey(), entry.getValue()));
                 });
 
-        // Copy only the correlationId and codespace headers from the Camel message into the PubSub message by default.
+        // Copy only a whitelist of message headers from the Camel exchange into the PubSub message.
         interceptSendToEndpoint("google-pubsub:*").process(
                 exchange -> {
                     Map<String, String> pubSubAttributes = new HashMap<>(exchange.getIn().getHeader(GooglePubsubConstants.ATTRIBUTES, new HashMap<>(), Map.class));
 
-                    Stream.of(Constants.CORRELATION_ID, Constants.DATASET_CODESPACE, Constants.DATASET_NB_NETEX_FILES, Constants.FILE_HANDLE, NETEX_FILE_NAME, Constants.JOB_TYPE, Constants.VALIDATION_REPORT_ID).forEach(header -> {
+                    Stream.of(PUBSUB_OUTBOUND_HEADERS_WHITELIST).forEach(header -> {
                                 if (exchange.getIn().getHeader(header) != null) {
                                     pubSubAttributes.put(header, exchange.getIn().getHeader(header, String.class));
                                 }
