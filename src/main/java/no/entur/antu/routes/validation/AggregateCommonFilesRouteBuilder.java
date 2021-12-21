@@ -21,33 +21,26 @@ package no.entur.antu.routes.validation;
 
 import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
-import no.entur.antu.validator.ValidationReport;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
-import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.builder.PredicateBuilder;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static no.entur.antu.Constants.AGGREGATED_VALIDATION_REPORT;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
-import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
-import static no.entur.antu.Constants.DATASET_STATUS;
+import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
 import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
+import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
-import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
-import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
+import static no.entur.antu.routes.validation.SplitDatasetRouteBuilder.ALL_NETEX_FILE_NAMES;
 
 
 /**
@@ -55,12 +48,6 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
  */
 @Component
 public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
-
-    private static final String FILENAME_DELIMITER = "§";
-    private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
-    public static final String ACCUMULATED_NETEX_LOCAL_IDS = "ACCUMULATED_FILE_LOCAL_IDS";
-    public static final String NETEX_LOCAL_IDS = "NETEX_FILE_LOCAL_IDS";
-
 
     @Override
     public void configure() throws Exception {
@@ -72,67 +59,24 @@ public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
                 .process(this::addSynchronizationForAggregatedExchange)
                 .process(this::setNewCorrelationId)
                 .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} common files (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
-
-                .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
-                .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_REPORTS))
+                .process(exchange -> System.out.println("aa"))
+                .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_COMMON_FILES))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
-                .routeId("aggregate-reports-pubsub");
+                .routeId("aggregate-common-files-pubsub");
 
-        from("direct:aggregateReports")
-                .log(LoggingLevel.INFO, correlation() + "Merging individual reports for validation report id ${header." + VALIDATION_REPORT_ID + "}")
-
-                .process(exchange -> {
-                    String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
-                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID, String.class);
-                    ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
-                    exchange.getIn().setHeader(AGGREGATED_VALIDATION_REPORT, validationReport);
-                    exchange.setProperty(ACCUMULATED_NETEX_LOCAL_IDS, new HashSet<String>());
-                })
-                .convertBodyTo(String.class)
-                .split(method(ReverseSortedFileNameSplitter.class, "split")).delimiter(FILENAME_DELIMITER)
-                .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
-                .setHeader(NETEX_FILE_NAME, body())
-                .setProperty(NETEX_LOCAL_IDS, method("localIdCache", "get(${header." + VALIDATION_REPORT_ID + "}, ${header." + NETEX_FILE_NAME + "})"))
-                .bean("netexIdUniquenessValidator", "validate(${exchangeProperty." + ACCUMULATED_NETEX_LOCAL_IDS + "},${exchangeProperty." + NETEX_LOCAL_IDS + "}, ,${header." + NETEX_FILE_NAME + "})")
-                .process(exchange -> {
-                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
-                    aggregatedValidationReport.addAllValidationReportEntries(exchange.getIn().getBody(List.class));
-
-                })
-                .to("direct:downloadValidationReport")
-                .unmarshal().json(JsonLibrary.Jackson, ValidationReport.class)
-                .process(exchange -> {
-                    ValidationReport validationReport = exchange.getIn().getBody(ValidationReport.class);
-                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
-                    aggregatedValidationReport.addAllValidationReportEntries(validationReport.getValidationReportEntries());
-
-                })
-                // end splitter
-                .end()
-                .log(LoggingLevel.INFO, correlation() + "Completed reports merging")
-                .setBody(header(AGGREGATED_VALIDATION_REPORT))
-                .choice()
-                .when(simple("${body.hasError()}"))
-                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
-                .otherwise()
-                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
-                .end()
-                .marshal().json(JsonLibrary.Jackson)
-                .to("direct:uploadAggregatedValidationReport")
-                .setBody(header(DATASET_STATUS))
-                .to("direct:notifyMarduk")
-                .routeId("aggregate-reports");
-
-        from("direct:createValidationJobs")
+        from("direct:createLineFilesValidationJobs")
                 .split(header(ALL_NETEX_FILE_NAMES))
+                .filter(PredicateBuilder.not(body().startsWith("_")))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
                 .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                 .setHeader(NETEX_FILE_NAME, body())
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
+                //end filter
+                .end()
                 //end split
                 .end()
-                .routeId("create-validation-jobs");
+                .routeId("create-line-files-validation-jobs");
     }
 
     /**
@@ -146,32 +90,17 @@ public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
             Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
             aggregatedExchange.getIn().setHeader(VALIDATION_REPORT_ID, newExchange.getIn().getHeader(VALIDATION_REPORT_ID));
             aggregatedExchange.getIn().setHeader(DATASET_CODESPACE, newExchange.getIn().getHeader(DATASET_CODESPACE));
-            String currentNetexFileNameList = aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES, String.class);
-            if (currentNetexFileNameList == null) {
-                aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getHeader(NETEX_FILE_NAME));
-            } else {
-                aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + FILENAME_DELIMITER + newExchange.getIn().getHeader(NETEX_FILE_NAME));
-            }
+            aggregatedExchange.getIn().setBody(newExchange.getIn().getBody());
             // check if all individual reports have been received
             // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.
-            Long nbNetexFiles = newExchange.getIn().getHeader(DATASET_NB_NETEX_FILES, Long.class);
+            Long nbCommonFiles = newExchange.getIn().getHeader(DATASET_NB_COMMON_FILES, Long.class);
             List<Message> aggregatedMessages = aggregatedExchange.getProperty(ExchangePropertyKey.GROUPED_EXCHANGE, List.class);
             Set<String> aggregatedFileNames = aggregatedMessages.stream().map(message -> message.getHeader(NETEX_FILE_NAME, String.class)).collect(Collectors.toSet());
-            if (aggregatedFileNames.size() >= nbNetexFiles) {
+            if (aggregatedFileNames.size() >= nbCommonFiles) {
                 aggregatedExchange.setProperty(Exchange.AGGREGATION_COMPLETE_CURRENT_GROUP, true);
             }
             return aggregatedExchange;
         }
     }
 
-    /**
-     * Sort the list in reverse order to get the common files first.
-     */
-    private static class ReverseSortedFileNameSplitter {
-
-        public static List<String> split(Exchange exchange) {
-            String fileNameList = exchange.getMessage().getBody(String.class);
-            return Arrays.stream(fileNameList.split(FILENAME_DELIMITER)).sorted(Collections.reverseOrder()).collect(Collectors.toList());
-        }
-    }
 }

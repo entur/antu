@@ -40,6 +40,7 @@ import static no.entur.antu.Constants.AGGREGATED_VALIDATION_REPORT;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
 import static no.entur.antu.Constants.DATASET_STATUS;
+import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
@@ -54,10 +55,7 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 @Component
 public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
-    private static final String FILENAME_DELIMITER = "§";
     private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
-    public static final String ACCUMULATED_NETEX_LOCAL_IDS = "ACCUMULATED_FILE_LOCAL_IDS";
-    public static final String NETEX_LOCAL_IDS = "NETEX_FILE_LOCAL_IDS";
 
 
     @Override

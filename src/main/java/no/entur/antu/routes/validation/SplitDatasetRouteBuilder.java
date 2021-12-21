@@ -27,9 +27,13 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.dataformat.zipfile.ZipSplitter;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
+import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
@@ -52,7 +56,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .streamCaching()
                 .to("direct:downloadNetexDataset")
                 .to("direct:uploadSingleNetexFiles")
-                .to("direct:createValidationJobs")
+                .to("direct:createCommonFilesValidationJobs")
                 .routeId("split-dataset");
 
         from("direct:downloadNetexDataset")
@@ -85,13 +89,20 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .routeId("upload-single-netex-files");
 
         from("direct:createCommonFilesValidationJobs")
+                .process(exchange -> {
+                    long nbCommonFiles = ((Set<String>) exchange.getIn().getHeader(ALL_NETEX_FILE_NAMES, Set.class)).stream().filter(fileName -> fileName.startsWith("_")).count();
+                    exchange.getIn().setHeader(DATASET_NB_COMMON_FILES, nbCommonFiles);
+                })
                 .split(header(ALL_NETEX_FILE_NAMES))
                 .filter(body().startsWith("_"))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
                 .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                 .setHeader(NETEX_FILE_NAME, body())
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
-                .setBody(header(ALL_NETEX_FILE_NAMES))
+                .process(exchange -> {
+                    String allFileNames = String.join(FILENAME_DELIMITER, ((Set<String>) exchange.getIn().getHeader(ALL_NETEX_FILE_NAMES, Set.class)));
+                    exchange.getIn().setBody(allFileNames);
+                })
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 //end split
                 .end()

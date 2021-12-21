@@ -43,6 +43,7 @@ import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
+import static no.entur.antu.routes.validation.SplitDatasetRouteBuilder.ALL_NETEX_FILE_NAMES;
 
 
 /**
@@ -63,6 +64,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:validateNetex")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}")
+                .setHeader(ALL_NETEX_FILE_NAMES, body())
                 .to("direct:initValidationReport")
                 .doTry()
                 .to("direct:downloadSingleNetexFile")
@@ -253,6 +255,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
                 .filter(header(NETEX_FILE_NAME).startsWith("_"))
                 .log(LoggingLevel.INFO, correlation() + "Notifying common files aggregator")
+                .setBody(header(ALL_NETEX_FILE_NAMES))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue")
                 //end filter
                 .end()

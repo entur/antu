@@ -67,7 +67,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE))
                 .to("direct:validateNetex")
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_COMMON_FILES))
-                .to("direct:aggregateCommonFiles")
+                .to("direct:createLineFilesValidationJobs")
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_REPORTS))
                 .to("direct:aggregateReports")
                 .otherwise()
