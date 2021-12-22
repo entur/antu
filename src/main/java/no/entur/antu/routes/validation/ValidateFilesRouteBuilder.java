@@ -43,11 +43,11 @@ import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
-import static no.entur.antu.routes.validation.SplitDatasetRouteBuilder.ALL_NETEX_FILE_NAMES;
 
 
 /**
- * Validate NeTEx files.
+ * Validate NeTEx files, both common files and line files.
+ *
  */
 @Component
 public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
@@ -57,6 +57,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
     public static final String PROP_VALIDATION_CONTEXT = "VALIDATION_CONTEXT";
     public static final String PROP_LOCAL_IDS = "LOCAL_IDS";
     public static final String PROP_LOCAL_REFS = "LOCAL_REFS";
+    private static final String PROP_ALL_NETEX_FILE_NAMES ="ALL_NETEX_FILE_NAMES";
 
     @Override
     public void configure() throws Exception {
@@ -64,7 +65,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:validateNetex")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}")
-                .setHeader(ALL_NETEX_FILE_NAMES, body())
+                .setProperty(PROP_ALL_NETEX_FILE_NAMES, body())
                 .to("direct:initValidationReport")
                 .doTry()
                 .to("direct:downloadSingleNetexFile")
@@ -255,7 +256,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
                 .filter(header(NETEX_FILE_NAME).startsWith("_"))
                 .log(LoggingLevel.INFO, correlation() + "Notifying common files aggregator")
-                .setBody(header(ALL_NETEX_FILE_NAMES))
+                .setBody(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue")
                 //end filter
                 .end()

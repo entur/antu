@@ -35,19 +35,22 @@ import java.util.stream.Collectors;
 
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
+import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
-import static no.entur.antu.routes.validation.SplitDatasetRouteBuilder.ALL_NETEX_FILE_NAMES;
 
 
 /**
- * Aggregate validation reports.
+ * Barrier waiting for all common files to be validated before creating validation jobs for the line files.
+ * Some validation rules applied to line files require that common files are processed first.
  */
 @Component
-public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
+public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
+
+    private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
 
     @Override
     public void configure() throws Exception {
@@ -59,14 +62,16 @@ public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
                 .process(this::addSynchronizationForAggregatedExchange)
                 .process(this::setNewCorrelationId)
                 .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} common files (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
-                .process(exchange -> System.out.println("aa"))
+                .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_COMMON_FILES))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("aggregate-common-files-pubsub");
 
         from("direct:createLineFilesValidationJobs")
-                .split(header(ALL_NETEX_FILE_NAMES))
+                .convertBodyTo(String.class)
+                .split(body()).delimiter(FILENAME_DELIMITER)
                 .filter(PredicateBuilder.not(body().startsWith("_")))
+                .log(LoggingLevel.DEBUG, correlation() + "Creating validation job for file ${body}")
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
                 .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                 .setHeader(NETEX_FILE_NAME, body())
@@ -80,8 +85,8 @@ public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
     }
 
     /**
-     * Complete the aggregation when all the individual reports have been received.
-     * The total number of reports to process is stored in a header that is included in every incoming message.
+     * Complete the aggregation when all common files have been received.
+     * The total number of common files to process is stored in a header that is included in every incoming message.
      */
     private static class CommonFilesAggregationStrategy extends GroupedMessageAggregationStrategy {
 
@@ -90,7 +95,7 @@ public class AggregateCommonFilesRouteBuilder extends BaseRouteBuilder {
             Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
             aggregatedExchange.getIn().setHeader(VALIDATION_REPORT_ID, newExchange.getIn().getHeader(VALIDATION_REPORT_ID));
             aggregatedExchange.getIn().setHeader(DATASET_CODESPACE, newExchange.getIn().getHeader(DATASET_CODESPACE));
-            aggregatedExchange.getIn().setBody(newExchange.getIn().getBody());
+            aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getBody());
             // check if all individual reports have been received
             // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.
             Long nbCommonFiles = newExchange.getIn().getHeader(DATASET_NB_COMMON_FILES, Long.class);

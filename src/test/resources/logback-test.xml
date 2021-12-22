@@ -30,6 +30,10 @@
     <logger name="com.google.auth.oauth2.DefaultCredentialsProvider" level="ERROR"/>
 
 
+    <logger name="no.entur.antu.validator.xpath.ValidationTree" level="INFO" />
+
+
+
     <root level="DEBUG">
         <appender-ref ref="CONSOLE-ASYNC" />
     </root>

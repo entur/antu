@@ -27,10 +27,8 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.dataformat.zipfile.ZipSplitter;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
@@ -40,7 +38,10 @@ import static no.entur.antu.Constants.NETEX_FILE_NAME;
 
 
 /**
- * Extract NeTEx files from a NeTEx archive and save them individually in a bucket. A Validation job is created for each NeTEx file.
+ * Extract NeTEx files from a NeTEx archive, save them individually in a bucket and
+ * create a validation job for each common file.
+ * Validation jobs for line files are created subsequently after all common files have been validated (see {@link CommonFilesBarrierRouteBuilder})
+ *
  */
 @Component
 public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
@@ -58,7 +59,6 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx files")
                 .to("direct:uploadSingleNetexFiles")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded NeTEx files")
-                .to("direct:createCommonFilesValidationJobs")
                 .to("direct:createCommonFilesValidationJobs")
                 .routeId("split-dataset");
 
@@ -85,8 +85,9 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .routeId("upload-single-netex-files");
 
         from("direct:createCommonFilesValidationJobs")
+                .log(LoggingLevel.DEBUG, correlation() + "Creating common files validation jobs")
                 .process(exchange -> {
-                    long nbCommonFiles = ((Set<String>) exchange.getIn().getHeader(ALL_NETEX_FILE_NAMES, Set.class)).stream().filter(fileName -> fileName.startsWith("_")).count();
+                    long nbCommonFiles = ((Set<String>) exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class)).stream().filter(fileName -> fileName.startsWith("_")).count();
                     exchange.getIn().setHeader(DATASET_NB_COMMON_FILES, nbCommonFiles);
                 })
                 .split(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
@@ -96,7 +97,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .setHeader(NETEX_FILE_NAME, body())
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
                 .process(exchange -> {
-                    String allFileNames = String.join(FILENAME_DELIMITER, ((Set<String>) exchange.getIn().getHeader(ALL_NETEX_FILE_NAMES, Set.class)));
+                    String allFileNames = String.join(FILENAME_DELIMITER, exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class));
                     exchange.getIn().setBody(allFileNames);
                 })
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")

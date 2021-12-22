@@ -33,7 +33,7 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 
 
 /**
- * Process NeTEX validation requests from Marduk.
+ * Process NeTEX validation requests.
  */
 @Component
 public class InitValidationRouteBuilder extends BaseRouteBuilder {
