@@ -45,7 +45,7 @@ public class AntuBlobStoreRoute extends BaseRouteBuilder {
 
         from("direct:uploadAntuBlob")
                 .bean(antuBlobStoreService, "uploadBlob")
-                .setBody(simple(""))
+                .setBody(constant(""))
                 .log(LoggingLevel.INFO, correlation() + "Stored file ${header." + FILE_HANDLE + "} in Antu bucket.")
                 .routeId("blobstore-antu-upload");
     }

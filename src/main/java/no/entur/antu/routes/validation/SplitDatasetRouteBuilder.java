@@ -41,7 +41,7 @@ import static no.entur.antu.Constants.NETEX_FILE_NAME;
 @Component
 public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
 
-    public static final String ALL_NETEX_FILE_NAMES = "ALL_NETEX_FILE_NAMES";
+    private static final String PROP_ALL_NETEX_FILE_NAMES = "ALL_NETEX_FILE_NAMES";
 
     @Override
     public void configure() throws Exception {
@@ -51,7 +51,9 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
         from("direct:splitDataset")
                 .streamCaching()
                 .to("direct:downloadNetexDataset")
+                .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx files")
                 .to("direct:uploadSingleNetexFiles")
+                .log(LoggingLevel.INFO, correlation() + "Uploaded NeTEx files")
                 .to("direct:createValidationJobs")
                 .routeId("split-dataset");
 
@@ -66,26 +68,19 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .routeId("download-netex-dataset");
 
         from("direct:uploadSingleNetexFiles")
-                .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx files")
                 .split(new ZipSplitter()).aggregationStrategy(new SingleNetexFileAggregationStrategy())
                 .streaming()
                 .log(LoggingLevel.INFO, correlation() + "Processing NeTEx file ${header." + Exchange.FILE_NAME + "}")
-                .filter(header(Exchange.FILE_NAME).not().endsWith(".xml"))
-                .log(LoggingLevel.INFO, correlation() + "Ignoring non-XML file ${header." + Exchange.FILE_NAME + "}")
-                // skip this file
-                .stop()
-                // end filter
-                .end()
-                .setHeader(NETEX_FILE_NAME, header(Exchange.FILE_NAME))
-                .marshal().zipFile()
+                .choice()
+                .when(header(Exchange.FILE_NAME).endsWith(".xml"))
                 .to("direct:uploadSingleNetexFile")
-                // end split
-                .end()
-                .log(LoggingLevel.INFO, correlation() + "Uploaded NeTEx files")
+                .otherwise()
+                .log(LoggingLevel.INFO, correlation() + "Ignoring non-XML file ${header." + Exchange.FILE_NAME + "}")
+                .setBody(constant(""))
                 .routeId("upload-single-netex-files");
 
         from("direct:createValidationJobs")
-                .split(header(ALL_NETEX_FILE_NAMES))
+                .split(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
                 .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                 .setHeader(NETEX_FILE_NAME, body())
@@ -96,6 +91,8 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .routeId("create-validation-jobs");
 
         from("direct:uploadSingleNetexFile")
+                .setHeader(NETEX_FILE_NAME, header(Exchange.FILE_NAME))
+                .marshal().zipFile()
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
                 .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx file ${header." + NETEX_FILE_NAME + "} to GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:uploadAntuBlob")
@@ -108,7 +105,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
         public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
             if (oldExchange == null) {
                 Set<String> netexFileNames = new HashSet<>();
-                newExchange.getIn().setHeader(ALL_NETEX_FILE_NAMES, netexFileNames);
+                newExchange.setProperty(PROP_ALL_NETEX_FILE_NAMES, netexFileNames);
                 String currentFileName = newExchange.getIn().getHeader(Exchange.FILE_NAME, String.class);
                 if (currentFileName.endsWith(".xml.zip")) {
                     netexFileNames.add(removeZipExtension(currentFileName));
@@ -117,7 +114,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
             }
             String currentFileName = newExchange.getIn().getHeader(Exchange.FILE_NAME, String.class);
             if (currentFileName.endsWith(".xml.zip")) {
-                Set<String> netexFileNames = oldExchange.getIn().getHeader(ALL_NETEX_FILE_NAMES, Set.class);
+                Set<String> netexFileNames = oldExchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class);
                 netexFileNames.add(removeZipExtension(currentFileName));
             }
 
