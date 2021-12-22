@@ -6,7 +6,6 @@ metadata:
     {{- include "common.labels" . | indent 4 }}
   annotations:
     kubernetes.io/ingress.class: traefik
-
   name: timetable-validation-v1-validation
   namespace: {{ .Release.Namespace }}
 spec:
