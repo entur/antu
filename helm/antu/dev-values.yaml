@@ -19,6 +19,3 @@ auth0:
     audience: https://ror.api.dev.entur.io
 
 monitoringEnabled: true
-
-ingress:
-  loadBalancerIP: 35.205.170.68
