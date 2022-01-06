@@ -134,7 +134,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 })
                 .to("direct:validateVersionOnRefToLocalIds")
                 .to("direct:validateReferenceToValidEntityType")
-                .to("direct:validateReferenceToNsr")
+                .to("direct:validateExternalReference")
                 .to("direct:validateDuplicatedNetexIds")
                 // end filter
                 .end()
@@ -201,15 +201,15 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Validation of reference entity type complete")
                 .routeId("validate-ref-entity-type");
 
-        from("direct:validateReferenceToNsr")
-                .log(LoggingLevel.INFO, correlation() + "Running validation of NSR reference")
-                .setBody(method("nsrRefValidator", "validate(${exchangeProperty." + PROP_LOCAL_REFS + "})"))
+        from("direct:validateExternalReference")
+                .log(LoggingLevel.INFO, correlation() + "Running validation of external reference")
+                .setBody(method("neTexReferenceValidator", "validate(${header." + VALIDATION_REPORT_ID + "}, ${exchangeProperty." + PROP_LOCAL_REFS + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})"))
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
                     validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
                 })
-                .log(LoggingLevel.INFO, correlation() + "Validation of NSR reference complete")
-                .routeId("validate-ref-nsr");
+                .log(LoggingLevel.INFO, correlation() + "Validation of external reference complete")
+                .routeId("validate-external-ref");
 
         from("direct:validateDuplicatedNetexIds")
                 .log(LoggingLevel.INFO, correlation() + "Running validation of duplicated NeTEx Ids")

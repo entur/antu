@@ -57,7 +57,6 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
 
-
     @Override
     public void configure() throws Exception {
         super.configure();
