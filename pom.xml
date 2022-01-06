@@ -28,7 +28,7 @@
         <entur.helpers.version>1.0.61</entur.helpers.version>
         <netex-java-model.version>1.0.13</netex-java-model.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <google.cloud.bom-version>24.0.0</google.cloud.bom-version>
+        <google.cloud.bom-version>24.1.2</google.cloud.bom-version>
         <saxon.version>10.6</saxon.version>
         <zt-zip.version>1.14</zt-zip.version>
         <redisson.version>3.16.6</redisson.version>
