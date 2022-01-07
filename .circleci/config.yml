@@ -55,7 +55,7 @@ aliases:
 jobs:
   build:
     docker:
-      - image:  cimg/openjdk:11.0
+      - image:  cimg/openjdk:17.0
     environment:
       MAVEN_OPTS: -Xmx3G
     steps:
