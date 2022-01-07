@@ -5,5 +5,5 @@ import java.util.Set;
 public interface CommonNetexIdRepository {
     Set<String> getCommonNetexIds(String reportId);
 
-    void addCommonNetexIds(String reportId, Set<String> commonIds);
+    void addCommonNetexIds(String reportId, Set<IdVersion> commonIds);
 }

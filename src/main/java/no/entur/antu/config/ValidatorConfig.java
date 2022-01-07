@@ -33,15 +33,12 @@ import no.entur.antu.validator.id.VersionOnLocalNetexIdValidator;
 import no.entur.antu.validator.id.VersionOnRefToLocalNetexIdValidator;
 import no.entur.antu.validator.schema.NetexSchemaValidator;
 import no.entur.antu.validator.xpath.XPathValidator;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.cache.Cache;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Configuration
 public class ValidatorConfig {

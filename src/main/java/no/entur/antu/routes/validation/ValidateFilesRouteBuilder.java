@@ -125,6 +125,10 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                     Set<IdVersion> localIds = new HashSet<>(localIdList);
                     exchange.setProperty(PROP_LOCAL_IDS, localIds);
                 })
+                .filter(header(NETEX_FILE_NAME).startsWith("_"))
+                .bean("commonNetexIdRepository", "addCommonNetexIds(${header." + VALIDATION_REPORT_ID + "},${exchangeProperty." + PROP_LOCAL_IDS + "})")
+                //end filter
+                .end()
                 .to("direct:validateIds")
                 .to("direct:validateVersionOnLocalIds")
                 .process(exchange -> {

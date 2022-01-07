@@ -77,8 +77,8 @@ public class CacheConfig {
     }
 
     @Bean
-    public CommonNetexIdRepository commonNetexIdRepository(@Qualifier("commonIdsCache") Cache<String, Set<String>> commonIdsCache) {
-        return new RedisCommonNetexIdRepository(commonIdsCache);
+    public CommonNetexIdRepository commonNetexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") Cache<String, Set<String>> commonIdsCache) {
+        return new RedisCommonNetexIdRepository(redissonClient, commonIdsCache);
     }
 
 }
