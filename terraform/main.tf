@@ -13,7 +13,7 @@ provider "google-beta" {
 }
 provider "kubernetes" {
   load_config_file = var.load_config_file
-  version = "~> 1.13.4"
+  version = "~> 2.7.0"
 }
 
 provider "random" {
