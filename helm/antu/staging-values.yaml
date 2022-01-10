@@ -19,6 +19,3 @@ auth0:
     audience: https://ror.api.staging.entur.io
 
 monitoringEnabled: true
-
-ingress:
-  loadBalancerIP: 130.211.80.129
