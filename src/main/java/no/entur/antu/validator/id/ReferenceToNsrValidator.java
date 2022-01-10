@@ -1,48 +1,42 @@
 package no.entur.antu.validator.id;
 
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validator.ValidationReportEntry;
-import no.entur.antu.validator.ValidationReportEntrySeverity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Validate that NeTEX references point to a valid element type.
+ * Validate that NeTEX references point to a valid stop or quay in the National Stop Place Registry.
  */
-public class ReferenceToNsrValidator {
+public class ReferenceToNsrValidator implements ExternalReferenceValidator {
 
-    private static final String MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE = "Unresolved reference to external reference data";
     private final StopPlaceRepository stopPlaceRepository;
 
     public ReferenceToNsrValidator(StopPlaceRepository stopPlaceRepository) {
         this.stopPlaceRepository = stopPlaceRepository;
     }
 
-    public List<ValidationReportEntry> validate(List<IdVersion> localRefs) {
-        List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
+    @Override
+    public Set<IdVersion> validateReferenceIds(Set<IdVersion> externalIds) {
         Set<String> stopPlaceIds = stopPlaceRepository.getStopPlaceIds();
         Set<String> quayIds = stopPlaceRepository.getQuayIds();
+        Set<IdVersion> validIds = new HashSet<>();
 
-        for (IdVersion id : localRefs) {
-            if (id.getId().contains(":Quay:") && !quayIds.contains(id.getId())) {
-                validationReportEntries.add(createValidationReportEntry(id));
-            } else if (id.getId().contains(":StopPlace:") && !stopPlaceIds.contains(id.getId())) {
-                validationReportEntries.add(createValidationReportEntry(id));
+        for (IdVersion id : externalIds) {
+            if (isValidQuayReference(quayIds, id) || isValidStopPlaceReference(stopPlaceIds, id)) {
+                validIds.add(id);
             }
         }
 
-        return validationReportEntries;
+        return validIds;
     }
 
-    private ValidationReportEntry createValidationReportEntry(IdVersion id) {
-        String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE;
-        return new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR, id.getFilename());
+    private boolean isValidStopPlaceReference(Set<String> stopPlaceIds, IdVersion id) {
+        return id.getId().contains(":StopPlace:") && stopPlaceIds.contains(id.getId());
     }
 
-    private String getIdVersionLocation(IdVersion id) {
-        return "[Line " + id.getLineNumber() + ", Column " + id.getColumnNumber() + ", Id " + id.getId() + "] ";
+    private boolean isValidQuayReference(Set<String> quayIds, IdVersion id) {
+        return id.getId().contains(":Quay:") && quayIds.contains(id.getId());
     }
 
 }

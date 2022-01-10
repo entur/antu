@@ -17,7 +17,6 @@ public class VersionOnLocalNetexIdValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VersionOnLocalNetexIdValidator.class);
 
-
     private static final String MESSAGE_FORMAT_MISSING_VERSION = "Missing version attribute on elements with id attribute";
 
     public List<ValidationReportEntry> validate(Set<IdVersion> localIds) {

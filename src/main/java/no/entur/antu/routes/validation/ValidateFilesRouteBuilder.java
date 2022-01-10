@@ -46,7 +46,8 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 
 
 /**
- * Validate NeTEx files.
+ * Validate NeTEx files, both common files and line files.
+ *
  */
 @Component
 public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
@@ -56,6 +57,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
     public static final String PROP_VALIDATION_CONTEXT = "VALIDATION_CONTEXT";
     public static final String PROP_LOCAL_IDS = "LOCAL_IDS";
     public static final String PROP_LOCAL_REFS = "LOCAL_REFS";
+    private static final String PROP_ALL_NETEX_FILE_NAMES ="ALL_NETEX_FILE_NAMES";
 
     @Override
     public void configure() throws Exception {
@@ -63,6 +65,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:validateNetex")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}")
+                .setProperty(PROP_ALL_NETEX_FILE_NAMES, body())
                 .to("direct:initValidationReport")
                 .doTry()
                 .to("direct:downloadSingleNetexFile")
@@ -122,6 +125,10 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                     Set<IdVersion> localIds = new HashSet<>(localIdList);
                     exchange.setProperty(PROP_LOCAL_IDS, localIds);
                 })
+                .filter(header(NETEX_FILE_NAME).startsWith("_"))
+                .bean("commonNetexIdRepository", "addCommonNetexIds(${header." + VALIDATION_REPORT_ID + "},${exchangeProperty." + PROP_LOCAL_IDS + "})")
+                //end filter
+                .end()
                 .to("direct:validateIds")
                 .to("direct:validateVersionOnLocalIds")
                 .process(exchange -> {
@@ -131,7 +138,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 })
                 .to("direct:validateVersionOnRefToLocalIds")
                 .to("direct:validateReferenceToValidEntityType")
-                .to("direct:validateReferenceToNsr")
+                .to("direct:validateExternalReference")
                 .to("direct:validateDuplicatedNetexIds")
                 // end filter
                 .end()
@@ -198,15 +205,15 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Validation of reference entity type complete")
                 .routeId("validate-ref-entity-type");
 
-        from("direct:validateReferenceToNsr")
-                .log(LoggingLevel.INFO, correlation() + "Running validation of NSR reference")
-                .setBody(method("nsrRefValidator", "validate(${exchangeProperty." + PROP_LOCAL_REFS + "})"))
+        from("direct:validateExternalReference")
+                .log(LoggingLevel.INFO, correlation() + "Running validation of external reference")
+                .setBody(method("neTexReferenceValidator", "validate(${header." + VALIDATION_REPORT_ID + "}, ${exchangeProperty." + PROP_LOCAL_REFS + "}, ${exchangeProperty." + PROP_LOCAL_IDS + "})"))
                 .process(exchange -> {
                     ValidationReport validationReport = exchange.getProperty(PROP_VALIDATION_REPORT, ValidationReport.class);
                     validationReport.addAllValidationReportEntries(exchange.getIn().getBody(Collection.class));
                 })
-                .log(LoggingLevel.INFO, correlation() + "Validation of NSR reference complete")
-                .routeId("validate-ref-nsr");
+                .log(LoggingLevel.INFO, correlation() + "Validation of external reference complete")
+                .routeId("validate-external-ref");
 
         from("direct:validateDuplicatedNetexIds")
                 .log(LoggingLevel.INFO, correlation() + "Running validation of duplicated NeTEx Ids")
@@ -251,6 +258,12 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         from("direct:notifyValidationReportAggregator")
                 .log(LoggingLevel.INFO, correlation() + "Notifying validation report aggregator")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
+                .filter(header(NETEX_FILE_NAME).startsWith("_"))
+                .log(LoggingLevel.INFO, correlation() + "Notifying common files aggregator")
+                .setBody(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
+                .to("google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue")
+                //end filter
+                .end()
                 .routeId("notify-validation-report-aggregator");
 
     }
