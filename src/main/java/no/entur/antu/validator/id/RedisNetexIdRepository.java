@@ -39,7 +39,7 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         localNetexIds.addAll(localIds);
         RSet<String> accumulatedNetexIds = redissonClient.getSet(accumulatedNetexIdsKey);
         accumulatedNetexIds.expire(1, TimeUnit.HOURS);
-        RLock lock = redissonClient.getLock(ACCUMULATED_NETEX_ID_LOCK_PREFIX);
+        RLock lock = redissonClient.getLock(ACCUMULATED_NETEX_ID_LOCK_PREFIX + reportId);
         try {
             lock.lock();
             Set<String> duplicates = localNetexIds.readIntersection(accumulatedNetexIdsKey);
@@ -51,6 +51,14 @@ public class RedisNetexIdRepository implements NetexIdRepository {
             }
         }
     }
+
+    @Override
+    public void cleanUp(String reportId) {
+        redissonClient.getKeys().deleteByPattern(NETEX_LOCAL_ID_SET_PREFIX + reportId);
+        redissonClient.getKeys().deleteByPattern(ACCUMULATED_NETEX_ID_SET_PREFIX + reportId);
+        redissonClient.getKeys().deleteByPattern(ACCUMULATED_NETEX_ID_LOCK_PREFIX + reportId);
+    }
+
 
     private String getNetexLocalIdsKey(String reportId, String filename) {
         return NETEX_LOCAL_ID_SET_PREFIX + reportId + '_' + filename;

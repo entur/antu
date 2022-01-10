@@ -54,8 +54,12 @@ public class RedisCommonNetexIdRepository implements CommonNetexIdRepository {
                 lock.unlock();
             }
         }
+    }
 
-
+    @Override
+    public void cleanUp(String reportId) {
+        redissonClient.getKeys().delete(COMMON_NETEX_ID_SET_PREFIX + reportId);
+        redissonClient.getKeys().delete(COMMON_NETEX_ID_LOCK_PREFIX + reportId);
     }
 
 
