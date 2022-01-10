@@ -27,7 +27,6 @@ public class RedisCommonNetexIdRepository implements CommonNetexIdRepository {
 
     @Override
     public Set<String> getCommonNetexIds(String reportId) {
-        // TODO temporary, should be initialized upstream in the route
         Set<String> commonIds = commonIdsCache.get(getCommonNetexIdsKey(reportId));
         if (commonIds != null) {
             return commonIds;
