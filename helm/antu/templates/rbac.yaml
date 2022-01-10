@@ -44,6 +44,6 @@ rules:
     verbs: ["create"]
   - apiGroups: ["coordination.k8s.io"]
     resources: ["leases"]
-    resourceNames: ["antu-leaders-lockonantureportaggregationqueue", "antu-leaders-lockonanturefreshstopcache"]
+    resourceNames: ["antu-leaders-lockonantureportaggregationqueue", "antu-leaders-lockonanturefreshstopcache", "antu-leaders-lockonantucommonfilesaggregationqueue"]
     verbs: ["get", "update", "list"]
 

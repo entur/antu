@@ -21,17 +21,19 @@ package no.entur.antu;
 public final class Constants {
     public static final String FILE_HANDLE = "RutebankenFileHandle";
     public static final String NETEX_FILE_NAME = "NETEX_FILE_NAME";
-
+    public static final String FILENAME_DELIMITER = "§";
 
     public static final String DATASET_CODESPACE = "EnturDatasetCodespace";
     public static final String DATASET_NB_NETEX_FILES = "EnturDatasetNbNetexFiles";
+    public static final String DATASET_NB_COMMON_FILES = "EnturDatasetNbCommonFiles";
 
     public static final String DATASET_STATUS = "EnturDatasetStatus";
 
     public static final String JOB_TYPE = "JOB_TYPE";
     public static final String JOB_TYPE_SPLIT = "SPLIT";
     public static final String JOB_TYPE_VALIDATE = "VALIDATE";
-    public static final String JOB_TYPE_AGGREGATE = "AGGREGATE";
+    public static final String JOB_TYPE_AGGREGATE_REPORTS = "AGGREGATE_REPORTS";
+    public static final String JOB_TYPE_AGGREGATE_COMMON_FILES = "AGGREGATE_COMMON_FILES";
 
     public static final String STATUS_VALIDATION_STARTED = "started";
     public static final String STATUS_VALIDATION_OK = "ok";

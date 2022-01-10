@@ -9,10 +9,10 @@ service:
 
 resources:
   cpuLimit: 1000m
-  memLimit: 1800Mi
+  memLimit: 2000Mi
   cpuRequest: 1000m
-  memRequest: 1300Mi
-  xmx: 1000m
+  memRequest: 1700Mi
+  xmx: 1500m
 
 horizontalPodAutoscaler:
   maxReplicas: 10

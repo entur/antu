@@ -30,13 +30,18 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Set;
 
+import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
+import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 
 
 /**
- * Extract NeTEx files from a NeTEx archive and save them individually in a bucket. A Validation job is created for each NeTEx file.
+ * Extract NeTEx files from a NeTEx archive, save them individually in a bucket and
+ * create a validation job for each common file.
+ * Validation jobs for line files are created subsequently after all common files have been validated (see {@link CommonFilesBarrierRouteBuilder})
+ *
  */
 @Component
 public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
@@ -54,7 +59,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx files")
                 .to("direct:uploadSingleNetexFiles")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded NeTEx files")
-                .to("direct:createValidationJobs")
+                .to("direct:createCommonFilesValidationJobs")
                 .routeId("split-dataset");
 
         from("direct:downloadNetexDataset")
@@ -79,16 +84,26 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .setBody(constant(""))
                 .routeId("upload-single-netex-files");
 
-        from("direct:createValidationJobs")
+        from("direct:createCommonFilesValidationJobs")
+                .log(LoggingLevel.DEBUG, correlation() + "Creating common files validation jobs")
+                .process(exchange -> {
+                    long nbCommonFiles = ((Set<String>) exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class)).stream().filter(fileName -> fileName.startsWith("_")).count();
+                    exchange.getIn().setHeader(DATASET_NB_COMMON_FILES, nbCommonFiles);
+                })
                 .split(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
+                .filter(body().startsWith("_"))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
                 .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                 .setHeader(NETEX_FILE_NAME, body())
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
+                .process(exchange -> {
+                    String allFileNames = String.join(FILENAME_DELIMITER, exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class));
+                    exchange.getIn().setBody(allFileNames);
+                })
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 //end split
                 .end()
-                .routeId("create-validation-jobs");
+                .routeId("create-common-files-validation-jobs");
 
         from("direct:uploadSingleNetexFile")
                 .setHeader(NETEX_FILE_NAME, header(Exchange.FILE_NAME))

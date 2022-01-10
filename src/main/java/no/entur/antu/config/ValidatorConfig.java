@@ -18,11 +18,17 @@ package no.entur.antu.config;
 
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validator.id.BlockJourneyReferencesIgnorer;
+import no.entur.antu.validator.id.CommonNetexIdRepository;
+import no.entur.antu.validator.id.ExternalReferenceValidator;
+import no.entur.antu.validator.id.NeTexReferenceValidator;
 import no.entur.antu.validator.id.NetexIdRepository;
 import no.entur.antu.validator.id.NetexIdUniquenessValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.id.ReferenceToNsrValidator;
 import no.entur.antu.validator.id.ReferenceToValidEntityTypeValidator;
+import no.entur.antu.validator.id.ServiceJourneyInterchangeIgnorer;
+import no.entur.antu.validator.id.TrainElementRegistryIdValidator;
 import no.entur.antu.validator.id.VersionOnLocalNetexIdValidator;
 import no.entur.antu.validator.id.VersionOnRefToLocalNetexIdValidator;
 import no.entur.antu.validator.schema.NetexSchemaValidator;
@@ -30,6 +36,9 @@ import no.entur.antu.validator.xpath.XPathValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class ValidatorConfig {
@@ -67,6 +76,16 @@ public class ValidatorConfig {
     @Bean("nsrRefValidator")
     public ReferenceToNsrValidator referenceToNsrValidator(StopPlaceRepository stopPlaceRepository) {
         return new ReferenceToNsrValidator(stopPlaceRepository);
+    }
+
+    @Bean("neTexReferenceValidator")
+    public NeTexReferenceValidator neTexReferenceValidator(CommonNetexIdRepository commonNetexIdRepository, ReferenceToNsrValidator referenceToNsrValidator) {
+        List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
+        externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
+        externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
+        externalReferenceValidators.add(new TrainElementRegistryIdValidator());
+        externalReferenceValidators.add(referenceToNsrValidator);
+        return new NeTexReferenceValidator(commonNetexIdRepository, externalReferenceValidators);
     }
 
     @Bean("netexIdUniquenessValidator")

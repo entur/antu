@@ -89,6 +89,24 @@ resource "google_pubsub_subscription" "AntuReportAggregationQueue" {
   }
 }
 
+resource "google_pubsub_topic" "AntuCommonFilesAggregationQueue" {
+  name = "AntuCommonFilesAggregationQueue"
+  project = var.gcp_pubsub_project
+  labels = var.labels
+}
+
+resource "google_pubsub_subscription" "AntuCommonFilesAggregationQueue" {
+  name = "AntuCommonFilesAggregationQueue"
+  topic = google_pubsub_topic.AntuCommonFilesAggregationQueue.name
+  project = var.gcp_pubsub_project
+  labels = var.labels
+  retry_policy {
+    minimum_backoff = "10s"
+  }
+}
+
+
+
 # Redis server
 resource "google_redis_instance" "antu-redis" {
   name = "${var.labels.app}-${var.kube_namespace}"

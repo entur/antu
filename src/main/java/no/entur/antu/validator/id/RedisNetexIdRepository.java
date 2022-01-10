@@ -33,7 +33,7 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         RSet<String> localNetexIds = redissonClient.getSet(netexLocalIdsKey);
         if (!localNetexIds.isEmpty()) {
             // protect against multiple run due to retry logic
-            throw new AntuException("Duplicate check already run for this file");
+            throw new AntuException("Duplicate check already run for file " + filename);
         }
         localNetexIds.expire(1, TimeUnit.HOURS);
         localNetexIds.addAll(localIds);
