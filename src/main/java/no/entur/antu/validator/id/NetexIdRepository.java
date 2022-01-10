@@ -16,4 +16,6 @@ public interface NetexIdRepository {
      * @return
      */
     Set<String> getDuplicates(String reportId, String filename, Set<String> localIds);
+
+    void cleanUp(String reportId);
 }

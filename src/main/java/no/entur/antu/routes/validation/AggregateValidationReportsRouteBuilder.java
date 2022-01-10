@@ -108,6 +108,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .to("direct:uploadAggregatedValidationReport")
                 .setBody(header(DATASET_STATUS))
                 .to("direct:notifyMarduk")
+                .to("direct:cleanUpCache")
                 .routeId("aggregate-reports");
 
         from("direct:downloadValidationReport")
@@ -134,6 +135,13 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .to("direct:uploadAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded aggregated Validation Report to GCS file ${header." + FILE_HANDLE + "}")
                 .routeId("upload-aggregated-validation-report");
+
+        from("direct:cleanUpCache")
+                .log(LoggingLevel.INFO, correlation() + "Clean up cache")
+                .bean("commonNetexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID + "})")
+                .bean("netexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID + "})")
+                .log(LoggingLevel.INFO, correlation() + "Cleaned up cache")
+                .routeId("cleanup-cache");
 
     }
 
