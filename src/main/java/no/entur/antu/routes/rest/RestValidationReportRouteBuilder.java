@@ -123,14 +123,13 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                         .append(Constants.VALIDATION_REPORT_PREFIX)
                         .append(header(VALIDATION_REPORT_ID_PARAM))
                         .append(".json"))
-                .log(LoggingLevel.INFO, correlation() + "Downloading NeTEx validation report ${header." + FILE_HANDLE  + "}")
+                .log(LoggingLevel.INFO, correlation() + "Downloading NeTEx validation report ${header." + FILE_HANDLE + "}")
                 .process(this::removeAllCamelHttpHeaders)
                 .to("direct:getAntuBlob")
                 .filter(simple("${body} == null"))
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
                 .routeId("validation-report")
                 .endRest()
-
 
                 .get("/swagger.json")
                 .apiDocs(false)
@@ -139,11 +138,30 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .to(commonApiDocEndpoint)
                 .endRest();
 
+        rest("/cache-admin")
+                .post("/clear-cache")
+                .description("Clear the cache")
+                .consumes(PLAIN)
+                .produces(PLAIN)
+                .responseMessage().code(200).message("Command accepted").endResponseMessage()
+                .route()
+                .to("direct:authorizeAdminRequest")
+                .log(LoggingLevel.INFO, correlation() + "Clear cache")
+                .process(this::removeAllCamelHttpHeaders)
+                .bean("cacheAdmin", "clear")
+                .routeId("admin-clear-cache")
+                .endRest();
+
 
         from("direct:authorizeEditorRequest")
                 .doTry()
-                .bean(authorizationService, "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})" )
+                .bean(authorizationService, "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})")
                 .routeId("admin-authorize-editor-request");
+
+        from("direct:authorizeAdminRequest")
+                .doTry()
+                .process(e -> authorizationService.verifyAdministratorPrivileges())
+                .routeId("admin-authorize-admin-request");
     }
 
 }

@@ -1,5 +1,7 @@
 package no.entur.antu.config;
 
+import no.entur.antu.cache.CacheAdmin;
+import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.validator.id.CommonNetexIdRepository;
 import no.entur.antu.validator.id.NetexIdRepository;
 import no.entur.antu.validator.id.RedisCommonNetexIdRepository;
@@ -79,6 +81,11 @@ public class CacheConfig {
     @Bean
     public CommonNetexIdRepository commonNetexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") Cache<String, Set<String>> commonIdsCache) {
         return new RedisCommonNetexIdRepository(redissonClient, commonIdsCache);
+    }
+
+    @Bean
+    public CacheAdmin cacheAdmin(RedissonClient redissonClient) {
+        return new RedissonCacheAdmin(redissonClient);
     }
 
 }
