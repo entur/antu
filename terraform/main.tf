@@ -85,7 +85,7 @@ resource "google_pubsub_subscription" "AntuReportAggregationQueue" {
   project = var.gcp_pubsub_project
   labels = var.labels
   expiration_policy {
-    ttl = "3600s"
+    ttl = "86400"
   }
   retry_policy {
     minimum_backoff = "10s"
@@ -104,7 +104,7 @@ resource "google_pubsub_subscription" "AntuCommonFilesAggregationQueue" {
   project = var.gcp_pubsub_project
   labels = var.labels
   expiration_policy {
-    ttl = "3600s"
+    ttl = "86400"
   }
   retry_policy {
     minimum_backoff = "10s"
