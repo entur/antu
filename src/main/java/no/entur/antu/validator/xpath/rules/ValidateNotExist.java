@@ -18,13 +18,13 @@ public class ValidateNotExist extends AbstractXPathValidationRule {
 
     private final String xpath;
     private final String message;
-    private final String category;
+    private final String name;
     private final ValidationReportEntrySeverity severity;
 
-    public ValidateNotExist(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
+    public ValidateNotExist(String xpath, String message, String name, ValidationReportEntrySeverity validationReportEntrySeverity) {
         this.xpath = xpath;
         this.message = message;
-        this.category = category;
+        this.name = name;
         this.severity = validationReportEntrySeverity;
     }
 
@@ -38,7 +38,7 @@ public class ValidateNotExist extends AbstractXPathValidationRule {
             for (XdmItem item : nodes) {
                 XdmNode xdmNode = (XdmNode) item;
                 String validationReportEntryMessage = getXdmNodeLocation(xdmNode) + message;
-                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, category, severity, validationContext.getFileName()));
+                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, name, severity, validationContext.getFileName()));
             }
             return validationReportEntries;
         } catch (SaxonApiException e) {
@@ -52,8 +52,8 @@ public class ValidateNotExist extends AbstractXPathValidationRule {
     }
 
     @Override
-    public String getCategory() {
-        return category;
+    public String getName() {
+        return name;
     }
 
     @Override

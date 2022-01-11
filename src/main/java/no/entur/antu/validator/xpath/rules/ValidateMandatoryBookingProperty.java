@@ -19,7 +19,7 @@ public class ValidateMandatoryBookingProperty extends AbstractXPathValidationRul
 
     private static final String MESSAGE_FORMAT = "Mandatory booking property %s not specified on FlexibleServiceProperties, FlexibleLine or on all StopPointInJourneyPatterns";
     public static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.ERROR;
-    public static final String CATEGORY = "Flexible Line";
+    public static final String RULE_NAME = "BOOKING_4";
 
     private final String bookingProperty;
 
@@ -61,7 +61,7 @@ public class ValidateMandatoryBookingProperty extends AbstractXPathValidationRul
                     XdmNode xdmNode = (XdmNode) item;
                     String message = getXdmNodeLocation(xdmNode) + String.format(MESSAGE_FORMAT, bookingProperty);
                     validationReportEntries.add(new ValidationReportEntry(message,
-                            CATEGORY,
+                            RULE_NAME,
                             SEVERITY,
                             validationContext.getFileName()));
                 }
@@ -80,8 +80,8 @@ public class ValidateMandatoryBookingProperty extends AbstractXPathValidationRul
     }
 
     @Override
-    public String getCategory() {
-        return CATEGORY;
+    public String getName() {
+        return RULE_NAME;
     }
 
     @Override

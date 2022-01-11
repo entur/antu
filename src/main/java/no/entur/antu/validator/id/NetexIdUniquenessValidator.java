@@ -51,7 +51,7 @@ public class NetexIdUniquenessValidator {
         if (!duplicateIds.isEmpty()) {
             for (String id : duplicateIds) {
                 String validationReportEntryMessage = getIdVersionLocation(netexIds.get(id)) + MESSAGE_FORMAT_DUPLICATE_ID_ACROSS_FILES;
-                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID Consistency", ValidationReportEntrySeverity.ERROR, fileName));
+                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NETEX_ID_1", ValidationReportEntrySeverity.ERROR, fileName));
             }
         }
         return validationReportEntries;

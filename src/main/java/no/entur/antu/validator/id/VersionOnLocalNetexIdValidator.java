@@ -25,7 +25,7 @@ public class VersionOnLocalNetexIdValidator {
         if (!nonVersionedLocalIds.isEmpty()) {
             for (IdVersion id : nonVersionedLocalIds) {
                 String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_MISSING_VERSION;
-                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR, id.getFilename()));
+                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NETEX_ID_8", ValidationReportEntrySeverity.ERROR, id.getFilename()));
                 LOGGER.debug("Id {} does not have version attribute set", id.getId());
             }
         }

@@ -16,13 +16,13 @@ public class ValidateAtLeastOne implements ValidationRule {
 
     private final String xpath;
     private final String message;
-    private final String category;
+    private final String name;
     private final ValidationReportEntrySeverity severity;
 
-    public ValidateAtLeastOne(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
+    public ValidateAtLeastOne(String xpath, String message, String name, ValidationReportEntrySeverity validationReportEntrySeverity) {
         this.xpath = xpath;
         this.message = message;
-        this.category = category;
+        this.name = name;
         this.severity = validationReportEntrySeverity;
     }
 
@@ -33,7 +33,7 @@ public class ValidateAtLeastOne implements ValidationRule {
             selector.setContextItem(validationContext.getXmlNode());
             XdmValue nodes = selector.evaluate();
             if (nodes.isEmpty()) {
-                return List.of(new ValidationReportEntry(message, category, severity, validationContext.getFileName()));
+                return List.of(new ValidationReportEntry(message, name, severity, validationContext.getFileName()));
             }
             return Collections.emptyList();
         } catch (SaxonApiException e) {
@@ -47,8 +47,8 @@ public class ValidateAtLeastOne implements ValidationRule {
     }
 
     @Override
-    public String getCategory() {
-        return category;
+    public String getName() {
+        return name;
     }
 
     @Override

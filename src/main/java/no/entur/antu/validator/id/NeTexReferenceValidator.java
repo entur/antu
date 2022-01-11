@@ -55,7 +55,7 @@ public class NeTexReferenceValidator {
 
     private ValidationReportEntry createValidationReportEntry(IdVersion id) {
         String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE;
-        return new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR, id.getFilename());
+        return new ValidationReportEntry(validationReportEntryMessage, "NETEX_ID_5", ValidationReportEntrySeverity.ERROR, id.getFilename());
     }
 
 

@@ -37,11 +37,11 @@ public class ReferenceToValidEntityTypeValidator {
                         && !("Default" + referencedElement + "Ref").equals(referencingElement)
                         && !canSubstitute(referencingElement, referencedElement)) {
                     String validationReportEntryMessage = getIdVersionLocation(id) + String.format(MESSAGE_FORMAT_INVALID_REFERENCE, referencedElement, referencingElement);
-                    validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR, id.getFilename()));
+                    validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NETEX_ID_6", ValidationReportEntrySeverity.ERROR, id.getFilename()));
                 }
             } else {
                 String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_INVALID_ID_STRUCTURE;
-                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR, id.getFilename()));
+                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NETEX_ID_7", ValidationReportEntrySeverity.ERROR, id.getFilename()));
             }
         }
         return validationReportEntries;

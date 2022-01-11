@@ -15,6 +15,6 @@ public class ValidateAllowedBuyWhenProperty extends ValidateNotExist {
     private static final String MESSAGE = "Illegal value for BuyWhen";
 
     public ValidateAllowedBuyWhenProperty(String context) {
-        super(context + "/BuyWhen[tokenize(.,' ')[not(. = (" + VALID_BUY_WHEN_PROPERTIES + "))]]", MESSAGE, "Booking", ValidationReportEntrySeverity.ERROR);
+        super(context + "/BuyWhen[tokenize(.,' ')[not(. = (" + VALID_BUY_WHEN_PROPERTIES + "))]]", MESSAGE, "BUY_WHEN_1", ValidationReportEntrySeverity.ERROR);
     }
 }

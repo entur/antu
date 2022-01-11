@@ -10,7 +10,7 @@ public interface ValidationRule {
 
     String getMessage();
 
-    String getCategory();
+    String getName();
 
     ValidationReportEntrySeverity getSeverity();
 }
