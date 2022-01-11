@@ -342,17 +342,17 @@ public class XPathValidator {
         ValidationTree serviceFrameValidationTree = new ValidationTree("Service frame in line file", path);
         serviceFrameValidationTree.addValidationRules(getServiceFrameBaseValidationRules());
 
-        serviceFrameValidationTree.addValidationRule(new ValidateExactlyOne("lines/*[self::Line or self::FlexibleLine]", "There must be either Lines or Flexible Lines", "FLEXIBLE_LINE_1", ValidationReportEntrySeverity.ERROR));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(Name) or normalize-space(Name) = '']", "Missing Name on Line", "FLEXIBLE_LINE_2", ValidationReportEntrySeverity.ERROR));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(PublicCode) or normalize-space(PublicCode) = '']", "Missing PublicCode on Line", "FLEXIBLE_LINE_3", ValidationReportEntrySeverity.WARNING));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportMode)]", "Missing TransportMode on Line", "FLEXIBLE_LINE_4", ValidationReportEntrySeverity.ERROR));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportSubmode)]", "Missing TransportSubmode on Line", "FLEXIBLE_LINE_5", ValidationReportEntrySeverity.WARNING));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine]/routes/Route", "Routes should not be defined within a Line or FlexibleLine", "FLEXIBLE_LINE_6", ValidationReportEntrySeverity.ERROR));
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(RepresentedByGroupRef)]", "A Line must refer to a GroupOfLines or a Network through element RepresentedByGroupRef", "FLEXIBLE_LINE_6", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateExactlyOne("lines/*[self::Line or self::FlexibleLine]", "There must be either Lines or Flexible Lines", "LINE_1", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(Name) or normalize-space(Name) = '']", "Missing Name on Line", "LINE_2", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(PublicCode) or normalize-space(PublicCode) = '']", "Missing PublicCode on Line", "LINE_3", ValidationReportEntrySeverity.WARNING));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportMode)]", "Missing TransportMode on Line", "LINE_4", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(TransportSubmode)]", "Missing TransportSubmode on Line", "LINE_5", ValidationReportEntrySeverity.WARNING));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine]/routes/Route", "Routes should not be defined within a Line or FlexibleLine", "LINE_6", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/*[self::Line or self::FlexibleLine][not(RepresentedByGroupRef)]", "A Line must refer to a GroupOfLines or a Network through element RepresentedByGroupRef", "LINE_7", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidatedAllowedTransportMode());
         serviceFrameValidationTree.addValidationRule(new ValidatedAllowedTransportSubMode());
 
-        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/FlexibleLine[not(FlexibleLineType)]", "Missing FlexibleLineType on FlexibleLine", "FLEXIBLE_LINE_7", ValidationReportEntrySeverity.ERROR));
+        serviceFrameValidationTree.addValidationRule(new ValidateNotExist("lines/FlexibleLine[not(FlexibleLineType)]", "Missing FlexibleLineType on FlexibleLine", "FLEXIBLE_LINE_1", ValidationReportEntrySeverity.ERROR));
         serviceFrameValidationTree.addValidationRule(new ValidateMandatoryBookingProperty("BookingMethods"));
         serviceFrameValidationTree.addValidationRule(new ValidateMandatoryBookingProperty("BookingContact"));
         serviceFrameValidationTree.addValidationRule(new ValidateMandatoryBookingProperty("BookWhen"));
