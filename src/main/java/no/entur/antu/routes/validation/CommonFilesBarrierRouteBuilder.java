@@ -20,6 +20,7 @@ package no.entur.antu.routes.validation;
 
 
 import no.entur.antu.Constants;
+import no.entur.antu.exception.AntuException;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
@@ -99,6 +100,9 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
             // check if all individual reports have been received
             // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.
             Long nbCommonFiles = newExchange.getIn().getHeader(DATASET_NB_COMMON_FILES, Long.class);
+            if (nbCommonFiles == null) {
+                throw new AntuException("Header not found: " + DATASET_NB_COMMON_FILES + " for validation report " + newExchange.getIn().getHeader(VALIDATION_REPORT_ID) + " and codespace " + newExchange.getIn().getHeader(DATASET_CODESPACE));
+            }
             List<Message> aggregatedMessages = aggregatedExchange.getProperty(ExchangePropertyKey.GROUPED_EXCHANGE, List.class);
             Set<String> aggregatedFileNames = aggregatedMessages.stream().map(message -> message.getHeader(NETEX_FILE_NAME, String.class)).collect(Collectors.toSet());
             if (aggregatedFileNames.size() >= nbCommonFiles) {

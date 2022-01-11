@@ -1,10 +1,12 @@
 package no.entur.antu.validator.id;
 
-import no.entur.antu.exception.AntuException;
 import org.redisson.api.RLock;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +22,8 @@ public class RedisNetexIdRepository implements NetexIdRepository {
     private static final String ACCUMULATED_NETEX_ID_LOCK_PREFIX = "ACCUMULATED_NETEX_ID_LOCK_";
     private static final String ACCUMULATED_NETEX_ID_SET_PREFIX = "ACCUMULATED_NETEX_ID_SET_";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisNetexIdRepository.class);
+
     private final RedissonClient redissonClient;
 
     public RedisNetexIdRepository(RedissonClient redissonClient) {
@@ -33,7 +37,8 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         RSet<String> localNetexIds = redissonClient.getSet(netexLocalIdsKey);
         if (!localNetexIds.isEmpty()) {
             // protect against multiple run due to retry logic
-            throw new AntuException("Duplicate check already run for file " + filename);
+            LOGGER.error("Duplicate check already run for file {} in report {}", filename, reportId);
+            return Collections.emptySet();
         }
         localNetexIds.expire(1, TimeUnit.HOURS);
         localNetexIds.addAll(localIds);
