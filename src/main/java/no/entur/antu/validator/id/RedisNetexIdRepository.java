@@ -22,7 +22,7 @@ public class RedisNetexIdRepository implements NetexIdRepository {
     private static final String ACCUMULATED_NETEX_ID_LOCK_PREFIX = "ACCUMULATED_NETEX_ID_LOCK_";
     private static final String ACCUMULATED_NETEX_ID_SET_PREFIX = "ACCUMULATED_NETEX_ID_SET_";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RedissonClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisNetexIdRepository.class);
 
     private final RedissonClient redissonClient;
 
