@@ -28,7 +28,7 @@ public class VersionOnRefToLocalNetexIdValidator {
         for (IdVersion id : nonVersionedLocalRefs) {
             if (localIdsWithoutVersion.contains(id.getId())) {
                 String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_MISSING_VERSION_ON_REF_TO_LOCAL_ID;
-                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NeTEx ID", ValidationReportEntrySeverity.ERROR, id.getFilename()));
+                validationReportEntries.add(new ValidationReportEntry(validationReportEntryMessage, "NETEX_ID_9", ValidationReportEntrySeverity.ERROR, id.getFilename()));
                 LOGGER.debug("Found local reference to {} in line file without use of version-attribute", id.getId());
             }
 

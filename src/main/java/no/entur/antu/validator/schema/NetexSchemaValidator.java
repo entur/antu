@@ -70,7 +70,7 @@ public class NetexSchemaValidator {
                 private void addValidationReportEntry(String fileName, SAXParseException saxParseException, ValidationReportEntrySeverity severity) throws SAXParseException {
                     if (errorCount < maxValidationReportEntries) {
                         String message = "Line " + saxParseException.getLineNumber() + ", Column " + saxParseException.getColumnNumber() + ": " + saxParseException.getMessage();
-                        validationReportEntries.add(new ValidationReportEntry(message, "NeTEx Schema Validation", severity, fileName));
+                        validationReportEntries.add(new ValidationReportEntry(message, "NETEX_SCHEMA", severity, fileName));
                     } else {
                         LOGGER.warn("File {} has too many schema validation errors (max is {}). Additional errors will not be reported.", fileName, maxValidationReportEntries);
                         throw saxParseException;

@@ -73,7 +73,7 @@ public class ValidationTree {
         for (ValidationRule validationRule : validationRules) {
             builder.append(spaces)
                     .append("[")
-                    .append(validationRule.getCategory())
+                    .append(validationRule.getName())
                     .append("] ")
                     .append("[")
                     .append(validationRule.getSeverity())
@@ -90,7 +90,7 @@ public class ValidationTree {
     public Set<String> getRuleMessages() {
         Set<String> rules = new HashSet<>();
         for (ValidationRule validationRule : validationRules) {
-            rules.add("[" + validationRule.getCategory() + "] " + validationRule.getMessage());
+            rules.add("[" + validationRule.getName() + "] " + validationRule.getMessage());
         }
         for (ValidationTree validationTree : subTrees) {
             rules.addAll(validationTree.getRuleMessages());

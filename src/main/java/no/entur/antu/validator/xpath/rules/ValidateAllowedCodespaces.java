@@ -25,7 +25,7 @@ public class ValidateAllowedCodespaces implements ValidationRule {
 
     private static final String MESSAGE_FORMAT = "Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s";
     public static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.ERROR;
-    public static final String CATEGORY = "Codespace";
+    public static final String RULE_NAME = "CODESPACE";
 
     @Override
     public List<ValidationReportEntry> validate(ValidationContext validationContext) {
@@ -48,7 +48,7 @@ public class ValidateAllowedCodespaces implements ValidationRule {
                 NetexCodespace netexCodespace = new NetexCodespace(xmlns, xmlnsUrl);
                 if (!validCodespaces.contains(netexCodespace)) {
                     String message = String.format(MESSAGE_FORMAT, netexCodespace, validCodespaces.stream().map(NetexCodespace::toString).collect(Collectors.joining()));
-                    validationReportEntries.add(new ValidationReportEntry(message, CATEGORY, SEVERITY, validationContext.getFileName()));
+                    validationReportEntries.add(new ValidationReportEntry(message, RULE_NAME, SEVERITY, validationContext.getFileName()));
                 }
             }
             return validationReportEntries;
@@ -63,8 +63,8 @@ public class ValidateAllowedCodespaces implements ValidationRule {
     }
 
     @Override
-    public String getCategory() {
-        return CATEGORY;
+    public String getName() {
+        return RULE_NAME;
     }
 
     @Override

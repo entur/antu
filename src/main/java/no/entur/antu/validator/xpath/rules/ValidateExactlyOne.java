@@ -14,15 +14,15 @@ import java.util.List;
 
 public class ValidateExactlyOne implements ValidationRule {
 
+    private final String name;
     private final String xpath;
     private final String message;
-    private final String category;
     private final ValidationReportEntrySeverity severity;
 
-    public ValidateExactlyOne(String xpath, String message, String category, ValidationReportEntrySeverity validationReportEntrySeverity) {
+    public ValidateExactlyOne(String xpath, String message, String name, ValidationReportEntrySeverity validationReportEntrySeverity) {
         this.xpath = xpath;
         this.message = message;
-        this.category = category;
+        this.name = name;
         this.severity = validationReportEntrySeverity;
     }
 
@@ -33,7 +33,7 @@ public class ValidateExactlyOne implements ValidationRule {
             selector.setContextItem(validationContext.getXmlNode());
             XdmValue nodes = selector.evaluate();
             if (nodes.size() != 1) {
-                return List.of(new ValidationReportEntry(message, category, severity, validationContext.getFileName()));
+                return List.of(new ValidationReportEntry(message, name, severity, validationContext.getFileName()));
             }
             return Collections.emptyList();
         } catch (SaxonApiException e) {
@@ -47,8 +47,8 @@ public class ValidateExactlyOne implements ValidationRule {
     }
 
     @Override
-    public String getCategory() {
-        return category;
+    public String getName() {
+        return name;
     }
 
     @Override

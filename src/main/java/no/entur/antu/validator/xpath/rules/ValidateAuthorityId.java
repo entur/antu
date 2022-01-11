@@ -25,7 +25,7 @@ public class ValidateAuthorityId implements ValidationRule {
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateAuthorityId.class);
 
     private static final String MESSAGE = "Invalid Authority Id";
-    private static final String CATEGORY = "Resource Frame";
+    private static final String RULE_NAME = "AUTHORITY";
     private static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.WARNING;
 
     private final OrganisationRepository organisationRepository;
@@ -55,7 +55,7 @@ public class ValidateAuthorityId implements ValidationRule {
 
                     String message = "Line " + lineNumber + ", Column " + columnNumber + ", NeTEx id " + netexId + ": " +  MESSAGE ;
                     LOGGER.warn(message);
-                    validationReportEntries.add(new ValidationReportEntry(message, CATEGORY, SEVERITY, validationContext.getFileName()));
+                    validationReportEntries.add(new ValidationReportEntry(message, RULE_NAME, SEVERITY, validationContext.getFileName()));
                 }
                 return validationReportEntries;
             }
@@ -71,8 +71,8 @@ public class ValidateAuthorityId implements ValidationRule {
     }
 
     @Override
-    public String getCategory() {
-        return CATEGORY;
+    public String getName() {
+        return RULE_NAME;
     }
 
     @Override

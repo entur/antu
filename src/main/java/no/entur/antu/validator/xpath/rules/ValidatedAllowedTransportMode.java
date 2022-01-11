@@ -20,6 +20,6 @@ public class ValidatedAllowedTransportMode extends ValidateNotExist {
     private static final String MESSAGE = "Illegal TransportMode";
 
     public ValidatedAllowedTransportMode() {
-        super("lines/*[self::Line or self::FlexibleLine]/TransportMode[not(. = (" + VALID_TRANSPORT_MODES + "))]", MESSAGE, "Service Frame", ValidationReportEntrySeverity.ERROR);
+        super("lines/*[self::Line or self::FlexibleLine]/TransportMode[not(. = (" + VALID_TRANSPORT_MODES + "))]", MESSAGE, "TRANSPORT_MODE", ValidationReportEntrySeverity.ERROR);
     }
 }

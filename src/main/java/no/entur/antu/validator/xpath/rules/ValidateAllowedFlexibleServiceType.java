@@ -15,7 +15,7 @@ public class ValidateAllowedFlexibleServiceType extends ValidateNotExist {
     public static final String MESSAGE = "Illegal FlexibleServiceType on ServiceJourney";
 
     public ValidateAllowedFlexibleServiceType() {
-        super("vehicleJourneys/ServiceJourney/FlexibleServiceProperties/FlexibleServiceType[not(. = (" + VALID_FLEXIBLE_SERVICE_TYPES + "))]", MESSAGE, "Service Frame", ValidationReportEntrySeverity.ERROR);
+        super("vehicleJourneys/ServiceJourney/FlexibleServiceProperties/FlexibleServiceType[not(. = (" + VALID_FLEXIBLE_SERVICE_TYPES + "))]", MESSAGE, "FLEXIBLE_LINE_9", ValidationReportEntrySeverity.ERROR);
     }
 }
 
