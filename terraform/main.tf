@@ -68,6 +68,7 @@ resource "google_pubsub_subscription" "AntuJobQueue" {
   project = var.gcp_pubsub_project
   labels = var.labels
   ack_deadline_seconds = 600
+  message_retention_duration = "3600s"
   retry_policy {
     minimum_backoff = "10s"
   }
@@ -84,9 +85,7 @@ resource "google_pubsub_subscription" "AntuReportAggregationQueue" {
   topic = google_pubsub_topic.AntuReportAggregationQueue.name
   project = var.gcp_pubsub_project
   labels = var.labels
-  expiration_policy {
-    ttl = "86400s"
-  }
+  message_retention_duration = "3600s"
   retry_policy {
     minimum_backoff = "10s"
   }
@@ -103,9 +102,7 @@ resource "google_pubsub_subscription" "AntuCommonFilesAggregationQueue" {
   topic = google_pubsub_topic.AntuCommonFilesAggregationQueue.name
   project = var.gcp_pubsub_project
   labels = var.labels
-  expiration_policy {
-    ttl = "86400s"
-  }
+  message_retention_duration = "3600s"
   retry_policy {
     minimum_backoff = "10s"
   }
