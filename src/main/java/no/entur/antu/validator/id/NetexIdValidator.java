@@ -1,5 +1,7 @@
 package no.entur.antu.validator.id;
 
+import no.entur.antu.validator.NetexValidator;
+import no.entur.antu.validator.ValidationReport;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.validator.codespace.NetexCodespace;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * Validate that NeTEX IDs have a valid structure.
  */
-public class NetexIdValidator {
+public class NetexIdValidator implements NetexValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetexIdValidator.class);
 
@@ -28,7 +30,12 @@ public class NetexIdValidator {
     private static final String MESSAGE_FORMAT_INVALID_ID_NAME = "Invalid structure on id %s. Expected %s";
     private static final String MESSAGE_FORMAT_UNAPPROVED_CODESPACE = "Use of unapproved codespace. Approved codespaces are %s";
 
-    public List<ValidationReportEntry> validate(ValidationContext validationContext, Set<IdVersion> localIds) {
+    @Override
+    public void validate(ValidationReport validationReport, ValidationContext validationContext) {
+        validationReport.addAllValidationReportEntries(validate(validationContext));
+    }
+
+    protected List<ValidationReportEntry> validate(ValidationContext validationContext) {
 
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
 
@@ -38,7 +45,7 @@ public class NetexIdValidator {
                 .collect(Collectors.toSet());
         String validNetexCodespaceList = String.join(",", validNetexCodespaces);
 
-        for (IdVersion id : localIds) {
+        for (IdVersion id : validationContext.getLocalIds()) {
             Matcher m = PATTERN_VALID_ID.matcher(id.getId());
             if (!m.matches()) {
                 String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_INVALID_ID_STRUCTURE;
@@ -69,6 +76,7 @@ public class NetexIdValidator {
     private String getIdVersionLocation(IdVersion id) {
         return "[Line " + id.getLineNumber() + ", Column " + id.getColumnNumber() + ", Id " + id.getId() + "] ";
     }
+
 
 
 }

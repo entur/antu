@@ -18,6 +18,8 @@ package no.entur.antu.config;
 
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validator.NetexValidator;
+import no.entur.antu.validator.NetexValidatorsRunner;
 import no.entur.antu.validator.id.BlockJourneyReferencesIgnorer;
 import no.entur.antu.validator.id.CommonNetexIdRepository;
 import no.entur.antu.validator.id.ExternalReferenceValidator;
@@ -91,6 +93,18 @@ public class ValidatorConfig {
     @Bean("netexIdUniquenessValidator")
     public NetexIdUniquenessValidator netexIdUniquenessValidator(NetexIdRepository netexIdRepository) {
         return new NetexIdUniquenessValidator(netexIdRepository);
+    }
+
+    @Bean("netexValidatorsRunner")
+    public NetexValidatorsRunner netexValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
+                                                       XPathValidator xpathValidator,
+                                                       NetexIdValidator netexIdValidator,
+                                                       VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
+                                                       ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
+                                                       NeTexReferenceValidator neTexReferenceValidator,
+                                                       NetexIdUniquenessValidator netexIdUniquenessValidator) {
+        List<NetexValidator> netexValidators = List.of(xpathValidator, netexIdValidator, versionOnLocalNetexIdValidator, referenceToValidEntityTypeValidator, neTexReferenceValidator, netexIdUniquenessValidator);
+        return new NetexValidatorsRunner(netexSchemaValidator, netexValidators);
     }
 
 

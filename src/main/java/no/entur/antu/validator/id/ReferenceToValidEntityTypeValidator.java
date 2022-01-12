@@ -1,7 +1,10 @@
 package no.entur.antu.validator.id;
 
+import no.entur.antu.validator.NetexValidator;
+import no.entur.antu.validator.ValidationReport;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.xpath.ValidationContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +16,7 @@ import java.util.Set;
 /**
  * Validate that NeTEX references point to a valid element type.
  */
-public class ReferenceToValidEntityTypeValidator {
+public class ReferenceToValidEntityTypeValidator  implements NetexValidator {
 
     private static final String MESSAGE_FORMAT_INVALID_REFERENCE = "Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements if type XXXX";
     private static final String MESSAGE_FORMAT_INVALID_ID_STRUCTURE = "Invalid id structure on element";
@@ -23,7 +26,12 @@ public class ReferenceToValidEntityTypeValidator {
         this.allowedSubstitutions = getAllowedSubstitutions();
     }
 
-    public List<ValidationReportEntry> validate(List<IdVersion> localRefs) {
+    @Override
+    public void validate(ValidationReport validationReport, ValidationContext validationContext) {
+        validationReport.addAllValidationReportEntries(validate(validationContext.getLocalRefs()));
+    }
+
+    protected List<ValidationReportEntry> validate(List<IdVersion> localRefs) {
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
 
         for (IdVersion id : localRefs) {

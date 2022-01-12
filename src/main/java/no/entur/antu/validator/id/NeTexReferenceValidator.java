@@ -1,7 +1,10 @@
 package no.entur.antu.validator.id;
 
+import no.entur.antu.validator.NetexValidator;
+import no.entur.antu.validator.ValidationReport;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.xpath.ValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +16,7 @@ import java.util.Set;
 /**
  * Validate that references refer to an existing element.
  */
-public class NeTexReferenceValidator {
+public class NeTexReferenceValidator implements NetexValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NeTexReferenceValidator.class);
 
@@ -26,7 +29,13 @@ public class NeTexReferenceValidator {
         this.externalReferenceValidators = externalReferenceValidators;
     }
 
-    public List<ValidationReportEntry> validate(String reportId, List<IdVersion> netexRefs, List<IdVersion> localIds) {
+    @Override
+    public void validate(ValidationReport validationReport, ValidationContext validationContext) {
+        validationReport.addAllValidationReportEntries(validate(validationReport.getValidationReportId(), validationContext.getLocalRefs(), validationContext.getLocalIds(), validationContext.isCommonFile()));
+    }
+
+    protected List<ValidationReportEntry> validate(String reportId, List<IdVersion> netexRefs, Set<IdVersion> localIds, boolean isCommonFile) {
+
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
 
         // Remove duplicates, that is: references that have the same id and version (see #IdVersion.equals)
@@ -49,6 +58,9 @@ public class NeTexReferenceValidator {
             }
         }
 
+        if(isCommonFile){
+            commonNetexIdRepository.addCommonNetexIds(reportId, localIds);
+        }
 
         return validationReportEntries;
     }

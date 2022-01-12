@@ -6,8 +6,8 @@ import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
-import no.entur.antu.validator.xpath.ValidationContext;
 import no.entur.antu.validator.xpath.ValidationRule;
+import no.entur.antu.validator.xpath.XPathValidationContext;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +27,7 @@ public class ValidateAtLeastOne implements ValidationRule {
     }
 
     @Override
-    public List<ValidationReportEntry> validate(ValidationContext validationContext)  {
+    public List<ValidationReportEntry> validate(XPathValidationContext validationContext)  {
         try {
             XPathSelector selector = validationContext.getxPathCompiler().compile(xpath).load();
             selector.setContextItem(validationContext.getXmlNode());

@@ -1,8 +1,10 @@
 package no.entur.antu.validator.xpath;
 
-import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.validator.NetexValidator;
+import no.entur.antu.validator.ValidationReport;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.validator.xpath.rules.ValidateAllowedBookingAccessProperty;
@@ -20,9 +22,7 @@ import no.entur.antu.validator.xpath.rules.ValidateNSRCodespace;
 import no.entur.antu.validator.xpath.rules.ValidateNotExist;
 import no.entur.antu.validator.xpath.rules.ValidatedAllowedTransportMode;
 import no.entur.antu.validator.xpath.rules.ValidatedAllowedTransportSubMode;
-import no.entur.antu.xml.XMLParserUtil;
 
-import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +32,7 @@ import static no.entur.antu.xml.XMLParserUtil.selectNodeSet;
 /**
  * Run XPath validation rules against the dataset.
  */
-public class XPathValidator {
+public class XPathValidator implements NetexValidator {
 
     private final OrganisationRepository organisationRepository;
     private final ValidationTree topLevelValidationTree;
@@ -42,14 +42,19 @@ public class XPathValidator {
         this.topLevelValidationTree = getTopLevelValidationTree();
     }
 
-    public List<ValidationReportEntry> validate(String codespace, String fileName, byte[] content) throws XMLStreamException, SaxonApiException {
-        XdmNode document = XMLParserUtil.parseFileToXdmNode(content);
-        ValidationContext validationContext = new ValidationContext(document, XMLParserUtil.getXPathCompiler(), codespace, fileName);
+    @Override
+    public void validate(ValidationReport validationReport, ValidationContext validationContext) {
+        List<ValidationReportEntry> validationReportEntries = validate(validationReport.getCodespace(), validationContext.getFileName(), validationContext.getXmlNode(), validationContext.getxPathCompiler());
+        validationReport.addAllValidationReportEntries(validationReportEntries);
+    }
+
+    protected List<ValidationReportEntry> validate(String codespace, String fileName, XdmNode document, XPathCompiler xPathCompiler) {
+        XPathValidationContext validationContext = new XPathValidationContext(document, xPathCompiler, codespace, fileName);
         return this.validate(validationContext);
 
     }
 
-    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+    public List<ValidationReportEntry> validate(XPathValidationContext validationContext) {
         return topLevelValidationTree.validate(validationContext);
     }
 
@@ -396,6 +401,7 @@ public class XPathValidator {
     public Set<String> getRuleMessages() {
         return topLevelValidationTree.getRuleMessages();
     }
+
 
 
 }

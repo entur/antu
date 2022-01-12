@@ -2,11 +2,11 @@ package no.entur.antu.validator.id;
 
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
-import no.entur.antu.validator.xpath.ValidationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,17 +17,17 @@ public final class NetexIdExtractorHelper {
     private NetexIdExtractorHelper() {
     }
 
-    public static List<IdVersion> collectEntityIdentificators(ValidationContext validationContext, Set<String> ignorableElementNames)
+    public static List<IdVersion> collectEntityIdentificators(XdmNode document, XPathCompiler xPathCompiler, String filename, Set<String> ignorableElementNames)
             throws SaxonApiException {
-        return collectIdOrRefWithVersion(validationContext, "id", ignorableElementNames);
+        return collectIdOrRefWithVersion(document, xPathCompiler, filename, "id", ignorableElementNames);
     }
 
-    public static List<IdVersion> collectEntityReferences(ValidationContext validationContext, Set<String> ignorableElementNames)
+    public static List<IdVersion> collectEntityReferences(XdmNode document, XPathCompiler xPathCompiler, String filename, Set<String> ignorableElementNames)
             throws SaxonApiException {
-        return collectIdOrRefWithVersion(validationContext, "ref", ignorableElementNames);
+        return collectIdOrRefWithVersion(document, xPathCompiler, filename, "ref", ignorableElementNames);
     }
 
-    public static List<IdVersion> collectIdOrRefWithVersion(ValidationContext validationContext, String attributeName, Set<String> ignorableElementNames)
+    public static List<IdVersion> collectIdOrRefWithVersion(XdmNode document, XPathCompiler xPathCompiler, String filename, String attributeName, Set<String> ignorableElementNames)
             throws SaxonApiException {
         StringBuilder filterClause = new StringBuilder();
         filterClause.append("//n:*[");
@@ -38,11 +38,10 @@ public final class NetexIdExtractorHelper {
         }
         filterClause.append("@").append(attributeName).append("]");
 
-        XPathSelector selector = validationContext.getxPathCompiler().compile(filterClause.toString()).load();
-        selector.setContextItem(validationContext.getXmlNode());
+        XPathSelector selector = xPathCompiler.compile(filterClause.toString()).load();
+        selector.setContextItem(document);
         XdmValue nodes = selector.evaluate();
 
-        String filename = validationContext.getFileName();
         QName versionQName = new QName("version");
         List<IdVersion> ids = new ArrayList<>();
         for (XdmItem item : nodes) {

@@ -10,8 +10,8 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
-import no.entur.antu.validator.xpath.ValidationContext;
 import no.entur.antu.validator.xpath.ValidationRule;
+import no.entur.antu.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ public class ValidateAuthorityId implements ValidationRule {
     }
 
     @Override
-    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+    public List<ValidationReportEntry> validate(XPathValidationContext validationContext) {
         try {
             Set<String> whitelistedAuthorityIds = organisationRepository.getWhitelistedAuthorityIds(validationContext.getCodespace());
             if (whitelistedAuthorityIds.isEmpty()) {

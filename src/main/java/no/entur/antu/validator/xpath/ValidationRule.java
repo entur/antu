@@ -6,7 +6,7 @@ import no.entur.antu.validator.ValidationReportEntrySeverity;
 import java.util.List;
 
 public interface ValidationRule {
-    List<ValidationReportEntry> validate(ValidationContext validationContext) ;
+    List<ValidationReportEntry> validate(XPathValidationContext validationContext) ;
 
     String getMessage();
 
