@@ -23,13 +23,13 @@ public class ValidationTree {
     private final String context;
     private final List<ValidationTree> subTrees;
     private final List<ValidationRule> validationRules;
-    private final Predicate<ValidationContext> executionCondition;
+    private final Predicate<XPathValidationContext> executionCondition;
 
     public ValidationTree(String name, String context) {
         this(name, context, validationContext -> true);
     }
 
-    public ValidationTree(String name, String context, Predicate<ValidationContext> executionCondition) {
+    public ValidationTree(String name, String context, Predicate<XPathValidationContext> executionCondition) {
         this.name = name;
         this.context = context;
         this.executionCondition = executionCondition;
@@ -37,7 +37,7 @@ public class ValidationTree {
         this.subTrees = new ArrayList<>();
     }
 
-    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+    public List<ValidationReportEntry> validate(XPathValidationContext validationContext) {
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
         for (ValidationRule validationRule : validationRules) {
             LOGGER.debug("Running validation rule '{}'/'{}'", name, validationRule.getMessage());
@@ -46,7 +46,7 @@ public class ValidationTree {
         for (ValidationTree validationSubTree : subTrees) {
             XdmValue subContextNodes = XMLParserUtil.selectNodeSet(validationSubTree.getContext(), validationContext.getxPathCompiler(), validationContext.getXmlNode());
             for (XdmItem xdmItem : subContextNodes) {
-                ValidationContext validationSubContext = new ValidationContext((XdmNode) xdmItem, validationContext.getxPathCompiler(), validationContext.getCodespace(), validationContext.getFileName());
+                XPathValidationContext validationSubContext = new XPathValidationContext((XdmNode) xdmItem, validationContext.getxPathCompiler(), validationContext.getCodespace(), validationContext.getFileName());
                 if (validationSubTree.executionCondition.test(validationSubContext)) {
                     LOGGER.debug("Running validation subtree '{}'/'{}'", name, validationSubTree.getName());
                     validationReportEntries.addAll(validationSubTree.validate(validationSubContext));

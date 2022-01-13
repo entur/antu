@@ -1,7 +1,10 @@
 package no.entur.antu.validator.id;
 
+import no.entur.antu.validator.NetexValidator;
+import no.entur.antu.validator.ValidationReport;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
+import no.entur.antu.validator.xpath.ValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * Verify that NeTEx ids in the current file are not already present in one of the previous files.
  */
-public class NetexIdUniquenessValidator {
+public class NetexIdUniquenessValidator implements NetexValidator {
 
     /**
      * Set of NeTEx elements for which id-uniqueness across lines is not verified.
@@ -37,7 +40,12 @@ public class NetexIdUniquenessValidator {
         this.netexIdRepository = netexIdRepository;
     }
 
-    public List<ValidationReportEntry> validate(String reportId, String fileName, Set<IdVersion> netexFileLocalIds) {
+    @Override
+    public void validate(ValidationReport validationReport, ValidationContext validationContext) {
+        validationReport.addAllValidationReportEntries(validate(validationReport.getValidationReportId(), validationContext.getFileName(), validationContext.getLocalIds()));
+    }
+
+    protected List<ValidationReportEntry> validate(String reportId, String fileName, Set<IdVersion> netexFileLocalIds) {
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
         final Map<String, IdVersion> netexIds;
         if (netexFileLocalIds == null) {
@@ -60,4 +68,5 @@ public class NetexIdUniquenessValidator {
     private String getIdVersionLocation(IdVersion id) {
         return "[Line " + id.getLineNumber() + ", Column " + id.getColumnNumber() + ", Id " + id.getId() + "] ";
     }
+
 }

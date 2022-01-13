@@ -11,8 +11,8 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.validator.codespace.NetexCodespace;
-import no.entur.antu.validator.xpath.ValidationContext;
 import no.entur.antu.validator.xpath.ValidationRule;
+import no.entur.antu.validator.xpath.XPathValidationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class ValidateAllowedCodespaces implements ValidationRule {
     public static final String RULE_NAME = "CODESPACE";
 
     @Override
-    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+    public List<ValidationReportEntry> validate(XPathValidationContext validationContext) {
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
         Set<NetexCodespace> validCodespaces = NetexCodespace.getValidNetexCodespacesFor(validationContext.getCodespace());
         try {

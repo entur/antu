@@ -9,7 +9,7 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationReportEntry;
 import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.validator.xpath.AbstractXPathValidationRule;
-import no.entur.antu.validator.xpath.ValidationContext;
+import no.entur.antu.validator.xpath.XPathValidationContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class ValidateNotExist extends AbstractXPathValidationRule {
     }
 
     @Override
-    public List<ValidationReportEntry> validate(ValidationContext validationContext) {
+    public List<ValidationReportEntry> validate(XPathValidationContext validationContext) {
         try {
             XPathSelector selector = validationContext.getxPathCompiler().compile(xpath).load();
             selector.setContextItem(validationContext.getXmlNode());

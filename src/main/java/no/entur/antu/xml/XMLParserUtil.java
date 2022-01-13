@@ -56,13 +56,17 @@ public final class XMLParserUtil {
         return xpathCompiler;
     }
 
-    public static XdmNode parseFileToXdmNode(byte[] content) throws SaxonApiException, XMLStreamException {
+    public static XdmNode parseFileToXdmNode(byte[] content) {
         DocumentBuilder builder = getProcessor().newDocumentBuilder();
         builder.setLineNumbering(true);
         builder.setWhitespaceStrippingPolicy(WhitespaceStrippingPolicy.ALL);
         // ignore SiteFrame
         Set<QName> elementsToSkip = Set.of(new QName(Constants.NETEX_NAMESPACE, "SiteFrame"));
-        return builder.build(new StAXSource(SkippingXMLStreamReaderFactory.newXMLStreamReader(new BufferedInputStream(new ByteArrayInputStream(content)), elementsToSkip)));
+        try {
+            return builder.build(new StAXSource(SkippingXMLStreamReaderFactory.newXMLStreamReader(new BufferedInputStream(new ByteArrayInputStream(content)), elementsToSkip)));
+        } catch (SaxonApiException | XMLStreamException e) {
+            throw new AntuException("Exception while parsing the NeTex document", e);
+        }
     }
 
     public static XdmValue selectNodeSet(String expression, XPathCompiler xpath, XdmNode document) {

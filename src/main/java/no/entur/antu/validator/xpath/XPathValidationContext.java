@@ -2,28 +2,20 @@ package no.entur.antu.validator.xpath;
 
 import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XdmNode;
-import no.entur.antu.validator.id.IdVersion;
 
-import java.util.List;
-import java.util.Set;
-
-public class ValidationContext {
+public class XPathValidationContext {
 
     private final XdmNode xmlNode;
     private final XPathCompiler xPathCompiler;
 
     private final String codespace;
     private final String fileName;
-    private final Set<IdVersion> localIds;
-    private final List<IdVersion> localRefs;
 
-    public ValidationContext(XdmNode document, XPathCompiler xPathCompiler, String codespace, String fileName, Set<IdVersion> localIds, List<IdVersion> localRefs) {
+    public XPathValidationContext(XdmNode document, XPathCompiler xPathCompiler, String codespace, String fileName) {
         this.xmlNode = document;
         this.xPathCompiler = xPathCompiler;
         this.codespace = codespace;
         this.fileName = fileName;
-        this.localIds = localIds;
-        this.localRefs = localRefs;
     }
 
     public XdmNode getXmlNode() {
@@ -41,17 +33,5 @@ public class ValidationContext {
 
     public String getCodespace() {
         return codespace;
-    }
-
-    public Set<IdVersion> getLocalIds() {
-        return localIds;
-    }
-
-    public List<IdVersion> getLocalRefs() {
-        return localRefs;
-    }
-
-    public boolean isCommonFile() {
-        return fileName.startsWith("_");
     }
 }
