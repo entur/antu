@@ -1,5 +1,7 @@
 package no.entur.antu.validator.id;
 
+import org.entur.netex.validation.validator.id.CommonNetexIdRepository;
+import org.entur.netex.validation.validator.id.IdVersion;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 

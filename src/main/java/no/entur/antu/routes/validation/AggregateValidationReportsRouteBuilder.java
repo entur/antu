@@ -21,13 +21,13 @@ package no.entur.antu.routes.validation;
 
 import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
-import no.entur.antu.validator.ValidationReport;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
+import org.entur.netex.validation.validator.ValidationReport;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;

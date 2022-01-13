@@ -20,11 +20,11 @@ package no.entur.antu.routes.validation;
 
 
 import no.entur.antu.routes.BaseRouteBuilder;
-import no.entur.antu.validator.ValidationReport;
-import no.entur.antu.validator.ValidationReportEntry;
-import no.entur.antu.validator.ValidationReportEntrySeverity;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.springframework.stereotype.Component;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_WORK;
@@ -43,9 +43,6 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
     private static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
-    public static final String PROP_VALIDATION_CONTEXT = "VALIDATION_CONTEXT";
-    public static final String PROP_LOCAL_IDS = "LOCAL_IDS";
-    public static final String PROP_LOCAL_REFS = "LOCAL_REFS";
     private static final String PROP_ALL_NETEX_FILE_NAMES ="ALL_NETEX_FILE_NAMES";
 
     @Override
@@ -54,6 +51,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:validateNetex")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}")
+                .process(this::extendAckDeadline)
                 .setProperty(PROP_ALL_NETEX_FILE_NAMES, body())
                 .doTry()
                 .to("direct:downloadSingleNetexFile")

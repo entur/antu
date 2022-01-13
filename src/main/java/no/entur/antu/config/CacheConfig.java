@@ -2,10 +2,10 @@ package no.entur.antu.config;
 
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
-import no.entur.antu.validator.id.CommonNetexIdRepository;
-import no.entur.antu.validator.id.NetexIdRepository;
 import no.entur.antu.validator.id.RedisCommonNetexIdRepository;
 import no.entur.antu.validator.id.RedisNetexIdRepository;
+import org.entur.netex.validation.validator.id.CommonNetexIdRepository;
+import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;

@@ -1,7 +1,8 @@
 package no.entur.antu.validator.xpath.rules;
 
 import no.entur.antu.Constants;
-import no.entur.antu.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.xpath.rules.ValidateExactlyOne;
 
 public class ValidateNSRCodespace extends ValidateExactlyOne {
 

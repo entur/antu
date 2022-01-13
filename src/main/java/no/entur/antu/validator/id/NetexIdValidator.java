@@ -1,11 +1,12 @@
 package no.entur.antu.validator.id;
 
-import no.entur.antu.validator.NetexValidator;
-import no.entur.antu.validator.ValidationReport;
-import no.entur.antu.validator.ValidationReportEntry;
-import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.validator.codespace.NetexCodespace;
-import no.entur.antu.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.NetexValidator;
+import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.id.IdVersion;
+import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,6 @@ public class NetexIdValidator implements NetexValidator {
     private String getIdVersionLocation(IdVersion id) {
         return "[Line " + id.getLineNumber() + ", Column " + id.getColumnNumber() + ", Id " + id.getId() + "] ";
     }
-
 
 
 }
