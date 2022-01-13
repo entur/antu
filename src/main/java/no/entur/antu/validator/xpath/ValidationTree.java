@@ -44,9 +44,9 @@ public class ValidationTree {
             validationReportEntries.addAll(validationRule.validate(validationContext));
         }
         for (ValidationTree validationSubTree : subTrees) {
-            XdmValue subContextNodes = XMLParserUtil.selectNodeSet(validationSubTree.getContext(), validationContext.getxPathCompiler(), validationContext.getXmlNode());
+            XdmValue subContextNodes = XMLParserUtil.selectNodeSet(validationSubTree.getContext(), validationContext.getXPathCompiler(), validationContext.getXmlNode());
             for (XdmItem xdmItem : subContextNodes) {
-                XPathValidationContext validationSubContext = new XPathValidationContext((XdmNode) xdmItem, validationContext.getxPathCompiler(), validationContext.getCodespace(), validationContext.getFileName());
+                XPathValidationContext validationSubContext = new XPathValidationContext((XdmNode) xdmItem, validationContext.getXPathCompiler(), validationContext.getCodespace(), validationContext.getFileName());
                 if (validationSubTree.executionCondition.test(validationSubContext)) {
                     LOGGER.debug("Running validation subtree '{}'/'{}'", name, validationSubTree.getName());
                     validationReportEntries.addAll(validationSubTree.validate(validationSubContext));

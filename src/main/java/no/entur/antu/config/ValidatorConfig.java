@@ -34,6 +34,8 @@ import no.entur.antu.validator.id.TrainElementRegistryIdValidator;
 import no.entur.antu.validator.id.VersionOnLocalNetexIdValidator;
 import no.entur.antu.validator.id.VersionOnRefToLocalNetexIdValidator;
 import no.entur.antu.validator.schema.NetexSchemaValidator;
+import no.entur.antu.validator.xpath.EnturValidationTreeFactory;
+import no.entur.antu.validator.xpath.ValidationTreeFactory;
 import no.entur.antu.validator.xpath.XPathValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -50,9 +52,14 @@ public class ValidatorConfig {
         return new NetexSchemaValidator(maxValidationError);
     }
 
+    @Bean()
+    public ValidationTreeFactory validationTreeFactory(OrganisationRepository organisationRepository) {
+        return new EnturValidationTreeFactory(organisationRepository);
+    }
+
     @Bean("xpathValidator")
-    public XPathValidator xpathValidator(OrganisationRepository organisationRepository) {
-        return new XPathValidator(organisationRepository);
+    public XPathValidator xpathValidator(ValidationTreeFactory validationTreeFactory) {
+        return new XPathValidator(validationTreeFactory);
     }
 
     @Bean("netexIdValidator")
