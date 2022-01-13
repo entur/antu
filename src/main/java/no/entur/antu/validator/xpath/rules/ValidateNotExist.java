@@ -31,7 +31,7 @@ public class ValidateNotExist extends AbstractXPathValidationRule {
     @Override
     public List<ValidationReportEntry> validate(XPathValidationContext validationContext) {
         try {
-            XPathSelector selector = validationContext.getxPathCompiler().compile(xpath).load();
+            XPathSelector selector = validationContext.getXPathCompiler().compile(xpath).load();
             selector.setContextItem(validationContext.getXmlNode());
             XdmValue nodes = selector.evaluate();
             List<ValidationReportEntry> validationReportEntries = new ArrayList<>();

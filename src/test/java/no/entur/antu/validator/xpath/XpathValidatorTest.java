@@ -22,7 +22,7 @@ class XpathValidatorTest {
     @Test
     void testValidator() throws IOException {
 
-        XPathValidator xPathValidator = new XPathValidator(new OrganisationRepository() {
+        OrganisationRepository stubOrganisationRepository = new OrganisationRepository() {
             @Override
             public void refreshCache() {
             }
@@ -31,7 +31,9 @@ class XpathValidatorTest {
             public Set<String> getWhitelistedAuthorityIds(String codespace) {
                 return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
             }
-        });
+        };
+        ValidationTreeFactory validationTreeFactory = new EnturValidationTreeFactory(stubOrganisationRepository);
+        XPathValidator xPathValidator = new XPathValidator(validationTreeFactory);
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
         assert testDatasetAsStream != null;

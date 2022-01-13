@@ -32,7 +32,7 @@ public class ValidateAllowedCodespaces implements ValidationRule {
         List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
         Set<NetexCodespace> validCodespaces = NetexCodespace.getValidNetexCodespacesFor(validationContext.getCodespace());
         try {
-            XPathSelector selector = validationContext.getxPathCompiler().compile("PublicationDelivery/dataObjects/*/codespaces/Codespace | PublicationDelivery/dataObjects/CompositeFrame/frames/*/codespaces/Codespace").load();
+            XPathSelector selector = validationContext.getXPathCompiler().compile("PublicationDelivery/dataObjects/*/codespaces/Codespace | PublicationDelivery/dataObjects/CompositeFrame/frames/*/codespaces/Codespace").load();
             selector.setContextItem(validationContext.getXmlNode());
             for (XdmItem item : selector) {
                 String xmlns = null;

@@ -22,14 +22,13 @@ public class XPathValidationContext {
         return xmlNode;
     }
 
-    public XPathCompiler getxPathCompiler() {
+    public XPathCompiler getXPathCompiler() {
         return xPathCompiler;
     }
 
     public String getFileName() {
         return fileName;
     }
-
 
     public String getCodespace() {
         return codespace;
