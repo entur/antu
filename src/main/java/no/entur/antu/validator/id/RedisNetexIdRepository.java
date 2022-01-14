@@ -1,5 +1,6 @@
 package no.entur.antu.validator.id;
 
+import no.entur.antu.exception.FileAlreadyValidatedException;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.api.RLock;
 import org.redisson.api.RSet;
@@ -7,7 +8,6 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -38,8 +38,7 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         RSet<String> localNetexIds = redissonClient.getSet(netexLocalIdsKey);
         if (!localNetexIds.isEmpty()) {
             // protect against multiple run due to retry logic
-            LOGGER.error("Duplicate check already run for file {} in report {}", filename, reportId);
-            return Collections.emptySet();
+            throw new FileAlreadyValidatedException("Validation already run for file " + filename + " in report " + reportId);
         }
         localNetexIds.expire(1, TimeUnit.HOURS);
         localNetexIds.addAll(localIds);

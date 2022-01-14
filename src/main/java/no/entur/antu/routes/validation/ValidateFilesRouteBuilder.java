@@ -19,6 +19,7 @@
 package no.entur.antu.routes.validation;
 
 
+import no.entur.antu.exception.FileAlreadyValidatedException;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
@@ -57,6 +58,9 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:downloadSingleNetexFile")
                 .setProperty(PROP_NETEX_FILE_CONTENT, body())
                 .to("direct:runNetexValidators")
+                .doCatch(FileAlreadyValidatedException.class)
+                .log(LoggingLevel.WARN, correlation() + "Ignoring NeTEx file ${header." + FILE_HANDLE + "} that has already been validated")
+                .stop()
                 .doCatch(Exception.class)
                 .log(LoggingLevel.ERROR, correlation() + "System error while validating the NeTEx file ${header." + FILE_HANDLE + "}: ${exception.message} stacktrace: ${exception.stacktrace}")
                 .to("direct:reportSystemError")

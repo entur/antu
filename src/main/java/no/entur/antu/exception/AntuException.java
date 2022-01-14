@@ -18,6 +18,9 @@
 
 package no.entur.antu.exception;
 
+/**
+ * Base class for exceptions that occur during the validation process.
+ */
 public class AntuException extends RuntimeException {
 
     public AntuException(Throwable cause) {
