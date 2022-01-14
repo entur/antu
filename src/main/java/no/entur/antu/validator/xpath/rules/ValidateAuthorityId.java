@@ -8,10 +8,10 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.ValidationReportEntry;
-import no.entur.antu.validator.ValidationReportEntrySeverity;
-import no.entur.antu.validator.xpath.ValidationRule;
-import no.entur.antu.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.xpath.ValidationRule;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

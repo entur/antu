@@ -2,8 +2,11 @@ package no.entur.antu.validator.xpath;
 
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.ValidationReportEntry;
-import no.entur.antu.xml.XMLParserUtil;
+import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidator;
+import org.entur.netex.validation.xml.XMLParserUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

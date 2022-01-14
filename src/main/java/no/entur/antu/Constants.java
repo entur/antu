@@ -60,9 +60,6 @@ public final class Constants {
 
     public static final String AGGREGATED_VALIDATION_REPORT = "AGGREGATED_VALIDATION_REPORT";
 
-
-    public static final String NETEX_NAMESPACE = "http://www.netex.org.uk/netex";
-
     public static final String NSR_XMLNS = "NSR";
     public static final String NSR_XMLNSURL = "http://www.rutebanken.org/ns/nsr";
 

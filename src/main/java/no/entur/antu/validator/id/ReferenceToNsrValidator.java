@@ -1,6 +1,8 @@
 package no.entur.antu.validator.id;
 
 import no.entur.antu.stop.StopPlaceRepository;
+import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
+import org.entur.netex.validation.validator.id.IdVersion;
 
 import java.util.HashSet;
 import java.util.Set;

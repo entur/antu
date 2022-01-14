@@ -7,19 +7,18 @@ import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmSequenceIterator;
-import no.entur.antu.exception.AntuException;
-import no.entur.antu.validator.ValidationReportEntry;
-import no.entur.antu.validator.ValidationReportEntrySeverity;
 import no.entur.antu.validator.codespace.NetexCodespace;
-import no.entur.antu.validator.xpath.ValidationRule;
-import no.entur.antu.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.Constants;
+import org.entur.netex.validation.exception.NetexValidationException;
+import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.xpath.ValidationRule;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static no.entur.antu.Constants.NETEX_NAMESPACE;
 
 public class ValidateAllowedCodespaces implements ValidationRule {
 
@@ -37,11 +36,11 @@ public class ValidateAllowedCodespaces implements ValidationRule {
             for (XdmItem item : selector) {
                 String xmlns = null;
                 String xmlnsUrl = null;
-                XdmNode codespaceNamespaceNode = getChild((XdmNode) item, new QName("n", NETEX_NAMESPACE, "Xmlns"));
+                XdmNode codespaceNamespaceNode = getChild((XdmNode) item, new QName("n", Constants.NETEX_NAMESPACE, "Xmlns"));
                 if (codespaceNamespaceNode != null) {
                     xmlns = codespaceNamespaceNode.getStringValue();
                 }
-                XdmNode codespaceNamespaceUrlNode = getChild((XdmNode) item, new QName("n", NETEX_NAMESPACE, "XmlnsUrl"));
+                XdmNode codespaceNamespaceUrlNode = getChild((XdmNode) item, new QName("n", Constants.NETEX_NAMESPACE, "XmlnsUrl"));
                 if (codespaceNamespaceUrlNode != null) {
                     xmlnsUrl = codespaceNamespaceUrlNode.getStringValue();
                 }
@@ -53,7 +52,7 @@ public class ValidateAllowedCodespaces implements ValidationRule {
             }
             return validationReportEntries;
         } catch (SaxonApiException e) {
-            throw new AntuException("Error while validating rule ", e);
+            throw new NetexValidationException("Error while validating rule ", e);
         }
     }
 

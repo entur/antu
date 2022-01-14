@@ -1,5 +1,8 @@
 package no.entur.antu.validator.id;
 
+import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
+import org.entur.netex.validation.validator.id.IdVersion;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
