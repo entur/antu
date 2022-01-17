@@ -8,9 +8,9 @@ service:
     internalPort: 8080
 
 resources:
-  cpuLimit: 2000m
+  cpuLimit: "2"
   memLimit: 2000Mi
-  cpuRequest: 1000m
+  cpuRequest: "1"
   memRequest: 1700Mi
   xmx: 1500m
 
