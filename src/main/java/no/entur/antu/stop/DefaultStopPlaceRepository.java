@@ -16,8 +16,10 @@
 package no.entur.antu.stop;
 
 import no.entur.antu.exception.AntuException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.cache.Cache;
+import java.util.Map;
 import java.util.Set;
 
 public class DefaultStopPlaceRepository implements StopPlaceRepository {
@@ -25,10 +27,12 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     public static final String STOP_PLACE_CACHE_KEY = "stopPlaceCache";
     public static final String QUAY_CACHE_KEY = "quayCache";
 
-    private final StopPlaceResource stopPlaceResource;
-    private final Cache<String, Set<String>> stopPlaceCache;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStopPlaceRepository.class);
 
-    public DefaultStopPlaceRepository(StopPlaceResource stopPlaceResource, Cache<String, Set<String>> stopPlaceCache) {
+    private final StopPlaceResource stopPlaceResource;
+    private final Map<String, Set<String>> stopPlaceCache;
+
+    public DefaultStopPlaceRepository(StopPlaceResource stopPlaceResource, Map<String, Set<String>> stopPlaceCache) {
         this.stopPlaceResource = stopPlaceResource;
         this.stopPlaceCache = stopPlaceCache;
     }
@@ -36,7 +40,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     @Override
     public Set<String> getStopPlaceIds() {
         Set<String> stopPlaceIds = stopPlaceCache.get(STOP_PLACE_CACHE_KEY);
-        if(stopPlaceIds == null) {
+        if (stopPlaceIds == null) {
             throw new AntuException("Stop place ids cache not found");
         }
         return stopPlaceIds;
@@ -45,7 +49,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     @Override
     public Set<String> getQuayIds() {
         Set<String> quayIds = stopPlaceCache.get(QUAY_CACHE_KEY);
-        if(quayIds == null) {
+        if (quayIds == null) {
             throw new AntuException("Quay ids cache not found");
         }
         return quayIds;
@@ -55,6 +59,9 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     public void refreshCache() {
         stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceResource.getStopPlaceIds());
         stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
+
+        LOGGER.debug("Updated stop places and quays cache. Cache now has {} stop places and {} quays", stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(), stopPlaceCache.get(QUAY_CACHE_KEY).size());
+
     }
 
 

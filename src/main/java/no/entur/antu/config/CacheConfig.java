@@ -7,6 +7,7 @@ import no.entur.antu.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.CommonNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.Redisson;
+import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.codec.Kryo5Codec;
@@ -25,12 +26,15 @@ import javax.cache.configuration.MutableConfiguration;
 import javax.cache.expiry.CreatedExpiryPolicy;
 import javax.cache.expiry.Duration;
 import javax.cache.expiry.ExpiryPolicy;
+import java.util.Map;
 import java.util.Set;
 
 @Configuration
 public class CacheConfig {
 
-    public static final String STOP_PLACE_AND_QUAY_CACHE_KEY = "stopPlaceAndQuayCache";
+    public static final String ORGANISATION_CACHE = "organisationCache";
+    public static final String STOP_PLACE_AND_QUAY_CACHE = "stopPlaceAndQuayCache";
+
     public static final String COMMON_IDS_CACHE_KEY = "commonIdsCache";
 
     @Bean
@@ -56,12 +60,15 @@ public class CacheConfig {
         return Redisson.create(redissonConfig);
     }
 
+
     @Bean
-    public Cache<String, Set<String>> stopPlaceCache(Config redissonConfig) {
-        MutableConfiguration<String, Set<String>> cacheConfig = new MutableConfiguration<>();
-        var redissonCacheConfig = RedissonConfiguration.fromConfig(redissonConfig, cacheConfig);
-        var manager = Caching.getCachingProvider().getCacheManager();
-        return manager.createCache(STOP_PLACE_AND_QUAY_CACHE_KEY, redissonCacheConfig);
+    public Map<String, Set<String>> stopPlaceAndQuayCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(STOP_PLACE_AND_QUAY_CACHE, LocalCachedMapOptions.defaults());
+    }
+
+    @Bean
+    public Map<String, Set<String>> organisationCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(ORGANISATION_CACHE, LocalCachedMapOptions.defaults());
     }
 
     @Bean
