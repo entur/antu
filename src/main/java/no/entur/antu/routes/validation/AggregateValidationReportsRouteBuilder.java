@@ -74,7 +74,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .routeId("aggregate-reports-pubsub");
 
         from("direct:aggregateReports")
-                .log(LoggingLevel.INFO, correlation() + "Merging individual reports for validation report id ${header." + VALIDATION_REPORT_ID + "}")
+                .log(LoggingLevel.INFO, correlation() + "Merging individual reports")
 
                 .process(exchange -> {
                     String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
@@ -138,7 +138,6 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         from("direct:cleanUpCache")
                 .log(LoggingLevel.INFO, correlation() + "Clean up cache")
-                .bean("commonNetexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID + "})")
                 .bean("netexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID + "})")
                 .log(LoggingLevel.INFO, correlation() + "Cleaned up cache")
                 .routeId("cleanup-cache");

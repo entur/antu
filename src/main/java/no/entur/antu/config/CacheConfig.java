@@ -2,9 +2,7 @@ package no.entur.antu.config;
 
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
-import no.entur.antu.validator.id.RedisCommonNetexIdRepository;
 import no.entur.antu.validator.id.RedisNetexIdRepository;
-import org.entur.netex.validation.validator.id.CommonNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.Redisson;
 import org.redisson.api.LocalCachedMapOptions;
@@ -81,13 +79,8 @@ public class CacheConfig {
     }
 
     @Bean
-    public NetexIdRepository netexIdRepository(RedissonClient redissonClient) {
-        return new RedisNetexIdRepository(redissonClient);
-    }
-
-    @Bean
-    public CommonNetexIdRepository commonNetexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") Cache<String, Set<String>> commonIdsCache) {
-        return new RedisCommonNetexIdRepository(redissonClient, commonIdsCache);
+    public NetexIdRepository netexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") Cache<String, Set<String>> commonIdsCache) {
+        return new RedisNetexIdRepository(redissonClient, commonIdsCache);
     }
 
     @Bean

@@ -25,7 +25,6 @@ import no.entur.antu.validator.xpath.EnturValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.id.BlockJourneyReferencesIgnorer;
-import org.entur.netex.validation.validator.id.CommonNetexIdRepository;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
@@ -88,13 +87,13 @@ public class ValidatorConfig {
     }
 
     @Bean("neTexReferenceValidator")
-    public NeTexReferenceValidator neTexReferenceValidator(CommonNetexIdRepository commonNetexIdRepository, ReferenceToNsrValidator referenceToNsrValidator) {
+    public NeTexReferenceValidator neTexReferenceValidator(NetexIdRepository netexIdRepository, ReferenceToNsrValidator referenceToNsrValidator) {
         List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
         externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
         externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
         externalReferenceValidators.add(new TrainElementRegistryIdValidator());
         externalReferenceValidators.add(referenceToNsrValidator);
-        return new NeTexReferenceValidator(commonNetexIdRepository, externalReferenceValidators);
+        return new NeTexReferenceValidator(netexIdRepository, externalReferenceValidators);
     }
 
     @Bean("netexIdUniquenessValidator")
