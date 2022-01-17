@@ -1,5 +1,5 @@
 env: production
-replicas: 1
+replicas: 2
 
 gcp:
   blobstoreProjectId: entur-ror-prod
