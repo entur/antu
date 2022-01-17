@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import javax.cache.Cache;
+import java.util.Map;
 import java.util.Set;
 
 @Configuration
@@ -42,7 +42,7 @@ public class StopPlaceConfig {
 
     @Bean
     @Profile("!test")
-    StopPlaceRepository stopPlaceRepository(StopPlaceResource stopPlaceResource, @Qualifier("stopPlaceCache") Cache<String, Set<String>> stopPlaceCache) {
+    StopPlaceRepository stopPlaceRepository(StopPlaceResource stopPlaceResource, @Qualifier("stopPlaceAndQuayCache") Map<String, Set<String>> stopPlaceCache) {
         return new DefaultStopPlaceRepository(stopPlaceResource, stopPlaceCache);
     }
 

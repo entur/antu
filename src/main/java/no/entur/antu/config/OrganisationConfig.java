@@ -19,11 +19,15 @@ package no.entur.antu.config;
 import no.entur.antu.organisation.DefaultOrganisationRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.organisation.OrganisationResource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Map;
+import java.util.Set;
 
 @Configuration
 public class OrganisationConfig {
@@ -37,7 +41,7 @@ public class OrganisationConfig {
 
     @Bean
     @Profile("!test")
-    OrganisationRepository organisationRepository(OrganisationResource organisationResource) {
-        return new DefaultOrganisationRepository(organisationResource);
+    OrganisationRepository organisationRepository(OrganisationResource organisationResource, @Qualifier("organisationCache") Map<String, Set<String>> organisationCache) {
+        return new DefaultOrganisationRepository(organisationResource, organisationCache);
     }
 }

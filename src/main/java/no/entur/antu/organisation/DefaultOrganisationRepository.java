@@ -34,30 +34,35 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOrganisationRepository.class);
 
     private final OrganisationResource organisationResource;
+    private final Map<String, Set<String>> organisationCache;
 
-    // volatile read-only access to the unmodifiable map is thread-safe as long as the values are not modified after the map creation
-    private volatile Map<String, Set<String>> authorityIdWhitelistByCodespace;
-
-    public DefaultOrganisationRepository(OrganisationResource organisationResource) {
+    public DefaultOrganisationRepository(OrganisationResource organisationResource, Map<String, Set<String>> organisationCache) {
         this.organisationResource = organisationResource;
-        this.authorityIdWhitelistByCodespace = Collections.emptyMap();
+        this.organisationCache = organisationCache;
     }
 
     @Override
     public void refreshCache() {
         Collection<Organisation> organisations = organisationResource.getOrganisations();
-        authorityIdWhitelistByCodespace = organisations.stream()
+
+        Map<String, Set<String>> authorityIdWhitelistByCodespace = organisations.stream()
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_CODESPACE))
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST))
                 .collect(Collectors.toUnmodifiableMap(
                         organisation -> organisation.references.get(REFERENCE_CODESPACE).toLowerCase(Locale.ROOT),
                         organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
-        LOGGER.debug("Updated organisation cache. Cache now has {} elements", authorityIdWhitelistByCodespace.size());
+
+        // remove deleted organisations
+        organisationCache.keySet().retainAll(authorityIdWhitelistByCodespace.keySet());
+        // update existing organisations and add new ones
+        organisationCache.putAll(authorityIdWhitelistByCodespace);
+
+        LOGGER.debug("Updated organisation cache. Cache now has {} elements", organisationCache.size());
     }
 
     @Override
     public Set<String> getWhitelistedAuthorityIds(String codespace) {
-        Set<String> whitelistedIds = authorityIdWhitelistByCodespace.get(codespace);
+        Set<String> whitelistedIds = organisationCache.get(codespace);
         if (whitelistedIds == null) {
             return Collections.emptySet();
         }
