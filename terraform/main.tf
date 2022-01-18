@@ -123,7 +123,7 @@ resource "google_redis_instance" "antu-redis" {
   labels                  = var.labels
   redis_configs           = {
     maxmemory-gb = "4.8",
-    maxmemory-policy = "volatile-ttl"
+    maxmemory-policy = "allkeys-lru"
     activedefrag = "yes"
   }
   timeouts {
@@ -139,7 +139,7 @@ resource "kubernetes_config_map" "antu-redis-config" {
   }
 
   data = {
-    "REDIS_HOST" = "${google_redis_instance.antu-redis.host}"
+    "REDIS_HOST" = google_redis_instance.antu-redis.host
   }
 
 }

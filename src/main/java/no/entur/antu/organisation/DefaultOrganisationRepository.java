@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 
 public class DefaultOrganisationRepository implements OrganisationRepository {
 
+    private static final String ORGANISATION_CACHE_KEY_PREFIX = "ORGANISATION_CACHE_";
+
     private static final String REFERENCE_CODESPACE = "codeSpace";
     private static final String REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST = "netexAuthorityIdsWhitelist";
 
@@ -49,7 +51,7 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_CODESPACE))
                 .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST))
                 .collect(Collectors.toUnmodifiableMap(
-                        organisation -> organisation.references.get(REFERENCE_CODESPACE).toLowerCase(Locale.ROOT),
+                        organisation -> getOrganisationKey(organisation.references.get(REFERENCE_CODESPACE).toLowerCase(Locale.ROOT)),
                         organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
 
         // remove deleted organisations
@@ -62,11 +64,15 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
 
     @Override
     public Set<String> getWhitelistedAuthorityIds(String codespace) {
-        Set<String> whitelistedIds = organisationCache.get(codespace);
+        Set<String> whitelistedIds = organisationCache.get(getOrganisationKey(codespace));
         if (whitelistedIds == null) {
             return Collections.emptySet();
         }
         return whitelistedIds;
+    }
+
+    private static String getOrganisationKey(String codespace) {
+        return ORGANISATION_CACHE_KEY_PREFIX + codespace;
     }
 
 }
