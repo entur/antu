@@ -24,6 +24,9 @@ import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import static no.entur.antu.Constants.JOB_TYPE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
@@ -38,6 +41,8 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 @Component
 public class InitValidationRouteBuilder extends BaseRouteBuilder {
 
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmnnnnnn");
+
     @Override
     public void configure() throws Exception {
         super.configure();
@@ -51,7 +56,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .process(this::setCorrelationIdIfMissing)
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyMarduk")
-                .setHeader(Constants.VALIDATION_REPORT_ID, simple("${date:now:yyyyMMddHHmmssSSS}"))
+                .setHeader(Constants.VALIDATION_REPORT_ID, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("init-dataset-validation");
