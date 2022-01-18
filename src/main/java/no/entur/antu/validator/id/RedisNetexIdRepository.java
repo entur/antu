@@ -6,11 +6,9 @@ import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.api.RLock;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.cache.Cache;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -23,8 +21,6 @@ import java.util.stream.Collectors;
 public class RedisNetexIdRepository implements NetexIdRepository {
 
     private static final String NETEX_LOCAL_ID_SET_PREFIX = "NETEX_LOCAL_ID_SET_";
-
-    private static final String COMMON_NETEX_ID_LOCK_PREFIX = "COMMON_NETEX_ID_LOCK_";
     private static final String COMMON_NETEX_ID_SET_PREFIX = "COMMON_NETEX_ID_SET_";
 
 
@@ -33,9 +29,9 @@ public class RedisNetexIdRepository implements NetexIdRepository {
 
     private final RedissonClient redissonClient;
 
-    private final Cache<String, Set<String>> commonIdsCache;
+    private final Map<String, Set<String>> commonIdsCache;
 
-    public RedisNetexIdRepository(RedissonClient redissonClient, Cache<String, Set<String>> commonIdsCache) {
+    public RedisNetexIdRepository(RedissonClient redissonClient, Map<String, Set<String>> commonIdsCache) {
         this.redissonClient = redissonClient;
         this.commonIdsCache = commonIdsCache;
     }
@@ -53,7 +49,7 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         localNetexIds.addAll(localIds);
         RSet<String> accumulatedNetexIds = redissonClient.getSet(accumulatedNetexIdsKey);
         accumulatedNetexIds.expire(1, TimeUnit.HOURS);
-        RLock lock = redissonClient.getLock(ACCUMULATED_NETEX_ID_LOCK_PREFIX + reportId);
+        RLock lock = redissonClient.getLock(getAccumulatedNetexIdsLockKey(reportId));
         try {
             lock.lock();
             Set<String> duplicates = localNetexIds.readIntersection(accumulatedNetexIdsKey);
@@ -79,33 +75,17 @@ public class RedisNetexIdRepository implements NetexIdRepository {
     @Override
     public void addSharedNetexIds(String reportId, Set<IdVersion> commonIdVersions) {
         Set<String> commonIds = commonIdVersions.stream().map(IdVersion::getId).collect(Collectors.toSet());
-        RLock lock = redissonClient.getLock(COMMON_NETEX_ID_LOCK_PREFIX + reportId);
         String cacheKey = getCommonNetexIdsKey(reportId);
-        try {
-            lock.lock();
-            Set<String> commonsIdsInCache = commonIdsCache.get(cacheKey);
-            if (commonsIdsInCache == null) {
-                commonIdsCache.put(cacheKey, commonIds);
-            } else {
-                commonsIdsInCache.addAll(commonIds);
-                commonIdsCache.put(cacheKey, commonsIdsInCache);
-            }
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
-        }
+        commonIdsCache.put(cacheKey, commonIds);
+        redissonClient.getKeys().expire(cacheKey,1, TimeUnit.HOURS);
     }
 
     @Override
     public void cleanUp(String reportId) {
-
-        redissonClient.getKeys().delete(COMMON_NETEX_ID_SET_PREFIX + reportId);
-        redissonClient.getKeys().delete(COMMON_NETEX_ID_LOCK_PREFIX + reportId);
-
+        redissonClient.getKeys().delete(getCommonNetexIdsKey(reportId));
+        redissonClient.getKeys().delete(getAccumulatedNetexIdsKey(reportId));
+        redissonClient.getKeys().delete(getAccumulatedNetexIdsLockKey(reportId));
         redissonClient.getKeys().deleteByPattern(NETEX_LOCAL_ID_SET_PREFIX + reportId);
-        redissonClient.getKeys().deleteByPattern(ACCUMULATED_NETEX_ID_SET_PREFIX + reportId);
-        redissonClient.getKeys().deleteByPattern(ACCUMULATED_NETEX_ID_LOCK_PREFIX + reportId);
     }
 
 
@@ -115,6 +95,10 @@ public class RedisNetexIdRepository implements NetexIdRepository {
 
     private String getAccumulatedNetexIdsKey(String reportId) {
         return ACCUMULATED_NETEX_ID_SET_PREFIX + reportId;
+    }
+
+    private String getAccumulatedNetexIdsLockKey(String reportId) {
+        return ACCUMULATED_NETEX_ID_LOCK_PREFIX + reportId;
     }
 
     private String getCommonNetexIdsKey(String reportId) {

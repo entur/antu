@@ -10,20 +10,12 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.codec.Kryo5Codec;
 import org.redisson.config.Config;
-import org.redisson.jcache.configuration.RedissonConfiguration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import javax.cache.Cache;
-import javax.cache.Caching;
-import javax.cache.configuration.Factory;
-import javax.cache.configuration.MutableConfiguration;
-import javax.cache.expiry.CreatedExpiryPolicy;
-import javax.cache.expiry.Duration;
-import javax.cache.expiry.ExpiryPolicy;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,8 +24,7 @@ public class CacheConfig {
 
     public static final String ORGANISATION_CACHE = "organisationCache";
     public static final String STOP_PLACE_AND_QUAY_CACHE = "stopPlaceAndQuayCache";
-
-    public static final String COMMON_IDS_CACHE_KEY = "commonIdsCache";
+    public static final String COMMON_IDS_CACHE = "commonIdsCache";
 
     @Bean
     public Config redissonConfig(RedisProperties redisProperties) {
@@ -70,16 +61,12 @@ public class CacheConfig {
     }
 
     @Bean
-    public Cache<String, Set<String>> commonIdsCache(Config redissonConfig) {
-        MutableConfiguration<String, Set<String>> cacheConfig = new MutableConfiguration<>();
-        cacheConfig.setExpiryPolicyFactory((Factory<ExpiryPolicy>) () -> new CreatedExpiryPolicy(Duration.ONE_HOUR));
-        var redissonCacheConfig = RedissonConfiguration.fromConfig(redissonConfig, cacheConfig);
-        var manager = Caching.getCachingProvider().getCacheManager();
-        return manager.createCache(COMMON_IDS_CACHE_KEY, redissonCacheConfig);
+    public Map<String, Set<String>> commonIdsCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(COMMON_IDS_CACHE, LocalCachedMapOptions.defaults());
     }
 
     @Bean
-    public NetexIdRepository netexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") Cache<String, Set<String>> commonIdsCache) {
+    public NetexIdRepository netexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") Map<String, Set<String>> commonIdsCache) {
         return new RedisNetexIdRepository(redissonClient, commonIdsCache);
     }
 
