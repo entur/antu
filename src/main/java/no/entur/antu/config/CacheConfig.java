@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Profile;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class CacheConfig {
@@ -62,7 +63,9 @@ public class CacheConfig {
 
     @Bean
     public Map<String, Set<String>> commonIdsCache(RedissonClient redissonClient) {
-        return redissonClient.getLocalCachedMap(COMMON_IDS_CACHE, LocalCachedMapOptions.defaults());
+        LocalCachedMapOptions<String, Set<String>> localCacheOptions = LocalCachedMapOptions.defaults();
+        localCacheOptions.timeToLive(1, TimeUnit.HOURS);
+        return redissonClient.getLocalCachedMap(COMMON_IDS_CACHE, localCacheOptions);
     }
 
     @Bean
