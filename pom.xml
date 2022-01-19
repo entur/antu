@@ -28,7 +28,7 @@
         <entur.helpers.version>1.0.61</entur.helpers.version>
         <netex-validator-java.version>0.0.3-SNAPSHOT</netex-validator-java.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <google.cloud.bom-version>24.0.0</google.cloud.bom-version>
+        <google.cloud.bom-version>24.2.0</google.cloud.bom-version>
         <zt-zip.version>1.14</zt-zip.version>
         <redisson.version>3.16.7</redisson.version>
         <kryo.version>5.2.1</kryo.version>
