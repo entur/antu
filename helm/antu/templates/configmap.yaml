@@ -10,6 +10,7 @@ data:
     # Camel
     camel.springboot.name=antu
     camel.dataformat.json-jackson.module-refs=jacksonJavaTimeModule
+    camel.dataformat.json-jackson.include=NON_NULL
     camel.cluster.kubernetes.enabled=true
     camel.cluster.kubernetes.cluster-labels[app]=antu
     camel.cluster.kubernetes.config-map-name=antu-leaders
