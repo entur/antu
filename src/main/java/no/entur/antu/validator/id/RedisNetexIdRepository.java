@@ -3,12 +3,12 @@ package no.entur.antu.validator.id;
 import no.entur.antu.exception.FileAlreadyValidatedException;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
+import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RLock;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -29,9 +29,9 @@ public class RedisNetexIdRepository implements NetexIdRepository {
 
     private final RedissonClient redissonClient;
 
-    private final Map<String, Set<String>> commonIdsCache;
+    private final RLocalCachedMap<String, Set<String>> commonIdsCache;
 
-    public RedisNetexIdRepository(RedissonClient redissonClient, Map<String, Set<String>> commonIdsCache) {
+    public RedisNetexIdRepository(RedissonClient redissonClient, RLocalCachedMap<String, Set<String>> commonIdsCache) {
         this.redissonClient = redissonClient;
         this.commonIdsCache = commonIdsCache;
     }
@@ -77,15 +77,14 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         Set<String> commonIds = commonIdVersions.stream().map(IdVersion::getId).collect(Collectors.toSet());
         String cacheKey = getCommonNetexIdsKey(reportId);
         commonIdsCache.put(cacheKey, commonIds);
-        redissonClient.getKeys().expire(cacheKey,1, TimeUnit.HOURS);
     }
 
     @Override
     public void cleanUp(String reportId) {
-        redissonClient.getKeys().delete(getCommonNetexIdsKey(reportId));
+        commonIdsCache.fastRemove(getCommonNetexIdsKey(reportId));
         redissonClient.getKeys().delete(getAccumulatedNetexIdsKey(reportId));
         redissonClient.getKeys().delete(getAccumulatedNetexIdsLockKey(reportId));
-        redissonClient.getKeys().deleteByPattern(NETEX_LOCAL_ID_SET_PREFIX + reportId);
+        redissonClient.getKeys().deleteByPattern(NETEX_LOCAL_ID_SET_PREFIX + reportId + '*');
     }
 
 

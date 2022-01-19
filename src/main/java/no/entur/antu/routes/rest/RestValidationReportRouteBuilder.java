@@ -139,6 +139,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .endRest();
 
         rest("/cache-admin")
+
                 .post("/clear-cache")
                 .description("Clear the cache")
                 .consumes(PLAIN)
@@ -149,7 +150,22 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Clear cache")
                 .process(this::removeAllCamelHttpHeaders)
                 .bean("cacheAdmin", "clear")
-                .routeId("admin-clear-cache")
+                .log(LoggingLevel.INFO, correlation() + "Cleared cache")
+                .routeId("admin-cache-clear")
+                .endRest()
+
+                .get("/dump-keys")
+                .description("Clear the cache")
+                .consumes(PLAIN)
+                .produces(PLAIN)
+                .responseMessage().code(200).message("Command accepted").endResponseMessage()
+                .route()
+                .to("direct:authorizeAdminRequest")
+                .log(LoggingLevel.INFO, correlation() + "Dump keys")
+                .process(this::removeAllCamelHttpHeaders)
+                .bean("cacheAdmin", "dumpKeys")
+                .log(LoggingLevel.INFO, correlation() + "Dumped keys")
+                .routeId("admin-cache-dum-keys")
                 .endRest();
 
 

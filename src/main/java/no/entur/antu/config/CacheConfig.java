@@ -6,6 +6,7 @@ import no.entur.antu.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.Redisson;
 import org.redisson.api.LocalCachedMapOptions;
+import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.codec.Kryo5Codec;
@@ -62,14 +63,14 @@ public class CacheConfig {
     }
 
     @Bean
-    public Map<String, Set<String>> commonIdsCache(RedissonClient redissonClient) {
+    public RLocalCachedMap<String, Set<String>> commonIdsCache(RedissonClient redissonClient) {
         LocalCachedMapOptions<String, Set<String>> localCacheOptions = LocalCachedMapOptions.defaults();
         localCacheOptions.timeToLive(1, TimeUnit.HOURS);
         return redissonClient.getLocalCachedMap(COMMON_IDS_CACHE, localCacheOptions);
     }
 
     @Bean
-    public NetexIdRepository netexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") Map<String, Set<String>> commonIdsCache) {
+    public NetexIdRepository netexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") RLocalCachedMap<String, Set<String>> commonIdsCache) {
         return new RedisNetexIdRepository(redissonClient, commonIdsCache);
     }
 
