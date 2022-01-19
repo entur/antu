@@ -17,9 +17,14 @@
 package no.entur.antu.config;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import org.apache.camel.component.google.pubsub.GooglePubsubComponent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class CamelConfig {
@@ -36,12 +41,17 @@ public class CamelConfig {
         return googlePubsubComponent;
     }
 
+
     /**
      * Register Java Time Module for JSON serialization/deserialization of Java Time objects.
+     *
      * @return
      */
     @Bean("jacksonJavaTimeModule")
     JavaTimeModule jacksonJavaTimeModule() {
-        return new JavaTimeModule();
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ISO_DATE_TIME));
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME));
+        return javaTimeModule;
     }
 }

@@ -43,7 +43,7 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
-    private static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
+    protected static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
     private static final String PROP_ALL_NETEX_FILE_NAMES ="ALL_NETEX_FILE_NAMES";
 
     @Override
