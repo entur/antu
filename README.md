@@ -1,5 +1,5 @@
 # Antu
-[![CircleCI](https://circleci.com/gh/entur/antu/tree/master.svg?style=svg)](https://circleci.com/gh/entur/antu/tree/master)
+[![CircleCI](https://circleci.com/gh/entur/antu/tree/main.svg?style=svg)](https://circleci.com/gh/entur/antu/tree/main)
 
 Validate NeTEx datasets against the [Nordic NeTEx Profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728891481/Nordic+NeTEx+Profile).
 
