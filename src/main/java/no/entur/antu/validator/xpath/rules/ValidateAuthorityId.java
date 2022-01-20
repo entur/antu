@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Validate the Authority ids against the Organisation Register.
+ */
 public class ValidateAuthorityId implements ValidationRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateAuthorityId.class);

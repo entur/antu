@@ -20,6 +20,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Collection;
 
+/**
+ * REST-client to access the Organisation Register REST-service.
+ */
 public class OrganisationResource {
 
     private final WebClient webClient;

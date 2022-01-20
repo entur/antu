@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Validate that the dataset references only the codespace it has access to.
+ */
 public class ValidateAllowedCodespaces implements ValidationRule {
 
     private static final String MESSAGE_FORMAT = "Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s";

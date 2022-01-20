@@ -9,6 +9,9 @@ import static no.entur.antu.Constants.NSR_XMLNSURL;
 import static no.entur.antu.Constants.PEN_XMLNS;
 import static no.entur.antu.Constants.PEN_XMLNSURL;
 
+/**
+ * A NeTEx codespace, identified by its namespace and its URL.
+ */
 public class NetexCodespace {
 
     public static final NetexCodespace NSR_NETEX_CODESPACE = new NetexCodespace(NSR_XMLNS, NSR_XMLNSURL);

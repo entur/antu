@@ -4,6 +4,9 @@ import no.entur.antu.Constants;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateExactlyOne;
 
+/**
+ * Validate that the PublicationDelivery refers to the NSR codespace.
+ */
 public class ValidateNSRCodespace extends ValidateExactlyOne {
 
     public ValidateNSRCodespace() {
