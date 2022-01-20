@@ -17,6 +17,9 @@ package no.entur.antu.organisation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Contact details for an {@link Organisation}
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrganisationContact {
 

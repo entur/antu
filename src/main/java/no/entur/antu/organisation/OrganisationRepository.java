@@ -17,10 +17,21 @@ package no.entur.antu.organisation;
 
 import java.util.Set;
 
+/**
+ * Repository that stores organisation data retrieved from the Organisation Register.
+ */
 public interface OrganisationRepository {
 
 
+    /**
+     * Retrieve data from the Organisation Register and update the cache accordingly.
+     */
     void refreshCache();
 
+    /**
+     * Return the set of whitelisted authorities for a given codespace.
+     * @param codespace the dataset codespace
+     * @return the set of whitelisted authorities for the codespace.
+     */
     Set<String> getWhitelistedAuthorityIds(String codespace);
 }

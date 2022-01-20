@@ -7,6 +7,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
+/**
+ * Validate that TrainElement objects refer to the PEN codespace (Entur-plass).
+ */
 public class TrainElementRegistryIdValidator implements ExternalReferenceValidator {
 
     public static final String NAME = "TrainElementRegistryIdValidator";
@@ -18,8 +21,8 @@ public class TrainElementRegistryIdValidator implements ExternalReferenceValidat
     }
 
     private static boolean isValidTrainElementId(IdVersion idVersion) {
-        String[] splittedId = idVersion.getId().split(":");
-        return splittedId.length == 3 && TRAIN_ELEMENT_CODESPACE.equals(splittedId[0]);
+        String[] idParts = idVersion.getId().split(":");
+        return idParts.length == 3 && TRAIN_ELEMENT_CODESPACE.equals(idParts[0]);
     }
 
 }

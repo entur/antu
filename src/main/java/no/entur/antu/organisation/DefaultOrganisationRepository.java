@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * OrganisationRepository implementation that stores data in a Redis cache.
+ */
 public class DefaultOrganisationRepository implements OrganisationRepository {
 
     private static final String ORGANISATION_CACHE_KEY_PREFIX = "ORGANISATION_CACHE_";

@@ -17,12 +17,27 @@ package no.entur.antu.stop;
 
 import java.util.Set;
 
+/**
+ * A repository to store and cache the stop place and quay ids retrieved from the National Stop Register.
+ */
 public interface StopPlaceRepository {
 
 
+    /**
+     * Return all stop place ids present in the cache.
+     * @return all stop place ids present in the cache.
+     */
     Set<String> getStopPlaceIds();
+
+    /**
+     * Return all quay ids present in the cache.
+     * @return all quay ids present in the cache.
+     */
     Set<String> getQuayIds();
 
+    /**
+     * Refresh the cache with data retrieved from the Stop Place Register.
+     */
     void refreshCache();
 
 }

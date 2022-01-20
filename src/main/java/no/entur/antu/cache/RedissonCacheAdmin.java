@@ -4,6 +4,9 @@ import org.redisson.api.RedissonClient;
 
 import java.util.stream.Collectors;
 
+/**
+ * Redisson-based implementation of the CacheAdmin interface.
+ */
 public class RedissonCacheAdmin implements CacheAdmin {
 
     private final RedissonClient redissonClient;

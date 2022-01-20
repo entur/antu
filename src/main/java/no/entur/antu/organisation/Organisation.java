@@ -20,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * An organisation defined in the Organisation Register.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Organisation {
     public static final String NETEX_AUTHORITY_ID_REFERENCE_KEY = "netexAuthorityId";

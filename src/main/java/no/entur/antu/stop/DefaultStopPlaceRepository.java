@@ -22,6 +22,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * StopPlaceRepository implementation using the new API exposed in Tiamat.
+ */
 public class DefaultStopPlaceRepository implements StopPlaceRepository {
 
     public static final String STOP_PLACE_CACHE_KEY = "stopPlaceCache";
