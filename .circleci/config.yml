@@ -120,7 +120,6 @@ workflows:
           context:
             - org-carbon
             - global
-
       - deploy-docker:
           context: global
           requires:
