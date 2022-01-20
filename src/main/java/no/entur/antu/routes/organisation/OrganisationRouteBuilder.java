@@ -38,8 +38,7 @@ public class OrganisationRouteBuilder extends BaseRouteBuilder {
     @Override
     public void configure() throws Exception {
         super.configure();
-
-        from("quartz://antu/refreshOrganisationCache?" + quartzTrigger)
+        from("master:lockOnAntuRefreshOrganisationCache:quartz://antu/refreshOrganisationCache?" + quartzTrigger)
                 .to("direct:refresh-organisation-cache")
                 .routeId("refresh-organisation-cache-quartz");
 
