@@ -32,7 +32,7 @@ public class NetexCodespace {
     }
 
     private static NetexCodespace getNetexCodespaceFor(String codespace) {
-        return new NetexCodespace(codespace.toUpperCase(Locale.ROOT), "http://www.rutebanken.org/ns/" + codespace.toLowerCase(Locale.ROOT));
+        return new NetexCodespace(codespace, "http://www.rutebanken.org/ns/" + codespace.toLowerCase(Locale.ROOT));
     }
 
     public String getXmlns() {
