@@ -27,6 +27,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static no.entur.antu.Constants.DATASET_CODESPACE;
+import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.JOB_TYPE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
@@ -54,6 +56,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
 
         from("direct:initDatasetValidation")
                 .process(this::setCorrelationIdIfMissing)
+                .setHeader(DATASET_CODESPACE, header(DATASET_REFERENTIAL).regexReplaceAll("rb_", ""))
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyMarduk")
                 .setHeader(Constants.VALIDATION_REPORT_ID, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()))
