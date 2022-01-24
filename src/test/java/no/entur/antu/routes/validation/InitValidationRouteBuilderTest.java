@@ -58,9 +58,11 @@ import java.util.Map;
 import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
+import static no.entur.antu.Constants.CORRELATION_ID;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class, properties = {
@@ -142,6 +144,8 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(CORRELATION_ID) != null));
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID) != null));
     }
 
     @Test
