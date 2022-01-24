@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static no.entur.antu.Constants.CORRELATION_ID;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
@@ -62,7 +63,6 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
                 .process(this::removeSynchronizationForAggregatedExchange)
                 .aggregate(header(VALIDATION_REPORT_ID)).aggregationStrategy(new CommonFilesAggregationStrategy()).completionTimeout(1800000)
                 .process(this::addSynchronizationForAggregatedExchange)
-                .process(this::setNewCorrelationId)
                 .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} common files (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
                 .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_COMMON_FILES))
@@ -98,6 +98,7 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
             aggregatedExchange.getIn().setHeader(VALIDATION_REPORT_ID, newExchange.getIn().getHeader(VALIDATION_REPORT_ID));
             aggregatedExchange.getIn().setHeader(DATASET_CODESPACE, newExchange.getIn().getHeader(DATASET_CODESPACE));
             aggregatedExchange.getIn().setHeader(DATASET_REFERENTIAL, newExchange.getIn().getHeader(DATASET_REFERENTIAL));
+            aggregatedExchange.getIn().setHeader(CORRELATION_ID, newExchange.getIn().getHeader(CORRELATION_ID));
             aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getBody());
             // check if all individual reports have been received
             // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.

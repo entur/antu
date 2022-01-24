@@ -59,7 +59,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .setHeader(DATASET_CODESPACE, header(DATASET_REFERENTIAL).regexReplaceAll("rb_", ""))
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyMarduk")
-                .setHeader(Constants.VALIDATION_REPORT_ID, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()))
+                .setHeader(Constants.VALIDATION_REPORT_ID, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()).substring(0, 18))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("init-dataset-validation");
