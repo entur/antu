@@ -48,7 +48,19 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
 
     private static final int ACK_DEADLINE_EXTENSION = 600;
     private static final String SYNCHRONIZATION_HOLDER = "SYNCHRONIZATION_HOLDER";
-    private static final String[] PUBSUB_OUTBOUND_HEADERS_WHITELIST = {Constants.CORRELATION_ID, Constants.DATASET_CODESPACE, Constants.DATASET_NB_COMMON_FILES, Constants.DATASET_NB_NETEX_FILES, Constants.FILE_HANDLE, NETEX_FILE_NAME, Constants.JOB_TYPE, Constants.VALIDATION_REPORT_ID};
+
+    /**
+     * Only these headers are copied from the Camel message to a PubSub topic.
+     */
+    private static final String[] PUBSUB_OUTBOUND_HEADERS_WHITELIST = {
+            Constants.CORRELATION_ID,
+            Constants.DATASET_REFERENTIAL,
+            Constants.DATASET_CODESPACE,
+            Constants.DATASET_NB_COMMON_FILES,
+            Constants.DATASET_NB_NETEX_FILES,
+            Constants.FILE_HANDLE, NETEX_FILE_NAME,
+            Constants.JOB_TYPE,
+            Constants.VALIDATION_REPORT_ID};
 
     @Value("${quartz.lenient.fire.time.ms:180000}")
     private int lenientFireTimeMs;

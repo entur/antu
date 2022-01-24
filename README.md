@@ -13,7 +13,7 @@ When all validation jobs are complete, the individual ValidationReports are comb
 Antu sends a message to a PubSub topic to notify Marduk that the validation is complete.
 
 # Validation rules
-Ant uses the [NeTEx validator library](https://github.com/entur/netex-validator-java) to execute a set of validation rules on the NeTEx dataset.  
+Antu uses the [NeTEx validator library](https://github.com/entur/netex-validator-java) to execute a set of validation rules on the NeTEx dataset.  
 In addition to the default rules present in this library, Antu defines a set of rules that are specific to Entur and relevant in a Norwegian context.  
 This applies to validation against the [National Stop Register](https://stoppested.entur.org/) or against the Organisation Register.
 

@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import static no.entur.antu.Constants.AGGREGATED_VALIDATION_REPORT;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
+import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
@@ -157,6 +158,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
             aggregatedExchange.getIn().setHeader(VALIDATION_REPORT_ID, newExchange.getIn().getHeader(VALIDATION_REPORT_ID));
             aggregatedExchange.getIn().setHeader(DATASET_CODESPACE, newExchange.getIn().getHeader(DATASET_CODESPACE));
+            aggregatedExchange.getIn().setHeader(DATASET_REFERENTIAL, newExchange.getIn().getHeader(DATASET_REFERENTIAL));
             String currentNetexFileNameList = aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES, String.class);
             if (currentNetexFileNameList == null) {
                 aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getHeader(NETEX_FILE_NAME));

@@ -58,6 +58,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
+import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 
@@ -124,7 +125,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
                 .to("mock:notifyMarduk"));
 
         notifyMarduk.expectedMessageCount(2);
-        notifyMarduk.setResultWaitTime(15000);
+       notifyMarduk.setResultWaitTime(15000);
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
@@ -135,13 +136,12 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         context.start();
         Map<String, Object> headers = new HashMap<>();
         headers.put(Constants.FILE_HANDLE, datasetBlobName);
-        headers.put(Constants.DATASET_CODESPACE, "FLB");
+        headers.put(Constants.DATASET_REFERENTIAL, "flb");
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyMarduk.assertIsSatisfied();
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
-
-
+        Assertions.assertTrue(notifyMarduk.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
     }
 
     @Test
