@@ -41,6 +41,10 @@ public final class Constants {
     public static final String STATUS_VALIDATION_OK = "ok";
     public static final String STATUS_VALIDATION_FAILED = "failed";
 
+    public static final String VALIDATION_STAGE_HEADER = "EnturValidationStage";
+    public static final String VALIDATION_STAGE_PREVALIDATION = "EnturValidationStagePreValidation";
+    public static final String VALIDATION_STAGE_EXPORT_NETEX_POSTVALIDATION = "EnturValidationStageExportNetexPostValidation";
+
 
     public static final String VALIDATION_REPORT_ID = "EnturValidationReportId";
 
