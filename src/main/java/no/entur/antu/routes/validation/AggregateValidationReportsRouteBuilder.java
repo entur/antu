@@ -117,7 +117,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         from("direct:downloadValidationReport")
                 .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
-                        .append(header(DATASET_CODESPACE))
+                        .append(header(DATASET_REFERENTIAL))
                         .append("/")
                         .append(header(VALIDATION_REPORT_ID))
                         .append("/")
@@ -131,7 +131,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         from("direct:uploadAggregatedValidationReport")
                 .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
-                        .append(header(DATASET_CODESPACE))
+                        .append(header(DATASET_REFERENTIAL))
                         .append("/validation-report-")
                         .append(header(VALIDATION_REPORT_ID))
                         .append(".json"))

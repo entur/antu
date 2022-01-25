@@ -118,6 +118,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .responseMessage().code(500).message("Internal error").endResponseMessage()
                 .route()
                 .to("direct:authorizeEditorRequest")
+
                 .setHeader(FILE_HANDLE, constant(BLOBSTORE_PATH_ANTU_REPORTS)
                         .append(header(CODESPACE_PARAM))
                         .append(Constants.VALIDATION_REPORT_PREFIX)

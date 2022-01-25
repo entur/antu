@@ -140,7 +140,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
     }
 
     protected String correlation() {
-        return "[codespace=${header." + Constants.DATASET_CODESPACE + "} reportId=${header." + Constants.VALIDATION_REPORT_ID + "} fileName= ${header." + NETEX_FILE_NAME  + "} correlationId=${header." + Constants.CORRELATION_ID + "}] ";
+        return "[referential=${header." + Constants.DATASET_REFERENTIAL + "} reportId=${header." + Constants.VALIDATION_REPORT_ID + "} fileName= ${header." + NETEX_FILE_NAME  + "} correlationId=${header." + Constants.CORRELATION_ID + "}] ";
     }
 
     public void extendAckDeadline(Exchange exchange) throws IOException {
