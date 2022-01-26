@@ -1,0 +1,2262 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:gis="http://www.opengis.net/gml/3.2" xmlns:siri="http://www.siri.org.uk/siri" version="1.13:NO-NeTEx-networktimetable:1.3">
+  <PublicationTimestamp>2021-10-07T13:40:22.702</PublicationTimestamp>
+  <ParticipantRef>RB</ParticipantRef>
+  <Description>Flåmsbana</Description>
+  <dataObjects>
+    <CompositeFrame created="2021-09-09T14:20:20.905" version="1" id="FLB:CompositeFrame:188">
+      <validityConditions>
+        <AvailabilityCondition version="1" id="FLB:AvailabilityCondition:1">
+          <FromDate>2021-10-05T00:00:00</FromDate>
+          <ToDate>2022-10-07T00:00:00</ToDate>
+        </AvailabilityCondition>
+      </validityConditions>
+      <codespaces>
+        <Codespace id="nsr">
+          <Xmlns>NSR</Xmlns>
+          <XmlnsUrl>http://www.rutebanken.org/ns/nsr-invalid</XmlnsUrl>
+        </Codespace>
+        <Codespace id="flb">
+          <Xmlns>FLB</Xmlns>
+          <XmlnsUrl>http://www.rutebanken.org/ns/flb</XmlnsUrl>
+        </Codespace>
+      </codespaces>
+      <FrameDefaults>
+        <DefaultLocale>
+          <TimeZone>Europe/Oslo</TimeZone>
+          <DefaultLanguage>no</DefaultLanguage>
+        </DefaultLocale>
+      </FrameDefaults>
+      <frames>
+        <ServiceFrame version="1" id="FLB:ServiceFrame:189">
+          <routes>
+            <Route version="0" id="FLB:Route:1-3">
+              <Name>Myrdal stasjon - Flåm stasjon</Name>
+              <ShortName>Myrdal stasjon - Flåm stasjon</ShortName>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="FLB:PointOnRoute:2">
+                  <RoutePointRef ref="FLB:RoutePoint:760232411"/>
+                </PointOnRoute>
+                <PointOnRoute order="2" version="1" id="FLB:PointOnRoute:3">
+                  <RoutePointRef ref="FLB:RoutePoint:760235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="3" version="1" id="FLB:PointOnRoute:4">
+                  <RoutePointRef ref="FLB:RoutePoint:761235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="4" version="1" id="FLB:PointOnRoute:5">
+                  <RoutePointRef ref="FLB:RoutePoint:762235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="5" version="1" id="FLB:PointOnRoute:6">
+                  <RoutePointRef ref="FLB:RoutePoint:764235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="6" version="1" id="FLB:PointOnRoute:7">
+                  <RoutePointRef ref="FLB:RoutePoint:760235901"/>
+                </PointOnRoute>
+                <PointOnRoute order="7" version="1" id="FLB:PointOnRoute:8">
+                  <RoutePointRef ref="FLB:RoutePoint:760236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="8" version="1" id="FLB:PointOnRoute:9">
+                  <RoutePointRef ref="FLB:RoutePoint:761236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="9" version="1" id="FLB:PointOnRoute:10">
+                  <RoutePointRef ref="FLB:RoutePoint:760236104"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+            <Route version="0" id="FLB:Route:1-6">
+              <Name>Myrdal stasjon - Flåm stasjon</Name>
+              <ShortName>Myrdal stasjon - Flåm stasjon</ShortName>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="FLB:PointOnRoute:11">
+                  <RoutePointRef ref="FLB:RoutePoint:760232411"/>
+                </PointOnRoute>
+                <PointOnRoute order="2" version="1" id="FLB:PointOnRoute:12">
+                  <RoutePointRef ref="FLB:RoutePoint:760235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="3" version="1" id="FLB:PointOnRoute:13">
+                  <RoutePointRef ref="FLB:RoutePoint:761235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="4" version="1" id="FLB:PointOnRoute:14">
+                  <RoutePointRef ref="FLB:RoutePoint:762235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="5" version="1" id="FLB:PointOnRoute:15">
+                  <RoutePointRef ref="FLB:RoutePoint:764235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="6" version="1" id="FLB:PointOnRoute:16">
+                  <RoutePointRef ref="FLB:RoutePoint:760235901"/>
+                </PointOnRoute>
+                <PointOnRoute order="7" version="1" id="FLB:PointOnRoute:17">
+                  <RoutePointRef ref="FLB:RoutePoint:760236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="8" version="1" id="FLB:PointOnRoute:18">
+                  <RoutePointRef ref="FLB:RoutePoint:761236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="9" version="1" id="FLB:PointOnRoute:19">
+                  <RoutePointRef ref="FLB:RoutePoint:760236105"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+            <Route version="0" id="FLB:Route:1-9">
+              <Name>Myrdal stasjon - Flåm stasjon</Name>
+              <ShortName>Myrdal stasjon - Flåm stasjon</ShortName>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="FLB:PointOnRoute:20">
+                  <RoutePointRef ref="FLB:RoutePoint:760232411"/>
+                </PointOnRoute>
+                <PointOnRoute order="2" version="1" id="FLB:PointOnRoute:21">
+                  <RoutePointRef ref="FLB:RoutePoint:760235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="3" version="1" id="FLB:PointOnRoute:22">
+                  <RoutePointRef ref="FLB:RoutePoint:761235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="4" version="1" id="FLB:PointOnRoute:23">
+                  <RoutePointRef ref="FLB:RoutePoint:762235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="5" version="1" id="FLB:PointOnRoute:24">
+                  <RoutePointRef ref="FLB:RoutePoint:764235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="6" version="1" id="FLB:PointOnRoute:25">
+                  <RoutePointRef ref="FLB:RoutePoint:760235901"/>
+                </PointOnRoute>
+                <PointOnRoute order="7" version="1" id="FLB:PointOnRoute:26">
+                  <RoutePointRef ref="FLB:RoutePoint:760236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="8" version="1" id="FLB:PointOnRoute:27">
+                  <RoutePointRef ref="FLB:RoutePoint:761236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="9" version="1" id="FLB:PointOnRoute:28">
+                  <RoutePointRef ref="FLB:RoutePoint:760236104"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+            <Route version="0" id="FLB:Route:1-5">
+              <Name>Flåm stasjon - Myrdal stasjon</Name>
+              <ShortName>Flåm stasjon - Myrdal stasjon</ShortName>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="FLB:PointOnRoute:29">
+                  <RoutePointRef ref="FLB:RoutePoint:760236104"/>
+                </PointOnRoute>
+                <PointOnRoute order="2" version="1" id="FLB:PointOnRoute:30">
+                  <RoutePointRef ref="FLB:RoutePoint:761236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="3" version="1" id="FLB:PointOnRoute:31">
+                  <RoutePointRef ref="FLB:RoutePoint:760236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="4" version="1" id="FLB:PointOnRoute:32">
+                  <RoutePointRef ref="FLB:RoutePoint:760235901"/>
+                </PointOnRoute>
+                <PointOnRoute order="5" version="1" id="FLB:PointOnRoute:33">
+                  <RoutePointRef ref="FLB:RoutePoint:764235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="6" version="1" id="FLB:PointOnRoute:34">
+                  <RoutePointRef ref="FLB:RoutePoint:762235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="7" version="1" id="FLB:PointOnRoute:35">
+                  <RoutePointRef ref="FLB:RoutePoint:761235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="8" version="1" id="FLB:PointOnRoute:36">
+                  <RoutePointRef ref="FLB:RoutePoint:760235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="9" version="1" id="FLB:PointOnRoute:37">
+                  <RoutePointRef ref="FLB:RoutePoint:760232411"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+            <Route version="0" id="FLB:Route:1-8">
+              <Name>Flåm stasjon - Myrdal stasjon</Name>
+              <ShortName>Flåm stasjon - Myrdal stasjon</ShortName>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="FLB:PointOnRoute:38">
+                  <RoutePointRef ref="FLB:RoutePoint:760236104"/>
+                </PointOnRoute>
+                <PointOnRoute order="2" version="1" id="FLB:PointOnRoute:39">
+                  <RoutePointRef ref="FLB:RoutePoint:761236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="3" version="1" id="FLB:PointOnRoute:40">
+                  <RoutePointRef ref="FLB:RoutePoint:760236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="4" version="1" id="FLB:PointOnRoute:41">
+                  <RoutePointRef ref="FLB:RoutePoint:760235901"/>
+                </PointOnRoute>
+                <PointOnRoute order="5" version="1" id="FLB:PointOnRoute:42">
+                  <RoutePointRef ref="FLB:RoutePoint:764235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="6" version="1" id="FLB:PointOnRoute:43">
+                  <RoutePointRef ref="FLB:RoutePoint:762235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="7" version="1" id="FLB:PointOnRoute:44">
+                  <RoutePointRef ref="FLB:RoutePoint:761235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="8" version="1" id="FLB:PointOnRoute:45">
+                  <RoutePointRef ref="FLB:RoutePoint:760235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="9" version="1" id="FLB:PointOnRoute:46">
+                  <RoutePointRef ref="FLB:RoutePoint:760232411"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+            <Route version="0" id="FLB:Route:1-4">
+              <Name>Flåm stasjon - Myrdal stasjon</Name>
+              <ShortName>Flåm stasjon - Myrdal stasjon</ShortName>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="FLB:PointOnRoute:47">
+                  <RoutePointRef ref="FLB:RoutePoint:760236104"/>
+                </PointOnRoute>
+                <PointOnRoute order="2" version="1" id="FLB:PointOnRoute:48">
+                  <RoutePointRef ref="FLB:RoutePoint:761236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="3" version="1" id="FLB:PointOnRoute:49">
+                  <RoutePointRef ref="FLB:RoutePoint:760236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="4" version="1" id="FLB:PointOnRoute:50">
+                  <RoutePointRef ref="FLB:RoutePoint:764235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="5" version="1" id="FLB:PointOnRoute:51">
+                  <RoutePointRef ref="FLB:RoutePoint:762235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="6" version="1" id="FLB:PointOnRoute:52">
+                  <RoutePointRef ref="FLB:RoutePoint:761235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="7" version="1" id="FLB:PointOnRoute:53">
+                  <RoutePointRef ref="FLB:RoutePoint:760235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="8" version="1" id="FLB:PointOnRoute:54">
+                  <RoutePointRef ref="FLB:RoutePoint:760232411"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+            <Route version="0" id="FLB:Route:1-2">
+              <Name>Flåm stasjon - Myrdal stasjon</Name>
+              <ShortName>Flåm stasjon - Myrdal stasjon</ShortName>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <pointsInSequence>
+                <PointOnRoute order="1" version="1" id="FLB:PointOnRoute:55">
+                  <RoutePointRef ref="FLB:RoutePoint:760236105"/>
+                </PointOnRoute>
+                <PointOnRoute order="2" version="1" id="FLB:PointOnRoute:56">
+                  <RoutePointRef ref="FLB:RoutePoint:761236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="3" version="1" id="FLB:PointOnRoute:57">
+                  <RoutePointRef ref="FLB:RoutePoint:760236001"/>
+                </PointOnRoute>
+                <PointOnRoute order="4" version="1" id="FLB:PointOnRoute:58">
+                  <RoutePointRef ref="FLB:RoutePoint:760235901"/>
+                </PointOnRoute>
+                <PointOnRoute order="5" version="1" id="FLB:PointOnRoute:59">
+                  <RoutePointRef ref="FLB:RoutePoint:764235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="6" version="1" id="FLB:PointOnRoute:60">
+                  <RoutePointRef ref="FLB:RoutePoint:762235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="7" version="1" id="FLB:PointOnRoute:61">
+                  <RoutePointRef ref="FLB:RoutePoint:761235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="8" version="1" id="FLB:PointOnRoute:62">
+                  <RoutePointRef ref="FLB:RoutePoint:760235801"/>
+                </PointOnRoute>
+                <PointOnRoute order="9" version="1" id="FLB:PointOnRoute:63">
+                  <RoutePointRef ref="FLB:RoutePoint:760232411"/>
+                </PointOnRoute>
+              </pointsInSequence>
+            </Route>
+          </routes>
+          <lines>
+            <Line version="0" id="FLB:Line:42">
+              <Name>Flåmsbana</Name>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <PublicCode>42</PublicCode>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <RepresentedByGroupRef ref="FLB:Network:1"/>
+              <Presentation>
+                <Colour>FF0000</Colour>
+                <TextColour>FFFFFF</TextColour>
+              </Presentation>
+            </Line>
+          </lines>
+          <journeyPatterns>
+            <JourneyPattern version="0" id="FLB:JourneyPattern:1-3">
+              <Name>Myrdal stasjon - Flåm stasjon</Name>
+              <RouteRef ref="FLB:Route:1-3" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="FLB:StopPointInJourneyPattern:1-3-1">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760232411"/>
+                  <ForAlighting>false</ForAlighting>
+                  <DestinationDisplayRef ref="FLB:DestinationDisplay:1"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="FLB:StopPointInJourneyPattern:1-3-2">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="3" version="0" id="FLB:StopPointInJourneyPattern:1-3-3">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="4" version="0" id="FLB:StopPointInJourneyPattern:1-3-4">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:762235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="5" version="0" id="FLB:StopPointInJourneyPattern:1-3-5">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:764235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="6" version="0" id="FLB:StopPointInJourneyPattern:1-3-6">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235901"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="7" version="0" id="FLB:StopPointInJourneyPattern:1-3-7">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="8" version="0" id="FLB:StopPointInJourneyPattern:1-3-8">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="9" version="0" id="FLB:StopPointInJourneyPattern:1-3-9">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236104"/>
+                  <ForBoarding>false</ForBoarding>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+              <linksInSequence>
+                <ServiceLinkInJourneyPattern order="1" version="1" id="FLB:ServiceLinkInJourneyPattern:64">
+                  <ServiceLinkRef ref="FLB:ServiceLink:8eb02092-73dc-46ec-b984-c8f17eac0f02"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="2" version="1" id="FLB:ServiceLinkInJourneyPattern:66">
+                  <ServiceLinkRef ref="FLB:ServiceLink:44e64698-8f4c-47c2-a651-53783dc38dce"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="3" version="1" id="FLB:ServiceLinkInJourneyPattern:68">
+                  <ServiceLinkRef ref="FLB:ServiceLink:80e73da5-8f29-44c4-8f51-cb6e01f7ea2f"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="4" version="1" id="FLB:ServiceLinkInJourneyPattern:70">
+                  <ServiceLinkRef ref="FLB:ServiceLink:c74d3a11-e818-471e-b06b-ea812cad1bad"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="5" version="1" id="FLB:ServiceLinkInJourneyPattern:72">
+                  <ServiceLinkRef ref="FLB:ServiceLink:a6fd01d8-012b-4707-adbd-90872906ce88"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="6" version="1" id="FLB:ServiceLinkInJourneyPattern:74">
+                  <ServiceLinkRef ref="FLB:ServiceLink:923992b3-a040-4cd7-ac1a-64313e214a89"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="7" version="1" id="FLB:ServiceLinkInJourneyPattern:76">
+                  <ServiceLinkRef ref="FLB:ServiceLink:135deb8c-323f-46db-9302-f2e5c698d3e9"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="8" version="1" id="FLB:ServiceLinkInJourneyPattern:78">
+                  <ServiceLinkRef ref="FLB:ServiceLink:c47ca58f-1756-4f24-8643-456fba87d4b2"/>
+                </ServiceLinkInJourneyPattern>
+              </linksInSequence>
+            </JourneyPattern>
+            <JourneyPattern version="0" id="FLB:JourneyPattern:1-6">
+              <Name>Myrdal stasjon - Flåm stasjon</Name>
+              <RouteRef ref="FLB:Route:1-6" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="FLB:StopPointInJourneyPattern:1-6-1">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760232411"/>
+                  <ForAlighting>false</ForAlighting>
+                  <DestinationDisplayRef ref="FLB:DestinationDisplay:1"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="FLB:StopPointInJourneyPattern:1-6-2">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="3" version="0" id="FLB:StopPointInJourneyPattern:1-6-3">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="4" version="0" id="FLB:StopPointInJourneyPattern:1-6-4">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:762235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="5" version="0" id="FLB:StopPointInJourneyPattern:1-6-5">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:764235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="6" version="0" id="FLB:StopPointInJourneyPattern:1-6-6">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235901"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="7" version="0" id="FLB:StopPointInJourneyPattern:1-6-7">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="8" version="0" id="FLB:StopPointInJourneyPattern:1-6-8">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="9" version="0" id="FLB:StopPointInJourneyPattern:1-6-9">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236105"/>
+                  <ForBoarding>false</ForBoarding>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+              <linksInSequence>
+                <ServiceLinkInJourneyPattern order="1" version="1" id="FLB:ServiceLinkInJourneyPattern:80">
+                  <ServiceLinkRef ref="FLB:ServiceLink:24248318-3234-4421-8696-f8473bf6d9fe"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="2" version="1" id="FLB:ServiceLinkInJourneyPattern:82">
+                  <ServiceLinkRef ref="FLB:ServiceLink:5633c12d-f76e-4565-a344-28cfce8bd1f4"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="3" version="1" id="FLB:ServiceLinkInJourneyPattern:84">
+                  <ServiceLinkRef ref="FLB:ServiceLink:e1c7944f-4af6-4cdc-8fcb-5742fd3afb81"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="4" version="1" id="FLB:ServiceLinkInJourneyPattern:86">
+                  <ServiceLinkRef ref="FLB:ServiceLink:7d34e761-cc75-4a0c-8a0d-da2b560c629d"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="5" version="1" id="FLB:ServiceLinkInJourneyPattern:88">
+                  <ServiceLinkRef ref="FLB:ServiceLink:fc296f44-55bd-470c-8a32-c09f774071f4"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="6" version="1" id="FLB:ServiceLinkInJourneyPattern:90">
+                  <ServiceLinkRef ref="FLB:ServiceLink:800a4013-f0bd-4531-b806-0c98aeb70fed"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="7" version="1" id="FLB:ServiceLinkInJourneyPattern:92">
+                  <ServiceLinkRef ref="FLB:ServiceLink:fc5fb1ce-a04f-4047-88e7-396488f3b618"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="8" version="1" id="FLB:ServiceLinkInJourneyPattern:94">
+                  <ServiceLinkRef ref="FLB:ServiceLink:e0bce670-961f-4f6a-9afb-140ca5260db7"/>
+                </ServiceLinkInJourneyPattern>
+              </linksInSequence>
+            </JourneyPattern>
+            <JourneyPattern version="0" id="FLB:JourneyPattern:1-9">
+              <Name>Myrdal stasjon - Flåm stasjon</Name>
+              <RouteRef ref="FLB:Route:1-9" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="FLB:StopPointInJourneyPattern:1-9-1">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760232411"/>
+                  <ForAlighting>false</ForAlighting>
+                  <DestinationDisplayRef ref="FLB:DestinationDisplay:1"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="FLB:StopPointInJourneyPattern:1-9-2">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="3" version="0" id="FLB:StopPointInJourneyPattern:1-9-3">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="4" version="0" id="FLB:StopPointInJourneyPattern:1-9-4">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:762235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="5" version="0" id="FLB:StopPointInJourneyPattern:1-9-5">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:764235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="6" version="0" id="FLB:StopPointInJourneyPattern:1-9-6">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235901"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="7" version="0" id="FLB:StopPointInJourneyPattern:1-9-7">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="8" version="0" id="FLB:StopPointInJourneyPattern:1-9-8">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="9" version="0" id="FLB:StopPointInJourneyPattern:1-9-9">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236104"/>
+                  <ForBoarding>false</ForBoarding>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+              <linksInSequence>
+                <ServiceLinkInJourneyPattern order="1" version="1" id="FLB:ServiceLinkInJourneyPattern:96">
+                  <ServiceLinkRef ref="FLB:ServiceLink:f18fc2a4-873a-42e6-930e-360e21facc8c"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="2" version="1" id="FLB:ServiceLinkInJourneyPattern:98">
+                  <ServiceLinkRef ref="FLB:ServiceLink:3cbb7e20-6cac-408c-b605-cbc7191ae676"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="3" version="1" id="FLB:ServiceLinkInJourneyPattern:100">
+                  <ServiceLinkRef ref="FLB:ServiceLink:72353743-d689-4800-a318-7020618165c1"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="4" version="1" id="FLB:ServiceLinkInJourneyPattern:102">
+                  <ServiceLinkRef ref="FLB:ServiceLink:f43b4824-d73a-45ff-8000-d07fcc4ec9d1"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="5" version="1" id="FLB:ServiceLinkInJourneyPattern:104">
+                  <ServiceLinkRef ref="FLB:ServiceLink:7037644c-d5ad-4090-88e2-d9857409d22d"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="6" version="1" id="FLB:ServiceLinkInJourneyPattern:106">
+                  <ServiceLinkRef ref="FLB:ServiceLink:fc2bc433-74f9-4e7b-812a-199ca8af894b"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="7" version="1" id="FLB:ServiceLinkInJourneyPattern:108">
+                  <ServiceLinkRef ref="FLB:ServiceLink:2200eea5-9ad1-4cc5-bbff-1d6ea8c9aa15"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="8" version="1" id="FLB:ServiceLinkInJourneyPattern:110">
+                  <ServiceLinkRef ref="FLB:ServiceLink:d57219e7-ffa3-4880-88b1-a9e08cb44607"/>
+                </ServiceLinkInJourneyPattern>
+              </linksInSequence>
+            </JourneyPattern>
+            <JourneyPattern version="0" id="FLB:JourneyPattern:1-5">
+              <Name>Flåm stasjon - Myrdal stasjon</Name>
+              <RouteRef ref="FLB:Route:1-5" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="FLB:StopPointInJourneyPattern:1-5-1">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236104"/>
+                  <ForAlighting>false</ForAlighting>
+                  <DestinationDisplayRef ref="FLB:DestinationDisplay:0"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="FLB:StopPointInJourneyPattern:1-5-2">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="3" version="0" id="FLB:StopPointInJourneyPattern:1-5-3">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="4" version="0" id="FLB:StopPointInJourneyPattern:1-5-4">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235901"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="5" version="0" id="FLB:StopPointInJourneyPattern:1-5-5">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:764235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="6" version="0" id="FLB:StopPointInJourneyPattern:1-5-6">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:762235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="7" version="0" id="FLB:StopPointInJourneyPattern:1-5-7">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="8" version="0" id="FLB:StopPointInJourneyPattern:1-5-8">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="9" version="0" id="FLB:StopPointInJourneyPattern:1-5-9">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760232411"/>
+                  <ForBoarding>false</ForBoarding>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+              <linksInSequence>
+                <ServiceLinkInJourneyPattern order="1" version="1" id="FLB:ServiceLinkInJourneyPattern:112">
+                  <ServiceLinkRef ref="FLB:ServiceLink:0a584675-b047-4afd-9b51-bc18194ea928"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="2" version="1" id="FLB:ServiceLinkInJourneyPattern:114">
+                  <ServiceLinkRef ref="FLB:ServiceLink:acac7ac0-ae5e-49e4-9622-3d4ddbb4e4af"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="3" version="1" id="FLB:ServiceLinkInJourneyPattern:116">
+                  <ServiceLinkRef ref="FLB:ServiceLink:6577c5b0-1af7-473f-b437-b1d009252611"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="4" version="1" id="FLB:ServiceLinkInJourneyPattern:118">
+                  <ServiceLinkRef ref="FLB:ServiceLink:a9a5fc7b-3cba-4d5b-a561-d012ea93e3a5"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="5" version="1" id="FLB:ServiceLinkInJourneyPattern:120">
+                  <ServiceLinkRef ref="FLB:ServiceLink:83a6f777-86a4-4c93-9c1d-bd445e6e3b85"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="6" version="1" id="FLB:ServiceLinkInJourneyPattern:122">
+                  <ServiceLinkRef ref="FLB:ServiceLink:d4b2a2b7-920e-4574-bc04-d504c3be9f8e"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="7" version="1" id="FLB:ServiceLinkInJourneyPattern:124">
+                  <ServiceLinkRef ref="FLB:ServiceLink:27ade0a2-628a-496a-9b72-c989cb5e6cf0"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="8" version="1" id="FLB:ServiceLinkInJourneyPattern:126">
+                  <ServiceLinkRef ref="FLB:ServiceLink:c7d10815-b446-43c7-9a55-7f3058c4fb10"/>
+                </ServiceLinkInJourneyPattern>
+              </linksInSequence>
+            </JourneyPattern>
+            <JourneyPattern version="0" id="FLB:JourneyPattern:1-8">
+              <Name>Flåm stasjon - Myrdal stasjon</Name>
+              <RouteRef ref="FLB:Route:1-8" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="FLB:StopPointInJourneyPattern:1-8-1">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236104"/>
+                  <ForAlighting>false</ForAlighting>
+                  <DestinationDisplayRef ref="FLB:DestinationDisplay:0"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="FLB:StopPointInJourneyPattern:1-8-2">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="3" version="0" id="FLB:StopPointInJourneyPattern:1-8-3">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="4" version="0" id="FLB:StopPointInJourneyPattern:1-8-4">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235901"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="5" version="0" id="FLB:StopPointInJourneyPattern:1-8-5">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:764235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="6" version="0" id="FLB:StopPointInJourneyPattern:1-8-6">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:762235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="7" version="0" id="FLB:StopPointInJourneyPattern:1-8-7">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="8" version="0" id="FLB:StopPointInJourneyPattern:1-8-8">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="9" version="0" id="FLB:StopPointInJourneyPattern:1-8-9">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760232411"/>
+                  <ForBoarding>false</ForBoarding>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+              <linksInSequence>
+                <ServiceLinkInJourneyPattern order="1" version="1" id="FLB:ServiceLinkInJourneyPattern:128">
+                  <ServiceLinkRef ref="FLB:ServiceLink:ae842178-5b35-42f4-b529-4d639a8423a7"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="2" version="1" id="FLB:ServiceLinkInJourneyPattern:130">
+                  <ServiceLinkRef ref="FLB:ServiceLink:82d80834-0204-46e7-a959-2755fb2a47aa"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="3" version="1" id="FLB:ServiceLinkInJourneyPattern:132">
+                  <ServiceLinkRef ref="FLB:ServiceLink:da907d3f-f245-470e-87e5-9018cc4db818"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="4" version="1" id="FLB:ServiceLinkInJourneyPattern:134">
+                  <ServiceLinkRef ref="FLB:ServiceLink:87890ef8-f67e-4670-a57d-a258fed380a9"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="5" version="1" id="FLB:ServiceLinkInJourneyPattern:136">
+                  <ServiceLinkRef ref="FLB:ServiceLink:f8b6e77e-8630-46fd-97d8-340e300daf45"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="6" version="1" id="FLB:ServiceLinkInJourneyPattern:138">
+                  <ServiceLinkRef ref="FLB:ServiceLink:a712c824-2171-47e7-a9ec-929e8a124e6b"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="7" version="1" id="FLB:ServiceLinkInJourneyPattern:140">
+                  <ServiceLinkRef ref="FLB:ServiceLink:8e62ca31-a910-4c21-882e-e4f97815fd9d"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="8" version="1" id="FLB:ServiceLinkInJourneyPattern:142">
+                  <ServiceLinkRef ref="FLB:ServiceLink:cf25b7e0-2c9c-4153-b4cd-d5f60bc98ab0"/>
+                </ServiceLinkInJourneyPattern>
+              </linksInSequence>
+            </JourneyPattern>
+            <JourneyPattern version="0" id="FLB:JourneyPattern:1-4">
+              <Name>Flåm stasjon - Myrdal stasjon</Name>
+              <RouteRef ref="FLB:Route:1-4" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="FLB:StopPointInJourneyPattern:1-4-1">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236104"/>
+                  <ForAlighting>false</ForAlighting>
+                  <DestinationDisplayRef ref="FLB:DestinationDisplay:0"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="FLB:StopPointInJourneyPattern:1-4-2">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="3" version="0" id="FLB:StopPointInJourneyPattern:1-4-3">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="4" version="0" id="FLB:StopPointInJourneyPattern:1-4-4">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:764235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="5" version="0" id="FLB:StopPointInJourneyPattern:1-4-5">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:762235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="6" version="0" id="FLB:StopPointInJourneyPattern:1-4-6">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="7" version="0" id="FLB:StopPointInJourneyPattern:1-4-7">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="8" version="0" id="FLB:StopPointInJourneyPattern:1-4-8">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760232411"/>
+                  <ForBoarding>false</ForBoarding>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+              <linksInSequence>
+                <ServiceLinkInJourneyPattern order="1" version="1" id="FLB:ServiceLinkInJourneyPattern:144">
+                  <ServiceLinkRef ref="FLB:ServiceLink:0460129b-4690-4936-bc4c-f07e12b93ff5"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="2" version="1" id="FLB:ServiceLinkInJourneyPattern:146">
+                  <ServiceLinkRef ref="FLB:ServiceLink:a07666e4-a09b-4f91-82c0-98d90d0362fa"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="3" version="1" id="FLB:ServiceLinkInJourneyPattern:148">
+                  <ServiceLinkRef ref="FLB:ServiceLink:58b2d4aa-0ca8-4cfe-8ea2-3b0a7082f736"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="4" version="1" id="FLB:ServiceLinkInJourneyPattern:150">
+                  <ServiceLinkRef ref="FLB:ServiceLink:6053fc8b-29c2-425a-9103-920a51f2c299"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="5" version="1" id="FLB:ServiceLinkInJourneyPattern:152">
+                  <ServiceLinkRef ref="FLB:ServiceLink:06904b2a-f52d-42b3-86fd-6864a8cd1466"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="6" version="1" id="FLB:ServiceLinkInJourneyPattern:154">
+                  <ServiceLinkRef ref="FLB:ServiceLink:ed1c00fc-eee0-4d4c-89fc-81889c663be2"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="7" version="1" id="FLB:ServiceLinkInJourneyPattern:156">
+                  <ServiceLinkRef ref="FLB:ServiceLink:6b997e54-4f77-423e-86d1-316af64e6624"/>
+                </ServiceLinkInJourneyPattern>
+              </linksInSequence>
+            </JourneyPattern>
+            <JourneyPattern version="0" id="FLB:JourneyPattern:1-2">
+              <Name>Flåm stasjon - Myrdal stasjon</Name>
+              <RouteRef ref="FLB:Route:1-2" version="0"/>
+              <pointsInSequence>
+                <StopPointInJourneyPattern order="1" version="0" id="FLB:StopPointInJourneyPattern:1-2-1">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236105"/>
+                  <ForAlighting>false</ForAlighting>
+                  <DestinationDisplayRef ref="FLB:DestinationDisplay:0"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="2" version="0" id="FLB:StopPointInJourneyPattern:1-2-2">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="3" version="0" id="FLB:StopPointInJourneyPattern:1-2-3">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760236001"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="4" version="0" id="FLB:StopPointInJourneyPattern:1-2-4">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235901"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="5" version="0" id="FLB:StopPointInJourneyPattern:1-2-5">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:764235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="6" version="0" id="FLB:StopPointInJourneyPattern:1-2-6">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:762235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="7" version="0" id="FLB:StopPointInJourneyPattern:1-2-7">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:761235801"/>
+                  <RequestStop>true</RequestStop>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="8" version="0" id="FLB:StopPointInJourneyPattern:1-2-8">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760235801"/>
+                </StopPointInJourneyPattern>
+                <StopPointInJourneyPattern order="9" version="0" id="FLB:StopPointInJourneyPattern:1-2-9">
+                  <ScheduledStopPointRef ref="FLB:ScheduledStopPoint:760232411"/>
+                  <ForBoarding>false</ForBoarding>
+                </StopPointInJourneyPattern>
+              </pointsInSequence>
+              <linksInSequence>
+                <ServiceLinkInJourneyPattern order="1" version="1" id="FLB:ServiceLinkInJourneyPattern:158">
+                  <ServiceLinkRef ref="FLB:ServiceLink:f398d16d-f0e2-4d1b-8e79-34193e441dd7"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="2" version="1" id="FLB:ServiceLinkInJourneyPattern:160">
+                  <ServiceLinkRef ref="FLB:ServiceLink:94248df1-ac19-44df-a2d4-af8cb4429811"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="3" version="1" id="FLB:ServiceLinkInJourneyPattern:162">
+                  <ServiceLinkRef ref="FLB:ServiceLink:00cb0f1a-c3a1-49fe-8abb-f7be632de35f"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="4" version="1" id="FLB:ServiceLinkInJourneyPattern:164">
+                  <ServiceLinkRef ref="FLB:ServiceLink:bb031347-a920-48e6-baff-1ecc10d9e462"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="5" version="1" id="FLB:ServiceLinkInJourneyPattern:166">
+                  <ServiceLinkRef ref="FLB:ServiceLink:7d8fc1a1-9788-4e27-beaf-f0df87da6767"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="6" version="1" id="FLB:ServiceLinkInJourneyPattern:168">
+                  <ServiceLinkRef ref="FLB:ServiceLink:51e078e0-afc5-472b-b819-4a4d49637a08"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="7" version="1" id="FLB:ServiceLinkInJourneyPattern:170">
+                  <ServiceLinkRef ref="FLB:ServiceLink:97d1a7b5-33a1-4fda-8421-672440a49a04"/>
+                </ServiceLinkInJourneyPattern>
+                <ServiceLinkInJourneyPattern order="8" version="1" id="FLB:ServiceLinkInJourneyPattern:172">
+                  <ServiceLinkRef ref="FLB:ServiceLink:f44a8ad5-df83-4330-b542-4df6c17076a0"/>
+                </ServiceLinkInJourneyPattern>
+              </linksInSequence>
+            </JourneyPattern>
+          </journeyPatterns>
+        </ServiceFrame>
+        <TimetableFrame version="1" id="FLB:TimetableFrame:190">
+          <vehicleJourneys>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-10-1857-202106151508">
+              <Name>Flåm</Name>
+              <PrivateCode>1857</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <ServiceAlteration>cancellation</ServiceAlteration>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-3" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:5">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-1" version="0"/>
+                  <DepartureTime>12:13:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:c0d25c5d-31b3-4798-993c-825bd74416d3">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-2" version="0"/>
+                  <ArrivalTime>12:15:00</ArrivalTime>
+                  <DepartureTime>12:16:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:b107ecc5-05e1-43fa-af4d-48fcf83efdfd">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-3" version="0"/>
+                  <ArrivalTime>12:17:00</ArrivalTime>
+                  <DepartureTime>12:18:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:41d96c6e-f3ce-4b0e-bba1-adc20d2bf6fc">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-4" version="0"/>
+                  <ArrivalTime>12:23:00</ArrivalTime>
+                  <DepartureTime>12:30:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:e9605ed5-0048-43e2-adcc-281a9ad6430c">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-5" version="0"/>
+                  <ArrivalTime>12:36:00</ArrivalTime>
+                  <DepartureTime>12:37:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:0f2dde3f-5136-4e80-8948-c2a456fccebd">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-6" version="0"/>
+                  <ArrivalTime>12:43:00</ArrivalTime>
+                  <DepartureTime>12:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:5b268d80-bb05-41bb-860b-cc176dbe97d6">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-7" version="0"/>
+                  <ArrivalTime>12:58:00</ArrivalTime>
+                  <DepartureTime>12:59:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:c5210a14-dbd1-43af-ac15-a382283e07ef">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-8" version="0"/>
+                  <ArrivalTime>13:02:00</ArrivalTime>
+                  <DepartureTime>13:03:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:51df27de-fb94-4a47-9f6a-79164a63be2a">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-9" version="0"/>
+                  <ArrivalTime>13:10:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-6-1855-202106151508">
+              <Name>Flåm</Name>
+              <PrivateCode>1855</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-3" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:d3946d29-41a1-4f1c-994b-22e0e15c48b6">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-1" version="0"/>
+                  <DepartureTime>10:58:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:1eb990db-13bf-47f5-b594-1565b8312915">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-2" version="0"/>
+                  <ArrivalTime>11:00:00</ArrivalTime>
+                  <DepartureTime>11:01:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:bac4d28c-e977-412b-8469-626c4559154a">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-3" version="0"/>
+                  <ArrivalTime>11:02:00</ArrivalTime>
+                  <DepartureTime>11:03:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:a0e69ba3-145c-451d-9a9b-8d4288d01195">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-4" version="0"/>
+                  <ArrivalTime>11:08:00</ArrivalTime>
+                  <DepartureTime>11:16:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:ed211d49-2bcb-465d-bc5f-6c3af1a4d0eb">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-5" version="0"/>
+                  <ArrivalTime>11:22:00</ArrivalTime>
+                  <DepartureTime>11:23:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:371f00af-3ec4-4ba7-a680-722103bf6382">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-6" version="0"/>
+                  <ArrivalTime>11:29:00</ArrivalTime>
+                  <DepartureTime>11:31:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:d4104540-0c11-457e-820f-eb5ef3caafb4">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-7" version="0"/>
+                  <ArrivalTime>11:44:00</ArrivalTime>
+                  <DepartureTime>11:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:a34669ef-4624-4f75-886d-068277c682fe">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-8" version="0"/>
+                  <ArrivalTime>11:47:00</ArrivalTime>
+                  <DepartureTime>11:48:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:bb4804c4-d2b3-4b8d-899b-ad657b49379c">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-9" version="0"/>
+                  <ArrivalTime>11:55:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-4-1853-202106151508">
+              <Name>Flåm</Name>
+              <PrivateCode>1853</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <ServiceAlteration>cancellation</ServiceAlteration>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-3" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:3">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-1" version="0"/>
+                  <DepartureTime>09:40:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:d89ba497-3d16-4105-8847-b1f485b51c34">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-2" version="0"/>
+                  <ArrivalTime>09:42:00</ArrivalTime>
+                  <DepartureTime>09:43:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:65566d00-f7fd-4f78-8182-ce7e255ffc7f">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-3" version="0"/>
+                  <ArrivalTime>09:44:00</ArrivalTime>
+                  <DepartureTime>09:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:b2689c75-3db5-45c1-8049-1f9c083568bc">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-4" version="0"/>
+                  <ArrivalTime>09:50:00</ArrivalTime>
+                  <DepartureTime>09:57:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:0d65ad51-8f57-470a-a74e-a670443bdf06">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-5" version="0"/>
+                  <ArrivalTime>10:03:00</ArrivalTime>
+                  <DepartureTime>10:04:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:4ac274e0-84ca-4bcd-904a-7b92419befab">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-6" version="0"/>
+                  <ArrivalTime>10:10:00</ArrivalTime>
+                  <DepartureTime>10:12:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:5f9408a6-9dfd-4f55-8c48-2281035a049f">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-7" version="0"/>
+                  <ArrivalTime>10:25:00</ArrivalTime>
+                  <DepartureTime>10:26:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:72eb9dad-9b52-4121-80e6-3bfed4eb6ad6">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-8" version="0"/>
+                  <ArrivalTime>10:28:00</ArrivalTime>
+                  <DepartureTime>10:29:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:bc2217ee-b62f-4ff4-b044-ab25170b8276">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-3-9" version="0"/>
+                  <ArrivalTime>10:35:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-13-1859-202106151508">
+              <Name>Flåm</Name>
+              <PrivateCode>1859</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-6" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:ef49bfa7-b53e-4164-b9fd-8e07b23fa4a5">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-1" version="0"/>
+                  <DepartureTime>13:27:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:941e25e6-9093-4c57-99a1-e96001388a2b">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-2" version="0"/>
+                  <ArrivalTime>13:29:00</ArrivalTime>
+                  <DepartureTime>13:30:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:40f9e43a-58a8-4225-8362-79350ea58ab0">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-3" version="0"/>
+                  <ArrivalTime>13:31:00</ArrivalTime>
+                  <DepartureTime>13:32:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:660ea7df-50c7-4f96-9d06-6d215025c238">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-4" version="0"/>
+                  <ArrivalTime>13:37:00</ArrivalTime>
+                  <DepartureTime>13:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:5d301eac-33c0-4fc9-a71a-5ef6f597da95">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-5" version="0"/>
+                  <ArrivalTime>13:51:00</ArrivalTime>
+                  <DepartureTime>13:52:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:8174eab0-7930-4648-afa7-6a42bc3a86cd">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-6" version="0"/>
+                  <ArrivalTime>13:58:00</ArrivalTime>
+                  <DepartureTime>14:00:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:3aab9ea5-299c-474f-8390-cb27bb7aec04">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-7" version="0"/>
+                  <ArrivalTime>14:13:00</ArrivalTime>
+                  <DepartureTime>14:14:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:c8e86b1b-c4ae-45ad-86e9-daf36e039aa7">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-8" version="0"/>
+                  <ArrivalTime>14:17:00</ArrivalTime>
+                  <DepartureTime>14:18:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:e2c312bb-a539-4c4b-bb0a-6abb50eb509a">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-6-9" version="0"/>
+                  <ArrivalTime>14:25:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-39-1877-202106151508">
+              <Name>Flåm</Name>
+              <PrivateCode>1877</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+                <DayTypeRef ref="FLB:DayType:144"/>
+                <DayTypeRef ref="FLB:DayType:145"/>
+                <DayTypeRef ref="FLB:DayType:146"/>
+                <DayTypeRef ref="FLB:DayType:147"/>
+                <DayTypeRef ref="FLB:DayType:148"/>
+                <DayTypeRef ref="FLB:DayType:149"/>
+                <DayTypeRef ref="FLB:DayType:150"/>
+                <DayTypeRef ref="FLB:DayType:151"/>
+                <DayTypeRef ref="FLB:DayType:152"/>
+                <DayTypeRef ref="FLB:DayType:153"/>
+                <DayTypeRef ref="FLB:DayType:154"/>
+                <DayTypeRef ref="FLB:DayType:155"/>
+                <DayTypeRef ref="FLB:DayType:156"/>
+                <DayTypeRef ref="FLB:DayType:157"/>
+                <DayTypeRef ref="FLB:DayType:158"/>
+                <DayTypeRef ref="FLB:DayType:159"/>
+                <DayTypeRef ref="FLB:DayType:160"/>
+                <DayTypeRef ref="FLB:DayType:161"/>
+                <DayTypeRef ref="FLB:DayType:162"/>
+                <DayTypeRef ref="FLB:DayType:163"/>
+                <DayTypeRef ref="FLB:DayType:164"/>
+                <DayTypeRef ref="FLB:DayType:165"/>
+                <DayTypeRef ref="FLB:DayType:166"/>
+                <DayTypeRef ref="FLB:DayType:167"/>
+                <DayTypeRef ref="FLB:DayType:168"/>
+                <DayTypeRef ref="FLB:DayType:169"/>
+                <DayTypeRef ref="FLB:DayType:170"/>
+                <DayTypeRef ref="FLB:DayType:171"/>
+                <DayTypeRef ref="FLB:DayType:172"/>
+                <DayTypeRef ref="FLB:DayType:173"/>
+                <DayTypeRef ref="FLB:DayType:174"/>
+                <DayTypeRef ref="FLB:DayType:175"/>
+                <DayTypeRef ref="FLB:DayType:176"/>
+                <DayTypeRef ref="FLB:DayType:177"/>
+                <DayTypeRef ref="FLB:DayType:178"/>
+                <DayTypeRef ref="FLB:DayType:179"/>
+                <DayTypeRef ref="FLB:DayType:180"/>
+                <DayTypeRef ref="FLB:DayType:181"/>
+                <DayTypeRef ref="FLB:DayType:182"/>
+                <DayTypeRef ref="FLB:DayType:183"/>
+                <DayTypeRef ref="FLB:DayType:184"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-9" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:111f7205-9edc-4e47-a36e-b6a255caa76b">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-1" version="0"/>
+                  <DepartureTime>18:00:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:fc1b9c69-6db5-4d50-b3c3-72a8a2fe1974">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-2" version="0"/>
+                  <ArrivalTime>18:02:00</ArrivalTime>
+                  <DepartureTime>18:03:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:3d8e326c-3694-42e9-abce-35974fc009db">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-3" version="0"/>
+                  <ArrivalTime>18:04:00</ArrivalTime>
+                  <DepartureTime>18:05:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:ec20fd52-48af-49a1-a640-479de617a845">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-4" version="0"/>
+                  <ArrivalTime>18:09:00</ArrivalTime>
+                  <DepartureTime>18:10:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:307bf1c1-cec8-4d01-8ed6-fd72230dd9e6">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-5" version="0"/>
+                  <ArrivalTime>18:18:00</ArrivalTime>
+                  <DepartureTime>18:19:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:1d8a2166-11ee-4e00-b389-489a5f68d24b">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-6" version="0"/>
+                  <ArrivalTime>18:23:00</ArrivalTime>
+                  <DepartureTime>18:24:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:39dcef6d-ed71-465e-a876-f4cb15971768">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-7" version="0"/>
+                  <ArrivalTime>18:36:00</ArrivalTime>
+                  <DepartureTime>18:37:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:14fc2c71-8abe-450d-9758-071c7a1ae755">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-8" version="0"/>
+                  <ArrivalTime>18:39:00</ArrivalTime>
+                  <DepartureTime>18:40:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:1da49cab-f465-4911-aa6f-5607860b345e">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-9" version="0"/>
+                  <ArrivalTime>18:45:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-37-1875-202106151508">
+              <Name>Flåm</Name>
+              <PrivateCode>1875</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+                <DayTypeRef ref="FLB:DayType:144"/>
+                <DayTypeRef ref="FLB:DayType:145"/>
+                <DayTypeRef ref="FLB:DayType:146"/>
+                <DayTypeRef ref="FLB:DayType:147"/>
+                <DayTypeRef ref="FLB:DayType:148"/>
+                <DayTypeRef ref="FLB:DayType:149"/>
+                <DayTypeRef ref="FLB:DayType:150"/>
+                <DayTypeRef ref="FLB:DayType:151"/>
+                <DayTypeRef ref="FLB:DayType:152"/>
+                <DayTypeRef ref="FLB:DayType:153"/>
+                <DayTypeRef ref="FLB:DayType:154"/>
+                <DayTypeRef ref="FLB:DayType:155"/>
+                <DayTypeRef ref="FLB:DayType:156"/>
+                <DayTypeRef ref="FLB:DayType:157"/>
+                <DayTypeRef ref="FLB:DayType:158"/>
+                <DayTypeRef ref="FLB:DayType:159"/>
+                <DayTypeRef ref="FLB:DayType:160"/>
+                <DayTypeRef ref="FLB:DayType:161"/>
+                <DayTypeRef ref="FLB:DayType:162"/>
+                <DayTypeRef ref="FLB:DayType:163"/>
+                <DayTypeRef ref="FLB:DayType:164"/>
+                <DayTypeRef ref="FLB:DayType:165"/>
+                <DayTypeRef ref="FLB:DayType:166"/>
+                <DayTypeRef ref="FLB:DayType:167"/>
+                <DayTypeRef ref="FLB:DayType:168"/>
+                <DayTypeRef ref="FLB:DayType:169"/>
+                <DayTypeRef ref="FLB:DayType:170"/>
+                <DayTypeRef ref="FLB:DayType:171"/>
+                <DayTypeRef ref="FLB:DayType:172"/>
+                <DayTypeRef ref="FLB:DayType:173"/>
+                <DayTypeRef ref="FLB:DayType:174"/>
+                <DayTypeRef ref="FLB:DayType:175"/>
+                <DayTypeRef ref="FLB:DayType:176"/>
+                <DayTypeRef ref="FLB:DayType:177"/>
+                <DayTypeRef ref="FLB:DayType:178"/>
+                <DayTypeRef ref="FLB:DayType:179"/>
+                <DayTypeRef ref="FLB:DayType:180"/>
+                <DayTypeRef ref="FLB:DayType:181"/>
+                <DayTypeRef ref="FLB:DayType:182"/>
+                <DayTypeRef ref="FLB:DayType:183"/>
+                <DayTypeRef ref="FLB:DayType:184"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-9" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:21fa8ce6-ae75-4cec-a517-63b3174a8c08">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-1" version="0"/>
+                  <DepartureTime>15:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:6c89baaa-9507-427f-a52e-4e38909dfdaf">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-2" version="0"/>
+                  <ArrivalTime>15:47:00</ArrivalTime>
+                  <DepartureTime>15:48:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:8606b6b5-cb71-4d07-9d0f-7975669eec46">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-3" version="0"/>
+                  <ArrivalTime>15:49:00</ArrivalTime>
+                  <DepartureTime>15:50:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:1c4ac106-066e-444a-9632-9b1d71637183">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-4" version="0"/>
+                  <ArrivalTime>15:54:00</ArrivalTime>
+                  <DepartureTime>15:55:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:1aad3a58-a464-43da-b7fc-9bbe260d0299">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-5" version="0"/>
+                  <ArrivalTime>16:03:00</ArrivalTime>
+                  <DepartureTime>16:04:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:bcd2eee2-7219-455b-9344-2a29e721f32a">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-6" version="0"/>
+                  <ArrivalTime>16:08:00</ArrivalTime>
+                  <DepartureTime>16:09:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:095e68c7-cbfe-4fdb-bde6-c466e6a7e49e">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-7" version="0"/>
+                  <ArrivalTime>16:21:00</ArrivalTime>
+                  <DepartureTime>16:22:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:ae9bee42-2892-468e-9227-2adb228f75ff">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-8" version="0"/>
+                  <ArrivalTime>16:24:00</ArrivalTime>
+                  <DepartureTime>16:25:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:f5b0808d-af04-46d3-8b73-73403d6d858c">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-9" version="0"/>
+                  <ArrivalTime>16:30:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-35-1873-202106151508">
+              <Name>Flåm</Name>
+              <PrivateCode>1873</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:144"/>
+                <DayTypeRef ref="FLB:DayType:145"/>
+                <DayTypeRef ref="FLB:DayType:146"/>
+                <DayTypeRef ref="FLB:DayType:147"/>
+                <DayTypeRef ref="FLB:DayType:148"/>
+                <DayTypeRef ref="FLB:DayType:149"/>
+                <DayTypeRef ref="FLB:DayType:150"/>
+                <DayTypeRef ref="FLB:DayType:151"/>
+                <DayTypeRef ref="FLB:DayType:152"/>
+                <DayTypeRef ref="FLB:DayType:153"/>
+                <DayTypeRef ref="FLB:DayType:154"/>
+                <DayTypeRef ref="FLB:DayType:155"/>
+                <DayTypeRef ref="FLB:DayType:156"/>
+                <DayTypeRef ref="FLB:DayType:157"/>
+                <DayTypeRef ref="FLB:DayType:158"/>
+                <DayTypeRef ref="FLB:DayType:159"/>
+                <DayTypeRef ref="FLB:DayType:160"/>
+                <DayTypeRef ref="FLB:DayType:161"/>
+                <DayTypeRef ref="FLB:DayType:162"/>
+                <DayTypeRef ref="FLB:DayType:163"/>
+                <DayTypeRef ref="FLB:DayType:164"/>
+                <DayTypeRef ref="FLB:DayType:165"/>
+                <DayTypeRef ref="FLB:DayType:166"/>
+                <DayTypeRef ref="FLB:DayType:167"/>
+                <DayTypeRef ref="FLB:DayType:168"/>
+                <DayTypeRef ref="FLB:DayType:169"/>
+                <DayTypeRef ref="FLB:DayType:170"/>
+                <DayTypeRef ref="FLB:DayType:171"/>
+                <DayTypeRef ref="FLB:DayType:172"/>
+                <DayTypeRef ref="FLB:DayType:173"/>
+                <DayTypeRef ref="FLB:DayType:174"/>
+                <DayTypeRef ref="FLB:DayType:175"/>
+                <DayTypeRef ref="FLB:DayType:176"/>
+                <DayTypeRef ref="FLB:DayType:177"/>
+                <DayTypeRef ref="FLB:DayType:178"/>
+                <DayTypeRef ref="FLB:DayType:179"/>
+                <DayTypeRef ref="FLB:DayType:180"/>
+                <DayTypeRef ref="FLB:DayType:181"/>
+                <DayTypeRef ref="FLB:DayType:182"/>
+                <DayTypeRef ref="FLB:DayType:183"/>
+                <DayTypeRef ref="FLB:DayType:184"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-9" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:7786c83b-9727-44e7-adef-328cf7aec4a7">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-1" version="0"/>
+                  <DepartureTime>13:05:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:bc51c349-275d-4f7b-9f61-b2751d5be609">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-2" version="0"/>
+                  <ArrivalTime>13:07:00</ArrivalTime>
+                  <DepartureTime>13:08:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:c33c448c-790b-423b-8820-f0fe9ade43e7">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-3" version="0"/>
+                  <ArrivalTime>13:09:00</ArrivalTime>
+                  <DepartureTime>13:10:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:1a97b1e5-7fb9-45b0-836b-8a00e2221f25">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-4" version="0"/>
+                  <ArrivalTime>13:16:00</ArrivalTime>
+                  <DepartureTime>13:17:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:9eedfffe-f0d9-4bb5-9094-72ab5e1ed57e">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-5" version="0"/>
+                  <ArrivalTime>13:25:00</ArrivalTime>
+                  <DepartureTime>13:26:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:891809d5-4788-4e6f-99f9-1c4a4590a62d">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-6" version="0"/>
+                  <ArrivalTime>13:30:00</ArrivalTime>
+                  <DepartureTime>13:31:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:3afd9a5d-3cbb-4dc6-b589-094db7897f27">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-7" version="0"/>
+                  <ArrivalTime>13:44:00</ArrivalTime>
+                  <DepartureTime>13:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:8716883d-fbc1-4063-8304-3123d435b02c">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-8" version="0"/>
+                  <ArrivalTime>13:47:00</ArrivalTime>
+                  <DepartureTime>13:48:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:54cd139f-d5f8-4e8a-a1b5-0c2df14b4541">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-9" version="0"/>
+                  <ArrivalTime>13:55:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-33-1871-202106151508">
+              <Name>Flåm</Name>
+              <PrivateCode>1871</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:144"/>
+                <DayTypeRef ref="FLB:DayType:145"/>
+                <DayTypeRef ref="FLB:DayType:146"/>
+                <DayTypeRef ref="FLB:DayType:147"/>
+                <DayTypeRef ref="FLB:DayType:148"/>
+                <DayTypeRef ref="FLB:DayType:149"/>
+                <DayTypeRef ref="FLB:DayType:150"/>
+                <DayTypeRef ref="FLB:DayType:151"/>
+                <DayTypeRef ref="FLB:DayType:152"/>
+                <DayTypeRef ref="FLB:DayType:153"/>
+                <DayTypeRef ref="FLB:DayType:154"/>
+                <DayTypeRef ref="FLB:DayType:155"/>
+                <DayTypeRef ref="FLB:DayType:156"/>
+                <DayTypeRef ref="FLB:DayType:157"/>
+                <DayTypeRef ref="FLB:DayType:158"/>
+                <DayTypeRef ref="FLB:DayType:159"/>
+                <DayTypeRef ref="FLB:DayType:160"/>
+                <DayTypeRef ref="FLB:DayType:161"/>
+                <DayTypeRef ref="FLB:DayType:162"/>
+                <DayTypeRef ref="FLB:DayType:163"/>
+                <DayTypeRef ref="FLB:DayType:164"/>
+                <DayTypeRef ref="FLB:DayType:165"/>
+                <DayTypeRef ref="FLB:DayType:166"/>
+                <DayTypeRef ref="FLB:DayType:167"/>
+                <DayTypeRef ref="FLB:DayType:168"/>
+                <DayTypeRef ref="FLB:DayType:169"/>
+                <DayTypeRef ref="FLB:DayType:170"/>
+                <DayTypeRef ref="FLB:DayType:171"/>
+                <DayTypeRef ref="FLB:DayType:172"/>
+                <DayTypeRef ref="FLB:DayType:173"/>
+                <DayTypeRef ref="FLB:DayType:174"/>
+                <DayTypeRef ref="FLB:DayType:175"/>
+                <DayTypeRef ref="FLB:DayType:176"/>
+                <DayTypeRef ref="FLB:DayType:177"/>
+                <DayTypeRef ref="FLB:DayType:178"/>
+                <DayTypeRef ref="FLB:DayType:179"/>
+                <DayTypeRef ref="FLB:DayType:180"/>
+                <DayTypeRef ref="FLB:DayType:181"/>
+                <DayTypeRef ref="FLB:DayType:182"/>
+                <DayTypeRef ref="FLB:DayType:183"/>
+                <DayTypeRef ref="FLB:DayType:184"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-9" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:d6a3377c-2ffc-44c1-81cb-629b8a04ffea">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-1" version="0"/>
+                  <DepartureTime>10:05:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:1f9ad2e4-fca0-4f14-8162-81bf0cd90c49">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-2" version="0"/>
+                  <ArrivalTime>10:07:00</ArrivalTime>
+                  <DepartureTime>10:08:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:b6a9ac23-f8dd-4a41-8fca-1ee34c52df9e">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-3" version="0"/>
+                  <ArrivalTime>10:09:00</ArrivalTime>
+                  <DepartureTime>10:10:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:06262769-1f93-4dfa-b080-13201bec1472">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-4" version="0"/>
+                  <ArrivalTime>10:16:00</ArrivalTime>
+                  <DepartureTime>10:17:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:142ec28b-127e-46a0-b9ed-46486ced0cf5">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-5" version="0"/>
+                  <ArrivalTime>10:25:00</ArrivalTime>
+                  <DepartureTime>10:26:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:f1ee4831-774a-4afe-afc5-9832e890ada0">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-6" version="0"/>
+                  <ArrivalTime>10:30:00</ArrivalTime>
+                  <DepartureTime>10:31:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:22b75ad6-81af-440f-8083-bee7ff1e4fb2">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-7" version="0"/>
+                  <ArrivalTime>10:44:00</ArrivalTime>
+                  <DepartureTime>10:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:d357331d-4ff1-4499-87b3-853c8875c8a8">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-8" version="0"/>
+                  <ArrivalTime>10:47:00</ArrivalTime>
+                  <DepartureTime>10:48:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:d0e30603-d79c-4a11-8ac2-eb568037e6d0">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-9-9" version="0"/>
+                  <ArrivalTime>10:55:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-12-1858-202106151508">
+              <Name>Myrdal</Name>
+              <PrivateCode>1858</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-5" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:8ad0fce1-4aff-424f-9b13-aa07b6b33a6a">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-1" version="0"/>
+                  <DepartureTime>12:20:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:8b491397-a772-4365-92a2-8a6b6ab8f9ee">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-2" version="0"/>
+                  <ArrivalTime>12:22:00</ArrivalTime>
+                  <DepartureTime>12:23:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:0ce34e0f-c0ef-4429-94a2-388ce7dda211">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-3" version="0"/>
+                  <ArrivalTime>12:24:00</ArrivalTime>
+                  <DepartureTime>12:25:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:3ea67b29-2f58-4d69-883b-ea315a7bb51b">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-4" version="0"/>
+                  <ArrivalTime>12:37:00</ArrivalTime>
+                  <DepartureTime>12:44:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:ad01d631-4d7d-4fc6-b195-a71972932735">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-5" version="0"/>
+                  <ArrivalTime>12:46:00</ArrivalTime>
+                  <DepartureTime>12:47:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:f260ef60-9f39-4286-a294-c9ae6484568c">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-6" version="0"/>
+                  <ArrivalTime>12:54:00</ArrivalTime>
+                  <DepartureTime>13:02:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:98bcd7e6-3a12-4068-8fe4-ee3282c3a72d">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-7" version="0"/>
+                  <ArrivalTime>13:05:00</ArrivalTime>
+                  <DepartureTime>13:06:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:89595901-cecc-4faa-98d2-5a6b2c007f81">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-8" version="0"/>
+                  <ArrivalTime>13:07:00</ArrivalTime>
+                  <DepartureTime>13:09:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:09c548af-5a80-4320-8de2-ed5873288d1f">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-5-9" version="0"/>
+                  <ArrivalTime>13:15:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-38-1876-202106151508">
+              <Name>Myrdal</Name>
+              <PrivateCode>1876</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+                <DayTypeRef ref="FLB:DayType:144"/>
+                <DayTypeRef ref="FLB:DayType:145"/>
+                <DayTypeRef ref="FLB:DayType:146"/>
+                <DayTypeRef ref="FLB:DayType:147"/>
+                <DayTypeRef ref="FLB:DayType:148"/>
+                <DayTypeRef ref="FLB:DayType:149"/>
+                <DayTypeRef ref="FLB:DayType:150"/>
+                <DayTypeRef ref="FLB:DayType:151"/>
+                <DayTypeRef ref="FLB:DayType:152"/>
+                <DayTypeRef ref="FLB:DayType:153"/>
+                <DayTypeRef ref="FLB:DayType:154"/>
+                <DayTypeRef ref="FLB:DayType:155"/>
+                <DayTypeRef ref="FLB:DayType:156"/>
+                <DayTypeRef ref="FLB:DayType:157"/>
+                <DayTypeRef ref="FLB:DayType:158"/>
+                <DayTypeRef ref="FLB:DayType:159"/>
+                <DayTypeRef ref="FLB:DayType:160"/>
+                <DayTypeRef ref="FLB:DayType:161"/>
+                <DayTypeRef ref="FLB:DayType:162"/>
+                <DayTypeRef ref="FLB:DayType:163"/>
+                <DayTypeRef ref="FLB:DayType:164"/>
+                <DayTypeRef ref="FLB:DayType:165"/>
+                <DayTypeRef ref="FLB:DayType:166"/>
+                <DayTypeRef ref="FLB:DayType:167"/>
+                <DayTypeRef ref="FLB:DayType:168"/>
+                <DayTypeRef ref="FLB:DayType:169"/>
+                <DayTypeRef ref="FLB:DayType:170"/>
+                <DayTypeRef ref="FLB:DayType:171"/>
+                <DayTypeRef ref="FLB:DayType:172"/>
+                <DayTypeRef ref="FLB:DayType:173"/>
+                <DayTypeRef ref="FLB:DayType:174"/>
+                <DayTypeRef ref="FLB:DayType:175"/>
+                <DayTypeRef ref="FLB:DayType:176"/>
+                <DayTypeRef ref="FLB:DayType:177"/>
+                <DayTypeRef ref="FLB:DayType:178"/>
+                <DayTypeRef ref="FLB:DayType:179"/>
+                <DayTypeRef ref="FLB:DayType:180"/>
+                <DayTypeRef ref="FLB:DayType:181"/>
+                <DayTypeRef ref="FLB:DayType:182"/>
+                <DayTypeRef ref="FLB:DayType:183"/>
+                <DayTypeRef ref="FLB:DayType:184"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-8" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:a0a5d535-23ad-44cf-af88-ce3efecbdf1d">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-1" version="0"/>
+                  <DepartureTime>16:50:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:839ae00c-30fb-4523-9764-2c72607f4660">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-2" version="0"/>
+                  <ArrivalTime>16:52:00</ArrivalTime>
+                  <DepartureTime>16:53:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:ce65996f-38ca-41d5-92df-5b53e8b3b3b7">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-3" version="0"/>
+                  <ArrivalTime>16:54:00</ArrivalTime>
+                  <DepartureTime>16:55:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:fbe615dc-0837-4a0e-96f2-f4d82dbe966a">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-4" version="0"/>
+                  <ArrivalTime>17:05:00</ArrivalTime>
+                  <DepartureTime>17:06:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:3edf318f-25d1-47a5-9d33-e39d00bec181">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-5" version="0"/>
+                  <ArrivalTime>17:09:00</ArrivalTime>
+                  <DepartureTime>17:10:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:6609aa97-065b-4ecd-9387-1bf5306e90c9">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-6" version="0"/>
+                  <ArrivalTime>17:20:00</ArrivalTime>
+                  <DepartureTime>17:21:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:9236a9dd-7279-4140-bf91-0d4c05d03d47">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-7" version="0"/>
+                  <ArrivalTime>17:26:00</ArrivalTime>
+                  <DepartureTime>17:27:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:7d2ca4d8-38b8-4cf5-a8a2-088fff904e5f">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-8" version="0"/>
+                  <ArrivalTime>17:31:00</ArrivalTime>
+                  <DepartureTime>17:32:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:9c06a483-1cbb-43fa-82f8-a2182f7622ba">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-9" version="0"/>
+                  <ArrivalTime>17:40:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-36-1874-202106151508">
+              <Name>Myrdal</Name>
+              <PrivateCode>1874</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+                <DayTypeRef ref="FLB:DayType:144"/>
+                <DayTypeRef ref="FLB:DayType:145"/>
+                <DayTypeRef ref="FLB:DayType:146"/>
+                <DayTypeRef ref="FLB:DayType:147"/>
+                <DayTypeRef ref="FLB:DayType:148"/>
+                <DayTypeRef ref="FLB:DayType:149"/>
+                <DayTypeRef ref="FLB:DayType:150"/>
+                <DayTypeRef ref="FLB:DayType:151"/>
+                <DayTypeRef ref="FLB:DayType:152"/>
+                <DayTypeRef ref="FLB:DayType:153"/>
+                <DayTypeRef ref="FLB:DayType:154"/>
+                <DayTypeRef ref="FLB:DayType:155"/>
+                <DayTypeRef ref="FLB:DayType:156"/>
+                <DayTypeRef ref="FLB:DayType:157"/>
+                <DayTypeRef ref="FLB:DayType:158"/>
+                <DayTypeRef ref="FLB:DayType:159"/>
+                <DayTypeRef ref="FLB:DayType:160"/>
+                <DayTypeRef ref="FLB:DayType:161"/>
+                <DayTypeRef ref="FLB:DayType:162"/>
+                <DayTypeRef ref="FLB:DayType:163"/>
+                <DayTypeRef ref="FLB:DayType:164"/>
+                <DayTypeRef ref="FLB:DayType:165"/>
+                <DayTypeRef ref="FLB:DayType:166"/>
+                <DayTypeRef ref="FLB:DayType:167"/>
+                <DayTypeRef ref="FLB:DayType:168"/>
+                <DayTypeRef ref="FLB:DayType:169"/>
+                <DayTypeRef ref="FLB:DayType:170"/>
+                <DayTypeRef ref="FLB:DayType:171"/>
+                <DayTypeRef ref="FLB:DayType:172"/>
+                <DayTypeRef ref="FLB:DayType:173"/>
+                <DayTypeRef ref="FLB:DayType:174"/>
+                <DayTypeRef ref="FLB:DayType:175"/>
+                <DayTypeRef ref="FLB:DayType:176"/>
+                <DayTypeRef ref="FLB:DayType:177"/>
+                <DayTypeRef ref="FLB:DayType:178"/>
+                <DayTypeRef ref="FLB:DayType:179"/>
+                <DayTypeRef ref="FLB:DayType:180"/>
+                <DayTypeRef ref="FLB:DayType:181"/>
+                <DayTypeRef ref="FLB:DayType:182"/>
+                <DayTypeRef ref="FLB:DayType:183"/>
+                <DayTypeRef ref="FLB:DayType:184"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-8" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:9cf07713-0ecb-47b2-991e-c492908fcffa">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-1" version="0"/>
+                  <DepartureTime>14:40:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:4d34661a-8e3c-4d8f-83b0-5e644b152d91">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-2" version="0"/>
+                  <ArrivalTime>14:42:00</ArrivalTime>
+                  <DepartureTime>14:43:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:59758d05-fb38-4f14-996f-23effb891e82">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-3" version="0"/>
+                  <ArrivalTime>14:44:00</ArrivalTime>
+                  <DepartureTime>14:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:a87b6e86-7e23-49a5-8f2f-a9c2964bbc25">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-4" version="0"/>
+                  <ArrivalTime>14:55:00</ArrivalTime>
+                  <DepartureTime>14:56:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:4d47e35a-68dd-48bd-915a-b7ba9cb2fd6f">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-5" version="0"/>
+                  <ArrivalTime>14:59:00</ArrivalTime>
+                  <DepartureTime>15:00:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:ab9c539e-ad76-4aea-bf03-a38380090212">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-6" version="0"/>
+                  <ArrivalTime>15:10:00</ArrivalTime>
+                  <DepartureTime>15:11:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:f0b83f0c-9796-4d93-b869-914c21598151">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-7" version="0"/>
+                  <ArrivalTime>15:16:00</ArrivalTime>
+                  <DepartureTime>15:17:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:6c7df96f-3508-49a1-8669-df6e35a19e4e">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-8" version="0"/>
+                  <ArrivalTime>15:21:00</ArrivalTime>
+                  <DepartureTime>15:22:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:4e0cfabc-09e9-4344-aece-3f37ddd6653e">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-9" version="0"/>
+                  <ArrivalTime>15:30:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-34-1872-202106151508">
+              <Name>Myrdal</Name>
+              <PrivateCode>1872</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:144"/>
+                <DayTypeRef ref="FLB:DayType:145"/>
+                <DayTypeRef ref="FLB:DayType:146"/>
+                <DayTypeRef ref="FLB:DayType:147"/>
+                <DayTypeRef ref="FLB:DayType:148"/>
+                <DayTypeRef ref="FLB:DayType:149"/>
+                <DayTypeRef ref="FLB:DayType:150"/>
+                <DayTypeRef ref="FLB:DayType:151"/>
+                <DayTypeRef ref="FLB:DayType:152"/>
+                <DayTypeRef ref="FLB:DayType:153"/>
+                <DayTypeRef ref="FLB:DayType:154"/>
+                <DayTypeRef ref="FLB:DayType:155"/>
+                <DayTypeRef ref="FLB:DayType:156"/>
+                <DayTypeRef ref="FLB:DayType:157"/>
+                <DayTypeRef ref="FLB:DayType:158"/>
+                <DayTypeRef ref="FLB:DayType:159"/>
+                <DayTypeRef ref="FLB:DayType:160"/>
+                <DayTypeRef ref="FLB:DayType:161"/>
+                <DayTypeRef ref="FLB:DayType:162"/>
+                <DayTypeRef ref="FLB:DayType:163"/>
+                <DayTypeRef ref="FLB:DayType:164"/>
+                <DayTypeRef ref="FLB:DayType:165"/>
+                <DayTypeRef ref="FLB:DayType:166"/>
+                <DayTypeRef ref="FLB:DayType:167"/>
+                <DayTypeRef ref="FLB:DayType:168"/>
+                <DayTypeRef ref="FLB:DayType:169"/>
+                <DayTypeRef ref="FLB:DayType:170"/>
+                <DayTypeRef ref="FLB:DayType:171"/>
+                <DayTypeRef ref="FLB:DayType:172"/>
+                <DayTypeRef ref="FLB:DayType:173"/>
+                <DayTypeRef ref="FLB:DayType:174"/>
+                <DayTypeRef ref="FLB:DayType:175"/>
+                <DayTypeRef ref="FLB:DayType:176"/>
+                <DayTypeRef ref="FLB:DayType:177"/>
+                <DayTypeRef ref="FLB:DayType:178"/>
+                <DayTypeRef ref="FLB:DayType:179"/>
+                <DayTypeRef ref="FLB:DayType:180"/>
+                <DayTypeRef ref="FLB:DayType:181"/>
+                <DayTypeRef ref="FLB:DayType:182"/>
+                <DayTypeRef ref="FLB:DayType:183"/>
+                <DayTypeRef ref="FLB:DayType:184"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-8" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:ceb18b09-6df8-45de-b8c9-55d109ba9934">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-1" version="0"/>
+                  <DepartureTime>11:45:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:0a800bf5-dada-4b14-bfae-01688673d5db">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-2" version="0"/>
+                  <ArrivalTime>11:47:00</ArrivalTime>
+                  <DepartureTime>11:48:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:3f8e4eec-b529-4719-b3b2-feee7bdb27a6">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-3" version="0"/>
+                  <ArrivalTime>11:49:00</ArrivalTime>
+                  <DepartureTime>11:50:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:187c548c-0e0d-46e3-a248-e2e7b08939cd">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-4" version="0"/>
+                  <ArrivalTime>12:00:00</ArrivalTime>
+                  <DepartureTime>12:01:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:e1c62f40-3d46-45fe-b3fc-443e1102ffcb">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-5" version="0"/>
+                  <ArrivalTime>12:04:00</ArrivalTime>
+                  <DepartureTime>12:05:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:9fa45a29-4cb5-4fb1-9fea-ccfe98987405">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-6" version="0"/>
+                  <ArrivalTime>12:15:00</ArrivalTime>
+                  <DepartureTime>12:16:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:bedb4445-d3f0-4f0a-9f49-77af3720a1d3">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-7" version="0"/>
+                  <ArrivalTime>12:21:00</ArrivalTime>
+                  <DepartureTime>12:22:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:05387157-f1d5-4e2d-be3a-1330bb43281c">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-8" version="0"/>
+                  <ArrivalTime>12:26:00</ArrivalTime>
+                  <DepartureTime>12:27:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:48f1f6b6-baed-4a4e-bf87-a7e2725b8919">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-9" version="0"/>
+                  <ArrivalTime>12:35:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-32-1870-202106151508">
+              <Name>Myrdal</Name>
+              <PrivateCode>1870</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:144"/>
+                <DayTypeRef ref="FLB:DayType:145"/>
+                <DayTypeRef ref="FLB:DayType:146"/>
+                <DayTypeRef ref="FLB:DayType:147"/>
+                <DayTypeRef ref="FLB:DayType:148"/>
+                <DayTypeRef ref="FLB:DayType:149"/>
+                <DayTypeRef ref="FLB:DayType:150"/>
+                <DayTypeRef ref="FLB:DayType:151"/>
+                <DayTypeRef ref="FLB:DayType:152"/>
+                <DayTypeRef ref="FLB:DayType:153"/>
+                <DayTypeRef ref="FLB:DayType:154"/>
+                <DayTypeRef ref="FLB:DayType:155"/>
+                <DayTypeRef ref="FLB:DayType:156"/>
+                <DayTypeRef ref="FLB:DayType:157"/>
+                <DayTypeRef ref="FLB:DayType:158"/>
+                <DayTypeRef ref="FLB:DayType:159"/>
+                <DayTypeRef ref="FLB:DayType:160"/>
+                <DayTypeRef ref="FLB:DayType:161"/>
+                <DayTypeRef ref="FLB:DayType:162"/>
+                <DayTypeRef ref="FLB:DayType:163"/>
+                <DayTypeRef ref="FLB:DayType:164"/>
+                <DayTypeRef ref="FLB:DayType:165"/>
+                <DayTypeRef ref="FLB:DayType:166"/>
+                <DayTypeRef ref="FLB:DayType:167"/>
+                <DayTypeRef ref="FLB:DayType:168"/>
+                <DayTypeRef ref="FLB:DayType:169"/>
+                <DayTypeRef ref="FLB:DayType:170"/>
+                <DayTypeRef ref="FLB:DayType:171"/>
+                <DayTypeRef ref="FLB:DayType:172"/>
+                <DayTypeRef ref="FLB:DayType:173"/>
+                <DayTypeRef ref="FLB:DayType:174"/>
+                <DayTypeRef ref="FLB:DayType:175"/>
+                <DayTypeRef ref="FLB:DayType:176"/>
+                <DayTypeRef ref="FLB:DayType:177"/>
+                <DayTypeRef ref="FLB:DayType:178"/>
+                <DayTypeRef ref="FLB:DayType:179"/>
+                <DayTypeRef ref="FLB:DayType:180"/>
+                <DayTypeRef ref="FLB:DayType:181"/>
+                <DayTypeRef ref="FLB:DayType:182"/>
+                <DayTypeRef ref="FLB:DayType:183"/>
+                <DayTypeRef ref="FLB:DayType:184"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-8" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:f6600bc0-a68c-43d9-9482-49859549054e">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-1" version="0"/>
+                  <DepartureTime>08:50:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:01fd861d-9fbe-4bc3-bba0-6b6f97b0fc43">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-2" version="0"/>
+                  <ArrivalTime>08:52:00</ArrivalTime>
+                  <DepartureTime>08:53:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:a580fe75-2acf-4bb0-a38a-8f054c07b053">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-3" version="0"/>
+                  <ArrivalTime>08:54:00</ArrivalTime>
+                  <DepartureTime>08:55:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:5adb5902-abcd-4bbd-8808-54f298f405f6">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-4" version="0"/>
+                  <ArrivalTime>09:05:00</ArrivalTime>
+                  <DepartureTime>09:06:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:e9819080-c617-4f30-a008-20c3bacb9dae">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-5" version="0"/>
+                  <ArrivalTime>09:09:00</ArrivalTime>
+                  <DepartureTime>09:10:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:94fa5fb0-7420-42d0-a6fd-8fef5bc0e6a0">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-6" version="0"/>
+                  <ArrivalTime>09:20:00</ArrivalTime>
+                  <DepartureTime>09:21:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:d5bd2535-2340-45ef-8f3a-e937cce58334">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-7" version="0"/>
+                  <ArrivalTime>09:26:00</ArrivalTime>
+                  <DepartureTime>09:27:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:b90e44bd-48f3-43d1-ab6a-71c8dba1ce96">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-8" version="0"/>
+                  <ArrivalTime>09:31:00</ArrivalTime>
+                  <DepartureTime>09:32:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:7e0f4ca4-ce10-4dae-ab5b-ee11415bc0f4">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-8-9" version="0"/>
+                  <ArrivalTime>09:40:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-8-1856-202106151508">
+              <Name>Myrdal</Name>
+              <PrivateCode>1856</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <ServiceAlteration>cancellation</ServiceAlteration>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-4" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:4">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-4-1" version="0"/>
+                  <DepartureTime>11:05:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:adc351e5-76c3-4a2d-a5b2-3c2b3218244c">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-4-2" version="0"/>
+                  <ArrivalTime>11:07:00</ArrivalTime>
+                  <DepartureTime>11:08:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:5d3fa1ca-d44c-43a3-b5e0-5431f120b828">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-4-3" version="0"/>
+                  <ArrivalTime>11:09:00</ArrivalTime>
+                  <DepartureTime>11:10:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:2d4f5a0c-ab77-41e3-a934-2fb34c6ef0fd">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-4-4" version="0"/>
+                  <ArrivalTime>11:32:00</ArrivalTime>
+                  <DepartureTime>11:33:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:1ef8981c-6451-4ee3-96f3-8496dfd25ca1">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-4-5" version="0"/>
+                  <ArrivalTime>11:40:00</ArrivalTime>
+                  <DepartureTime>11:48:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:2864da60-6728-4356-ac0f-020777650196">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-4-6" version="0"/>
+                  <ArrivalTime>11:51:00</ArrivalTime>
+                  <DepartureTime>11:52:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:fd90211b-9e4e-42ee-a560-aa99d4a783ff">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-4-7" version="0"/>
+                  <ArrivalTime>11:53:00</ArrivalTime>
+                  <DepartureTime>11:55:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:08335498-b85d-4259-a99c-56d391fdb8f7">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-4-8" version="0"/>
+                  <ArrivalTime>12:01:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+            <ServiceJourney version="0" id="FLB:ServiceJourney:1-2-1852-202106151508">
+              <Name>Myrdal</Name>
+              <PrivateCode>1852</PrivateCode>
+              <TransportMode>rail</TransportMode>
+              <TransportSubmode>
+                <RailSubmode>regionalRail</RailSubmode>
+              </TransportSubmode>
+              <dayTypes>
+                <DayTypeRef ref="FLB:DayType:117"/>
+                <DayTypeRef ref="FLB:DayType:118"/>
+                <DayTypeRef ref="FLB:DayType:119"/>
+                <DayTypeRef ref="FLB:DayType:120"/>
+                <DayTypeRef ref="FLB:DayType:121"/>
+                <DayTypeRef ref="FLB:DayType:122"/>
+                <DayTypeRef ref="FLB:DayType:123"/>
+                <DayTypeRef ref="FLB:DayType:124"/>
+                <DayTypeRef ref="FLB:DayType:125"/>
+                <DayTypeRef ref="FLB:DayType:126"/>
+                <DayTypeRef ref="FLB:DayType:127"/>
+                <DayTypeRef ref="FLB:DayType:128"/>
+                <DayTypeRef ref="FLB:DayType:129"/>
+                <DayTypeRef ref="FLB:DayType:130"/>
+                <DayTypeRef ref="FLB:DayType:131"/>
+                <DayTypeRef ref="FLB:DayType:132"/>
+                <DayTypeRef ref="FLB:DayType:133"/>
+                <DayTypeRef ref="FLB:DayType:134"/>
+                <DayTypeRef ref="FLB:DayType:135"/>
+                <DayTypeRef ref="FLB:DayType:136"/>
+                <DayTypeRef ref="FLB:DayType:137"/>
+                <DayTypeRef ref="FLB:DayType:138"/>
+                <DayTypeRef ref="FLB:DayType:139"/>
+                <DayTypeRef ref="FLB:DayType:140"/>
+                <DayTypeRef ref="FLB:DayType:141"/>
+                <DayTypeRef ref="FLB:DayType:142"/>
+                <DayTypeRef ref="FLB:DayType:143"/>
+              </dayTypes>
+              <JourneyPatternRef ref="FLB:JourneyPattern:1-2" version="0"/>
+              <OperatorRef ref="FLB:Operator:503"/>
+              <LineRef ref="FLB:Line:42" version="0"/>
+              <passingTimes>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:5bcfcac2-ef71-4734-85f4-8c754f3ab186">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-1" version="0"/>
+                  <DepartureTime>08:35:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:3f514a10-8495-488a-9f55-40b665e8269d">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-2" version="0"/>
+                  <ArrivalTime>08:37:00</ArrivalTime>
+                  <DepartureTime>08:38:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:0fd90e7b-5dc1-4b48-b2c5-b81475b5b460">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-3" version="0"/>
+                  <ArrivalTime>08:40:00</ArrivalTime>
+                  <DepartureTime>08:41:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:f1c8e186-6498-4ad0-a088-5bb3aa69615a">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-4" version="0"/>
+                  <ArrivalTime>08:52:00</ArrivalTime>
+                  <DepartureTime>08:58:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:a03447fc-c622-4175-bc5f-ea5f71de802a">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-5" version="0"/>
+                  <ArrivalTime>09:00:00</ArrivalTime>
+                  <DepartureTime>09:01:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:d6702bb4-7c27-42e6-a337-abfb74a1a564">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-6" version="0"/>
+                  <ArrivalTime>09:09:00</ArrivalTime>
+                  <DepartureTime>09:15:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:fe592996-c558-4510-9d1a-10c77abc2ad8">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-7" version="0"/>
+                  <ArrivalTime>09:18:00</ArrivalTime>
+                  <DepartureTime>09:19:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:edd009be-9cdd-4f5c-acc8-adc10b9d4759">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-8" version="0"/>
+                  <ArrivalTime>09:20:00</ArrivalTime>
+                  <DepartureTime>09:22:00</DepartureTime>
+                </TimetabledPassingTime>
+                <TimetabledPassingTime version="0" id="FLB:TimetabledPassingTime:038919b2-6864-4ea5-a1f9-5f74423fd6c4">
+                  <StopPointInJourneyPatternRef ref="FLB:StopPointInJourneyPattern:1-2-9" version="0"/>
+                  <ArrivalTime>09:28:00</ArrivalTime>
+                </TimetabledPassingTime>
+              </passingTimes>
+            </ServiceJourney>
+          </vehicleJourneys>
+          <noticeAssignments>
+            <NoticeAssignment order="3" version="1" id="FLB:NoticeAssignment:186">
+              <NoticeRef ref="FLB:Notice:1"/>
+              <NoticedObjectRef ref="FLB:TimetabledPassingTime:4" version="0"/>
+            </NoticeAssignment>
+            <NoticeAssignment order="2" version="1" id="FLB:NoticeAssignment:185">
+              <NoticeRef ref="FLB:Notice:1"/>
+              <NoticedObjectRef ref="FLB:TimetabledPassingTime:3" version="0"/>
+            </NoticeAssignment>
+            <NoticeAssignment order="1" version="1" id="FLB:NoticeAssignment:184">
+              <NoticeRef ref="FLB:Notice:1"/>
+              <NoticedObjectRef ref="FLB:TimetabledPassingTime:5" version="0"/>
+            </NoticeAssignment>
+          </noticeAssignments>
+        </TimetableFrame>
+      </frames>
+    </CompositeFrame>
+  </dataObjects>
+</PublicationDelivery>
