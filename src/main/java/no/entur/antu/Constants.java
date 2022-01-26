@@ -41,11 +41,6 @@ public final class Constants {
     public static final String STATUS_VALIDATION_OK = "ok";
     public static final String STATUS_VALIDATION_FAILED = "failed";
 
-    public static final String VALIDATION_STAGE_HEADER = "EnturValidationStage";
-    public static final String VALIDATION_STAGE_PREVALIDATION = "EnturValidationStagePreValidation";
-    public static final String VALIDATION_STAGE_EXPORT_NETEX_POSTVALIDATION = "EnturValidationStageExportNetexPostValidation";
-
-
     public static final String VALIDATION_REPORT_ID = "EnturValidationReportId";
 
     public static final String BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED = "inbound/received/";
@@ -54,12 +49,11 @@ public final class Constants {
     public static final String GCS_BUCKET_FILE_NAME = BLOBSTORE_PATH_ANTU_WORK + "${header." + DATASET_REFERENTIAL + "}/${header." + VALIDATION_REPORT_ID + "}/${header." + NETEX_FILE_NAME + "}.zip";
 
     /**
-     * Headers originating from Marduk that must be sent back when notifying Marduk
+     * Headers originating from the validation client that must be sent back when notifying the validation client
      */
+    public static final String VALIDATION_STAGE_HEADER = "EnturValidationStage";
+    public static final String VALIDATION_CLIENT_HEADER = "EnturValidationClient";
     public static final String CORRELATION_ID = "RutebankenCorrelationId";
-    public static final String PROVIDER_ID = "RutebankenProviderId";
-    public static final String ORIGINAL_PROVIDER_ID = "RutebankenOriginalProviderId";
-
 
     public static final String CAMEL_ALL_HTTP_HEADERS = "CamelHttp*";
     public static final String VALIDATION_REPORT_PREFIX = "/validation-report-";

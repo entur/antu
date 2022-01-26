@@ -62,9 +62,10 @@ import static no.entur.antu.Constants.CORRELATION_ID;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
+import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
-import static no.entur.antu.Constants.VALIDATION_STAGE_PREVALIDATION;
+
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class, properties = {
@@ -75,11 +76,15 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
     private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex.zip";
     private static final String TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex-schema-error.zip";
 
+    private static final String VALIDATION_STAGE_PREVALIDATION = "EnturValidationStagePreValidation";
+    private static final String TEST_VALIDATION_CLIENT = "test-validation-client";
+
+
     @Produce("direct:initDatasetValidation")
     protected ProducerTemplate initDatasetValidation;
 
-    @EndpointInject("mock:notifyMarduk")
-    protected MockEndpoint notifyMarduk;
+    @EndpointInject("mock:notifyStatus")
+    protected MockEndpoint notifyStatus;
 
     @TestConfiguration
     static class TestContextConfiguration {
@@ -123,13 +128,13 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
     @Test
     void testValidateAuthority() throws Exception {
 
-        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
-                .to("mock:notifyMarduk"));
-        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
-                .to("mock:notifyMarduk"));
+        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
+                .to("mock:notifyStatus"));
+        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
+                .to("mock:notifyStatus"));
 
-        notifyMarduk.expectedMessageCount(2);
-       notifyMarduk.setResultWaitTime(15000);
+        notifyStatus.expectedMessageCount(2);
+       notifyStatus.setResultWaitTime(15000);
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
@@ -142,26 +147,28 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         headers.put(Constants.FILE_HANDLE, datasetBlobName);
         headers.put(Constants.DATASET_REFERENTIAL, "flb");
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
+        headers.put(Constants.VALIDATION_CLIENT_HEADER, TEST_VALIDATION_CLIENT);
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
-        notifyMarduk.assertIsSatisfied();
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(CORRELATION_ID) != null));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID) != null));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().allMatch(exchange -> VALIDATION_STAGE_PREVALIDATION.equals(exchange.getIn().getHeader(VALIDATION_STAGE_HEADER))));
+        notifyStatus.assertIsSatisfied();
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(CORRELATION_ID) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_STAGE_PREVALIDATION.equals(exchange.getIn().getHeader(VALIDATION_STAGE_HEADER))));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> TEST_VALIDATION_CLIENT.equals(exchange.getIn().getHeader(VALIDATION_CLIENT_HEADER))));
     }
 
     @Test
     void testValidateSchemaMoreThanMaxError() throws Exception {
 
-        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
-                .to("mock:notifyMarduk"));
-        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyMarduk").skipSendToOriginalEndpoint()
-                .to("mock:notifyMarduk"));
+        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
+                .to("mock:notifyStatus"));
+        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
+                .to("mock:notifyStatus"));
 
-        notifyMarduk.expectedMessageCount(2);
-        notifyMarduk.setResultWaitTime(15000);
+        notifyStatus.expectedMessageCount(2);
+        notifyStatus.setResultWaitTime(15000);
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
@@ -174,9 +181,9 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         headers.put(Constants.FILE_HANDLE, datasetBlobName);
         headers.put(Constants.DATASET_CODESPACE, "FLB");
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
-        notifyMarduk.assertIsSatisfied();
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyMarduk.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
+        notifyStatus.assertIsSatisfied();
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
 
     }
 
