@@ -59,7 +59,20 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx files")
                 .to("direct:uploadSingleNetexFiles")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded NeTEx files")
+                .process(exchange -> {
+                    long nbCommonFiles = ((Set<String>) exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class)).stream().filter(fileName -> fileName.startsWith("_")).count();
+                    exchange.getIn().setHeader(DATASET_NB_COMMON_FILES, nbCommonFiles);
+                })
+                .choice()
+                .when(header(DATASET_NB_COMMON_FILES).isGreaterThan(0))
                 .to("direct:createCommonFilesValidationJobs")
+                .otherwise()
+                // skip the common file barrier and go directly to the line file job creation step
+                .process(exchange -> {
+                    String allFileNames = String.join(FILENAME_DELIMITER, exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class));
+                    exchange.getIn().setBody(allFileNames);
+                })
+                .to("direct:createLineFilesValidationJobs")
                 .routeId("split-dataset");
 
         from("direct:downloadNetexDataset")
@@ -86,10 +99,6 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
 
         from("direct:createCommonFilesValidationJobs")
                 .log(LoggingLevel.DEBUG, correlation() + "Creating common files validation jobs")
-                .process(exchange -> {
-                    long nbCommonFiles = ((Set<String>) exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class)).stream().filter(fileName -> fileName.startsWith("_")).count();
-                    exchange.getIn().setHeader(DATASET_NB_COMMON_FILES, nbCommonFiles);
-                })
                 .split(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
                 .filter(body().startsWith("_"))
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE))
