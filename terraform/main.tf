@@ -55,6 +55,28 @@ resource "google_project_iam_member" "pubsub_project_iam_member_publisher" {
   member = "serviceAccount:${google_service_account.antu_service_account.email}"
 }
 
+resource "google_pubsub_topic" "AntuNetexValidationQueue" {
+  name = "AntuNetexValidationQueue"
+  project = var.gcp_resources_project
+  labels = var.labels
+}
+
+resource "google_pubsub_subscription" "AntuNetexValidationQueue" {
+  name = "AntuNetexValidationQueue"
+  topic = google_pubsub_topic.AntuNetexValidationQueue.name
+  project = var.gcp_resources_project
+  labels = var.labels
+  retry_policy {
+    minimum_backoff = "10s"
+  }
+}
+
+resource "google_pubsub_topic" "AntuNetexValidationStatusQueue" {
+  name = "AntuNetexValidationStatusQueue"
+  project = var.gcp_resources_project
+  labels = var.labels
+}
+
 # Create pubsub topics and subscriptions
 resource "google_pubsub_topic" "AntuJobQueue" {
   name = "AntuJobQueue"

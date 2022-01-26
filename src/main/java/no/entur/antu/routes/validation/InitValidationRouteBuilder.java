@@ -59,7 +59,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .setHeader(DATASET_CODESPACE, header(DATASET_REFERENTIAL).regexReplaceAll("rb_", ""))
                 .setHeader(Constants.VALIDATION_REPORT_ID, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()).substring(0, 18))
                 .setBody(constant(STATUS_VALIDATION_STARTED))
-                .to("direct:notifyMarduk")
+                .to("direct:notifyStatus")
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("init-dataset-validation");
@@ -82,10 +82,10 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.ERROR, correlation() + "Unknown job type ${header." + Constants.JOB_TYPE + " } ")
                 .routeId("process-job");
 
-        from("direct:notifyMarduk")
-                .log(LoggingLevel.INFO, correlation() + "Notifying Marduk")
+        from("direct:notifyStatus")
+                .log(LoggingLevel.INFO, correlation() + "Notifying Status")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")
-                .routeId("notify-marduk");
+                .routeId("notify-status");
 
 
     }

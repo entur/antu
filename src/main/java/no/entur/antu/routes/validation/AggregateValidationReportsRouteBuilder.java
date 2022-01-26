@@ -48,6 +48,7 @@ import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
+import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
 
@@ -111,7 +112,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .marshal().json(JsonLibrary.Jackson)
                 .to("direct:uploadAggregatedValidationReport")
                 .setBody(header(DATASET_STATUS))
-                .to("direct:notifyMarduk")
+                .to("direct:notifyStatus")
                 .to("direct:cleanUpCache")
                 .routeId("aggregate-reports");
 
@@ -162,6 +163,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             aggregatedExchange.getIn().setHeader(DATASET_REFERENTIAL, newExchange.getIn().getHeader(DATASET_REFERENTIAL));
             aggregatedExchange.getIn().setHeader(CORRELATION_ID, newExchange.getIn().getHeader(CORRELATION_ID));
             aggregatedExchange.getIn().setHeader(VALIDATION_STAGE_HEADER, newExchange.getIn().getHeader(VALIDATION_STAGE_HEADER));
+            aggregatedExchange.getIn().setHeader(VALIDATION_CLIENT_HEADER, newExchange.getIn().getHeader(VALIDATION_CLIENT_HEADER));
             String currentNetexFileNameList = aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES, String.class);
             if (currentNetexFileNameList == null) {
                 aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getHeader(NETEX_FILE_NAME));
