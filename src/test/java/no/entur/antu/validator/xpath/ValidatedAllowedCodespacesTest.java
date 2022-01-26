@@ -21,21 +21,23 @@ class ValidatedAllowedCodespacesTest {
     @Test
     void testValidCodeSpace() throws IOException {
         ValidateAllowedCodespaces validateAllowedCodespaces = new ValidateAllowedCodespaces();
-        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_FILE_VALID_CODESPACE);
-        XdmNode document = XMLParserUtil.parseFileToXdmNode(testDatasetAsStream.readAllBytes());
-        XPathValidationContext validationContext = new XPathValidationContext(document, XMLParserUtil.getXPathCompiler(), TEST_CODESPACE, TEST_FILE_VALID_CODESPACE);
-        List<ValidationReportEntry> validationReportEntries = validateAllowedCodespaces.validate(validationContext);
+        List<ValidationReportEntry> validationReportEntries = getValidationReportEntries(TEST_FILE_VALID_CODESPACE, TEST_CODESPACE, validateAllowedCodespaces);
         Assertions.assertTrue(validationReportEntries.isEmpty());
     }
 
     @Test
     void testInValidCodeSpace() throws IOException {
         ValidateAllowedCodespaces validateAllowedCodespaces = new ValidateAllowedCodespaces();
-        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_FILE_VALID_INVALID_CODESPACE);
-        XdmNode document = XMLParserUtil.parseFileToXdmNode(testDatasetAsStream.readAllBytes());
-        XPathValidationContext validationContext = new XPathValidationContext(document, XMLParserUtil.getXPathCompiler(), TEST_CODESPACE, TEST_FILE_VALID_INVALID_CODESPACE);
-        List<ValidationReportEntry> validationReportEntries = validateAllowedCodespaces.validate(validationContext);
+        List<ValidationReportEntry> validationReportEntries = getValidationReportEntries(TEST_FILE_VALID_INVALID_CODESPACE, TEST_CODESPACE, validateAllowedCodespaces);
         Assertions.assertFalse(validationReportEntries.isEmpty());
+    }
+
+    private List<ValidationReportEntry> getValidationReportEntries(String testFileValidCodespace, String testCodespace, ValidateAllowedCodespaces validateAllowedCodespaces) throws IOException {
+        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + testFileValidCodespace);
+        assert testDatasetAsStream != null;
+        XdmNode document = XMLParserUtil.parseFileToXdmNode(testDatasetAsStream.readAllBytes());
+        XPathValidationContext validationContext = new XPathValidationContext(document, XMLParserUtil.getXPathCompiler(), testCodespace, testFileValidCodespace);
+        return validateAllowedCodespaces.validate(validationContext);
     }
 
 }
