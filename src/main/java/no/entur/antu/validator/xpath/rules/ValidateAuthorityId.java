@@ -45,7 +45,7 @@ public class ValidateAuthorityId implements ValidationRule {
                 return Collections.emptyList();
             } else {
                 String xpath = "//ResourceFrame/organisations/Authority[not(@id=('" + String.join("','", whitelistedAuthorityIds) + "'))]";
-                XPathSelector selector = validationContext.getXPathCompiler().compile(xpath).load();
+                XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler().compile(xpath).load();
                 selector.setContextItem(validationContext.getXmlNode());
                 XdmValue nodes = selector.evaluate();
                 List<ValidationReportEntry> validationReportEntries = new ArrayList<>();

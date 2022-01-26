@@ -32,6 +32,7 @@ import javax.ws.rs.NotFoundException;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
 import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 @Component
 public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
@@ -123,7 +124,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                         .append(header(CODESPACE_PARAM))
                         .append(Constants.VALIDATION_REPORT_PREFIX)
                         .append(header(VALIDATION_REPORT_ID_PARAM))
-                        .append(".json"))
+                        .append(VALIDATION_REPORT_SUFFIX))
                 .log(LoggingLevel.INFO, correlation() + "Downloading NeTEx validation report ${header." + FILE_HANDLE + "}")
                 .process(this::removeAllCamelHttpHeaders)
                 .to("direct:getAntuBlob")
