@@ -29,7 +29,7 @@ public class ValidateAuthorityId implements ValidationRule {
 
     private static final String MESSAGE = "Invalid Authority Id";
     private static final String RULE_NAME = "AUTHORITY";
-    private static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.WARNING;
+    private static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.ERROR;
 
     private final OrganisationRepository organisationRepository;
 
