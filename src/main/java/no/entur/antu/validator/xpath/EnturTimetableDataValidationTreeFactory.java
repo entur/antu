@@ -13,11 +13,11 @@ import java.util.List;
 /**
  * Build the tree of XPath validation rules with Entur-specific rules.
  */
-public class EnturValidationTreeFactory extends DefaultValidationTreeFactory {
+public class EnturTimetableDataValidationTreeFactory extends DefaultValidationTreeFactory {
 
     private final OrganisationRepository organisationRepository;
 
-    public EnturValidationTreeFactory(OrganisationRepository organisationRepository) {
+    public EnturTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
         this.organisationRepository = organisationRepository;
     }
 

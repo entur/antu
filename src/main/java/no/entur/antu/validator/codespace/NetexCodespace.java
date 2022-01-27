@@ -28,7 +28,11 @@ public class NetexCodespace {
 
     public static Set<NetexCodespace> getValidNetexCodespacesFor(String codespace) {
         NetexCodespace netexCodespace = NetexCodespace.getNetexCodespaceFor(codespace);
-        return  Set.of(NSR_NETEX_CODESPACE, PEN_NETEX_CODESPACE, netexCodespace);
+        if (NSR_NETEX_CODESPACE.equals(netexCodespace)) {
+            return Set.of(NSR_NETEX_CODESPACE, PEN_NETEX_CODESPACE);
+        } else {
+            return Set.of(NSR_NETEX_CODESPACE, PEN_NETEX_CODESPACE, netexCodespace);
+        }
     }
 
     private static NetexCodespace getNetexCodespaceFor(String codespace) {

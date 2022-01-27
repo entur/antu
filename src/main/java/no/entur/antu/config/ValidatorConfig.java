@@ -16,13 +16,11 @@
 
 package no.entur.antu.config;
 
-import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validator.NetexValidationProfile;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.id.ReferenceToNsrValidator;
 import no.entur.antu.validator.id.TrainElementRegistryIdValidator;
-import no.entur.antu.validator.xpath.EnturValidationTreeFactory;
-import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.id.BlockJourneyReferencesIgnorer;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
@@ -34,59 +32,52 @@ import org.entur.netex.validation.validator.id.ServiceJourneyInterchangeIgnorer;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
-import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.XPathValidator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static no.entur.antu.Constants.VALIDATION_CLIENT_KAKKA;
+import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
 
 @Configuration
 public class ValidatorConfig {
 
-    @Bean("netexSchemaValidator")
+    @Bean
     public NetexSchemaValidator netexSchemaValidator(@Value("${antu.netex.validation.entries.max:100}") int maxValidationError) {
         return new NetexSchemaValidator(maxValidationError);
     }
 
-    @Bean()
-    public ValidationTreeFactory validationTreeFactory(OrganisationRepository organisationRepository) {
-        return new EnturValidationTreeFactory(organisationRepository);
-    }
-
-    @Bean("xpathValidator")
-    public XPathValidator xpathValidator(ValidationTreeFactory validationTreeFactory) {
-        return new XPathValidator(validationTreeFactory);
-    }
-
-    @Bean("netexIdValidator")
+    @Bean
     public NetexIdValidator netexIdValidator() {
         return new NetexIdValidator();
     }
 
-    @Bean("versionOnLocalNetexIdValidator")
+    @Bean
     public VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator() {
         return new VersionOnLocalNetexIdValidator();
     }
 
-    @Bean("versionOnRefToLocalNetexIdValidator")
+    @Bean
     public VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator() {
         return new VersionOnRefToLocalNetexIdValidator();
     }
 
-    @Bean("refToValidEntityTypeValidator")
+    @Bean
     public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator() {
         return new ReferenceToValidEntityTypeValidator();
     }
 
-    @Bean("nsrRefValidator")
-    public ReferenceToNsrValidator referenceToNsrValidator(StopPlaceRepository stopPlaceRepository) {
+    @Bean
+    public ReferenceToNsrValidator nsrRefValidator(StopPlaceRepository stopPlaceRepository) {
         return new ReferenceToNsrValidator(stopPlaceRepository);
     }
 
-    @Bean("neTexReferenceValidator")
+    @Bean
     public NeTexReferenceValidator neTexReferenceValidator(NetexIdRepository netexIdRepository, ReferenceToNsrValidator referenceToNsrValidator) {
         List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
         externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
@@ -96,21 +87,17 @@ public class ValidatorConfig {
         return new NeTexReferenceValidator(netexIdRepository, externalReferenceValidators);
     }
 
-    @Bean("netexIdUniquenessValidator")
+    @Bean
     public NetexIdUniquenessValidator netexIdUniquenessValidator(NetexIdRepository netexIdRepository) {
         return new NetexIdUniquenessValidator(netexIdRepository);
     }
 
-    @Bean("netexValidatorsRunner")
-    public NetexValidatorsRunner netexValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
-                                                       XPathValidator xpathValidator,
-                                                       NetexIdValidator netexIdValidator,
-                                                       VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
-                                                       ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
-                                                       NeTexReferenceValidator neTexReferenceValidator,
-                                                       NetexIdUniquenessValidator netexIdUniquenessValidator) {
-        List<NetexValidator> netexValidators = List.of(xpathValidator, netexIdValidator, versionOnLocalNetexIdValidator, referenceToValidEntityTypeValidator, neTexReferenceValidator, netexIdUniquenessValidator);
-        return new NetexValidatorsRunner(netexSchemaValidator, netexValidators);
+    @Bean
+    public NetexValidationProfile netexValidationProfile(@Qualifier("timetableDataValidatorsRunner") NetexValidatorsRunner timetableDataValidatorsRunner, @Qualifier("stopPlaceDataValidatorsRunner") NetexValidatorsRunner stopDataValidatorsRunner) {
+        return new NetexValidationProfile(Map.of(
+                VALIDATION_CLIENT_MARDUK, timetableDataValidatorsRunner,
+                VALIDATION_CLIENT_KAKKA, stopDataValidatorsRunner
+        ));
     }
 
 

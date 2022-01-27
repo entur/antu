@@ -56,6 +56,9 @@ public abstract class AntuRouteBuilderIntegrationTestBase {
     @Value("${blobstore.gcs.marduk.container.name}")
     private String mardukContainerName;
 
+    @Value("${blobstore.gcs.antu.container.name}")
+    private String antuContainerName;
+
 
     @Autowired
     protected ModelCamelContext context;
@@ -66,6 +69,9 @@ public abstract class AntuRouteBuilderIntegrationTestBase {
     @Autowired
     protected InMemoryBlobStoreRepository mardukInMemoryBlobStoreRepository;
 
+    @Autowired
+    protected InMemoryBlobStoreRepository antuInMemoryBlobStoreRepository;
+
 
     @EndpointInject("mock:sink")
     protected MockEndpoint sink;
@@ -73,6 +79,7 @@ public abstract class AntuRouteBuilderIntegrationTestBase {
     @PostConstruct
     void initInMemoryBlobStoreRepositories() {
         mardukInMemoryBlobStoreRepository.setContainerName(mardukContainerName);
+        antuInMemoryBlobStoreRepository.setContainerName(antuContainerName);
     }
 
 }
