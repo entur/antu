@@ -7,6 +7,8 @@ import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RLock;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Set;
@@ -26,6 +28,8 @@ public class RedisNetexIdRepository implements NetexIdRepository {
 
     private static final String ACCUMULATED_NETEX_ID_LOCK_PREFIX = "ACCUMULATED_NETEX_ID_LOCK_";
     private static final String ACCUMULATED_NETEX_ID_SET_PREFIX = "ACCUMULATED_NETEX_ID_SET_";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisNetexIdRepository.class);
 
     private final RedissonClient redissonClient;
 
@@ -66,8 +70,10 @@ public class RedisNetexIdRepository implements NetexIdRepository {
     public Set<String> getSharedNetexIds(String reportId) {
         Set<String> commonIds = commonIdsCache.get(getCommonNetexIdsKey(reportId));
         if (commonIds != null) {
+            LOGGER.debug("Found {} shared ids for reportId {}", commonIds.size(), reportId);
             return commonIds;
         } else {
+            LOGGER.debug("No shared ids found for reportId {}", reportId);
             return Collections.emptySet();
         }
     }
