@@ -34,6 +34,10 @@ public abstract class AbstractBlobStoreService {
         this.repository.setContainerName(containerName);
     }
 
+    public boolean existBlob(@Header(value = Constants.FILE_HANDLE) String name, Exchange exchange) {
+        return repository.existBlob(name);
+    }
+
     public InputStream getBlob(@Header(value = Constants.FILE_HANDLE) String name, Exchange exchange) {
         return repository.getBlob(name);
     }
