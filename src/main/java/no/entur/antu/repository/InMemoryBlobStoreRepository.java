@@ -60,6 +60,13 @@ public class InMemoryBlobStoreRepository implements BlobStoreRepository {
     }
 
     @Override
+    public boolean existBlob(String objectName) {
+        LOGGER.debug("existBlob called in in-memory blob store");
+        byte[] data = getBlobsForCurrentContainer().get(objectName);
+        return data != null;
+    }
+
+    @Override
     public InputStream getBlob(String objectName) {
         LOGGER.debug("get blob called in in-memory blob store");
         byte[] data = getBlobsForCurrentContainer().get(objectName);

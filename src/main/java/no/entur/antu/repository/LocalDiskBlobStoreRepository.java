@@ -53,6 +53,13 @@ public class LocalDiskBlobStoreRepository implements BlobStoreRepository {
     }
 
     @Override
+    public boolean existBlob(String objectName) {
+        LOGGER.debug("existBlob called in local-disk blob store on {}", objectName);
+        Path path = Paths.get(getContainerFolder()).resolve(objectName);
+        return path.toFile().exists();
+    }
+
+    @Override
     public InputStream getBlob(String objectName) {
         LOGGER.debug("get blob called in local-disk blob store on {}", objectName);
         Path path = Paths.get(getContainerFolder()).resolve(objectName);

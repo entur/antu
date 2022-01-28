@@ -136,6 +136,12 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                         .append("/validation-report-")
                         .append(header(VALIDATION_REPORT_ID))
                         .append(".json"))
+                .choice()
+                .when(method("antuBlobStoreService", "existBlob"))
+                // protection against multiple pubsub message delivery
+                .log(LoggingLevel.WARN, correlation() + "The report has already been generated: ${header." + FILE_HANDLE + "}. Ignoring.")
+                .stop()
+                .otherwise()
                 .log(LoggingLevel.INFO, correlation() + "Uploading aggregated Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:uploadAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded aggregated Validation Report to GCS file ${header." + FILE_HANDLE + "}")
