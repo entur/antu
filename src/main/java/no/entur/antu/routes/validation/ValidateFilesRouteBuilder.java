@@ -21,6 +21,7 @@ package no.entur.antu.routes.validation;
 
 import no.entur.antu.exception.FileAlreadyValidatedException;
 import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.validator.ValidationReportTransformer;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -48,6 +49,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
     protected static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
     private static final String PROP_ALL_NETEX_FILE_NAMES ="ALL_NETEX_FILE_NAMES";
 
+    private static final ValidationReportTransformer VALIDATION_REPORT_TRANSFORMER = new ValidationReportTransformer(50);
+
     @Override
     public void configure() throws Exception {
         super.configure();
@@ -68,6 +71,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:reportSystemError")
                 // end catch
                 .end()
+                .to("direct:truncateReport")
                 .to("direct:saveValidationReport")
                 .to("direct:notifyValidationReportAggregator")
                 .routeId("validate-netex");
@@ -101,6 +105,12 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                     exchange.setProperty(PROP_VALIDATION_REPORT, validationReport);
                 })
                 .routeId("report-system-error");
+
+        from("direct:truncateReport")
+                .log(LoggingLevel.INFO, correlation() + "Truncating validation report")
+                .bean(VALIDATION_REPORT_TRANSFORMER, "truncate(${exchangeProperty." + PROP_VALIDATION_REPORT + "})")
+                .log(LoggingLevel.INFO, correlation() + "Truncated validation report")
+                .routeId("truncate-validation-report");
 
         from("direct:saveValidationReport")
                 .log(LoggingLevel.INFO, correlation() + "Saving validation report")
