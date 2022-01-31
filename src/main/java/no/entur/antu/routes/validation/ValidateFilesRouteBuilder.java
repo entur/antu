@@ -19,6 +19,7 @@
 package no.entur.antu.routes.validation;
 
 
+import no.entur.antu.exception.AntuException;
 import no.entur.antu.exception.FileAlreadyValidatedException;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validator.ValidationReportTransformer;
@@ -66,6 +67,9 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .doCatch(FileAlreadyValidatedException.class)
                 .log(LoggingLevel.WARN, correlation() + "Ignoring NeTEx file ${header." + FILE_HANDLE + "} that has already been validated")
                 .stop()
+                .doCatch(InterruptedException.class)
+                .log(LoggingLevel.INFO, correlation() + "Interrupted while processing file ${header." + FILE_HANDLE + "}, the file will be retried later: ${exception.message} stacktrace: ${exception.stacktrace}")
+                .throwException(new AntuException("File processing interrupted"))
                 .doCatch(Exception.class)
                 .log(LoggingLevel.ERROR, correlation() + "System error while validating the NeTEx file ${header." + FILE_HANDLE + "}: ${exception.message} stacktrace: ${exception.stacktrace}")
                 .to("direct:reportSystemError")
