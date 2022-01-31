@@ -24,7 +24,6 @@ import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.KeyGenerator;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -61,12 +60,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .setHeader(Constants.VALIDATION_REPORT_ID, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()).substring(0, 18))
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyStatus")
-                .process(exchange -> {
-                    KeyGenerator generator = KeyGenerator.getInstance("DES");
-                    exchange.getIn().setBody(generator.generateKey().getEncoded());
-                })
-                .marshal().base64()
-                .setHeader(Constants.ENCRYPTION_KEY, body())
+                .to("direct:createEncryptionKey")
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("init-dataset-validation");
