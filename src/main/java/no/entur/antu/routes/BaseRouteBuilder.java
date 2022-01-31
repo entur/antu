@@ -29,6 +29,7 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.google.pubsub.GooglePubsubConstants;
 import org.apache.camel.component.google.pubsub.GooglePubsubEndpoint;
 import org.apache.camel.component.google.pubsub.consumer.AcknowledgeAsync;
+import org.apache.camel.converter.crypto.CryptoDataFormat;
 import org.apache.camel.support.DefaultExchange;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -62,7 +63,8 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
             Constants.JOB_TYPE,
             Constants.VALIDATION_REPORT_ID,
             Constants.VALIDATION_STAGE_HEADER,
-            Constants.VALIDATION_CLIENT_HEADER};
+            Constants.VALIDATION_CLIENT_HEADER,
+            Constants.ENCRYPTION_KEY};
 
     @Value("${quartz.lenient.fire.time.ms:180000}")
     private int lenientFireTimeMs;

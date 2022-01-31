@@ -78,7 +78,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:downloadSingleNetexFile").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Downloading single NeTEx file ${header." + FILE_HANDLE + "}")
-                .to("direct:getAntuBlob")
+                .to("direct:downloadBlobFromMemoryStore")
                 .log(LoggingLevel.INFO, correlation() + "Downloaded single NeTEx file ${header." + FILE_HANDLE + "}")
                 .filter(body().isNull())
                 .log(LoggingLevel.ERROR, correlation() + "NeTEx file not found: ${header." + FILE_HANDLE + "}")

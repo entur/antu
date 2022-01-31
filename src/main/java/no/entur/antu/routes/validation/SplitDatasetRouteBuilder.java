@@ -119,7 +119,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .marshal().zipFile()
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
                 .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx file ${header." + NETEX_FILE_NAME + "} to GCS file ${header." + FILE_HANDLE + "}")
-                .to("direct:uploadAntuBlob")
+                .to("direct:uploadBlobToMemoryStore")
                 .routeId("upload-single-netex-file");
 
     }

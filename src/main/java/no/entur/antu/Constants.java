@@ -20,7 +20,7 @@ package no.entur.antu;
 
 public final class Constants {
     public static final String FILE_HANDLE = "RutebankenFileHandle";
-    public static final String NETEX_FILE_NAME = "NETEX_FILE_NAME";
+    public static final String NETEX_FILE_NAME = "EnturNetexFileName";
     public static final String FILENAME_DELIMITER = "§";
 
     public static final String DATASET_REFERENTIAL = "EnturDatasetReferential";
@@ -70,6 +70,8 @@ public final class Constants {
 
     public static final String PEN_XMLNS = "PEN";
     public static final String PEN_XMLNSURL = "http://www.rutebanken.org/ns/pen";
+
+    public static final String ENCRYPTION_KEY = "EnturTemporaryFileEncryptionKey";
 
 
     private Constants() {

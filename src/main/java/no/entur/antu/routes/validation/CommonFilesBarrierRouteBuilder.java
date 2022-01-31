@@ -38,6 +38,7 @@ import static no.entur.antu.Constants.CORRELATION_ID;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
+import static no.entur.antu.Constants.ENCRYPTION_KEY;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
@@ -103,6 +104,7 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
             aggregatedExchange.getIn().setHeader(CORRELATION_ID, newExchange.getIn().getHeader(CORRELATION_ID));
             aggregatedExchange.getIn().setHeader(VALIDATION_STAGE_HEADER, newExchange.getIn().getHeader(VALIDATION_STAGE_HEADER));
             aggregatedExchange.getIn().setHeader(VALIDATION_CLIENT_HEADER, newExchange.getIn().getHeader(VALIDATION_CLIENT_HEADER));
+            aggregatedExchange.getIn().setHeader(ENCRYPTION_KEY, newExchange.getIn().getHeader(ENCRYPTION_KEY));
             aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getBody());
             // check if all individual reports have been received
             // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.
