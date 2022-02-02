@@ -25,6 +25,7 @@ import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
+import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.XPathValidator;
@@ -53,10 +54,11 @@ public class StopPlaceDataValidatorConfig {
                                                                @Qualifier("stopPlaceDataXPathValidator") XPathValidator xpathValidator,
                                                                NetexIdValidator netexIdValidator,
                                                                VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
+                                                               VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                NeTexReferenceValidator neTexReferenceValidator,
                                                                NetexIdUniquenessValidator netexIdUniquenessValidator) {
-        List<NetexValidator> netexValidators = List.of(xpathValidator, netexIdValidator, versionOnLocalNetexIdValidator, referenceToValidEntityTypeValidator, neTexReferenceValidator, netexIdUniquenessValidator);
+        List<NetexValidator> netexValidators = List.of(xpathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, neTexReferenceValidator, netexIdUniquenessValidator);
         NetexXMLParser netexXMLParser = new NetexXMLParser();
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
     }

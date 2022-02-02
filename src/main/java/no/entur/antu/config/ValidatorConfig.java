@@ -77,8 +77,8 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator() {
-        return new VersionOnRefToLocalNetexIdValidator();
+    public VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator(ValidationReportEntryFactory validationReportEntryFactory) {
+        return new VersionOnRefToLocalNetexIdValidator(validationReportEntryFactory);
     }
 
     @Bean
