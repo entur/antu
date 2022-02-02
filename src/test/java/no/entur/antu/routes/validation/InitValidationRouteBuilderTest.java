@@ -68,6 +68,7 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_KAKKA;
+import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
@@ -85,7 +86,6 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
     private static final String TEST_DATASET_STOP_PLACE_FILE_NAME = "stopdata.zip";
 
     private static final String VALIDATION_STAGE_PREVALIDATION = "EnturValidationStagePreValidation";
-    private static final String TEST_VALIDATION_CLIENT = "test-validation-client";
     public static final String TEST_DATASET_STOP_PLACE_CODESPACE = "nsr";
 
 
@@ -156,7 +156,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         headers.put(Constants.FILE_HANDLE, datasetBlobName);
         headers.put(Constants.DATASET_REFERENTIAL, "flb");
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
-        headers.put(Constants.VALIDATION_CLIENT_HEADER, TEST_VALIDATION_CLIENT);
+        headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyStatus.assertIsSatisfied();
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
@@ -165,7 +165,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(CORRELATION_ID) != null));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID) != null));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_STAGE_PREVALIDATION.equals(exchange.getIn().getHeader(VALIDATION_STAGE_HEADER))));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> TEST_VALIDATION_CLIENT.equals(exchange.getIn().getHeader(VALIDATION_CLIENT_HEADER))));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_CLIENT_MARDUK.equals(exchange.getIn().getHeader(VALIDATION_CLIENT_HEADER))));
     }
 
     @Test

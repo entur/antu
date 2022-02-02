@@ -10,10 +10,9 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 import no.entur.antu.validator.codespace.NetexCodespace;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.exception.NetexValidationException;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +25,11 @@ import java.util.stream.Collectors;
 public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
 
     private static final String MESSAGE_FORMAT = "Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s";
-    public static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.ERROR;
-    public static final String RULE_NAME = "CODESPACE";
+    public static final String RULE_CODE = "CODESPACE";
 
     @Override
-    public List<ValidationReportEntry> validate(XPathValidationContext validationContext) {
-        List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
+    public List<XPathValidationReportEntry> validate(XPathValidationContext validationContext) {
+        List<XPathValidationReportEntry> validationReportEntries = new ArrayList<>();
         Set<NetexCodespace> validCodespaces = NetexCodespace.getValidNetexCodespacesFor(validationContext.getCodespace());
         try {
             XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler().compile("PublicationDelivery/dataObjects/*/codespaces/Codespace | PublicationDelivery/dataObjects/CompositeFrame/frames/*/codespaces/Codespace").load();
@@ -51,7 +49,7 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
                 NetexCodespace netexCodespace = new NetexCodespace(xmlns, xmlnsUrl);
                 if (!validCodespaces.contains(netexCodespace)) {
                     String message = getXdmNodeLocation(codespaceNode) + String.format(MESSAGE_FORMAT, netexCodespace, validCodespaces.stream().map(NetexCodespace::toString).collect(Collectors.joining()));
-                    validationReportEntries.add(new ValidationReportEntry(message, RULE_NAME, SEVERITY, validationContext.getFileName()));
+                    validationReportEntries.add(new XPathValidationReportEntry(message, RULE_CODE, validationContext.getFileName()));
                 }
             }
             return validationReportEntries;
@@ -66,15 +64,9 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
     }
 
     @Override
-    public String getName() {
-        return RULE_NAME;
+    public String getCode() {
+        return RULE_CODE;
     }
-
-    @Override
-    public ValidationReportEntrySeverity getSeverity() {
-        return SEVERITY;
-    }
-
 
     private static XdmNode getChild(XdmNode parent, QName childName) {
         XdmSequenceIterator<XdmNode> iter = parent.axisIterator(Axis.CHILD, childName);
