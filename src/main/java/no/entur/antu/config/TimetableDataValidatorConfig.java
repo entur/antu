@@ -21,6 +21,7 @@ import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
+import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
@@ -45,8 +46,8 @@ public class TimetableDataValidatorConfig {
     }
 
     @Bean
-    public XPathValidator timetableDataXPathValidator(@Qualifier("timetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory) {
-        return new XPathValidator(validationTreeFactory);
+    public XPathValidator timetableDataXPathValidator(@Qualifier("timetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory, ValidationReportEntryFactory validationReportEntryFactory) {
+        return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
     }
 
     @Bean

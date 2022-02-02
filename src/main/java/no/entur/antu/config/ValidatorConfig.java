@@ -21,7 +21,11 @@ import no.entur.antu.validator.NetexValidationProfile;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.id.ReferenceToNsrValidator;
 import no.entur.antu.validator.id.TrainElementRegistryIdValidator;
+import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
+import org.entur.netex.validation.configuration.ValidationConfigLoader;
+import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
+import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.BlockJourneyReferencesIgnorer;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
@@ -53,13 +57,23 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public NetexIdValidator netexIdValidator() {
-        return new NetexIdValidator();
+    public ValidationConfigLoader validationConfigLoader(@Value("${antu.netex.validation.configuration.file:configuration.antu.yaml}")String configurationFile) {
+        return new DefaultValidationConfigLoader(configurationFile);
     }
 
     @Bean
-    public VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator() {
-        return new VersionOnLocalNetexIdValidator();
+    public ValidationReportEntryFactory validationReportEntryFactory(ValidationConfigLoader validationConfigLoader) {
+        return new DefaultValidationEntryFactory(validationConfigLoader);
+    }
+
+    @Bean
+    public NetexIdValidator netexIdValidator(ValidationReportEntryFactory validationReportEntryFactory) {
+        return new NetexIdValidator(validationReportEntryFactory);
+    }
+
+    @Bean
+    public VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator(ValidationReportEntryFactory validationReportEntryFactory) {
+        return new VersionOnLocalNetexIdValidator(validationReportEntryFactory);
     }
 
     @Bean
@@ -68,8 +82,8 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator() {
-        return new ReferenceToValidEntityTypeValidator();
+    public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator(ValidationReportEntryFactory validationReportEntryFactory) {
+        return new ReferenceToValidEntityTypeValidator(validationReportEntryFactory);
     }
 
     @Bean
@@ -78,18 +92,18 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public NeTexReferenceValidator neTexReferenceValidator(NetexIdRepository netexIdRepository, ReferenceToNsrValidator referenceToNsrValidator) {
+    public NeTexReferenceValidator neTexReferenceValidator(NetexIdRepository netexIdRepository, ReferenceToNsrValidator referenceToNsrValidator, ValidationReportEntryFactory validationReportEntryFactory) {
         List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
         externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
         externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
         externalReferenceValidators.add(new TrainElementRegistryIdValidator());
         externalReferenceValidators.add(referenceToNsrValidator);
-        return new NeTexReferenceValidator(netexIdRepository, externalReferenceValidators);
+        return new NeTexReferenceValidator(netexIdRepository, externalReferenceValidators, validationReportEntryFactory);
     }
 
     @Bean
-    public NetexIdUniquenessValidator netexIdUniquenessValidator(NetexIdRepository netexIdRepository) {
-        return new NetexIdUniquenessValidator(netexIdRepository);
+    public NetexIdUniquenessValidator netexIdUniquenessValidator(NetexIdRepository netexIdRepository, ValidationReportEntryFactory validationReportEntryFactory) {
+        return new NetexIdUniquenessValidator(netexIdRepository, validationReportEntryFactory);
     }
 
     @Bean

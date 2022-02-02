@@ -1,0 +1,12 @@
+validationRuleConfigs:
+  # Entur custom rules
+  - code: NSR_CODESPACE
+    name: NSR_CODESPACE
+    severity: ERROR
+  - code: AUTHORITY_ID
+    name: AUTHORITY_ID
+    severity: ERROR
+  - code: CODESPACE
+    name: CODESPACE
+    severity: ERROR
+

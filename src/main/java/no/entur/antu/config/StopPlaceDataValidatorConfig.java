@@ -20,6 +20,7 @@ import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.xpath.EnturStopPlaceDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
+import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
@@ -43,8 +44,8 @@ public class StopPlaceDataValidatorConfig {
     }
 
     @Bean
-    public XPathValidator stopPlaceDataXPathValidator(@Qualifier("stopPlaceDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory) {
-        return new XPathValidator(validationTreeFactory);
+    public XPathValidator stopPlaceDataXPathValidator(@Qualifier("stopPlaceDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory, ValidationReportEntryFactory validationReportEntryFactory) {
+        return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
     }
 
     @Bean
