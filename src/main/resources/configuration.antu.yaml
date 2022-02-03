@@ -9,4 +9,12 @@ validationRuleConfigs:
   - code: CODESPACE
     name: CODESPACE
     severity: ERROR
-
+  - code: NETEX_ID_2
+    name: NETEX_ID_2
+    severity: ERROR
+  - code: NETEX_ID_3
+    name: NETEX_ID_3
+    severity: ERROR
+  - code: NETEX_ID_4
+    name: NETEX_ID_4
+    severity: ERROR
