@@ -1,9 +1,11 @@
 package no.entur.antu.sweden.validator;
 
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
+import no.entur.antu.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
+import org.entur.netex.validation.validator.xpath.rules.ValidatedAllowedTransportMode;
 
 import java.util.List;
 
@@ -14,14 +16,6 @@ import java.util.List;
 public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetableDataValidationTreeFactory {
     public EnturTimetableDataSwedenValidationTreeFactory() {
         super(null);
-    }
-
-    @Override
-    protected ValidationTree getResourceFrameValidationTree(String path) {
-        ValidationTree resourceFrameValidationTree = super.getResourceFrameValidationTree(path);
-        // remove validation against the Norwegian organisation registry
-        resourceFrameValidationTree.removeValidationRule("AUTHORITY_ID");
-        return resourceFrameValidationTree;
     }
 
     @Override
@@ -38,9 +32,26 @@ public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetabl
     @Override
     protected List<ValidationRule> getCompositeFrameBaseValidationRules() {
         List<ValidationRule> compositeFrameBaseValidationRules = super.getCompositeFrameBaseValidationRules();
+        // remove check on NSR codespace
+        compositeFrameBaseValidationRules.removeIf(validationRule -> validationRule.getCode().equals("NSR_CODESPACE"));
         // allow common files that contain only a SiteFrame
         compositeFrameBaseValidationRules.removeIf(validationRule -> validationRule.getCode().equals("SITE_FRAME_IN_COMMON_FILE"));
         return compositeFrameBaseValidationRules;
     }
 
+
+    protected ValidationTree getServiceFrameValidationTreeForLineFile(String path) {
+        ValidationTree serviceFrameValidationTree = super.getServiceFrameValidationTreeForLineFile(path);
+        serviceFrameValidationTree.removeValidationRule("TRANSPORT_MODE");
+        serviceFrameValidationTree.addValidationRule(new SwedenValidatedAllowedTransportMode());
+        return serviceFrameValidationTree;
+    }
+
+    @Override
+    protected ValidationTree getResourceFrameValidationTree(String path) {
+        ValidationTree resourceFrameValidationTree = super.getResourceFrameValidationTree(path);
+        // remove validation against the Norwegian organisation registry
+        resourceFrameValidationTree.removeValidationRule("AUTHORITY_ID");
+        return resourceFrameValidationTree;
+    }
 }
