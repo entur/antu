@@ -62,7 +62,8 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
             Constants.JOB_TYPE,
             Constants.VALIDATION_REPORT_ID,
             Constants.VALIDATION_STAGE_HEADER,
-            Constants.VALIDATION_CLIENT_HEADER};
+            Constants.VALIDATION_CLIENT_HEADER,
+            Constants.VALIDATION_PROFILE_HEADER};
 
     @Value("${quartz.lenient.fire.time.ms:180000}")
     private int lenientFireTimeMs;

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class RedisNetexIdRepository implements NetexIdRepository {
 
     private static final String NETEX_LOCAL_ID_SET_PREFIX = "NETEX_LOCAL_ID_SET_";
     private static final String COMMON_NETEX_ID_SET_PREFIX = "COMMON_NETEX_ID_SET_";
+    private static final String COMMON_NETEX_ID_LOCK_PREFIX = "COMMON_NETEX_LOCK_SET_";
 
 
     private static final String ACCUMULATED_NETEX_ID_LOCK_PREFIX = "ACCUMULATED_NETEX_ID_LOCK_";
@@ -82,12 +84,27 @@ public class RedisNetexIdRepository implements NetexIdRepository {
     public void addSharedNetexIds(String reportId, Set<IdVersion> commonIdVersions) {
         Set<String> commonIds = commonIdVersions.stream().map(IdVersion::getId).collect(Collectors.toSet());
         String cacheKey = getCommonNetexIdsKey(reportId);
-        commonIdsCache.put(cacheKey, commonIds);
+        RLock lock = redissonClient.getLock(getCommonNetexIdsLockKey(reportId));
+        try {
+            lock.lock();
+            Set<String> existingCommonIds = commonIdsCache.get(cacheKey);
+            if (existingCommonIds == null) {
+                existingCommonIds = new HashSet<>();
+            }
+            existingCommonIds.addAll(commonIds);
+            commonIdsCache.put(cacheKey, existingCommonIds);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+
     }
 
     @Override
     public void cleanUp(String reportId) {
         commonIdsCache.fastRemove(getCommonNetexIdsKey(reportId));
+        redissonClient.getKeys().delete(getCommonNetexIdsLockKey(reportId));
         redissonClient.getKeys().delete(getAccumulatedNetexIdsKey(reportId));
         redissonClient.getKeys().delete(getAccumulatedNetexIdsLockKey(reportId));
         redissonClient.getKeys().deleteByPattern(NETEX_LOCAL_ID_SET_PREFIX + reportId + '*');
@@ -108,5 +125,9 @@ public class RedisNetexIdRepository implements NetexIdRepository {
 
     private String getCommonNetexIdsKey(String reportId) {
         return COMMON_NETEX_ID_SET_PREFIX + reportId;
+    }
+
+    private String getCommonNetexIdsLockKey(String reportId) {
+        return COMMON_NETEX_ID_LOCK_PREFIX + reportId;
     }
 }
