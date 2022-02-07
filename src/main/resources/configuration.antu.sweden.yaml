@@ -1,0 +1,21 @@
+validationRuleConfigs:
+    # Entur custom rules for swedish timetable data
+  - code: NETEX_ID_SE_1
+    name: SE/Invalid country code in NeTEx ID
+    severity: ERROR
+  - code: VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1
+    name: SE/Validity condition on common frames
+    severity: ERROR
+  - code: STOP_PLACE_REF_SE_1
+    name: SE/Missing reference to stop place or quay
+    severity: ERROR
+
+  # Reduced severity for missing URL on Authority
+  - code: AUTHORITY_4
+    name: SE/Authority ContactDetails
+    severity: WARNING
+  - code: AUTHORITY_5
+    name: SE/Authority URL
+    severity: WARNING
+
+

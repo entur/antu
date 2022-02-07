@@ -53,10 +53,15 @@ public final class Constants {
      */
     public static final String VALIDATION_STAGE_HEADER = "EnturValidationStage";
     public static final String VALIDATION_CLIENT_HEADER = "EnturValidationClient";
+    public static final String VALIDATION_PROFILE_HEADER = "EnturValidationProfile";
     public static final String CORRELATION_ID = "RutebankenCorrelationId";
 
     public static final String VALIDATION_CLIENT_MARDUK = "Marduk";
     public static final String VALIDATION_CLIENT_KAKKA = "Kakka";
+
+    public static final String VALIDATION_PROFILE_TIMETABLE = "Timetable";
+    public static final String VALIDATION_PROFILE_TIMETABLE_SWEDEN = "TimetableSweden";
+    public static final String VALIDATION_PROFILE_STOP = "Stop";
 
     public static final String CAMEL_ALL_HTTP_HEADERS = "CamelHttp*";
     public static final String VALIDATION_REPORT_PREFIX = "/validation-report-";

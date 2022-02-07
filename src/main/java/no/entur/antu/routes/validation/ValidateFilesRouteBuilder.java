@@ -22,6 +22,7 @@ package no.entur.antu.routes.validation;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.exception.FileAlreadyValidatedException;
 import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.exception.RetryableAntuException;
 import no.entur.antu.validator.ValidationReportTransformer;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
@@ -35,7 +36,7 @@ import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
-import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 
 
@@ -67,8 +68,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .doCatch(FileAlreadyValidatedException.class)
                 .log(LoggingLevel.WARN, correlation() + "Ignoring NeTEx file ${header." + FILE_HANDLE + "} that has already been validated")
                 .stop()
-                .doCatch(InterruptedException.class)
-                .log(LoggingLevel.INFO, correlation() + "Interrupted while processing file ${header." + FILE_HANDLE + "}, the file will be retried later: ${exception.message} stacktrace: ${exception.stacktrace}")
+                .doCatch(InterruptedException.class, RetryableAntuException.class)
+                .log(LoggingLevel.INFO, correlation() + "Retryable exception while processing file ${header." + FILE_HANDLE + "}, the file will be retried later: ${exception.message} stacktrace: ${exception.stacktrace}")
                 .throwException(new AntuException("File processing interrupted"))
                 .doCatch(Exception.class)
                 .log(LoggingLevel.ERROR, correlation() + "System error while validating the NeTEx file ${header." + FILE_HANDLE + "}: ${exception.message} stacktrace: ${exception.stacktrace}")
@@ -94,7 +95,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:runNetexValidators").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Running NeTEx validators")
-                .bean("netexValidationProfile", "validate(${header." + VALIDATION_CLIENT_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})")
+                .validate(header(VALIDATION_PROFILE_HEADER).isNotNull())
+                .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})")
                 .setProperty(PROP_VALIDATION_REPORT, body())
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");

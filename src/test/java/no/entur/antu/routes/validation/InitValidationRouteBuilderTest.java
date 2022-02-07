@@ -69,6 +69,7 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_KAKKA;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
@@ -191,6 +192,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_STOP_PLACE_CODESPACE);
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
         headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_KAKKA);
+        headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_STOP);
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyStatus.assertIsSatisfied();
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
