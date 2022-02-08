@@ -98,7 +98,7 @@ spec:
       schedulerName: default-scheduler
       securityContext: {}
       serviceAccountName: antu-service-account
-      terminationGracePeriodSeconds: 30
+      terminationGracePeriodSeconds: 80
       volumes:
         - name: antu-service-account
           secret:

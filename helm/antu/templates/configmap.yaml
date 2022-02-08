@@ -16,7 +16,7 @@ data:
     camel.cluster.kubernetes.config-map-name=antu-leaders
     camel.servlet.mapping.context-path=/services/*
     # the Camel shutdown timeout must be shorter than the Kubernetes terminationGracePeriod
-    antu.shutdown.timeout=25
+    antu.shutdown.timeout=75
     antu.camel.redelivery.max=0
 
     # Organisation register
