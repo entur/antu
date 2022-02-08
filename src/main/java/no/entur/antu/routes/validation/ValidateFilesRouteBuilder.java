@@ -96,6 +96,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         from("direct:runNetexValidators").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Running NeTEx validators")
                 .validate(header(VALIDATION_PROFILE_HEADER).isNotNull())
+                .validate(header(DATASET_CODESPACE).isNotNull())
                 .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})")
                 .setProperty(PROP_VALIDATION_REPORT, body())
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
