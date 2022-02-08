@@ -1,6 +1,5 @@
 package no.entur.antu.validator.xpath.rules;
 
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
@@ -8,7 +7,8 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.organisation.OrganisationRepository;
-import org.entur.netex.validation.validator.xpath.ValidationRule;
+import org.entur.netex.validation.validator.DataLocation;
+import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Validate the Authority ids against the Organisation Register.
  */
-public class ValidateAuthorityId implements ValidationRule {
+public class ValidateAuthorityId extends AbstractXPathValidationRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateAuthorityId.class);
 
@@ -49,14 +49,9 @@ public class ValidateAuthorityId implements ValidationRule {
                 List<XPathValidationReportEntry> validationReportEntries = new ArrayList<>();
                 for (XdmItem item : nodes) {
                     XdmNode xdmNode = (XdmNode) item;
-
-                    int lineNumber = xdmNode.getLineNumber();
-                    int columnNumber = xdmNode.getColumnNumber();
-                    String netexId = xdmNode.getAttributeValue(new QName("id"));
-
-                    String message = "Line " + lineNumber + ", Column " + columnNumber + ", NeTEx id " + netexId + ": " +  MESSAGE ;
-                    LOGGER.warn(message);
-                    validationReportEntries.add(new XPathValidationReportEntry(message, RULE_CODE, validationContext.getFileName()));
+                    DataLocation dataLocation = getXdmNodeLocation(validationContext.getFileName(), xdmNode);
+                    LOGGER.warn("{}" + MESSAGE, dataLocation);
+                    validationReportEntries.add(new XPathValidationReportEntry(MESSAGE, RULE_CODE, dataLocation));
                 }
                 return validationReportEntries;
             }

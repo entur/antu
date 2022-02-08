@@ -1,6 +1,7 @@
 package no.entur.antu.sweden.stop;
 
 import org.entur.netex.validation.validator.AbstractNetexValidator;
+import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
@@ -68,8 +69,8 @@ public class SwedenStopPlaceValidator extends AbstractNetexValidator {
 
 
     private ValidationReportEntry createValidationReportEntry(IdVersion id) {
-        String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE_TO_STOP_OR_QUAY;
-        return createValidationReportEntry(RULE_CODE_STOP_PLACE_REF_SE_1, id.getFilename(), validationReportEntryMessage);
+        DataLocation location = getIdVersionLocation(id);
+        return createValidationReportEntry(RULE_CODE_STOP_PLACE_REF_SE_1, location, MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE_TO_STOP_OR_QUAY);
     }
 
 

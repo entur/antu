@@ -2,6 +2,7 @@ package no.entur.antu.validator.id;
 
 import no.entur.antu.validator.codespace.NetexCodespace;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
+import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
@@ -55,22 +56,22 @@ public class NetexIdValidator extends AbstractNetexValidator {
 
         for (IdVersion id : validationContext.getLocalIds()) {
             Matcher m = PATTERN_VALID_ID.matcher(id.getId());
+            DataLocation dataLocation = getIdVersionLocation(id);
             if (!m.matches()) {
-                String validationReportEntryMessage = getIdVersionLocation(id) + MESSAGE_FORMAT_INVALID_ID_STRUCTURE;
-                validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_2, id.getFilename(), validationReportEntryMessage));
+                validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_2, dataLocation, MESSAGE_FORMAT_INVALID_ID_STRUCTURE));
                 LOGGER.debug("Id {} has an invalid format. Valid format is {}", id, REGEXP_VALID_ID);
             } else {
                 if (!m.group(2).equals(id.getElementName())) {
                     String expectedId = m.group(1) + ":" + id.getElementName() + ":" + m.group(3);
-                    String validationReportEntryMessage = getIdVersionLocation(id) + String.format(MESSAGE_FORMAT_INVALID_ID_NAME, id.getId(), expectedId);
-                    validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_3, id.getFilename(), validationReportEntryMessage));
+                    String validationReportEntryMessage = String.format(MESSAGE_FORMAT_INVALID_ID_NAME, id.getId(), expectedId);
+                    validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_3, dataLocation, validationReportEntryMessage));
                     LOGGER.debug("Id {} has an invalid format for the name part. Expected {}", id, expectedId);
                 }
 
                 String prefix = m.group(1);
                 if (!validNetexCodespaces.contains(prefix)) {
-                    String validationReportEntryMessage = getIdVersionLocation(id) + String.format(MESSAGE_FORMAT_UNAPPROVED_CODESPACE, validNetexCodespaceList);
-                    validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_4, id.getFilename(), validationReportEntryMessage));
+                    String validationReportEntryMessage = String.format(MESSAGE_FORMAT_UNAPPROVED_CODESPACE, validNetexCodespaceList);
+                    validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_4, dataLocation, validationReportEntryMessage));
                     LOGGER.debug("Id {} uses an unapproved codespace prefix. Approved codespaces are: {}", id, validNetexCodespaceList);
                 }
 

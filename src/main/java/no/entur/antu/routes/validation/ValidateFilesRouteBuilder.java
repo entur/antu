@@ -26,6 +26,7 @@ import no.entur.antu.exception.RetryableAntuException;
 import no.entur.antu.validator.ValidationReportTransformer;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
@@ -107,7 +108,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                     String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
                     String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID, String.class);
                     ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
-                    ValidationReportEntry validationReportEntry = new ValidationReportEntry("System error while validating the  file " + exchange.getIn().getHeader(NETEX_FILE_NAME), "SYSTEM_ERROR", ValidationReportEntrySeverity.ERROR, exchange.getIn().getHeader(NETEX_FILE_NAME, String.class));
+                    String fileName = exchange.getIn().getHeader(NETEX_FILE_NAME, String.class);
+                    ValidationReportEntry validationReportEntry = new ValidationReportEntry("System error while validating the  file " + exchange.getIn().getHeader(NETEX_FILE_NAME), "SYSTEM_ERROR", ValidationReportEntrySeverity.ERROR, new DataLocation(null, fileName, null, null));
                     validationReport.addValidationReportEntry(validationReportEntry);
                     exchange.setProperty(PROP_VALIDATION_REPORT, validationReport);
                 })
