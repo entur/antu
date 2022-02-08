@@ -1,11 +1,9 @@
 package no.entur.antu.sweden.validator;
 
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import no.entur.antu.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
-import org.entur.netex.validation.validator.xpath.rules.ValidatedAllowedTransportMode;
 
 import java.util.List;
 
@@ -40,10 +38,12 @@ public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetabl
     }
 
 
+    @Override
     protected ValidationTree getServiceFrameValidationTreeForLineFile(String path) {
         ValidationTree serviceFrameValidationTree = super.getServiceFrameValidationTreeForLineFile(path);
+        // use valid transport mode for swedish data
         serviceFrameValidationTree.removeValidationRule("TRANSPORT_MODE");
-        serviceFrameValidationTree.addValidationRule(new SwedenValidatedAllowedTransportMode());
+        serviceFrameValidationTree.addValidationRule(new SwedenValidateAllowedTransportMode());
         return serviceFrameValidationTree;
     }
 
