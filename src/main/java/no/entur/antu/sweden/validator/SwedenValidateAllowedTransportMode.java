@@ -2,7 +2,7 @@ package no.entur.antu.sweden.validator;
 
 import org.entur.netex.validation.validator.xpath.rules.ValidatedAllowedTransportMode;
 
-public class SwedenValidatedAllowedTransportMode extends ValidatedAllowedTransportMode {
+public class SwedenValidateAllowedTransportMode extends ValidatedAllowedTransportMode {
 
     private static final String SWEDEN_VALID_TRANSPORT_MODES = "'" + String.join("','",
             "coach",
@@ -18,7 +18,7 @@ public class SwedenValidatedAllowedTransportMode extends ValidatedAllowedTranspo
             "unknown")
             + "'";
 
-    public SwedenValidatedAllowedTransportMode() {
+    public SwedenValidateAllowedTransportMode() {
         super(SWEDEN_VALID_TRANSPORT_MODES);
 
     }

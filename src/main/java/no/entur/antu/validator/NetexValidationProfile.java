@@ -30,7 +30,10 @@ public class NetexValidationProfile {
      */
     public ValidationReport validate(String validationProfile, String codespace, String validationReportId, String filename, byte[] fileContent) {
         if (validationProfile == null) {
-            throw new AntuException("Missing validation profile ");
+            throw new AntuException("Missing validation profile");
+        }
+        if (codespace == null) {
+            throw new AntuException("Missing codespace");
         }
         NetexValidatorsRunner netexValidatorsRunner = netexValidatorsRunners.get(validationProfile);
         if (netexValidatorsRunner == null) {
