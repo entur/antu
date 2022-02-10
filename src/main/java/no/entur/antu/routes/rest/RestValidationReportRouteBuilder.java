@@ -23,6 +23,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestParamType;
+import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
@@ -130,6 +131,10 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .to("direct:getAntuBlob")
                 .filter(simple("${body} == null"))
                 .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
+                // end filter
+                .end()
+                .setHeader(Exchange.CONTENT_ENCODING, constant("gzip"))
+                .removeHeader(HttpHeaders.AUTHORIZATION)
                 .routeId("validation-report")
                 .endRest()
 
