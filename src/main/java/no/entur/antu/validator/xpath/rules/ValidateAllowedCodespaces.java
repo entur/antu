@@ -10,6 +10,7 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 import no.entur.antu.validator.codespace.NetexCodespace;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.exception.NetexValidationException;
+import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
@@ -48,8 +49,9 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
                 }
                 NetexCodespace netexCodespace = new NetexCodespace(xmlns, xmlnsUrl);
                 if (!validCodespaces.contains(netexCodespace)) {
-                    String message = getXdmNodeLocation(codespaceNode) + String.format(MESSAGE_FORMAT, netexCodespace, validCodespaces.stream().map(NetexCodespace::toString).collect(Collectors.joining()));
-                    validationReportEntries.add(new XPathValidationReportEntry(message, RULE_CODE, validationContext.getFileName()));
+                    DataLocation dataLocation = getXdmNodeLocation(validationContext.getFileName(), codespaceNode);
+                    String message = String.format(MESSAGE_FORMAT, netexCodespace, validCodespaces.stream().map(NetexCodespace::toString).collect(Collectors.joining()));
+                    validationReportEntries.add(new XPathValidationReportEntry(message, RULE_CODE, dataLocation));
                 }
             }
             return validationReportEntries;
