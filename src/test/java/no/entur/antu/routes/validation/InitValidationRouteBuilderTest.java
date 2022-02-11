@@ -155,7 +155,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         context.start();
         Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.FILE_HANDLE, datasetBlobName);
+        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
         headers.put(Constants.DATASET_REFERENTIAL, "flb");
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
         headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
@@ -190,7 +190,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         context.start();
         Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.FILE_HANDLE, datasetBlobName);
+        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
         headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_STOP_PLACE_CODESPACE);
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
         headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_KAKKA);
@@ -236,7 +236,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         context.start();
         Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.FILE_HANDLE, datasetBlobName);
+        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
         headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_CODESPACE);
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
         headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
