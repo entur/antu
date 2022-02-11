@@ -38,7 +38,7 @@ import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 
 
 /**
@@ -98,7 +98,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Running NeTEx validators")
                 .validate(header(VALIDATION_PROFILE_HEADER).isNotNull())
                 .validate(header(DATASET_CODESPACE).isNotNull())
-                .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})")
+                .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})")
                 .setProperty(PROP_VALIDATION_REPORT, body())
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");
@@ -106,7 +106,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         from("direct:reportSystemError")
                 .process(exchange -> {
                     String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
-                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID, String.class);
+                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
                     ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
                     String fileName = exchange.getIn().getHeader(NETEX_FILE_NAME, String.class);
                     ValidationReportEntry validationReportEntry = new ValidationReportEntry("System error while validating the  file " + exchange.getIn().getHeader(NETEX_FILE_NAME), "SYSTEM_ERROR", ValidationReportEntrySeverity.ERROR, new DataLocation(null, fileName, null, null));
@@ -133,7 +133,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .setHeader(FILE_HANDLE, constant(BLOBSTORE_PATH_ANTU_WORK)
                         .append(header(DATASET_REFERENTIAL))
                         .append("/")
-                        .append(header(VALIDATION_REPORT_ID))
+                        .append(header(VALIDATION_REPORT_ID_HEADER))
                         .append("/")
                         .append(header(NETEX_FILE_NAME))
                         .append(".json"))
