@@ -53,14 +53,16 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
      * Only these headers are copied from the Camel message to a PubSub topic.
      */
     private static final String[] PUBSUB_OUTBOUND_HEADERS_WHITELIST = {
-            Constants.CORRELATION_ID,
             Constants.DATASET_REFERENTIAL,
             Constants.DATASET_CODESPACE,
             Constants.DATASET_NB_COMMON_FILES,
             Constants.DATASET_NB_NETEX_FILES,
-            Constants.FILE_HANDLE, NETEX_FILE_NAME,
+            Constants.FILE_HANDLE,
+            Constants.NETEX_FILE_NAME,
             Constants.JOB_TYPE,
-            Constants.VALIDATION_REPORT_ID,
+            Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER,
+            Constants.VALIDATION_CORRELATION_ID_HEADER,
+            Constants.VALIDATION_REPORT_ID_HEADER,
             Constants.VALIDATION_STAGE_HEADER,
             Constants.VALIDATION_CLIENT_HEADER,
             Constants.VALIDATION_PROFILE_HEADER};
@@ -134,15 +136,15 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
     }
 
     protected void setNewCorrelationId(Exchange e) {
-        e.getIn().setHeader(Constants.CORRELATION_ID, UUID.randomUUID().toString());
+        e.getIn().setHeader(Constants.VALIDATION_CORRELATION_ID_HEADER, UUID.randomUUID().toString());
     }
 
     protected void setCorrelationIdIfMissing(Exchange e) {
-        e.getIn().setHeader(Constants.CORRELATION_ID, e.getIn().getHeader(Constants.CORRELATION_ID, UUID.randomUUID().toString()));
+        e.getIn().setHeader(Constants.VALIDATION_CORRELATION_ID_HEADER, e.getIn().getHeader(Constants.VALIDATION_CORRELATION_ID_HEADER, UUID.randomUUID().toString()));
     }
 
     protected String correlation() {
-        return "[referential=${header." + Constants.DATASET_REFERENTIAL + "} reportId=${header." + Constants.VALIDATION_REPORT_ID + "} fileName= ${header." + NETEX_FILE_NAME  + "} correlationId=${header." + Constants.CORRELATION_ID + "}] ";
+        return "[referential=${header." + Constants.DATASET_REFERENTIAL + "} reportId=${header." + Constants.VALIDATION_REPORT_ID_HEADER + "} fileName= ${header." + NETEX_FILE_NAME  + "} correlationId=${header." + Constants.VALIDATION_CORRELATION_ID_HEADER + "}] ";
     }
 
     public void extendAckDeadline(Exchange exchange) throws IOException {
@@ -193,4 +195,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
     protected void removeAllCamelHttpHeaders(Exchange e) {
         e.getIn().removeHeaders(Constants.CAMEL_ALL_HTTP_HEADERS);
     }
+
+
+
 }

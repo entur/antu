@@ -19,7 +19,11 @@
 package no.entur.antu;
 
 public final class Constants {
-    public static final String FILE_HANDLE = "RutebankenFileHandle";
+
+    /**
+     * Header used internally in Antu to reference a file in the blob store.
+     */
+    public static final String FILE_HANDLE = "EnturFileHandle";
     public static final String NETEX_FILE_NAME = "NETEX_FILE_NAME";
     public static final String FILENAME_DELIMITER = "§";
 
@@ -41,12 +45,12 @@ public final class Constants {
     public static final String STATUS_VALIDATION_OK = "ok";
     public static final String STATUS_VALIDATION_FAILED = "failed";
 
-    public static final String VALIDATION_REPORT_ID = "EnturValidationReportId";
+    public static final String VALIDATION_REPORT_ID_HEADER = "EnturValidationReportId";
 
     public static final String BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED = "inbound/received/";
     public static final String BLOBSTORE_PATH_ANTU_REPORTS = "reports/";
     public static final String BLOBSTORE_PATH_ANTU_WORK = "work/";
-    public static final String GCS_BUCKET_FILE_NAME = BLOBSTORE_PATH_ANTU_WORK + "${header." + DATASET_REFERENTIAL + "}/${header." + VALIDATION_REPORT_ID + "}/${header." + NETEX_FILE_NAME + "}.zip";
+    public static final String GCS_BUCKET_FILE_NAME = BLOBSTORE_PATH_ANTU_WORK + "${header." + DATASET_REFERENTIAL + "}/${header." + VALIDATION_REPORT_ID_HEADER + "}/${header." + NETEX_FILE_NAME + "}.zip";
 
     /**
      * Headers originating from the validation client that must be sent back when notifying the validation client
@@ -54,7 +58,8 @@ public final class Constants {
     public static final String VALIDATION_STAGE_HEADER = "EnturValidationStage";
     public static final String VALIDATION_CLIENT_HEADER = "EnturValidationClient";
     public static final String VALIDATION_PROFILE_HEADER = "EnturValidationProfile";
-    public static final String CORRELATION_ID = "RutebankenCorrelationId";
+    public static final String VALIDATION_DATASET_FILE_HANDLE_HEADER = "EnturValidationDatasetFileHandle";
+    public static final String VALIDATION_CORRELATION_ID_HEADER = "EnturValidationCorrelationId";
 
     public static final String VALIDATION_CLIENT_MARDUK = "Marduk";
     public static final String VALIDATION_CLIENT_KAKKA = "Kakka";

@@ -26,7 +26,6 @@ import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.model.dataformat.JsonLibrary;
-import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.springframework.stereotype.Component;
 
@@ -37,7 +36,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static no.entur.antu.Constants.AGGREGATED_VALIDATION_REPORT;
-import static no.entur.antu.Constants.CORRELATION_ID;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
@@ -48,10 +46,7 @@ import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
-import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
-import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 
 
 /**
@@ -68,7 +63,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         from("master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
                 .process(this::removeSynchronizationForAggregatedExchange)
-                .aggregate(header(VALIDATION_REPORT_ID)).aggregationStrategy(new ValidationReportAggregationStrategy()).completionTimeout(1800000)
+                .aggregate(header(VALIDATION_REPORT_ID_HEADER)).aggregationStrategy(new ValidationReportAggregationStrategy()).completionTimeout(1800000)
                 .process(this::addSynchronizationForAggregatedExchange)
                 .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} validation reports (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
 
@@ -82,7 +77,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
                 .process(exchange -> {
                     String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
-                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID, String.class);
+                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
                     ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
                     exchange.getIn().setHeader(AGGREGATED_VALIDATION_REPORT, validationReport);
                 })
@@ -121,7 +116,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
                         .append(header(DATASET_REFERENTIAL))
                         .append("/")
-                        .append(header(VALIDATION_REPORT_ID))
+                        .append(header(VALIDATION_REPORT_ID_HEADER))
                         .append("/")
                         .append(header(NETEX_FILE_NAME))
                         .append(".json"))
@@ -135,7 +130,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
                         .append(header(DATASET_REFERENTIAL))
                         .append("/validation-report-")
-                        .append(header(VALIDATION_REPORT_ID))
+                        .append(header(VALIDATION_REPORT_ID_HEADER))
                         .append(".json"))
                 .choice()
                 .when(method("antuBlobStoreService", "existBlob"))
@@ -150,8 +145,8 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         from("direct:cleanUpCache")
                 .log(LoggingLevel.INFO, correlation() + "Clean up cache")
-                .bean("netexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID + "})")
-                .bean("swedenStopPlaceNetexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID + "})")
+                .bean("netexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})")
+                .bean("swedenStopPlaceNetexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})")
                 .log(LoggingLevel.INFO, correlation() + "Cleaned up cache")
                 .routeId("cleanup-cache");
 
@@ -161,18 +156,12 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
      * Complete the aggregation when all the individual reports have been received.
      * The total number of reports to process is stored in a header that is included in every incoming message.
      */
-    private static class ValidationReportAggregationStrategy extends GroupedMessageAggregationStrategy {
+    private static class ValidationReportAggregationStrategy extends AntuGroupedMessageAggregationStrategy {
 
         @Override
         public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
             Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
-            aggregatedExchange.getIn().setHeader(VALIDATION_REPORT_ID, newExchange.getIn().getHeader(VALIDATION_REPORT_ID));
-            aggregatedExchange.getIn().setHeader(DATASET_CODESPACE, newExchange.getIn().getHeader(DATASET_CODESPACE));
-            aggregatedExchange.getIn().setHeader(DATASET_REFERENTIAL, newExchange.getIn().getHeader(DATASET_REFERENTIAL));
-            aggregatedExchange.getIn().setHeader(CORRELATION_ID, newExchange.getIn().getHeader(CORRELATION_ID));
-            aggregatedExchange.getIn().setHeader(VALIDATION_STAGE_HEADER, newExchange.getIn().getHeader(VALIDATION_STAGE_HEADER));
-            aggregatedExchange.getIn().setHeader(VALIDATION_CLIENT_HEADER, newExchange.getIn().getHeader(VALIDATION_CLIENT_HEADER));
-            aggregatedExchange.getIn().setHeader(VALIDATION_PROFILE_HEADER, newExchange.getIn().getHeader(VALIDATION_PROFILE_HEADER));
+            copyValidationHeaders(newExchange, aggregatedExchange);
             String currentNetexFileNameList = aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES, String.class);
             if (currentNetexFileNameList == null) {
                 aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getHeader(NETEX_FILE_NAME));
