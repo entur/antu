@@ -1,20 +1,20 @@
 validationRuleConfigs:
   # Entur custom rules
   - code: NSR_CODESPACE
-    name: NSR_CODESPACE
+    name: NSR Codespace not declared
     severity: ERROR
   - code: AUTHORITY_ID
-    name: AUTHORITY_ID
+    name: Authority invalid Id
     severity: ERROR
   - code: CODESPACE
-    name: CODESPACE
+    name: Codespace unknown
     severity: ERROR
   - code: NETEX_ID_2
-    name: NETEX_ID_2
+    name: NeTEx ID duplicated across files
     severity: ERROR
   - code: NETEX_ID_3
-    name: NETEX_ID_3
+    name: NeTEx ID invalid element name inside structure
     severity: ERROR
   - code: NETEX_ID_4
-    name: NETEX_ID_4
+    name: NeTEx ID with unapproved codespace
     severity: ERROR
