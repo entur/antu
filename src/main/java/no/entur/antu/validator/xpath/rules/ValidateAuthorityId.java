@@ -50,7 +50,7 @@ public class ValidateAuthorityId extends AbstractXPathValidationRule {
                 for (XdmItem item : nodes) {
                     XdmNode xdmNode = (XdmNode) item;
                     DataLocation dataLocation = getXdmNodeLocation(validationContext.getFileName(), xdmNode);
-                    LOGGER.warn("{}" + MESSAGE, dataLocation);
+                    LOGGER.warn(MESSAGE + ": {}", dataLocation);
                     validationReportEntries.add(new XPathValidationReportEntry(MESSAGE, RULE_CODE, dataLocation));
                 }
                 return validationReportEntries;
