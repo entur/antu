@@ -6,7 +6,6 @@ import org.entur.netex.validation.validator.xpath.ValidationTree;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
