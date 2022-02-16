@@ -9,6 +9,9 @@ validationRuleConfigs:
   - code: STOP_PLACE_REF_SE_1
     name: SE/Missing reference to stop place or quay
     severity: ERROR
+  - code: COMPOSITE_FRAME_SE_1
+    name: SE/CompositeFrame missing ValidityCondition/ValidBetween
+    severity: ERROR
 
   # Reduced severity for missing URL on Authority
   - code: AUTHORITY_4
