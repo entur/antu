@@ -4,6 +4,7 @@ import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
+import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 import java.util.List;
 
@@ -21,9 +22,9 @@ public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetabl
         ValidationTree validationTree = super.getSingleFramesValidationTreeForCommonFile();
         // remove check on SiteFrame, they are part of Swedish datasets
         validationTree.removeValidationRule("SITE_FRAME_IN_COMMON_FILE");
-        // allow common files that contain only a SiteFrame
+        // allow common files that contain only a SiteFrame and accept ValidBetween syntax in addition to validityConditions syntax
         validationTree.removeValidationRule("VALIDITY_CONDITIONS_IN_COMMON_FILE_1");
-        validationTree.addValidationRule(new ValidateAtLeastOne("ServiceFrame[validityConditions] | ServiceCalendarFrame[validityConditions] | SiteFrame[validityConditions]", "Neither ServiceFrame nor ServiceCalendarFrame nor SiteFrame defines ValidityConditions", "VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1"));
+        validationTree.addValidationRule(new ValidateAtLeastOne("ServiceFrame[validityConditions or ValidBetween] | ServiceCalendarFrame[validityConditions or ValidBetween] | SiteFrame[validityConditions or ValidBetween]", "Neither ServiceFrame nor ServiceCalendarFrame nor SiteFrame defines ValidityConditions", "VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1"));
         return validationTree;
     }
 
@@ -34,6 +35,11 @@ public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetabl
         compositeFrameBaseValidationRules.removeIf(validationRule -> validationRule.getCode().equals("NSR_CODESPACE"));
         // allow common files that contain only a SiteFrame
         compositeFrameBaseValidationRules.removeIf(validationRule -> validationRule.getCode().equals("SITE_FRAME_IN_COMMON_FILE"));
+
+        // accept ValidBetween syntax in addition to validityConditions syntax
+        compositeFrameBaseValidationRules.removeIf(validationRule -> validationRule.getCode().equals("COMPOSITE_FRAME_1"));
+        compositeFrameBaseValidationRules.add(new ValidateNotExist(".[not(validityConditions or ValidBetween)]", "A CompositeFrame must define a ValidityCondition valid for all data within the CompositeFrame", "COMPOSITE_FRAME_SE_1"));
+
         return compositeFrameBaseValidationRules;
     }
 
