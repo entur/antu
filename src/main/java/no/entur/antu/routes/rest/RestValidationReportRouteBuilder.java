@@ -177,6 +177,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
 
 
         from("direct:authorizeEditorRequest")
+                .validate(header(CODESPACE_PARAM).isNotNull())
                 .doTry()
                 .bean(authorizationService, "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})")
                 .routeId("admin-authorize-editor-request");
