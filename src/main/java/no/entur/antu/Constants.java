@@ -24,7 +24,7 @@ public final class Constants {
      * Header used internally in Antu to reference a file in the blob store.
      */
     public static final String FILE_HANDLE = "EnturFileHandle";
-    public static final String NETEX_FILE_NAME = "NETEX_FILE_NAME";
+    public static final String NETEX_FILE_NAME = "EnturNetexFileName";
     public static final String FILENAME_DELIMITER = "§";
 
     public static final String DATASET_REFERENTIAL = "EnturDatasetReferential";
