@@ -26,6 +26,7 @@ import no.entur.antu.exception.RetryableAntuException;
 import no.entur.antu.validator.ValidationReportTransformer;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.util.StopWatch;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
@@ -53,6 +54,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
     private static final String PROP_ALL_NETEX_FILE_NAMES ="ALL_NETEX_FILE_NAMES";
 
     private static final ValidationReportTransformer VALIDATION_REPORT_TRANSFORMER = new ValidationReportTransformer(50);
+    private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
 
     @Override
     public void configure() throws Exception {
@@ -61,6 +63,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         from("direct:validateNetex")
                 .log(LoggingLevel.INFO, correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}")
                 .process(this::extendAckDeadline)
+                .setProperty(PROP_STOP_WATCH, StopWatch::new)
                 .setProperty(PROP_ALL_NETEX_FILE_NAMES, body())
                 .doTry()
                 .to("direct:downloadSingleNetexFile")
@@ -80,6 +83,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:truncateReport")
                 .to("direct:saveValidationReport")
                 .to("direct:notifyValidationReportAggregator")
+                .log(LoggingLevel.INFO, correlation() + "Validated NeTEx file ${header." + NETEX_FILE_NAME + "} in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
                 .routeId("validate-netex");
 
         from("direct:downloadSingleNetexFile").streamCaching()
