@@ -112,7 +112,7 @@ spec:
                   key: redis-server-trust-store-password
                   name: ror-antu-secret
           command: [ "keytool" ]
-          args: [ "-importcert", "-v", "-noprompt", "-file", "/etc/antu-redis-config/redis-server-ca.pem", "-keystore", "redis-server-ca.jks", "-storepass", "$(ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD)" ]
+          args: [ "-importcert", "-v", "-noprompt", "-file", "/etc/antu-redis-config/redis-server-ca.pem", "-keystore", "/deployments/truststore/redis-server-ca.jks", "-storepass", "$(ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD)" ]
           volumeMounts:
             - mountPath: /etc/antu-redis-config
               name: antu-redis-config
