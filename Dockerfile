@@ -6,7 +6,6 @@ FROM adoptopenjdk/openjdk11:alpine-jre
 RUN apk add --no-cache tini
 WORKDIR /deployments
 RUN addgroup appuser && adduser --disabled-password appuser --ingroup appuser
-RUN mkdir /deployments/truststore && chown appuser:appuser /deployments/truststore
 USER appuser
 COPY --from=builder dependencies/ ./
 COPY --from=builder snapshot-dependencies/ ./
