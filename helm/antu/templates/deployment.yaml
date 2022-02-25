@@ -52,6 +52,11 @@ spec:
               value: Europe/Oslo
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /etc/antu-service-account/credentials.json
+            - name: ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis-server-trust-store-password
+                  name: ror-antu-secret
           envFrom:
             - configMapRef:
                 name: antu-redis-configmap
@@ -90,8 +95,27 @@ spec:
             - mountPath: /etc/antu-service-account
               name: antu-service-account
               readOnly: true
+            - mountPath: /etc/antu-redis-config
+              name: antu-redis-config
+              readOnly: true
             - mountPath: /etc/application-config
               name: application-config
+              readOnly: true
+      initContainers:
+        - name: antu-init-trust-store
+          image: {{ .Values.image.identifier }}
+          imagePullPolicy: "Always"
+          env:
+            - name: ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis-server-trust-store-password
+                  name: ror-antu-secret
+          command: [ "keytool" ]
+          args: [ "-importcert", "-v", "-noprompt", "-file", "/etc/antu-redis-config/redis-server-ca.pem", "-keystore", "redis-server-ca.jks", "-storepass", "$(ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD)" ]
+          volumeMounts:
+            - mountPath: /etc/antu-redis-config
+              name: antu-redis-config
               readOnly: true
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -108,3 +132,7 @@ spec:
           configMap:
             defaultMode: 420
             name: antu-config
+        - name: antu-redis-config
+          configMap:
+            defaultMode: 420
+            name: antu-redis-configmap
