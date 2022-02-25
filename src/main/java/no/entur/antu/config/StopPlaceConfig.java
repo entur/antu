@@ -16,8 +16,8 @@
 
 package no.entur.antu.config;
 
-import no.entur.antu.stop.CompatibilityStopPlaceResource;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
+import no.entur.antu.stop.DefaultStopPlaceResource;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.StopPlaceResource;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,7 +37,7 @@ public class StopPlaceConfig {
     @Bean
     @Profile("!test")
     StopPlaceResource stopPlaceResource(@Value("${antu.stop.registry.id.url}") String stopIdsEndpoint, WebClient.Builder webClientBuilder) {
-        return new CompatibilityStopPlaceResource(stopIdsEndpoint, webClientBuilder);
+        return new DefaultStopPlaceResource(stopIdsEndpoint, webClientBuilder);
     }
 
     @Bean

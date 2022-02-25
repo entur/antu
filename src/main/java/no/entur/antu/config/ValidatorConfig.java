@@ -21,7 +21,11 @@ import no.entur.antu.validator.NetexValidationProfile;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.id.ReferenceToNsrValidator;
 import no.entur.antu.validator.id.TrainElementRegistryIdValidator;
+import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
+import org.entur.netex.validation.configuration.ValidationConfigLoader;
+import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
+import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.BlockJourneyReferencesIgnorer;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
@@ -41,8 +45,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static no.entur.antu.Constants.VALIDATION_CLIENT_KAKKA;
-import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
 
 @Configuration
 public class ValidatorConfig {
@@ -53,50 +58,61 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public NetexIdValidator netexIdValidator() {
-        return new NetexIdValidator();
+    public ValidationConfigLoader validationConfigLoader(@Value("${antu.netex.validation.configuration.file:configuration.antu.yaml}")String configurationFile) {
+        return new DefaultValidationConfigLoader(configurationFile);
     }
 
     @Bean
-    public VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator() {
-        return new VersionOnLocalNetexIdValidator();
+    public ValidationReportEntryFactory validationReportEntryFactory(@Qualifier("validationConfigLoader") ValidationConfigLoader validationConfigLoader) {
+        return new DefaultValidationEntryFactory(validationConfigLoader);
     }
 
     @Bean
-    public VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator() {
-        return new VersionOnRefToLocalNetexIdValidator();
+    public NetexIdValidator netexIdValidator(@Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+        return new NetexIdValidator(validationReportEntryFactory);
     }
 
     @Bean
-    public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator() {
-        return new ReferenceToValidEntityTypeValidator();
+    public VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator(@Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+        return new VersionOnLocalNetexIdValidator(validationReportEntryFactory);
     }
 
     @Bean
-    public ReferenceToNsrValidator nsrRefValidator(StopPlaceRepository stopPlaceRepository) {
+    public VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator(@Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+        return new VersionOnRefToLocalNetexIdValidator(validationReportEntryFactory);
+    }
+
+    @Bean
+    public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator(@Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+        return new ReferenceToValidEntityTypeValidator(validationReportEntryFactory);
+    }
+
+    @Bean
+    public ReferenceToNsrValidator nsrRefValidator(@Qualifier("stopPlaceRepository")  StopPlaceRepository stopPlaceRepository) {
         return new ReferenceToNsrValidator(stopPlaceRepository);
     }
 
     @Bean
-    public NeTexReferenceValidator neTexReferenceValidator(NetexIdRepository netexIdRepository, ReferenceToNsrValidator referenceToNsrValidator) {
+    public NeTexReferenceValidator neTexReferenceValidator(NetexIdRepository netexIdRepository, ReferenceToNsrValidator referenceToNsrValidator, @Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
         List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
         externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
         externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
         externalReferenceValidators.add(new TrainElementRegistryIdValidator());
         externalReferenceValidators.add(referenceToNsrValidator);
-        return new NeTexReferenceValidator(netexIdRepository, externalReferenceValidators);
+        return new NeTexReferenceValidator(netexIdRepository, externalReferenceValidators, validationReportEntryFactory);
     }
 
     @Bean
-    public NetexIdUniquenessValidator netexIdUniquenessValidator(NetexIdRepository netexIdRepository) {
-        return new NetexIdUniquenessValidator(netexIdRepository);
+    public NetexIdUniquenessValidator netexIdUniquenessValidator(NetexIdRepository netexIdRepository, @Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+        return new NetexIdUniquenessValidator(netexIdRepository, validationReportEntryFactory);
     }
 
     @Bean
-    public NetexValidationProfile netexValidationProfile(@Qualifier("timetableDataValidatorsRunner") NetexValidatorsRunner timetableDataValidatorsRunner, @Qualifier("stopPlaceDataValidatorsRunner") NetexValidatorsRunner stopDataValidatorsRunner) {
+    public NetexValidationProfile netexValidationProfile(@Qualifier("timetableDataValidatorsRunner") NetexValidatorsRunner timetableDataValidatorsRunner, @Qualifier("swedenTimetableDataSwedenValidatorsRunner") NetexValidatorsRunner timetableSwedenDataValidatorsRunner, @Qualifier("stopPlaceDataValidatorsRunner") NetexValidatorsRunner stopDataValidatorsRunner) {
         return new NetexValidationProfile(Map.of(
-                VALIDATION_CLIENT_MARDUK, timetableDataValidatorsRunner,
-                VALIDATION_CLIENT_KAKKA, stopDataValidatorsRunner
+                VALIDATION_PROFILE_TIMETABLE, timetableDataValidatorsRunner,
+                VALIDATION_PROFILE_TIMETABLE_SWEDEN, timetableSwedenDataValidatorsRunner,
+                VALIDATION_PROFILE_STOP, stopDataValidatorsRunner
         ));
     }
 

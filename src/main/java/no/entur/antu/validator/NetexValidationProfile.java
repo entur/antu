@@ -20,14 +20,21 @@ public class NetexValidationProfile {
 
     /**
      * Validate a NeTEx file according to a validation profile
-     * @param validationProfile the NeTEx validation profile
-     * @param codespace the dataset codespace.
+     *
+     * @param validationProfile  the NeTEx validation profile
+     * @param codespace          the dataset codespace.
      * @param validationReportId the report id.
-     * @param filename the name of the NeTEx file.
-     * @param fileContent the binary content of the NeTEx file.
+     * @param filename           the name of the NeTEx file.
+     * @param fileContent        the binary content of the NeTEx file.
      * @return a ValidationReport listing the findings for this NeTEx file.
      */
     public ValidationReport validate(String validationProfile, String codespace, String validationReportId, String filename, byte[] fileContent) {
+        if (validationProfile == null) {
+            throw new AntuException("Missing validation profile");
+        }
+        if (codespace == null) {
+            throw new AntuException("Missing codespace");
+        }
         NetexValidatorsRunner netexValidatorsRunner = netexValidatorsRunners.get(validationProfile);
         if (netexValidatorsRunner == null) {
             throw new AntuException("Unknown validation profile " + validationProfile);

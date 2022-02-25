@@ -26,13 +26,13 @@
         <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
         <camel.version>3.11.5</camel.version>
         <entur.helpers.version>1.0.66</entur.helpers.version>
-        <netex-validator-java.version>0.0.5</netex-validator-java.version>
+        <netex-validator-java.version>0.0.13</netex-validator-java.version>
         <commons-io.version>2.11.0</commons-io.version>
         <google.cloud.bom-version>24.0.0</google.cloud.bom-version>
         <zt-zip.version>1.14</zt-zip.version>
         <redisson.version>3.16.7</redisson.version>
-        <kryo.version>5.2.1</kryo.version>
-        <embedded-redis.version>0.8.1</embedded-redis.version>
+        <kryo.version>5.3.0</kryo.version>
+        <embedded-redis.version>0.8.2</embedded-redis.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>

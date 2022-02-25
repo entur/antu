@@ -1,6 +1,5 @@
 package no.entur.antu.validator.xpath.rules;
 
-import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
@@ -8,10 +7,10 @@ import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.organisation.OrganisationRepository;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
-import org.entur.netex.validation.validator.xpath.ValidationRule;
+import org.entur.netex.validation.validator.DataLocation;
+import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,13 +22,12 @@ import java.util.Set;
 /**
  * Validate the Authority ids against the Organisation Register.
  */
-public class ValidateAuthorityId implements ValidationRule {
+public class ValidateAuthorityId extends AbstractXPathValidationRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidateAuthorityId.class);
 
     private static final String MESSAGE = "Invalid Authority Id";
-    private static final String RULE_NAME = "AUTHORITY";
-    private static final ValidationReportEntrySeverity SEVERITY = ValidationReportEntrySeverity.ERROR;
+    private static final String RULE_CODE = "AUTHORITY_ID";
 
     private final OrganisationRepository organisationRepository;
 
@@ -38,7 +36,7 @@ public class ValidateAuthorityId implements ValidationRule {
     }
 
     @Override
-    public List<ValidationReportEntry> validate(XPathValidationContext validationContext) {
+    public List<XPathValidationReportEntry> validate(XPathValidationContext validationContext) {
         try {
             Set<String> whitelistedAuthorityIds = organisationRepository.getWhitelistedAuthorityIds(validationContext.getCodespace());
             if (whitelistedAuthorityIds.isEmpty()) {
@@ -48,17 +46,12 @@ public class ValidateAuthorityId implements ValidationRule {
                 XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler().compile(xpath).load();
                 selector.setContextItem(validationContext.getXmlNode());
                 XdmValue nodes = selector.evaluate();
-                List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
+                List<XPathValidationReportEntry> validationReportEntries = new ArrayList<>();
                 for (XdmItem item : nodes) {
                     XdmNode xdmNode = (XdmNode) item;
-
-                    int lineNumber = xdmNode.getLineNumber();
-                    int columnNumber = xdmNode.getColumnNumber();
-                    String netexId = xdmNode.getAttributeValue(new QName("id"));
-
-                    String message = "Line " + lineNumber + ", Column " + columnNumber + ", NeTEx id " + netexId + ": " +  MESSAGE ;
-                    LOGGER.warn(message);
-                    validationReportEntries.add(new ValidationReportEntry(message, RULE_NAME, SEVERITY, validationContext.getFileName()));
+                    DataLocation dataLocation = getXdmNodeLocation(validationContext.getFileName(), xdmNode);
+                    LOGGER.warn(MESSAGE + ": {}", dataLocation);
+                    validationReportEntries.add(new XPathValidationReportEntry(MESSAGE, RULE_CODE, dataLocation));
                 }
                 return validationReportEntries;
             }
@@ -74,12 +67,8 @@ public class ValidateAuthorityId implements ValidationRule {
     }
 
     @Override
-    public String getName() {
-        return RULE_NAME;
+    public String getCode() {
+        return RULE_CODE;
     }
 
-    @Override
-    public ValidationReportEntrySeverity getSeverity() {
-        return SEVERITY;
-    }
 }

@@ -57,7 +57,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
         from("direct:initDatasetValidation")
                 .process(this::setCorrelationIdIfMissing)
                 .setHeader(DATASET_CODESPACE, header(DATASET_REFERENTIAL).regexReplaceAll("rb_", ""))
-                .setHeader(Constants.VALIDATION_REPORT_ID, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()).substring(0, 18))
+                .setHeader(Constants.VALIDATION_REPORT_ID_HEADER, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()).substring(0, 18))
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyStatus")
                 .to("direct:createEncryptionKey")

@@ -66,11 +66,6 @@ variable "redis_reserved_ip_range" {
   description = "IP range for Redis, follow addressing scheme"
 }
 
-variable "redis_prevent_destroy" {
-  description = "Prevents destruction of this redis instance"
-  type        = bool
-  default     = false
-}
 
 
 

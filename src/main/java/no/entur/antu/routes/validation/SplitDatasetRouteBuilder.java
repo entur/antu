@@ -35,6 +35,7 @@ import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER;
 
 
 /**
@@ -55,6 +56,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
 
         from("direct:splitDataset")
                 .streamCaching()
+                .setHeader(FILE_HANDLE, header(VALIDATION_DATASET_FILE_HANDLE_HEADER))
                 .to("direct:downloadNetexDataset")
                 .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx files")
                 .to("direct:uploadSingleNetexFiles")

@@ -26,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class AuthorizationService {
@@ -50,7 +51,7 @@ public class AuthorizationService {
      */
     public void verifyRouteDataEditorPrivileges(String codespace) {
         verifyAtLeastOne(new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_ADMIN),
-                new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_EDIT, codespace));
+                new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_EDIT, codespace.toUpperCase(Locale.ROOT)));
     }
 
     protected void verifyAtLeastOne(AuthorizationClaim... claims) {

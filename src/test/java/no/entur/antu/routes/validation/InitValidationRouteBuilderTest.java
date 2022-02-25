@@ -62,13 +62,16 @@ import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
 import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
-import static no.entur.antu.Constants.CORRELATION_ID;
+import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_KAKKA;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
+import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
@@ -85,7 +88,6 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
     private static final String TEST_DATASET_STOP_PLACE_FILE_NAME = "stopdata.zip";
 
     private static final String VALIDATION_STAGE_PREVALIDATION = "EnturValidationStagePreValidation";
-    private static final String TEST_VALIDATION_CLIENT = "test-validation-client";
     public static final String TEST_DATASET_STOP_PLACE_CODESPACE = "nsr";
 
 
@@ -153,19 +155,20 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         context.start();
         Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.FILE_HANDLE, datasetBlobName);
+        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
         headers.put(Constants.DATASET_REFERENTIAL, "flb");
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
-        headers.put(Constants.VALIDATION_CLIENT_HEADER, TEST_VALIDATION_CLIENT);
+        headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
+        headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_TIMETABLE);
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyStatus.assertIsSatisfied();
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(CORRELATION_ID) != null));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_CORRELATION_ID_HEADER) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER) != null));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_STAGE_PREVALIDATION.equals(exchange.getIn().getHeader(VALIDATION_STAGE_HEADER))));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> TEST_VALIDATION_CLIENT.equals(exchange.getIn().getHeader(VALIDATION_CLIENT_HEADER))));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_CLIENT_MARDUK.equals(exchange.getIn().getHeader(VALIDATION_CLIENT_HEADER))));
     }
 
     @Test
@@ -187,21 +190,22 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         context.start();
         Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.FILE_HANDLE, datasetBlobName);
+        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
         headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_STOP_PLACE_CODESPACE);
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
         headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_KAKKA);
+        headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_STOP);
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyStatus.assertIsSatisfied();
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(CORRELATION_ID) != null));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_CORRELATION_ID_HEADER) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER) != null));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_STAGE_PREVALIDATION.equals(exchange.getIn().getHeader(VALIDATION_STAGE_HEADER))));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_CLIENT_KAKKA.equals(exchange.getIn().getHeader(VALIDATION_CLIENT_HEADER))));
 
-        String validationReportId = notifyStatus.getExchanges().stream().findFirst().orElseThrow().getIn().getHeader(VALIDATION_REPORT_ID, String.class);
+        String validationReportId = notifyStatus.getExchanges().stream().findFirst().orElseThrow().getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
 
         String reportBlobName = BLOBSTORE_PATH_ANTU_REPORTS + TEST_DATASET_STOP_PLACE_CODESPACE  + VALIDATION_REPORT_PREFIX + validationReportId + VALIDATION_REPORT_SUFFIX;
         InputStream reportInputStream = antuInMemoryBlobStoreRepository.getBlob(reportBlobName);
@@ -232,10 +236,17 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         context.start();
         Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.FILE_HANDLE, datasetBlobName);
-        headers.put(Constants.DATASET_CODESPACE, "FLB");
+        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
+        headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_CODESPACE);
+        headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
+        headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
+        headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_TIMETABLE);
         initDatasetValidation.sendBodyAndHeaders(" ", headers);
         notifyStatus.assertIsSatisfied();
+
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_CORRELATION_ID_HEADER) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER) != null));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
 
