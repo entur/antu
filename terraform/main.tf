@@ -4,11 +4,11 @@ terraform {
 }
 
 provider "google" {
-  version = "~> 4.3.0"
+  version = "~> 4.10.0"
   region  = var.gcp_region
 }
 provider "google-beta" {
-  version = "~> 4.3.0"
+  version = "~> 4.10.0"
   region  = var.gcp_region
 }
 provider "kubernetes" {
@@ -142,6 +142,7 @@ resource "google_redis_instance" "antu-redis" {
   reserved_ip_range       = var.redis_reserved_ip_range
   tier                    = "STANDARD_HA"
   location_id             = var.redis_zone
+  transit_encryption_mode = "SERVER_AUTHENTICATION"
   labels                  = var.labels
   redis_configs           = {
     maxmemory-gb = "4.8",
@@ -162,6 +163,7 @@ resource "kubernetes_config_map" "antu-redis-config" {
 
   data = {
     "REDIS_HOST" = google_redis_instance.antu-redis.host
+    "redis-server-ca.pem" = google_redis_instance.antu-redis.server_ca_certs.0.cert
   }
 
 }
@@ -181,3 +183,18 @@ resource "kubernetes_secret" "antu_service_account_credentials" {
     "credentials.json" = base64decode(google_service_account_key.antu_service_account_key.private_key)
   }
 }
+
+resource "random_password" "truststore-password" {
+  length           = 16
+  special          = true
+}
+resource "kubernetes_secret" "ror-antu-secret" {
+  metadata {
+    name = "${var.labels.team}-${var.labels.app}-secret"
+    namespace = var.kube_namespace
+  }
+  data = {
+    "redis-server-trust-store-password" = random_password.truststore-password.result
+  }
+}
+
