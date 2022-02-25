@@ -34,7 +34,7 @@ public class CacheConfig {
     public static final String COMMON_IDS_CACHE = "commonIdsCache";
 
     @Bean
-    public Config redissonConfig(RedisProperties redisProperties, @Value("${antu.redis.server.trust.store.file}")String trustStoreFile, @Value("${antu.redis.server.trust.store.password}") String trustStorePassword) throws MalformedURLException {
+    public Config redissonConfig(RedisProperties redisProperties, @Value("${antu.redis.server.trust.store.file:redis-server-ca.jks}")String trustStoreFile, @Value("${antu.redis.server.trust.store.password}") String trustStorePassword) throws MalformedURLException {
         Config redissonConfig = new Config();
 
         Codec codec = new Kryo5Codec(this.getClass().getClassLoader());
