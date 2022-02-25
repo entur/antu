@@ -37,7 +37,10 @@ public class CacheConfig {
 
 
     @Bean
-    public Config redissonConfig(RedisProperties redisProperties, @Value("${antu.redis.server.trust.store.file:}") String trustStoreFile, @Value("${antu.redis.server.trust.store.password:}") String trustStorePassword) throws MalformedURLException {
+    public Config redissonConfig(RedisProperties redisProperties,
+                                 @Value("${antu.redis.server.trust.store.file:}") String trustStoreFile,
+                                 @Value("${antu.redis.server.trust.store.password:}") String trustStorePassword,
+                                 @Value("${antu.redis.authentication.string:}") String authenticationString ) throws MalformedURLException {
         Config redissonConfig = new Config();
 
         Codec codec = new Kryo5Codec(this.getClass().getClassLoader());
@@ -63,7 +66,8 @@ public class CacheConfig {
             redissonConfig.useSingleServer()
                     .setAddress(address)
                     .setSslTruststore(new File(trustStoreFile).toURI().toURL())
-                    .setSslTruststorePassword(trustStorePassword);
+                    .setSslTruststorePassword(trustStorePassword)
+                    .setPassword(authenticationString);
             return redissonConfig;
         }
 

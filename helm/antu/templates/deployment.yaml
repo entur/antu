@@ -57,6 +57,11 @@ spec:
                 secretKeyRef:
                   key: redis-server-trust-store-password
                   name: ror-antu-secret
+            - name: ANTU_REDIS_AUTHENTICATION_STRING
+              valueFrom:
+                secretKeyRef:
+                  key: redis-authentication-string
+                  name: ror-antu-secret
           envFrom:
             - configMapRef:
                 name: antu-redis-configmap

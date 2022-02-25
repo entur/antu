@@ -143,6 +143,7 @@ resource "google_redis_instance" "antu-redis" {
   tier                    = "STANDARD_HA"
   location_id             = var.redis_zone
   transit_encryption_mode = "SERVER_AUTHENTICATION"
+  auth_enabled = "true"
   labels                  = var.labels
   redis_configs           = {
     maxmemory-gb = "4.8",
@@ -163,6 +164,7 @@ resource "kubernetes_config_map" "antu-redis-config" {
 
   data = {
     "REDIS_HOST" = google_redis_instance.antu-redis.host
+    "REDIS_PORT" = google_redis_instance.antu-redis.port
     "redis-server-ca.pem" = google_redis_instance.antu-redis.server_ca_certs.0.cert
   }
 
@@ -195,6 +197,7 @@ resource "kubernetes_secret" "ror-antu-secret" {
   }
   data = {
     "redis-server-trust-store-password" = random_password.truststore-password.result
+    "redis-authentication-string" =  google_redis_instance.antu-redis.auth_string
   }
 }
 
