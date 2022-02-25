@@ -23,7 +23,7 @@ import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 
 
 /**
@@ -38,14 +38,12 @@ public class MemoryStoreRoute extends BaseRouteBuilder {
     public void configure() {
 
         from("direct:downloadBlobFromMemoryStore")
-                .bean("temporaryFileRepository", "download(${header." + VALIDATION_REPORT_ID + "},${header." + NETEX_FILE_NAME + "})")
-                .to("direct:decryptPayload")
+                .bean("temporaryFileRepository", "download(${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "})")
                 .log(LoggingLevel.INFO, correlation() + "Returning from fetching file ${header." + NETEX_FILE_NAME + "} from memory store.")
                 .routeId("memory-store-download");
 
         from("direct:uploadBlobToMemoryStore")
-                .to("direct:encryptPayload")
-                .bean("temporaryFileRepository", "upload(${header." + VALIDATION_REPORT_ID + "},${header." + NETEX_FILE_NAME + "}, ${body} )")
+                .bean("temporaryFileRepository", "upload(${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "}, ${body} )")
                 .setBody(constant(""))
                 .log(LoggingLevel.INFO, correlation() + "Stored file ${header." + NETEX_FILE_NAME + "} in memory store.")
                 .routeId("memory-store-upload");

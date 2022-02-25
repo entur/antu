@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
-import static no.entur.antu.Constants.DATASET_REFERENTIAL;
-import static no.entur.antu.Constants.ENCRYPTION_KEY;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
