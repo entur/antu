@@ -49,7 +49,7 @@ data:
 
     # Redis
     spring.redis.host=${REDIS_HOST}
-    spring.redis.port=6379
+    spring.redis.port=6378
     antu.redis.server.trust.store.file=/deployments/truststore/redis-server-ca.jks
 
     # Actuator
