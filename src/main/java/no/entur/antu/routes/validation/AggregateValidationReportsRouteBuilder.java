@@ -146,6 +146,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         from("direct:cleanUpCache")
                 .log(LoggingLevel.INFO, correlation() + "Clean up cache")
                 .bean("netexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})")
+                .bean("temporaryFileRepository", "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})")
                 .bean("swedenStopPlaceNetexIdRepository", "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})")
                 .log(LoggingLevel.INFO, correlation() + "Cleaned up cache")
                 .routeId("cleanup-cache");

@@ -19,7 +19,10 @@ package no.entur.antu.config;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import no.entur.antu.memorystore.RedisTemporaryFileRepository;
+import no.entur.antu.memorystore.TemporaryFileRepository;
 import org.apache.camel.component.google.pubsub.GooglePubsubComponent;
+import org.redisson.api.RedissonClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -53,5 +56,11 @@ public class CamelConfig {
         javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ISO_DATE_TIME));
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME));
         return javaTimeModule;
+    }
+
+    @Bean
+    TemporaryFileRepository temporaryFileRepository(RedissonClient redissonClient) {
+        return new RedisTemporaryFileRepository(redissonClient);
+
     }
 }
