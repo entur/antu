@@ -35,6 +35,7 @@ data:
     antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}
     spring.cloud.gcp.project-id=${antu.pubsub.project.id}
     camel.component.google-pubsub.service-account-key=file:/etc/antu-service-account/credentials.json
+    camel.component.google-pubsub.synchronous-pull-retryable-codes=DEADLINE_EXCEEDED
 
     #OAuth2 Resource Server
     spring.security.oauth2.resourceserver.jwt.issuer-uri={{ .Values.auth0.ror.url }}

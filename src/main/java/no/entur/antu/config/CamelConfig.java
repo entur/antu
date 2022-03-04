@@ -21,7 +21,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import no.entur.antu.memorystore.RedisTemporaryFileRepository;
 import no.entur.antu.memorystore.TemporaryFileRepository;
-import org.apache.camel.component.google.pubsub.GooglePubsubComponent;
 import org.redisson.api.RedissonClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,19 +30,6 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class CamelConfig {
-
-    /**
-     * Add the DEADLINE_EXCEEDED error code to the list of retryable PubSub server errors.
-     *
-     * @return a customized Google PubSub component that can retry DEADLINE_EXCEEDED errors.
-     */
-    @Bean("google-pubsub")
-    public GooglePubsubComponent googlePubsubComponent() {
-        GooglePubsubComponent googlePubsubComponent = new GooglePubsubComponent();
-        googlePubsubComponent.setSynchronousPullRetryableCodes("DEADLINE_EXCEEDED");
-        return googlePubsubComponent;
-    }
-
 
     /**
      * Register Java Time Module for JSON serialization/deserialization of Java Time objects.

@@ -30,7 +30,7 @@ public class StopRouteBuilder extends BaseRouteBuilder {
 
     private final String quartzTrigger;
 
-    public StopRouteBuilder(@Value("${antu.stop.refresh.interval:fireNow=true&trigger.repeatCount=0}") String quartzTrigger) {
+    public StopRouteBuilder(@Value("${antu.stop.refresh.interval:trigger.repeatCount=0}") String quartzTrigger) {
         super();
         this.quartzTrigger = quartzTrigger;
     }
