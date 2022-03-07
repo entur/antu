@@ -16,7 +16,7 @@
  */
 
 /*
- * Copied from https://github.com/apache/camel/blob/camel-3.11.3/components/camel-google/camel-google-pubsub/src/main/java/org/apache/camel/component/google/pubsub/GooglePubsubConsumer.java
+ * Copied from https://github.com/apache/camel/blob/camel-3.14.1/components/camel-google/camel-google-pubsub/src/main/java/org/apache/camel/component/google/pubsub/GooglePubsubConsumer.java
  * Original source licensed under the Apache Licence V2  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Notice:
@@ -29,7 +29,6 @@
  * Changes:
  * - fix synchronous pull request shutdown in doStop().
  */
-
 package org.apache.camel.component.google.pubsub;
 
 import java.io.IOException;
@@ -162,8 +161,7 @@ public class GooglePubsubConsumer extends DefaultConsumer {
             while (isRunAllowed() && !isSuspendingOrSuspended()) {
                 MessageReceiver messageReceiver = new CamelMessageReceiver(GooglePubsubConsumer.this, endpoint, processor);
 
-                Subscriber subscriber = endpoint.getComponent().getSubscriber(subscriptionName, messageReceiver,
-                        endpoint.getServiceAccountKey());
+                Subscriber subscriber = endpoint.getComponent().getSubscriber(subscriptionName, messageReceiver, endpoint);
                 try {
                     subscribers.add(subscriber);
                     subscriber.startAsync().awaitRunning();
@@ -180,7 +178,7 @@ public class GooglePubsubConsumer extends DefaultConsumer {
         private void synchronousPull(String subscriptionName) throws ExecutionException, InterruptedException {
             while (isRunAllowed() && !isSuspendingOrSuspended()) {
                 ApiFuture<PullResponse> synchronousPullResponseFuture = null;
-                try (SubscriberStub subscriber = endpoint.getComponent().getSubscriberStub(endpoint.getServiceAccountKey())) {
+                try (SubscriberStub subscriber = endpoint.getComponent().getSubscriberStub(endpoint)) {
 
                     PullRequest pullRequest = PullRequest.newBuilder()
                             .setMaxMessages(endpoint.getMaxMessagesPerPoll())

@@ -156,7 +156,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
                 .addAllAckIds(List.of(ackId))
                 .setAckDeadlineSeconds(ACK_DEADLINE_EXTENSION)
                 .build();
-        try (SubscriberStub subscriberStub = fromEndpoint.getComponent().getSubscriberStub(fromEndpoint.getServiceAccountKey())) {
+        try (SubscriberStub subscriberStub = fromEndpoint.getComponent().getSubscriberStub(fromEndpoint)) {
             subscriberStub.modifyAckDeadlineCallable().call(modifyAckDeadlineRequest);
         }
     }

@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.rutebanken.superpom</groupId>
         <artifactId>superpom</artifactId>
-        <version>1.0.35</version>
+        <version>1.0.36</version>
     </parent>
 
     <groupId>no.entur.antu</groupId>
@@ -24,11 +24,10 @@
     </scm>
     <properties>
         <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
-        <camel.version>3.11.5</camel.version>
-        <entur.helpers.version>1.0.66</entur.helpers.version>
+        <camel.version>3.14.1</camel.version>
+        <entur.helpers.version>1.0.68</entur.helpers.version>
         <netex-validator-java.version>0.0.14</netex-validator-java.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <google.cloud.bom-version>24.0.0</google.cloud.bom-version>
         <zt-zip.version>1.14</zt-zip.version>
         <redisson.version>3.16.7</redisson.version>
         <kryo.version>5.3.0</kryo.version>
@@ -49,14 +48,6 @@
                 <groupId>org.apache.camel.springboot</groupId>
                 <artifactId>camel-spring-boot-bom</artifactId>
                 <version>${camel.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.google.cloud</groupId>
-                <artifactId>libraries-bom</artifactId>
-                <version>${google.cloud.bom-version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
