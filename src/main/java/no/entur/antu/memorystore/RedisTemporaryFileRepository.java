@@ -1,6 +1,5 @@
 package no.entur.antu.memorystore;
 
-import no.entur.antu.exception.AntuException;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 
@@ -32,7 +31,7 @@ public class RedisTemporaryFileRepository implements TemporaryFileRepository {
         if (temporaryFile.isExists()) {
             return (byte[]) temporaryFile.get();
         } else {
-            throw new AntuException("File " + fileName + "for validation report " + validationReportId + " not found in the memory store");
+            throw new AntuMemoryStoreFileNotFoundException("File " + fileName + "for validation report " + validationReportId + " not found in the memory store");
         }
 
     }
