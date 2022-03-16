@@ -50,6 +50,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Configuration for validating timetable data from Sweden.
@@ -109,7 +110,8 @@ public class TimetableDataSwedenValidatorConfig {
                                                                            @Qualifier("swedenNeTexReferenceValidator") NeTexReferenceValidator swedenNeTexReferenceValidator,
                                                                            NetexIdUniquenessValidator netexIdUniquenessValidator) {
         List<NetexValidator> netexValidators = List.of(swedenXPathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, swedenStopPlaceValidator, swedenNeTexReferenceValidator, netexIdUniquenessValidator);
-        NetexXMLParser netexXMLParser = new NetexXMLParser();
+        // ignore navigationPaths and equipments elements
+        NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("navigationPaths", "equipments"));
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
     }
 
