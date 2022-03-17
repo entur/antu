@@ -50,6 +50,11 @@
         <!--- Reducing verbosity of Jackson startup logs-->
         <logger name="org.apache.camel.component.jackson.JacksonDataFormat" level="WARN" />
 
+        <!-- TODO test file aggregation -->
+        <logger name="no.entur.antu.routes.validation.AggregateValidationReportsRouteBuilder" level="TRACE" />
+        <logger name="split-dataset" level="TRACE" />
+        <logger name="aggregate-common-files-pubsub" level="TRACE" />
+
         <root level="INFO">
             <appender-ref ref="console"/>
         </root>

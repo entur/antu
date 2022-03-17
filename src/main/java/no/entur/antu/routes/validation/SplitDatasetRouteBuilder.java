@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
@@ -70,10 +71,8 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .to("direct:createCommonFilesValidationJobs")
                 .otherwise()
                 // skip the common file barrier and go directly to the line file job creation step
-                .process(exchange -> {
-                    String allFileNames = String.join(FILENAME_DELIMITER, exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class));
-                    exchange.getIn().setBody(allFileNames);
-                })
+                .process(exchange -> exchange.getIn().setBody(buildFileNamesList(exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class))))
+                .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
                 .to("direct:createLineFilesValidationJobs")
                 .routeId("split-dataset");
 
@@ -107,10 +106,8 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                 .setHeader(NETEX_FILE_NAME, body())
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
-                .process(exchange -> {
-                    String allFileNames = String.join(FILENAME_DELIMITER, exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class));
-                    exchange.getIn().setBody(allFileNames);
-                })
+                .process(exchange -> exchange.getIn().setBody(buildFileNamesList(exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class))))
+                .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 //end split
                 .end()
@@ -124,6 +121,10 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .to("direct:uploadBlobToMemoryStore")
                 .routeId("upload-single-netex-file");
 
+    }
+
+    private String buildFileNamesList(Set<String> netexFileNames) {
+        return netexFileNames.stream().sorted().collect(Collectors.joining(FILENAME_DELIMITER));
     }
 
     public static final class SingleNetexFileAggregationStrategy implements AggregationStrategy {
