@@ -62,6 +62,7 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
                 .process(this::addSynchronizationForAggregatedExchange)
                 .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} common files (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
                 .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
+                .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_COMMON_FILES))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("aggregate-common-files-pubsub");

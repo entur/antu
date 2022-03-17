@@ -27,6 +27,8 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -56,6 +58,8 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AggregateValidationReportsRouteBuilder.class);
 
     @Override
     public void configure() throws Exception {
@@ -164,16 +168,23 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
             copyValidationHeaders(newExchange, aggregatedExchange);
             String currentNetexFileNameList = aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES, String.class);
+            String incomingNetexFileName = newExchange.getIn().getHeader(NETEX_FILE_NAME, String.class);
             if (currentNetexFileNameList == null) {
-                aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, newExchange.getIn().getHeader(NETEX_FILE_NAME));
+                aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, incomingNetexFileName);
             } else {
-                aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + FILENAME_DELIMITER + newExchange.getIn().getHeader(NETEX_FILE_NAME));
+                aggregatedExchange.setProperty(PROP_DATASET_NETEX_FILE_NAMES, currentNetexFileNameList + FILENAME_DELIMITER + incomingNetexFileName);
             }
             // check if all individual reports have been received
             // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.
             Long nbNetexFiles = newExchange.getIn().getHeader(DATASET_NB_NETEX_FILES, Long.class);
             List<Message> aggregatedMessages = aggregatedExchange.getProperty(ExchangePropertyKey.GROUPED_EXCHANGE, List.class);
             Set<String> aggregatedFileNames = aggregatedMessages.stream().map(message -> message.getHeader(NETEX_FILE_NAME, String.class)).collect(Collectors.toSet());
+
+            if(LOGGER.isTraceEnabled()) {
+                String receivedFileNames = Arrays.stream(aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES,String.class).split(FILENAME_DELIMITER)).sorted().collect(Collectors.joining(FILENAME_DELIMITER));
+                LOGGER.trace("Received file {}. All received files: {}", incomingNetexFileName, receivedFileNames);
+            }
+
             if (aggregatedFileNames.size() >= nbNetexFiles) {
                 aggregatedExchange.setProperty(Exchange.AGGREGATION_COMPLETE_CURRENT_GROUP, true);
             }
