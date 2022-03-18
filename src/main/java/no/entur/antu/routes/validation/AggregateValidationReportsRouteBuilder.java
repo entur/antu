@@ -183,8 +183,9 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             Set<String> aggregatedFileNames = aggregatedMessages.stream().map(message -> message.getHeader(NETEX_FILE_NAME, String.class)).collect(Collectors.toSet());
 
             if(LOGGER.isTraceEnabled()) {
+                String reportId = aggregatedExchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
                 String receivedFileNames = Arrays.stream(aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES,String.class).split(FILENAME_DELIMITER)).sorted().collect(Collectors.joining(FILENAME_DELIMITER));
-                LOGGER.trace("Received file {}. All received files: {}", incomingNetexFileName, receivedFileNames);
+                LOGGER.trace("Received file {} for report {}. All received files: {}", incomingNetexFileName, reportId, receivedFileNames);
             }
 
             if (aggregatedFileNames.size() >= nbNetexFiles) {
