@@ -40,6 +40,7 @@ import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
+import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 
 /**
@@ -136,7 +137,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                         .append(header(VALIDATION_REPORT_ID_HEADER))
                         .append("/")
                         .append(header(NETEX_FILE_NAME))
-                        .append(".json"))
+                        .append(VALIDATION_REPORT_SUFFIX))
                 .log(LoggingLevel.INFO, correlation() + "Uploading Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:uploadAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + FILE_HANDLE + "}")
