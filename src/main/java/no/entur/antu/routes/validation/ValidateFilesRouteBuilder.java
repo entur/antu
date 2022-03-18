@@ -20,7 +20,6 @@ package no.entur.antu.routes.validation;
 
 
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.exception.FileAlreadyValidatedException;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.exception.RetryableAntuException;
@@ -70,9 +69,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:downloadSingleNetexFile")
                 .setProperty(PROP_NETEX_FILE_CONTENT, body())
                 .to("direct:runNetexValidators")
-                // duplicated PubSub messages can be detected either when trying to download the NeTEx file (it does not exist anymore after the report is generated and all temporary files are deleted)
-                // or during ID uniqueness checking (the collection containing the NeTEx IDs exists already in the memory store if the file has been processed before)
-                .doCatch(AntuMemoryStoreFileNotFoundException.class, FileAlreadyValidatedException.class)
+                // Duplicated PubSub messages are detected when trying to download the NeTEx file: it does not exist anymore after the report is generated and all temporary files are deleted
+                .doCatch(AntuMemoryStoreFileNotFoundException.class)
                 .log(LoggingLevel.WARN, correlation() + "Ignoring NeTEx file ${header." + FILE_HANDLE + "} that has already been validated")
                 .stop()
                 .doCatch(InterruptedException.class, RetryableAntuException.class)
