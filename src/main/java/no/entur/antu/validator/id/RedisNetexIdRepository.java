@@ -1,6 +1,5 @@
 package no.entur.antu.validator.id;
 
-import no.entur.antu.exception.FileAlreadyValidatedException;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.api.RLocalCachedMap;
@@ -24,6 +23,8 @@ import java.util.stream.Collectors;
 public class RedisNetexIdRepository implements NetexIdRepository {
 
     private static final String NETEX_LOCAL_ID_SET_PREFIX = "NETEX_LOCAL_ID_SET_";
+    private static final String DUPLICATED_ID_SET_PREFIX = "DUPLICATED_ID_SET_";
+
     private static final String COMMON_NETEX_ID_SET_PREFIX = "COMMON_NETEX_ID_SET_";
     private static final String COMMON_NETEX_ID_LOCK_PREFIX = "COMMON_NETEX_LOCK_SET_";
 
@@ -46,21 +47,32 @@ public class RedisNetexIdRepository implements NetexIdRepository {
     public Set<String> getDuplicateNetexIds(String reportId, String filename, Set<String> localIds) {
         String netexLocalIdsKey = getNetexLocalIdsKey(reportId, filename);
         String accumulatedNetexIdsKey = getAccumulatedNetexIdsKey(reportId);
-        RSet<String> localNetexIds = redissonClient.getSet(netexLocalIdsKey);
-        if (!localNetexIds.isEmpty()) {
-            // protect against multiple run due to retry logic
-            throw new FileAlreadyValidatedException("Validation already run for file " + filename + " in report " + reportId);
-        }
-        localNetexIds.expire(1, TimeUnit.HOURS);
-        localNetexIds.addAll(localIds);
-        RSet<String> accumulatedNetexIds = redissonClient.getSet(accumulatedNetexIdsKey);
-        accumulatedNetexIds.expire(1, TimeUnit.HOURS);
+        String duplicatedNetexIdsKey = getDuplicatedNetexIdsKey(reportId, filename);
+
         RLock lock = redissonClient.getLock(getAccumulatedNetexIdsLockKey(reportId));
         try {
             lock.lock();
-            Set<String> duplicates = localNetexIds.readIntersection(accumulatedNetexIdsKey);
+
+            // in order to make the operation idempotent in case of multiple deliveries of the same PubSub message,
+            // the duplicated ids that were calculated in a previous invocation are retrieved and reused.
+            RSet<String> duplicatedIds = redissonClient.getSet(duplicatedNetexIdsKey);
+            if (!duplicatedIds.isEmpty()) {
+                LOGGER.warn("Validation already run for file {} in report {}", filename, reportId);
+                return new HashSet<>(duplicatedIds);
+            }
+            duplicatedIds.expire(1, TimeUnit.HOURS);
+
+            RSet<String> localNetexIds = redissonClient.getSet(netexLocalIdsKey);
+            localNetexIds.expire(1, TimeUnit.HOURS);
+            localNetexIds.addAll(localIds);
+
+            RSet<String> accumulatedNetexIds = redissonClient.getSet(accumulatedNetexIdsKey);
+            accumulatedNetexIds.expire(1, TimeUnit.HOURS);
+
+            Set<String> intersection = localNetexIds.readIntersection(accumulatedNetexIdsKey);
+            duplicatedIds.addAll(intersection);
             accumulatedNetexIds.union(netexLocalIdsKey);
-            return duplicates;
+            return intersection;
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -108,11 +120,16 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         redissonClient.getKeys().delete(getAccumulatedNetexIdsKey(reportId));
         redissonClient.getKeys().delete(getAccumulatedNetexIdsLockKey(reportId));
         redissonClient.getKeys().deleteByPattern(NETEX_LOCAL_ID_SET_PREFIX + reportId + '*');
+        redissonClient.getKeys().deleteByPattern(DUPLICATED_ID_SET_PREFIX + reportId + '*');
     }
 
 
     private String getNetexLocalIdsKey(String reportId, String filename) {
         return NETEX_LOCAL_ID_SET_PREFIX + reportId + '_' + filename;
+    }
+
+    private String getDuplicatedNetexIdsKey(String reportId, String filename) {
+        return DUPLICATED_ID_SET_PREFIX + reportId + '_' + filename;
     }
 
     private String getAccumulatedNetexIdsKey(String reportId) {

@@ -34,13 +34,12 @@
 
 package no.entur.antu.routes.validation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.util.TestValidationReportUtil;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -62,33 +61,39 @@ import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
 import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
-import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_KAKKA;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
+import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
+import static no.entur.antu.util.TestValidationReportUtil.getValidationReport;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class, properties = {
         "antu.netex.validation.entries.max=1"})
 class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
 
-    private static final String TEST_DATASET_CODESPACE = "flb";
+    private static final String TEST_DATASET_CODESPACE_FLB = "flb";
+    private static final String TEST_DATASET_CODESPACE_AVI = "avi";
+    public static final String TEST_DATASET_STOP_PLACE_CODESPACE = "nsr";
+
     private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex.zip";
     private static final String TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex-schema-error.zip";
 
     private static final String TEST_DATASET_STOP_PLACE_FILE_NAME = "stopdata.zip";
 
     private static final String VALIDATION_STAGE_PREVALIDATION = "EnturValidationStagePreValidation";
-    public static final String TEST_DATASET_STOP_PLACE_CODESPACE = "nsr";
+
+    private static final String TEST_DATASET_NO_DUPLICATED_ID = "rb_avi-aggregated-netex.zip";
+    private static final String TEST_DATASET_DUPLICATED_ID = "rb_avi-aggregated-netex-duplicated-id.zip";
 
 
     @Produce("direct:initDatasetValidation")
@@ -110,7 +115,14 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
                 @Override
                 public Set<String> getWhitelistedAuthorityIds(String codespace) {
-                    return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
+                    if ("avi".equals(codespace)) {
+                        return Set.of("AVI:Authority:Avinor");
+                    }
+                    if ("flb".equals(codespace)) {
+                        return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
+                    }
+                    return Collections.emptySet();
+
                 }
             };
         }
@@ -149,7 +161,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME;
+        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME;
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
@@ -184,7 +196,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_STOP_PLACE_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_STOP_PLACE_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_STOP_PLACE_FILE_NAME;
+        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_STOP_PLACE_FILE_NAME;
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
@@ -207,15 +219,13 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         String validationReportId = notifyStatus.getExchanges().stream().findFirst().orElseThrow().getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
 
-        String reportBlobName = BLOBSTORE_PATH_ANTU_REPORTS + TEST_DATASET_STOP_PLACE_CODESPACE  + VALIDATION_REPORT_PREFIX + validationReportId + VALIDATION_REPORT_SUFFIX;
+        String reportBlobName = BLOBSTORE_PATH_ANTU_REPORTS + TEST_DATASET_STOP_PLACE_CODESPACE + VALIDATION_REPORT_PREFIX + validationReportId + VALIDATION_REPORT_SUFFIX;
         InputStream reportInputStream = antuInMemoryBlobStoreRepository.getBlob(reportBlobName);
-        assert reportInputStream != null;
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        ValidationReport validationReport = objectMapper.readerFor(ValidationReport.class).readValue(reportInputStream);
+        ValidationReport validationReport = getValidationReport(reportInputStream);
         Assertions.assertTrue(validationReport.hasError());
 
     }
+
 
     @Test
     void testValidateSchemaMoreThanMaxError() throws Exception {
@@ -230,14 +240,14 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
+        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
         mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
         context.start();
         Map<String, Object> headers = new HashMap<>();
         headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
-        headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_CODESPACE);
+        headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_CODESPACE_FLB);
         headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
         headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
         headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_TIMETABLE);
@@ -249,6 +259,86 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER) != null));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
         Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_FAILED.equals(exchange.getIn().getBody(String.class))));
+
+    }
+
+    @Test
+    void testValidateNoDuplicatedId() throws Exception {
+
+        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
+                .to("mock:notifyStatus"));
+        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
+                .to("mock:notifyStatus"));
+
+        notifyStatus.expectedMessageCount(2);
+        notifyStatus.setResultWaitTime(300000);
+
+        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_NO_DUPLICATED_ID);
+        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_NO_DUPLICATED_ID);
+        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_AVI + '/' + TEST_DATASET_NO_DUPLICATED_ID;
+        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+
+
+        context.start();
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
+        headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_CODESPACE_AVI);
+        headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
+        headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
+        headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_TIMETABLE);
+        initDatasetValidation.sendBodyAndHeaders(" ", headers);
+        notifyStatus.assertIsSatisfied();
+
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_CORRELATION_ID_HEADER) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+
+        String reportId = notifyStatus.getExchanges().stream().findFirst().orElseThrow().getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
+        InputStream validationReportAsStream = antuInMemoryBlobStoreRepository.getBlob(BLOBSTORE_PATH_ANTU_REPORTS + TEST_DATASET_CODESPACE_AVI + VALIDATION_REPORT_PREFIX + reportId + VALIDATION_REPORT_SUFFIX);
+        Assertions.assertNotNull(validationReportAsStream, "Validation report not found");
+        ValidationReport validationReport = TestValidationReportUtil.getValidationReport(validationReportAsStream);
+        Assertions.assertTrue(validationReport.getValidationReportEntries().stream().noneMatch(validationReportEntry -> "NeTEx ID duplicated across files".equals(validationReportEntry.getName())));
+    }
+
+
+    @Test
+    void testValidateDuplicatedId() throws Exception {
+
+        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
+                .to("mock:notifyStatus"));
+        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
+                .to("mock:notifyStatus"));
+
+        notifyStatus.expectedMessageCount(2);
+        notifyStatus.setResultWaitTime(300000);
+
+        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_DUPLICATED_ID);
+        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_DUPLICATED_ID);
+        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_AVI + '/' + TEST_DATASET_DUPLICATED_ID;
+        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+
+
+        context.start();
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
+        headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_CODESPACE_AVI);
+        headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
+        headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
+        headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_TIMETABLE);
+        initDatasetValidation.sendBodyAndHeaders(" ", headers);
+        notifyStatus.assertIsSatisfied();
+
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_CORRELATION_ID_HEADER) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER) != null));
+        Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
+
+        String reportId = notifyStatus.getExchanges().stream().findFirst().orElseThrow().getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
+        InputStream validationReportAsStream = antuInMemoryBlobStoreRepository.getBlob(BLOBSTORE_PATH_ANTU_REPORTS + TEST_DATASET_CODESPACE_AVI + VALIDATION_REPORT_PREFIX + reportId + VALIDATION_REPORT_SUFFIX);
+        Assertions.assertNotNull(validationReportAsStream, "Validation report not found");
+        ValidationReport validationReport = TestValidationReportUtil.getValidationReport(validationReportAsStream);
+        Assertions.assertTrue(validationReport.getValidationReportEntries().stream().anyMatch(validationReportEntry -> "NeTEx ID duplicated across files".equals(validationReportEntry.getName())));
 
     }
 

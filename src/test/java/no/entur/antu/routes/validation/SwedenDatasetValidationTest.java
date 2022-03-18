@@ -34,11 +34,10 @@
 
 package no.entur.antu.routes.validation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
+import no.entur.antu.util.TestValidationReportUtil;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -55,12 +54,12 @@ import java.util.Map;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
 import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
-import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
+import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
@@ -124,9 +123,7 @@ class SwedenDatasetValidationTest extends AntuRouteBuilderIntegrationTestBase {
         String reportBlobName = BLOBSTORE_PATH_ANTU_REPORTS + TEST_DATASET_CODESPACE + VALIDATION_REPORT_PREFIX + validationReportId + VALIDATION_REPORT_SUFFIX;
         InputStream reportInputStream = antuInMemoryBlobStoreRepository.getBlob(reportBlobName);
         assert reportInputStream != null;
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        ValidationReport validationReport = objectMapper.readerFor(ValidationReport.class).readValue(reportInputStream);
+        ValidationReport validationReport = TestValidationReportUtil.getValidationReport(reportInputStream);
         Assertions.assertFalse(validationReport.hasError());
     }
 

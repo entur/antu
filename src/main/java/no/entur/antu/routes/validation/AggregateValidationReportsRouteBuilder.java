@@ -49,6 +49,8 @@ import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
+import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
+import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 
 /**
@@ -123,7 +125,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                         .append(header(VALIDATION_REPORT_ID_HEADER))
                         .append("/")
                         .append(header(NETEX_FILE_NAME))
-                        .append(".json"))
+                        .append(VALIDATION_REPORT_SUFFIX))
                 .log(LoggingLevel.INFO, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:getAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Downloaded Validation Report from GCS file ${header." + FILE_HANDLE + "}")
@@ -133,9 +135,9 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         from("direct:uploadAggregatedValidationReport")
                 .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
                         .append(header(DATASET_REFERENTIAL))
-                        .append("/validation-report-")
+                        .append(VALIDATION_REPORT_PREFIX)
                         .append(header(VALIDATION_REPORT_ID_HEADER))
-                        .append(".json"))
+                        .append(VALIDATION_REPORT_SUFFIX))
                 .choice()
                 .when(method("antuBlobStoreService", "existBlob"))
                 // protection against multiple pubsub message delivery
