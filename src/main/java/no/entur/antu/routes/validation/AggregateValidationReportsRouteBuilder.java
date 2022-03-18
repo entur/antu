@@ -67,7 +67,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
     public void configure() throws Exception {
         super.configure();
 
-        from("master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
+        from("master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue?concurrentConsumers=10")
                 .process(this::removeSynchronizationForAggregatedExchange)
                 .aggregate(header(VALIDATION_REPORT_ID_HEADER)).aggregationStrategy(new ValidationReportAggregationStrategy()).completionTimeout(1800000)
                 .process(this::addSynchronizationForAggregatedExchange)
