@@ -55,14 +55,13 @@ public class RedisNetexIdRepository implements NetexIdRepository {
 
             // in order to make the operation idempotent in case of multiple deliveries of the same PubSub message,
             // the duplicated ids that were calculated in a previous invocation are retrieved and reused.
+            RSet<String> localNetexIds = redissonClient.getSet(netexLocalIdsKey);
             RSet<String> duplicatedIds = redissonClient.getSet(duplicatedNetexIdsKey);
-            if (!duplicatedIds.isEmpty()) {
+            if (localNetexIds.isExists()) {
                 LOGGER.warn("Validation already run for file {} in report {}", filename, reportId);
                 return new HashSet<>(duplicatedIds);
             }
             duplicatedIds.expire(1, TimeUnit.HOURS);
-
-            RSet<String> localNetexIds = redissonClient.getSet(netexLocalIdsKey);
             localNetexIds.expire(1, TimeUnit.HOURS);
             localNetexIds.addAll(localIds);
 
