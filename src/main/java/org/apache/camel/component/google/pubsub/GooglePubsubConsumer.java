@@ -31,16 +31,6 @@
  */
 package org.apache.camel.component.google.pubsub;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-
 import com.google.api.core.AbstractApiService;
 import com.google.api.core.ApiFuture;
 import com.google.api.gax.rpc.ApiException;
@@ -62,6 +52,16 @@ import org.apache.camel.support.DefaultConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+
 public class GooglePubsubConsumer extends DefaultConsumer {
 
     private Logger localLog;
@@ -70,7 +70,7 @@ public class GooglePubsubConsumer extends DefaultConsumer {
     private final Processor processor;
     private ExecutorService executor;
     private List<Subscriber> subscribers;
-    private Set<ApiFuture<PullResponse>> pendingSynchronousPullResponses;
+    private final Set<ApiFuture<PullResponse>> pendingSynchronousPullResponses;
 
     GooglePubsubConsumer(GooglePubsubEndpoint endpoint, Processor processor) {
         super(endpoint, processor);
@@ -108,7 +108,7 @@ public class GooglePubsubConsumer extends DefaultConsumer {
             }
         }
 
-        safeCancelSynchronousPullResponses(pendingSynchronousPullResponses);
+        safeCancelSynchronousPullResponses();
 
         if (executor != null) {
             if (getEndpoint() != null && getEndpoint().getCamelContext() != null) {
@@ -120,15 +120,17 @@ public class GooglePubsubConsumer extends DefaultConsumer {
         executor = null;
     }
 
-    private void safeCancelSynchronousPullResponses(Set<ApiFuture<PullResponse>> pullResponseFutures) {
-        for (ApiFuture<PullResponse> pullResponseApiFuture : pullResponseFutures) {
-            try {
-                pullResponseApiFuture.cancel(true);
-            } catch (Exception e) {
-                localLog.warn("Exception while cancelling pending synchronous pull response", e);
+    private void safeCancelSynchronousPullResponses() {
+        synchronized (pendingSynchronousPullResponses) {
+            for (ApiFuture<PullResponse> pullResponseApiFuture : pendingSynchronousPullResponses) {
+                try {
+                    pullResponseApiFuture.cancel(true);
+                } catch (Exception e) {
+                    localLog.warn("Exception while cancelling pending synchronous pull response", e);
+                }
             }
+            pendingSynchronousPullResponses.clear();
         }
-        pullResponseFutures.clear();
     }
 
     private class SubscriberWrapper implements Runnable {
@@ -219,13 +221,13 @@ public class GooglePubsubConsumer extends DefaultConsumer {
                 } catch (IOException e) {
                     localLog.error("I/O exception while getting messages from PubSub. Reconnecting.", e);
                 } catch (ExecutionException e) {
-                    if (e.getCause() instanceof ApiException && ((ApiException)(e.getCause())).isRetryable()) {
+                    if (e.getCause() instanceof ApiException && ((ApiException) (e.getCause())).isRetryable()) {
                         localLog.error("Retryable API exception in getting messages from PubSub", e.getCause());
                     } else {
                         throw e;
                     }
                 } finally {
-                    if(synchronousPullResponseFuture != null) {
+                    if (synchronousPullResponseFuture != null) {
                         pendingSynchronousPullResponses.remove(synchronousPullResponseFuture);
                     }
                 }
