@@ -76,7 +76,7 @@ public class GooglePubsubConsumer extends DefaultConsumer {
         super(endpoint, processor);
         this.endpoint = endpoint;
         this.processor = processor;
-        this.subscribers = new LinkedList<>();
+        this.subscribers = Collections.synchronizedList(new LinkedList<>());
         this.pendingSynchronousPullResponses = Collections.synchronizedSet(new HashSet<>());
         String loggerId = endpoint.getLoggerId();
 
@@ -101,10 +101,11 @@ public class GooglePubsubConsumer extends DefaultConsumer {
     protected void doStop() throws Exception {
         super.doStop();
         localLog.info("Stopping Google PubSub consumer for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
-
-        if (subscribers != null && !subscribers.isEmpty()) {
-            localLog.info("Stopping subscribers for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
-            subscribers.forEach(AbstractApiService::stopAsync);
+        synchronized (subscribers) {
+            if (subscribers != null && !subscribers.isEmpty()) {
+                localLog.info("Stopping subscribers for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
+                subscribers.forEach(AbstractApiService::stopAsync);
+            }
         }
 
         safeCancelSynchronousPullResponses(pendingSynchronousPullResponses);
