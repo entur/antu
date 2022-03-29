@@ -70,7 +70,7 @@ public class GooglePubsubConsumer extends DefaultConsumer {
     private final Processor processor;
     private ExecutorService executor;
     private List<Subscriber> subscribers;
-    private Set<ApiFuture<PullResponse>> pendingSynchronousPullResponses;
+    private final Set<ApiFuture<PullResponse>> pendingSynchronousPullResponses;
 
     GooglePubsubConsumer(GooglePubsubEndpoint endpoint, Processor processor) {
         super(endpoint, processor);
@@ -102,13 +102,13 @@ public class GooglePubsubConsumer extends DefaultConsumer {
         super.doStop();
         localLog.info("Stopping Google PubSub consumer for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
         synchronized (subscribers) {
-            if (subscribers != null && !subscribers.isEmpty()) {
-                localLog.info("Stopping subscribers for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
-                subscribers.forEach(AbstractApiService::stopAsync);
+        if (subscribers != null && !subscribers.isEmpty()) {
+            localLog.info("Stopping subscribers for {}/{}", endpoint.getProjectId(), endpoint.getDestinationName());
+            subscribers.forEach(AbstractApiService::stopAsync);
             }
         }
 
-        safeCancelSynchronousPullResponses(pendingSynchronousPullResponses);
+        safeCancelSynchronousPullResponses();
 
         if (executor != null) {
             if (getEndpoint() != null && getEndpoint().getCamelContext() != null) {
@@ -120,15 +120,17 @@ public class GooglePubsubConsumer extends DefaultConsumer {
         executor = null;
     }
 
-    private void safeCancelSynchronousPullResponses(Set<ApiFuture<PullResponse>> pullResponseFutures) {
-        for (ApiFuture<PullResponse> pullResponseApiFuture : pullResponseFutures) {
-            try {
-                pullResponseApiFuture.cancel(true);
-            } catch (Exception e) {
-                localLog.warn("Exception while cancelling pending synchronous pull response", e);
+    private void safeCancelSynchronousPullResponses() {
+        synchronized (pendingSynchronousPullResponses) {
+            for (ApiFuture<PullResponse> pullResponseApiFuture : pendingSynchronousPullResponses) {
+                try {
+                    pullResponseApiFuture.cancel(true);
+                } catch (Exception e) {
+                    localLog.warn("Exception while cancelling pending synchronous pull response", e);
+                }
             }
+            pendingSynchronousPullResponses.clear();
         }
-        pullResponseFutures.clear();
     }
 
     private class SubscriberWrapper implements Runnable {
@@ -219,13 +221,13 @@ public class GooglePubsubConsumer extends DefaultConsumer {
                 } catch (IOException e) {
                     localLog.error("I/O exception while getting messages from PubSub. Reconnecting.", e);
                 } catch (ExecutionException e) {
-                    if (e.getCause() instanceof ApiException && ((ApiException)(e.getCause())).isRetryable()) {
+                    if (e.getCause() instanceof ApiException && ((ApiException) (e.getCause())).isRetryable()) {
                         localLog.error("Retryable API exception in getting messages from PubSub", e.getCause());
                     } else {
                         throw e;
                     }
                 } finally {
-                    if(synchronousPullResponseFuture != null) {
+                    if (synchronousPullResponseFuture != null) {
                         pendingSynchronousPullResponses.remove(synchronousPullResponseFuture);
                     }
                 }
