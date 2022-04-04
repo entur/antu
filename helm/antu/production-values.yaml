@@ -11,6 +11,8 @@ gcp:
   antu:
     bucketName: ror-antu-production
 
+tiamatUrl: http://tiamat.prd.entur.internal
+
 organisationRegistryUrl: https://api.entur.io/organisations/v1/register/organisations
 
 auth0:

@@ -24,7 +24,7 @@ data:
     antu.organisation.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true&startDelayedSeconds=30
 
     # Stop place register
-    antu.stop.registry.id.url=http://tiamat/services/stop_places
+    antu.stop.registry.id.url={{ .Values.tiamatUrl }}/services/stop_places
     antu.stop.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true&startDelayedSeconds=30
 
 
