@@ -20,6 +20,7 @@ spec:
   template:
     metadata:
       annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
         prometheus.io/path: /actuator/prometheus
         prometheus.io/port: "{{ .Values.service.http.internalPort }}"
         prometheus.io/scrape: "true"
