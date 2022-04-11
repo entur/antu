@@ -13,9 +13,11 @@ import java.util.Map;
 public class NetexValidationProfile {
 
     private final Map<String, NetexValidatorsRunner> netexValidatorsRunners;
+    private final boolean skipSchemaValidation;
 
-    public NetexValidationProfile(Map<String, NetexValidatorsRunner> netexValidatorsRunners) {
+    public NetexValidationProfile(Map<String, NetexValidatorsRunner> netexValidatorsRunners, boolean skipSchemaValidation) {
         this.netexValidatorsRunners = netexValidatorsRunners;
+        this.skipSchemaValidation = skipSchemaValidation;
     }
 
     /**
@@ -39,7 +41,7 @@ public class NetexValidationProfile {
         if (netexValidatorsRunner == null) {
             throw new AntuException("Unknown validation profile " + validationProfile);
         } else {
-            return netexValidatorsRunner.validate(codespace, validationReportId, filename, fileContent);
+            return netexValidatorsRunner.validate(codespace, validationReportId, filename, fileContent, skipSchemaValidation);
         }
     }
 }
