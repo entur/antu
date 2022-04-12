@@ -4,7 +4,7 @@ terraform {
 }
 
 provider "google" {
-  version = "~> 4.11.0"
+  version = "~> 4.17.0"
   region  = var.gcp_region
 }
 provider "google-beta" {
