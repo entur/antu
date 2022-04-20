@@ -43,7 +43,7 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 @Component
 public class InitValidationRouteBuilder extends BaseRouteBuilder {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmnnnnnn");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSSSSS");
 
     @Override
     public void configure() throws Exception {
@@ -57,7 +57,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
         from("direct:initDatasetValidation")
                 .process(this::setCorrelationIdIfMissing)
                 .setHeader(DATASET_CODESPACE, header(DATASET_REFERENTIAL).regexReplaceAll("rb_", ""))
-                .setHeader(Constants.VALIDATION_REPORT_ID_HEADER, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()).substring(0, 18))
+                .setHeader(Constants.VALIDATION_REPORT_ID_HEADER, header(DATASET_REFERENTIAL).append('_').append(DATE_TIME_FORMATTER.format(LocalDateTime.now())))
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyStatus")
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
@@ -83,7 +83,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .routeId("process-job");
 
         from("direct:notifyStatus")
-                .log(LoggingLevel.INFO, correlation() + "Notifying Status")
+                .log(LoggingLevel.INFO, correlation() + "Notifying status ${body}")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")
                 .routeId("notify-status");
 
