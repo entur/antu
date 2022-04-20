@@ -14,10 +14,12 @@ public class NetexValidationProfile {
 
     private final Map<String, NetexValidatorsRunner> netexValidatorsRunners;
     private final boolean skipSchemaValidation;
+    private final boolean skipNetexValidators;
 
-    public NetexValidationProfile(Map<String, NetexValidatorsRunner> netexValidatorsRunners, boolean skipSchemaValidation) {
+    public NetexValidationProfile(Map<String, NetexValidatorsRunner> netexValidatorsRunners, boolean skipSchemaValidation, boolean skipNetexValidators) {
         this.netexValidatorsRunners = netexValidatorsRunners;
         this.skipSchemaValidation = skipSchemaValidation;
+        this.skipNetexValidators = skipNetexValidators;
     }
 
     /**
@@ -41,7 +43,7 @@ public class NetexValidationProfile {
         if (netexValidatorsRunner == null) {
             throw new AntuException("Unknown validation profile " + validationProfile);
         } else {
-            return netexValidatorsRunner.validate(codespace, validationReportId, filename, fileContent, skipSchemaValidation);
+            return netexValidatorsRunner.validate(codespace, validationReportId, filename, fileContent, skipSchemaValidation, skipNetexValidators);
         }
     }
 }

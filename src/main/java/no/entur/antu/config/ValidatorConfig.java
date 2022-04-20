@@ -111,12 +111,13 @@ public class ValidatorConfig {
     public NetexValidationProfile netexValidationProfile(@Qualifier("timetableDataValidatorsRunner") NetexValidatorsRunner timetableDataValidatorsRunner,
                                                          @Qualifier("swedenTimetableDataSwedenValidatorsRunner") NetexValidatorsRunner timetableSwedenDataValidatorsRunner,
                                                          @Qualifier("stopPlaceDataValidatorsRunner") NetexValidatorsRunner stopDataValidatorsRunner,
-                                                         @Value("${antu.netex.validation.schema.skip:false}") boolean skipSchemaValidation) {
+                                                         @Value("${antu.netex.validation.schema.skip:false}") boolean skipSchemaValidation,
+                                                         @Value("${antu.netex.validation.validators.skip:false}") boolean skipNetexValidators) {
         return new NetexValidationProfile(Map.of(
                 VALIDATION_PROFILE_TIMETABLE, timetableDataValidatorsRunner,
                 VALIDATION_PROFILE_TIMETABLE_SWEDEN, timetableSwedenDataValidatorsRunner,
                 VALIDATION_PROFILE_STOP, stopDataValidatorsRunner
-        ), skipSchemaValidation);
+        ), skipSchemaValidation, skipNetexValidators);
     }
 
 
