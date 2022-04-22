@@ -44,6 +44,7 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 public class InitValidationRouteBuilder extends BaseRouteBuilder {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSSSSS");
+    private static final String PROP_REPORT_ID_TIMESTAMP = "REPORT_ID_TIMESTAMP";
 
     @Override
     public void configure() throws Exception {
@@ -57,7 +58,8 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
         from("direct:initDatasetValidation")
                 .process(this::setCorrelationIdIfMissing)
                 .setHeader(DATASET_CODESPACE, header(DATASET_REFERENTIAL).regexReplaceAll("rb_", ""))
-                .setHeader(Constants.VALIDATION_REPORT_ID_HEADER, header(DATASET_REFERENTIAL).append('_').append(DATE_TIME_FORMATTER.format(LocalDateTime.now())))
+                .setProperty(PROP_REPORT_ID_TIMESTAMP, () -> DATE_TIME_FORMATTER.format(LocalDateTime.now()))
+                .setHeader(Constants.VALIDATION_REPORT_ID_HEADER, header(DATASET_REFERENTIAL).append('_').append(exchangeProperty(PROP_REPORT_ID_TIMESTAMP)))
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyStatus")
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
