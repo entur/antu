@@ -7,4 +7,8 @@ public class RetryableAntuException extends AntuException {
     public RetryableAntuException(Throwable t) {
         super(t);
     }
+
+    public RetryableAntuException(String message, Throwable t) {
+        super(message, t);
+    }
 }
