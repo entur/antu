@@ -20,13 +20,15 @@ package no.entur.antu.routes.validation;
 
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.exception.RetryableAntuException;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.routes.BaseRouteBuilder;
-import no.entur.antu.exception.RetryableAntuException;
+import no.entur.antu.validator.AntuNetexValidationProgressCallback;
 import no.entur.antu.validator.ValidationReportTransformer;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.util.StopWatch;
+import org.entur.netex.validation.exception.RetryableNetexValidationException;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
@@ -45,17 +47,17 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 /**
  * Validate NeTEx files, both common files and line files.
- *
  */
 @Component
 public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
     protected static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
-    private static final String PROP_ALL_NETEX_FILE_NAMES ="ALL_NETEX_FILE_NAMES";
+    private static final String PROP_ALL_NETEX_FILE_NAMES = "ALL_NETEX_FILE_NAMES";
 
     private static final ValidationReportTransformer VALIDATION_REPORT_TRANSFORMER = new ValidationReportTransformer(50);
     private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
+    private static final String PROP_NETEX_VALIDATION_CALLBACK = "PROP_NETEX_VALIDATION_CALLBACK";
 
     @Override
     public void configure() throws Exception {
@@ -74,7 +76,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .doCatch(AntuMemoryStoreFileNotFoundException.class)
                 .log(LoggingLevel.WARN, correlation() + "Ignoring NeTEx file ${header." + FILE_HANDLE + "} that has already been validated")
                 .stop()
-                .doCatch(InterruptedException.class, RetryableAntuException.class)
+                .doCatch(InterruptedException.class, RetryableNetexValidationException.class, RetryableAntuException.class)
                 .log(LoggingLevel.INFO, correlation() + "Retryable exception while processing file ${header." + FILE_HANDLE + "}, the file will be retried later: ${exception.message} stacktrace: ${exception.stacktrace}")
                 .throwException(new AntuException("File processing interrupted"))
                 .doCatch(Exception.class)
@@ -99,7 +101,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Running NeTEx validators")
                 .validate(header(VALIDATION_PROFILE_HEADER).isNotNull())
                 .validate(header(DATASET_CODESPACE).isNotNull())
-                .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})")
+                .process(exchange -> exchange.setProperty(PROP_NETEX_VALIDATION_CALLBACK, new AntuNetexValidationProgressCallback(this, exchange)))
+                .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "},${exchangeProperty." + PROP_NETEX_VALIDATION_CALLBACK + "})")
                 .setProperty(PROP_VALIDATION_REPORT, body())
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");

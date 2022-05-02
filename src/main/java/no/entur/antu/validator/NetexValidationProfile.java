@@ -1,6 +1,7 @@
 package no.entur.antu.validator;
 
 import no.entur.antu.exception.AntuException;
+import org.entur.netex.validation.validator.NetexValidationProgressCallBack;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReport;
 
@@ -32,7 +33,7 @@ public class NetexValidationProfile {
      * @param fileContent        the binary content of the NeTEx file.
      * @return a ValidationReport listing the findings for this NeTEx file.
      */
-    public ValidationReport validate(String validationProfile, String codespace, String validationReportId, String filename, byte[] fileContent) {
+    public ValidationReport validate(String validationProfile, String codespace, String validationReportId, String filename, byte[] fileContent, NetexValidationProgressCallBack netexValidationProgressCallBack) {
         if (validationProfile == null) {
             throw new AntuException("Missing validation profile");
         }
@@ -43,7 +44,7 @@ public class NetexValidationProfile {
         if (netexValidatorsRunner == null) {
             throw new AntuException("Unknown validation profile " + validationProfile);
         } else {
-            return netexValidatorsRunner.validate(codespace, validationReportId, filename, fileContent, skipSchemaValidation, skipNetexValidators);
+            return netexValidatorsRunner.validate(codespace, validationReportId, filename, fileContent, skipSchemaValidation, skipNetexValidators, netexValidationProgressCallBack);
         }
     }
 }
