@@ -23,6 +23,7 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.exception.RetryableAntuException;
+import no.entur.antu.validator.AntuNetexValidationProgressCallback;
 import no.entur.antu.validator.ValidationReportTransformer;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
@@ -56,6 +57,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final ValidationReportTransformer VALIDATION_REPORT_TRANSFORMER = new ValidationReportTransformer(50);
     private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
+    private static final String PROP_NETEX_VALIDATION_CALLBACK = "PROP_NETEX_VALIDATION_CALLBACK";
 
     @Override
     public void configure() throws Exception {
@@ -99,7 +101,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Running NeTEx validators")
                 .validate(header(VALIDATION_PROFILE_HEADER).isNotNull())
                 .validate(header(DATASET_CODESPACE).isNotNull())
-                .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "})")
+                .process(exchange -> exchange.setProperty(PROP_NETEX_VALIDATION_CALLBACK, new AntuNetexValidationProgressCallback(this, exchange)))
+                .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "},${exchangeProperty." + PROP_NETEX_VALIDATION_CALLBACK + "})")
                 .setProperty(PROP_VALIDATION_REPORT, body())
                 .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");

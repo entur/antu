@@ -22,6 +22,7 @@ import com.google.cloud.pubsub.v1.stub.SubscriberStub;
 import com.google.pubsub.v1.ModifyAckDeadlineRequest;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import no.entur.antu.Constants;
+import no.entur.antu.exception.RetryableAntuException;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExtendedExchange;
 import org.apache.camel.Message;
@@ -46,7 +47,6 @@ import static no.entur.antu.Constants.NETEX_FILE_NAME;
  */
 public abstract class BaseRouteBuilder extends RouteBuilder {
 
-    private static final int ACK_DEADLINE_EXTENSION = 600;
     private static final String SYNCHRONIZATION_HOLDER = "SYNCHRONIZATION_HOLDER";
 
     /**
@@ -78,6 +78,9 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
 
     @Value("${antu.camel.redelivery.backoff.multiplier:3}")
     private int backOffMultiplier;
+
+    @Value("${antu.camel.pubsub.deadline.extension:600}")
+    private int deadlineExtension;
 
     @Override
     public void configure() throws Exception {
@@ -143,21 +146,23 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
         e.getIn().setHeader(Constants.VALIDATION_CORRELATION_ID_HEADER, e.getIn().getHeader(Constants.VALIDATION_CORRELATION_ID_HEADER, UUID.randomUUID().toString()));
     }
 
-    protected String correlation() {
+    public String correlation() {
         return "[referential=${header." + Constants.DATASET_REFERENTIAL + "} reportId=${header." + Constants.VALIDATION_REPORT_ID_HEADER + "} fileName= ${header." + NETEX_FILE_NAME  + "} correlationId=${header." + Constants.VALIDATION_CORRELATION_ID_HEADER + "}] ";
     }
 
-    public void extendAckDeadline(Exchange exchange) throws IOException {
+    public void extendAckDeadline(Exchange exchange) {
         String ackId = exchange.getIn().getHeader(GooglePubsubConstants.ACK_ID, String.class);
         GooglePubsubEndpoint fromEndpoint = (GooglePubsubEndpoint) exchange.getFromEndpoint();
         String subscriptionName = ProjectSubscriptionName.format(fromEndpoint.getProjectId(), fromEndpoint.getDestinationName());
         ModifyAckDeadlineRequest modifyAckDeadlineRequest = ModifyAckDeadlineRequest.newBuilder()
                 .setSubscription(subscriptionName)
                 .addAllAckIds(List.of(ackId))
-                .setAckDeadlineSeconds(ACK_DEADLINE_EXTENSION)
+                .setAckDeadlineSeconds(deadlineExtension)
                 .build();
         try (SubscriberStub subscriberStub = fromEndpoint.getComponent().getSubscriberStub(fromEndpoint)) {
             subscriberStub.modifyAckDeadlineCallable().call(modifyAckDeadlineRequest);
+        } catch (IOException e) {
+            throw new RetryableAntuException("Exception while extending the deadline", e);
         }
     }
 
