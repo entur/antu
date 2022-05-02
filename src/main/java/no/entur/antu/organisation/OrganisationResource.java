@@ -27,8 +27,11 @@ public class OrganisationResource {
 
     private final WebClient webClient;
 
-    public OrganisationResource(String organisationRegistryUrl, WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl(organisationRegistryUrl).build();
+    public OrganisationResource(String organisationRegistryUrl, WebClient orgRegisterClient) {
+        this.webClient = orgRegisterClient.mutate()
+                .defaultHeader("Et-Client-Name", "entur-antu")
+                .baseUrl(organisationRegistryUrl)
+                .build();
     }
 
     public Collection<Organisation> getOrganisations() {
