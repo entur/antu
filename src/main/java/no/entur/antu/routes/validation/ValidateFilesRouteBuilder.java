@@ -20,14 +20,15 @@ package no.entur.antu.routes.validation;
 
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.exception.RetryableAntuException;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.routes.BaseRouteBuilder;
-import no.entur.antu.exception.RetryableAntuException;
 import no.entur.antu.validator.AntuNetexValidationProgressCallback;
 import no.entur.antu.validator.ValidationReportTransformer;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.util.StopWatch;
+import org.entur.netex.validation.exception.RetryableNetexValidationException;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
@@ -46,14 +47,13 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 /**
  * Validate NeTEx files, both common files and line files.
- *
  */
 @Component
 public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
     protected static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
-    private static final String PROP_ALL_NETEX_FILE_NAMES ="ALL_NETEX_FILE_NAMES";
+    private static final String PROP_ALL_NETEX_FILE_NAMES = "ALL_NETEX_FILE_NAMES";
 
     private static final ValidationReportTransformer VALIDATION_REPORT_TRANSFORMER = new ValidationReportTransformer(50);
     private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
@@ -76,7 +76,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .doCatch(AntuMemoryStoreFileNotFoundException.class)
                 .log(LoggingLevel.WARN, correlation() + "Ignoring NeTEx file ${header." + FILE_HANDLE + "} that has already been validated")
                 .stop()
-                .doCatch(InterruptedException.class, RetryableAntuException.class)
+                .doCatch(InterruptedException.class, RetryableNetexValidationException.class, RetryableAntuException.class)
                 .log(LoggingLevel.INFO, correlation() + "Retryable exception while processing file ${header." + FILE_HANDLE + "}, the file will be retried later: ${exception.message} stacktrace: ${exception.stacktrace}")
                 .throwException(new AntuException("File processing interrupted"))
                 .doCatch(Exception.class)
