@@ -43,10 +43,10 @@ data:
     antu.oauth2.resourceserver.auth0.ror.claim.namespace=https://ror.entur.io/
 
     #Oauth2 Client
-    spring.security.oauth2.client.provider.orgRegister.token-uri={{ .Values.auth0.partner.tokenUri }}
-    spring.security.oauth2.client.registration.orgRegister.client-id={{ .Values.auth0.partner.clientId }}
-    spring.security.oauth2.client.registration.orgRegister.authorization-grant-type=client_credentials
-    orgRegister.oauth2.client.audience={{ .Values.auth0.partner.orgRegister.audience }}
+    spring.security.oauth2.client.provider.orgregister.token-uri={{ .Values.auth0.partner.tokenUri }}
+    spring.security.oauth2.client.registration.orgregister.client-id={{ .Values.auth0.partner.clientId }}
+    spring.security.oauth2.client.registration.orgregister.authorization-grant-type=client_credentials
+    orgregister.oauth2.client.audience={{ .Values.auth0.partner.orgregister.audience }}
 
     # Blobstore
     blobstore.gcs.project.id={{ .Values.gcp.blobstoreProjectId }}

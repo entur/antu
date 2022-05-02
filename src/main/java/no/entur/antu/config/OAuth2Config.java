@@ -58,7 +58,7 @@ public class OAuth2Config {
 
     @Bean
     @Profile("!test")
-    WebClient webClient(WebClient.Builder webClientBuilder, OAuth2ClientProperties properties, @Value("${orgRegister.oauth2.client.audience}") String audience) {
+    WebClient webClient(WebClient.Builder webClientBuilder, OAuth2ClientProperties properties, @Value("${orgregister.oauth2.client.audience}") String audience) {
         return new AuthorizedWebClientBuilder(webClientBuilder)
                 .withOAuth2ClientProperties(properties)
                 .withAudience(audience)
