@@ -79,7 +79,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
     @Value("${antu.camel.redelivery.backoff.multiplier:3}")
     private int backOffMultiplier;
 
-    @Value("${antu.camel.pubsub.deadline.extension:600}")
+    @Value("${antu.camel.pubsub.deadline.extension:60}")
     private int deadlineExtension;
 
     @Override
