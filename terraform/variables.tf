@@ -66,6 +66,10 @@ variable "redis_reserved_ip_range" {
   description = "IP range for Redis, follow addressing scheme"
 }
 
+variable ror-partner-auth0-secret {
+  description = "Auth0 client secret for Entur partner tenant"
+}
+
 
 
 

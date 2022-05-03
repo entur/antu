@@ -35,8 +35,8 @@ public class OrganisationConfig {
 
     @Bean
     @Profile("!test")
-    OrganisationResource organisationResource(@Value("${antu.organisation.registry.url}") String organisationRegistryUrl, WebClient.Builder webClientBuilder) {
-        return new OrganisationResource(organisationRegistryUrl, webClientBuilder);
+    OrganisationResource organisationResource(@Value("${antu.organisation.registry.url}") String organisationRegistryUrl, WebClient orgRegisterClient) {
+        return new OrganisationResource(organisationRegistryUrl, orgRegisterClient);
     }
 
     @Bean

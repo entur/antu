@@ -16,15 +16,18 @@
 
 package no.entur.antu.config;
 
+import org.entur.oauth2.AuthorizedWebClientBuilder;
 import org.entur.oauth2.JwtRoleAssignmentExtractor;
 import org.entur.oauth2.RoRJwtDecoderBuilder;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class OAuth2Config {
@@ -49,6 +52,17 @@ public class OAuth2Config {
         return new RoRJwtDecoderBuilder().withIssuer(rorAuth0Issuer)
                 .withAudience(rorAuth0Audience)
                 .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
+                .build();
+    }
+
+
+    @Bean
+    @Profile("!test")
+    WebClient webClient(WebClient.Builder webClientBuilder, OAuth2ClientProperties properties, @Value("${orgregister.oauth2.client.audience}") String audience) {
+        return new AuthorizedWebClientBuilder(webClientBuilder)
+                .withOAuth2ClientProperties(properties)
+                .withAudience(audience)
+                .withClientRegistrationId("orgregister")
                 .build();
     }
 

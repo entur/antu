@@ -19,5 +19,11 @@ auth0:
   ror:
     url: https://auth2.entur.org/
     audience: https://ror.api.entur.io
+  partner:
+    tokenUri: https://partner.entur.org/oauth/token
+    clientId: ms08sY6rN2fjlNst881de632KNGyvgcY
+    orgregister:
+      audience: https://api.entur.io
+
 
 monitoringEnabled: false
