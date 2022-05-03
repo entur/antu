@@ -21,8 +21,8 @@ auth0:
     audience: https://ror.api.entur.io
   partner:
     tokenUri: https://partner.entur.org/oauth/token
-    clientId: xxx
-    orgRegister:
+    clientId: ms08sY6rN2fjlNst881de632KNGyvgcY
+    orgregister:
       audience: https://api.entur.io
 
 

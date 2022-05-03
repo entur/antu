@@ -21,8 +21,8 @@ auth0:
     audience: https://ror.api.staging.entur.io
   partner:
     tokenUri: https://partner.staging.entur.org/oauth/token
-    clientId: xxx
-    orgRegister:
+    clientId: N2f2Hinou2m6JiCRw4mYWUd89eBm0Jbp
+    orgregister:
       audience: https://api.staging.entur.io
 
 monitoringEnabled: true
