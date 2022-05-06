@@ -50,6 +50,7 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
+import static no.entur.antu.Constants.VALIDATION_REPORT_STATUS_SUFFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 
@@ -115,6 +116,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .to("direct:uploadAggregatedValidationReport")
                 .setBody(header(DATASET_STATUS))
                 .to("direct:notifyStatus")
+                .to("direct:createValidationReportStatusFile")
                 .to("direct:cleanUpCache")
                 .routeId("aggregate-reports");
 
@@ -137,17 +139,37 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                         .append(header(DATASET_REFERENTIAL))
                         .append(VALIDATION_REPORT_PREFIX)
                         .append(header(VALIDATION_REPORT_ID_HEADER))
-                        .append(VALIDATION_REPORT_SUFFIX))
+                        .append(VALIDATION_REPORT_STATUS_SUFFIX))
                 .choice()
                 .when(method("antuBlobStoreService", "existBlob"))
                 // protection against multiple pubsub message delivery
                 .log(LoggingLevel.WARN, correlation() + "The report has already been generated: ${header." + FILE_HANDLE + "}. Ignoring.")
                 .stop()
                 .otherwise()
+                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
+                        .append(header(DATASET_REFERENTIAL))
+                        .append(VALIDATION_REPORT_PREFIX)
+                        .append(header(VALIDATION_REPORT_ID_HEADER))
+                        .append(VALIDATION_REPORT_SUFFIX))
                 .log(LoggingLevel.INFO, correlation() + "Uploading aggregated Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
                 .to("direct:uploadAntuBlob")
                 .log(LoggingLevel.INFO, correlation() + "Uploaded aggregated Validation Report to GCS file ${header." + FILE_HANDLE + "}")
                 .routeId("upload-aggregated-validation-report");
+
+        from("direct:createValidationReportStatusFile")
+                // create a status file after the PubSub status notification is sent to Marduk.
+                // this covers the case where the application process crashes or is restarted between the time
+                // the aggregated report is uploaded and the time the PubSub notification message is sent.
+                .log(LoggingLevel.INFO, correlation() + "Update validation report status file")
+                .setBody(constant("OK"))
+                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
+                        .append(header(DATASET_REFERENTIAL))
+                        .append(VALIDATION_REPORT_PREFIX)
+                        .append(header(VALIDATION_REPORT_ID_HEADER))
+                        .append(VALIDATION_REPORT_STATUS_SUFFIX))
+                .to("direct:uploadAntuBlob")
+                .log(LoggingLevel.INFO, correlation() + "Updated validation report status file")
+                .routeId("create-validation-report-status-file");
 
         from("direct:cleanUpCache")
                 .log(LoggingLevel.INFO, correlation() + "Clean up cache")
