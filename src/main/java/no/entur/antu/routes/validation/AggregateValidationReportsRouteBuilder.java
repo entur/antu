@@ -157,10 +157,12 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .routeId("upload-aggregated-validation-report");
 
         from("direct:createValidationReportStatusFile")
-                // create a status file after the PubSub status notification is sent to Marduk.
-                // this covers the case where the application process crashes or is restarted between the time
+                // Create a status file after the PubSub status notification is sent to Marduk.
+                // This covers the case where the application process crashes or is restarted between the time
                 // the aggregated report is uploaded and the time the PubSub notification message is sent.
-                .log(LoggingLevel.INFO, correlation() + "Update validation report status file")
+                // When the PubSub message in the job queue is retried, the validation report should be uploaded and
+                // the notification sent only if the status file is missing.
+                .log(LoggingLevel.INFO, correlation() + "Create validation report status file")
                 .setBody(constant("OK"))
                 .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_REPORTS)
                         .append(header(DATASET_REFERENTIAL))
@@ -168,7 +170,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                         .append(header(VALIDATION_REPORT_ID_HEADER))
                         .append(VALIDATION_REPORT_STATUS_SUFFIX))
                 .to("direct:uploadAntuBlob")
-                .log(LoggingLevel.INFO, correlation() + "Updated validation report status file")
+                .log(LoggingLevel.INFO, correlation() + "Created validation report status file")
                 .routeId("create-validation-report-status-file");
 
         from("direct:cleanUpCache")
