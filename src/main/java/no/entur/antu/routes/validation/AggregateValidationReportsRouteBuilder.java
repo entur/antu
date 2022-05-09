@@ -26,6 +26,7 @@ import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.util.StopWatch;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
+import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_STATUS_SUFFIX;
@@ -63,6 +65,8 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
     private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AggregateValidationReportsRouteBuilder.class);
+
+    private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
 
     @Override
     public void configure() throws Exception {
@@ -81,7 +85,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         from("direct:aggregateReports")
                 .log(LoggingLevel.INFO, correlation() + "Merging individual reports")
-
+                .setProperty(PROP_STOP_WATCH, StopWatch::new)
                 .process(exchange -> {
                     String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
                     String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
@@ -102,7 +106,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 })
                 // end splitter
                 .end()
-                .log(LoggingLevel.INFO, correlation() + "Completed reports merging")
+                .log(LoggingLevel.INFO, correlation() + "Completed reports merging in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
                 .setBody(header(AGGREGATED_VALIDATION_REPORT))
                 .choice()
                 .when(simple("${body.hasError()}"))
@@ -121,7 +125,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .routeId("aggregate-reports");
 
         from("direct:downloadValidationReport")
-                .setHeader(FILE_HANDLE, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
+                .setHeader(TEMPORARY_FILE_NAME, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
                         .append(header(DATASET_REFERENTIAL))
                         .append("/")
                         .append(header(VALIDATION_REPORT_ID_HEADER))
@@ -129,7 +133,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                         .append(header(NETEX_FILE_NAME))
                         .append(VALIDATION_REPORT_SUFFIX))
                 .log(LoggingLevel.INFO, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
-                .to("direct:getAntuBlob")
+                .to("direct:downloadBlobFromMemoryStore")
                 .log(LoggingLevel.INFO, correlation() + "Downloaded Validation Report from GCS file ${header." + FILE_HANDLE + "}")
                 .routeId("download-validation-report");
 

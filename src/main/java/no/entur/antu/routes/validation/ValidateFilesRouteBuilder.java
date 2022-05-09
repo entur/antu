@@ -40,6 +40,7 @@ import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
@@ -92,6 +93,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
         from("direct:downloadSingleNetexFile").streamCaching()
                 .log(LoggingLevel.INFO, correlation() + "Downloading single NeTEx file ${header." + FILE_HANDLE + "}")
+                .setHeader(TEMPORARY_FILE_NAME, header(NETEX_FILE_NAME))
                 .to("direct:downloadBlobFromMemoryStore")
                 .log(LoggingLevel.INFO, correlation() + "Downloaded single NeTEx file ${header." + FILE_HANDLE + "}")
                 .unmarshal().zipFile()
@@ -134,16 +136,16 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .routeId("save-validation-report");
 
         from("direct:uploadValidationReport")
-                .setHeader(FILE_HANDLE, constant(BLOBSTORE_PATH_ANTU_WORK)
+                .setHeader(TEMPORARY_FILE_NAME, constant(BLOBSTORE_PATH_ANTU_WORK)
                         .append(header(DATASET_REFERENTIAL))
                         .append("/")
                         .append(header(VALIDATION_REPORT_ID_HEADER))
                         .append("/")
                         .append(header(NETEX_FILE_NAME))
                         .append(VALIDATION_REPORT_SUFFIX))
-                .log(LoggingLevel.INFO, correlation() + "Uploading Validation Report  to GCS file ${header." + FILE_HANDLE + "}")
-                .to("direct:uploadAntuBlob")
-                .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + FILE_HANDLE + "}")
+                .log(LoggingLevel.INFO, correlation() + "Uploading Validation Report  to GCS file ${header." + TEMPORARY_FILE_NAME + "}")
+                .to("direct:uploadBlobToMemoryStore")
+                .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + TEMPORARY_FILE_NAME + "}")
                 .routeId("upload-validation-report");
 
         from("direct:notifyValidationReportAggregator")
