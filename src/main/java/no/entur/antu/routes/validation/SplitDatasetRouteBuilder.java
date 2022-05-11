@@ -25,6 +25,7 @@ import org.apache.camel.AggregationStrategy;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.dataformat.zipfile.ZipSplitter;
+import org.apache.camel.util.StopWatch;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER;
 
 
@@ -49,6 +51,7 @@ import static no.entur.antu.Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER;
 public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_ALL_NETEX_FILE_NAMES = "ALL_NETEX_FILE_NAMES";
+    private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
 
     @Override
     public void configure() throws Exception {
@@ -57,6 +60,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
 
         from("direct:splitDataset")
                 .streamCaching()
+                .setProperty(PROP_STOP_WATCH, StopWatch::new)
                 .setHeader(FILE_HANDLE, header(VALIDATION_DATASET_FILE_HANDLE_HEADER))
                 .to("direct:downloadNetexDataset")
                 .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx files")
@@ -74,6 +78,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .process(exchange -> exchange.getIn().setBody(buildFileNamesList(exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class))))
                 .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
                 .to("direct:createLineFilesValidationJobs")
+                .log(LoggingLevel.INFO, correlation() + "Splitted NeTEx file in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
                 .routeId("split-dataset");
 
         from("direct:downloadNetexDataset")
@@ -118,6 +123,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .marshal().zipFile()
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
                 .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx file ${header." + NETEX_FILE_NAME + "} to GCS file ${header." + FILE_HANDLE + "}")
+                .setHeader(TEMPORARY_FILE_NAME, header(NETEX_FILE_NAME))
                 .to("direct:uploadBlobToMemoryStore")
                 .routeId("upload-single-netex-file");
 

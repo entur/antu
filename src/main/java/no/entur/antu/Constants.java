@@ -25,6 +25,8 @@ public final class Constants {
      */
     public static final String FILE_HANDLE = "EnturFileHandle";
     public static final String NETEX_FILE_NAME = "EnturNetexFileName";
+
+    public static final String TEMPORARY_FILE_NAME = "EnturTemporaryFileName";
     public static final String FILENAME_DELIMITER = "§";
 
     public static final String DATASET_REFERENTIAL = "EnturDatasetReferential";
