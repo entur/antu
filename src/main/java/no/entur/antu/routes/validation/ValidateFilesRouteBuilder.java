@@ -75,7 +75,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:runNetexValidators")
                 // Duplicated PubSub messages are detected when trying to download the NeTEx file: it does not exist anymore after the report is generated and all temporary files are deleted
                 .doCatch(AntuMemoryStoreFileNotFoundException.class)
-                .log(LoggingLevel.WARN, correlation() + "Ignoring NeTEx file ${header." + FILE_HANDLE + "} that has already been validated")
+                .log(LoggingLevel.WARN, correlation() + "NeTEx file ${header." + FILE_HANDLE + "} has already been validated and removed from the memory store. Ignoring")
                 .stop()
                 .doCatch(InterruptedException.class, RetryableNetexValidationException.class, RetryableAntuException.class)
                 .log(LoggingLevel.INFO, correlation() + "Retryable exception while processing file ${header." + FILE_HANDLE + "}, the file will be retried later: ${exception.message} stacktrace: ${exception.stacktrace}")
