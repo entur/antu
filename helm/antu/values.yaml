@@ -18,3 +18,6 @@ horizontalPodAutoscaler:
   maxReplicas: 10
   minReplicas: 2
   targetCPUUtilizationPercentage: 50
+
+kubernetes:
+  maxPods: 10

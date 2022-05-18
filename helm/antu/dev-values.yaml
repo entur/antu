@@ -26,3 +26,6 @@ auth0:
       audience: https://api.dev.entur.io
 
 monitoringEnabled: true
+
+kubernetes:
+  namespace: dev

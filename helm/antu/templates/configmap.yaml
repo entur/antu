@@ -31,6 +31,10 @@ data:
     # Validators
     antu.schema.validation.enabled=true
 
+    # Kubernetes
+    antu.kubernetes.namespace={{ .Values.kubernetes.namespace }}
+    antu.kubernetes.maxpods={{ .Values.kubernetes.maxpods }}
+
     # PubSub
     antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}
     spring.cloud.gcp.project-id=${antu.pubsub.project.id}

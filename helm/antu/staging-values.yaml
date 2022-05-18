@@ -26,3 +26,6 @@ auth0:
       audience: https://api.staging.entur.io
 
 monitoringEnabled: true
+
+kubernetes:
+  namespace: staging
