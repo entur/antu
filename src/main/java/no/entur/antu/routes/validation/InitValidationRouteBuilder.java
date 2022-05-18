@@ -62,9 +62,20 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .setHeader(Constants.VALIDATION_REPORT_ID_HEADER, header(DATASET_REFERENTIAL).append('_').append(exchangeProperty(PROP_REPORT_ID_TIMESTAMP)))
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyStatus")
+                .to("direct:scaleUpKubernetesDeployment")
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("init-dataset-validation");
+
+        from("direct:scaleUpKubernetesDeployment")
+                .filter(simple("{{antu.kubernetes.enabled:true}}"))
+                .log(LoggingLevel.INFO, correlation() + "Scaling up Kubernetes deployments")
+                .setHeader("CamelKubernetesDeploymentReplicas", simple("{{antu.kubernetes.maxpods:10}}"))
+                .setHeader("CamelKubernetesDeploymentName", simple("{{antu.kubernetes.deployment:antu}}"))
+                .setHeader("CamelKubernetesNamespaceName", simple("{{antu.kubernetes.namespace}}"))
+                .to("kubernetes-deployments:///?kubernetesClient=#kubernetesClient&operation=scaleDeployment")
+                .log(LoggingLevel.INFO, correlation() + "Scaled up Kubernetes deployments")
+                .routeId("scale-up-kubernetes-deployment");
 
         from("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue?synchronousPull=true&concurrentConsumers={{antu.netex.job.consumers:1}}")
                 .to("direct:processJob")

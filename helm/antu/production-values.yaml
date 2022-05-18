@@ -27,3 +27,6 @@ auth0:
 
 
 monitoringEnabled: false
+
+kubernetes:
+  namespace: production
