@@ -48,5 +48,5 @@ rules:
     verbs: ["get", "update", "list"]
   - apiGroups: ["apps"]
     resources: ["deployments/scale"]
-    verbs: ["patch"]
+    verbs: ["get", "list", "patch"]
 

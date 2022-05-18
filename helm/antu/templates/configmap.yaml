@@ -33,7 +33,7 @@ data:
 
     # Kubernetes
     antu.kubernetes.namespace={{ .Values.kubernetes.namespace }}
-    antu.kubernetes.maxpods={{ .Values.kubernetes.maxpods }}
+    antu.kubernetes.maxpods={{ .Values.kubernetes.maxPods }}
 
     # PubSub
     antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}
