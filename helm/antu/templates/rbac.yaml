@@ -47,6 +47,6 @@ rules:
     resourceNames: ["antu-leaders-lockonantureportaggregationqueue", "antu-leaders-lockonanturefreshstopcache", "antu-leaders-lockonantucommonfilesaggregationqueue", "antu-leaders-lockonanturefreshorganisationcache"]
     verbs: ["get", "update", "list"]
   - apiGroups: ["apps"]
-    resources: ["deployments/scale"]
-    verbs: ["get", "list", "patch"]
+    resources: [ "deployments" ]
+    verbs: [ "get", "list", "watch", "update", "patch" ]
 
