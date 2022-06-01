@@ -10,7 +10,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   rules:
-          {{- if eq .Values.env "production"}}
+          {{- if eq .Values.env "prod"}}
     - host: timetable-validation-v1-validation-{{ .Release.Namespace }}.entur.io
           {{ else }}
     - host: timetable-validation-v1-validation-{{ .Release.Namespace }}.{{ .Release.Namespace }}.entur.io
