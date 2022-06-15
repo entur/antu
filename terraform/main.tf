@@ -8,7 +8,7 @@ provider "google" {
   region  = var.gcp_region
 }
 provider "google-beta" {
-  version = "~> 4.11.0"
+  version = "~> 4.25.0"
   region  = var.gcp_region
 }
 provider "kubernetes" {
