@@ -10,7 +10,7 @@ validationRuleConfigs:
     name: Codespace unknown
     severity: ERROR
   - code: NETEX_ID_2
-    name: NeTEx ID duplicated across files
+    name: NeTEx ID invalid structure
     severity: ERROR
   - code: NETEX_ID_3
     name: NeTEx ID invalid element name inside structure
