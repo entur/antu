@@ -9,10 +9,10 @@ import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
@@ -61,12 +61,12 @@ public class RedisNetexIdRepository implements NetexIdRepository {
                 LOGGER.warn("Validation already run for file {} in report {}", filename, reportId);
                 return new HashSet<>(duplicatedIds);
             }
-            duplicatedIds.expire(1, TimeUnit.HOURS);
-            localNetexIds.expire(1, TimeUnit.HOURS);
+            duplicatedIds.expire(Duration.ofHours(1));
+            localNetexIds.expire(Duration.ofHours(1));
             localNetexIds.addAll(localIds);
 
             RSet<String> accumulatedNetexIds = redissonClient.getSet(accumulatedNetexIdsKey);
-            accumulatedNetexIds.expire(1, TimeUnit.HOURS);
+            accumulatedNetexIds.expire(Duration.ofHours(1));
 
             Set<String> intersection = localNetexIds.readIntersection(accumulatedNetexIdsKey);
             duplicatedIds.addAll(intersection);
