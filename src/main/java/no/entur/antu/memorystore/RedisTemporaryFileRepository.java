@@ -3,7 +3,7 @@ package no.entur.antu.memorystore;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 
 /**
@@ -21,7 +21,7 @@ public class RedisTemporaryFileRepository implements TemporaryFileRepository {
     @Override
     public void upload(String validationReportId, String fileName, byte[] content) {
         RBucket<Object> temporaryFile = redissonClient.getBucket(getTemporaryFileKey(validationReportId, fileName));
-        temporaryFile.expire(1, TimeUnit.HOURS);
+        temporaryFile.expire(Duration.ofHours(1));
         temporaryFile.set(content);
     }
 
