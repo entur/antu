@@ -84,16 +84,20 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .bindingMode(RestBindingMode.off)
                 .endpointProperty("matchOnUriPrefix", "true")
                 .apiContextPath("/swagger.json")
-                .apiProperty("api.title", "Antu NeTEx Validation API").apiProperty("api.version", "1.0")
-                .apiContextRouteId("doc-api");
+                .apiProperty("api.title", "Antu NeTEx Validation API")
+                .apiProperty("api.version", "1.0");
 
         rest("")
                 .apiDocs(false)
                 .description("Wildcard definitions necessary to get Jetty to match authorization filters to endpoints with path params")
-                .get().route().routeId("admin-route-authorize-get").throwException(new NotFoundException()).endRest()
-                .post().route().routeId("admin-route-authorize-post").throwException(new NotFoundException()).endRest()
-                .put().route().routeId("admin-route-authorize-put").throwException(new NotFoundException()).endRest()
-                .delete().route().routeId("admin-route-authorize-delete").throwException(new NotFoundException()).endRest();
+                .get()
+                .to("direct:adminRouteAuthorizeGet")
+                .post()
+                .to("direct:adminRouteAuthorizePost")
+                .put()
+                .to("direct:adminRouteAuthorizePut")
+                .delete()
+                .to("direct:adminRouteAuthorizeDelete");
 
         String commonApiDocEndpoint = "http:" + host + ":" + port + "/services/swagger.json?bridgeEndpoint=true";
 
@@ -118,9 +122,49 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .responseMessage().code(200).endResponseMessage()
                 .responseMessage().code(404).message("Unknown codespace").endResponseMessage()
                 .responseMessage().code(500).message("Internal error").endResponseMessage()
-                .route()
-                .to("direct:authorizeEditorRequest")
+                .to("direct:validationReport")
 
+                .get("/swagger.json")
+                .apiDocs(false)
+                .bindingMode(RestBindingMode.off)
+                .to(commonApiDocEndpoint);
+
+
+        rest("/cache-admin")
+
+                .post("/clear-cache")
+                .description("Clear the cache")
+                .consumes(PLAIN)
+                .produces(PLAIN)
+                .responseMessage().code(200).message("Command accepted").endResponseMessage()
+                .to("direct:adminCacheClear")
+
+                .get("/dump-keys")
+                .description("Clear the cache")
+                .consumes(PLAIN)
+                .produces(PLAIN)
+                .responseMessage().code(200).message("Command accepted").endResponseMessage()
+                .to("direct:adminCacheDumpKeys");
+
+
+        from("direct:adminRouteAuthorizeGet")
+                .throwException(new NotFoundException())
+                .routeId("admin-route-authorize-get");
+
+        from("direct:adminRouteAuthorizePost")
+                .throwException(new NotFoundException())
+                .routeId("admin-route-authorize-post");
+
+        from("direct:adminRouteAuthorizePut")
+                .throwException(new NotFoundException())
+                .routeId("admin-route-authorize-put");
+
+        from("direct:adminRouteAuthorizeDelete")
+                .throwException(new NotFoundException())
+                .routeId("admin-route-authorize-delete");
+
+        from("direct:validationReport")
+                .to("direct:authorizeEditorRequest")
                 .setHeader(FILE_HANDLE, constant(BLOBSTORE_PATH_ANTU_REPORTS)
                         .append(header(CODESPACE_PARAM))
                         .append(Constants.VALIDATION_REPORT_PREFIX)
@@ -135,46 +179,23 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
                 .end()
                 .setHeader(Exchange.CONTENT_ENCODING, constant("gzip"))
                 .removeHeader(HttpHeaders.AUTHORIZATION)
-                .routeId("validation-report")
-                .endRest()
+                .routeId("validation-report");
 
-                .get("/swagger.json")
-                .apiDocs(false)
-                .bindingMode(RestBindingMode.off)
-                .route()
-                .to(commonApiDocEndpoint)
-                .endRest();
-
-        rest("/cache-admin")
-
-                .post("/clear-cache")
-                .description("Clear the cache")
-                .consumes(PLAIN)
-                .produces(PLAIN)
-                .responseMessage().code(200).message("Command accepted").endResponseMessage()
-                .route()
+        from("direct:adminCacheClear")
                 .to("direct:authorizeAdminRequest")
                 .log(LoggingLevel.INFO, correlation() + "Clear cache")
                 .process(this::removeAllCamelHttpHeaders)
                 .bean("cacheAdmin", "clear")
                 .log(LoggingLevel.INFO, correlation() + "Cleared cache")
-                .routeId("admin-cache-clear")
-                .endRest()
+                .routeId("admin-cache-clear");
 
-                .get("/dump-keys")
-                .description("Clear the cache")
-                .consumes(PLAIN)
-                .produces(PLAIN)
-                .responseMessage().code(200).message("Command accepted").endResponseMessage()
-                .route()
+        from("direct:adminCacheDumpKeys")
                 .to("direct:authorizeAdminRequest")
                 .log(LoggingLevel.INFO, correlation() + "Dump keys")
                 .process(this::removeAllCamelHttpHeaders)
                 .bean("cacheAdmin", "dumpKeys")
                 .log(LoggingLevel.INFO, correlation() + "Dumped keys")
-                .routeId("admin-cache-dum-keys")
-                .endRest();
-
+                .routeId("admin-cache-dump-keys");
 
         from("direct:authorizeEditorRequest")
                 .validate(header(CODESPACE_PARAM).isNotNull())
