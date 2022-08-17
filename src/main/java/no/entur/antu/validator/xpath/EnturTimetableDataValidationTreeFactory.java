@@ -48,4 +48,12 @@ public class EnturTimetableDataValidationTreeFactory extends DefaultValidationTr
         lineFileValidationTree.addValidationRule(new ValidateAllowedCodespaces());
         return lineFileValidationTree;
     }
+
+    @Override
+    protected ValidationTree getTimetableFrameValidationTree(String path) {
+        ValidationTree timetableFrameValidationTree = super.getTimetableFrameValidationTree(path);
+        // Disabling check of duplicate DatedServiceJourney with different versions (slow test)
+        timetableFrameValidationTree.removeValidationRule("DATED_SERVICE_JOURNEY_4");
+        return timetableFrameValidationTree;
+    }
 }
