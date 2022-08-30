@@ -17,7 +17,7 @@ provider "kubernetes" {
 }
 
 provider "random" {
-  version = "~> 3.1.0"
+  version = "~> 3.4.0"
 }
 
 # create service account
