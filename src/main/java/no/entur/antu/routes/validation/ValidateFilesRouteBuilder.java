@@ -92,21 +92,21 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .routeId("validate-netex");
 
         from("direct:downloadSingleNetexFile").streamCaching()
-                .log(LoggingLevel.INFO, correlation() + "Downloading single NeTEx file ${header." + FILE_HANDLE + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Downloading single NeTEx file ${header." + FILE_HANDLE + "}")
                 .setHeader(TEMPORARY_FILE_NAME, header(NETEX_FILE_NAME))
                 .to("direct:downloadBlobFromMemoryStore")
-                .log(LoggingLevel.INFO, correlation() + "Downloaded single NeTEx file ${header." + FILE_HANDLE + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Downloaded single NeTEx file ${header." + FILE_HANDLE + "}")
                 .unmarshal().zipFile()
                 .routeId("download-single-netex-file");
 
         from("direct:runNetexValidators").streamCaching()
-                .log(LoggingLevel.INFO, correlation() + "Running NeTEx validators")
+                .log(LoggingLevel.DEBUG, correlation() + "Running NeTEx validators")
                 .validate(header(VALIDATION_PROFILE_HEADER).isNotNull())
                 .validate(header(DATASET_CODESPACE).isNotNull())
                 .process(exchange -> exchange.setProperty(PROP_NETEX_VALIDATION_CALLBACK, new AntuNetexValidationProgressCallback(this, exchange)))
                 .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "},${exchangeProperty." + PROP_NETEX_VALIDATION_CALLBACK + "})")
                 .setProperty(PROP_VALIDATION_REPORT, body())
-                .log(LoggingLevel.INFO, correlation() + "Completed all NeTEx validators")
+                .log(LoggingLevel.DEBUG, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");
 
         from("direct:reportSystemError")
@@ -122,17 +122,17 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .routeId("report-system-error");
 
         from("direct:truncateReport")
-                .log(LoggingLevel.INFO, correlation() + "Truncating validation report")
+                .log(LoggingLevel.DEBUG, correlation() + "Truncating validation report")
                 .bean(VALIDATION_REPORT_TRANSFORMER, "truncate(${exchangeProperty." + PROP_VALIDATION_REPORT + "})")
-                .log(LoggingLevel.INFO, correlation() + "Truncated validation report")
+                .log(LoggingLevel.DEBUG, correlation() + "Truncated validation report")
                 .routeId("truncate-validation-report");
 
         from("direct:saveValidationReport")
-                .log(LoggingLevel.INFO, correlation() + "Saving validation report")
+                .log(LoggingLevel.DEBUG, correlation() + "Saving validation report")
                 .setBody(exchangeProperty(PROP_VALIDATION_REPORT))
                 .marshal().json(JsonLibrary.Jackson)
                 .to("direct:uploadValidationReport")
-                .log(LoggingLevel.INFO, correlation() + "Saved validation report")
+                .log(LoggingLevel.DEBUG, correlation() + "Saved validation report")
                 .routeId("save-validation-report");
 
         from("direct:uploadValidationReport")
@@ -143,16 +143,16 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                         .append("/")
                         .append(header(NETEX_FILE_NAME))
                         .append(VALIDATION_REPORT_SUFFIX))
-                .log(LoggingLevel.INFO, correlation() + "Uploading Validation Report  to GCS file ${header." + TEMPORARY_FILE_NAME + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Uploading Validation Report  to GCS file ${header." + TEMPORARY_FILE_NAME + "}")
                 .to("direct:uploadBlobToMemoryStore")
-                .log(LoggingLevel.INFO, correlation() + "Uploaded Validation Report to GCS file ${header." + TEMPORARY_FILE_NAME + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Uploaded Validation Report to GCS file ${header." + TEMPORARY_FILE_NAME + "}")
                 .routeId("upload-validation-report");
 
         from("direct:notifyValidationReportAggregator")
-                .log(LoggingLevel.INFO, correlation() + "Notifying validation report aggregator")
+                .log(LoggingLevel.DEBUG, correlation() + "Notifying validation report aggregator")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
                 .filter(header(NETEX_FILE_NAME).startsWith("_"))
-                .log(LoggingLevel.INFO, correlation() + "Notifying common files aggregator")
+                .log(LoggingLevel.DEBUG, correlation() + "Notifying common files aggregator")
                 .setBody(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue")
                 //end filter

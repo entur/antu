@@ -39,13 +39,13 @@ public class MemoryStoreRoute extends BaseRouteBuilder {
 
         from("direct:downloadBlobFromMemoryStore")
                 .bean("temporaryFileRepository", "download(${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + TEMPORARY_FILE_NAME + "})")
-                .log(LoggingLevel.INFO, correlation() + "Returning from fetching file ${header." + TEMPORARY_FILE_NAME + "} from memory store.")
+                .log(LoggingLevel.DEBUG, correlation() + "Returning from fetching file ${header." + TEMPORARY_FILE_NAME + "} from memory store.")
                 .routeId("memory-store-download");
 
         from("direct:uploadBlobToMemoryStore")
                 .bean("temporaryFileRepository", "upload(${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + TEMPORARY_FILE_NAME + "}, ${body} )")
                 .setBody(constant(""))
-                .log(LoggingLevel.INFO, correlation() + "Stored file ${header." + TEMPORARY_FILE_NAME + "} in memory store.")
+                .log(LoggingLevel.DEBUG, correlation() + "Stored file ${header." + TEMPORARY_FILE_NAME + "} in memory store.")
                 .routeId("memory-store-upload");
     }
 }

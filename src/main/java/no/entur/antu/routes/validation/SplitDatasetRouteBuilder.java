@@ -78,7 +78,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .process(exchange -> exchange.getIn().setBody(buildFileNamesList(exchange.getProperty(PROP_ALL_NETEX_FILE_NAMES, Set.class))))
                 .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
                 .to("direct:createLineFilesValidationJobs")
-                .log(LoggingLevel.INFO, correlation() + "Splitted NeTEx file in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
+                .log(LoggingLevel.DEBUG, correlation() + "Splitted NeTEx file in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
                 .routeId("split-dataset");
 
         from("direct:downloadNetexDataset")
@@ -94,12 +94,12 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
         from("direct:uploadSingleNetexFiles")
                 .split(new ZipSplitter()).aggregationStrategy(new SingleNetexFileAggregationStrategy())
                 .streaming()
-                .log(LoggingLevel.INFO, correlation() + "Processing NeTEx file ${header." + Exchange.FILE_NAME + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Processing NeTEx file ${header." + Exchange.FILE_NAME + "}")
                 .choice()
                 .when(header(Exchange.FILE_NAME).endsWith(".xml"))
                 .to("direct:uploadSingleNetexFile")
                 .otherwise()
-                .log(LoggingLevel.INFO, correlation() + "Ignoring non-XML file ${header." + Exchange.FILE_NAME + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Ignoring non-XML file ${header." + Exchange.FILE_NAME + "}")
                 .setBody(constant(""))
                 .routeId("upload-single-netex-files");
 
@@ -122,7 +122,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .setHeader(NETEX_FILE_NAME, header(Exchange.FILE_NAME))
                 .marshal().zipFile()
                 .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
-                .log(LoggingLevel.INFO, correlation() + "Uploading NeTEx file ${header." + NETEX_FILE_NAME + "} to GCS file ${header." + FILE_HANDLE + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Uploading NeTEx file ${header." + NETEX_FILE_NAME + "} to GCS file ${header." + FILE_HANDLE + "}")
                 .setHeader(TEMPORARY_FILE_NAME, header(NETEX_FILE_NAME))
                 .to("direct:uploadBlobToMemoryStore")
                 .routeId("upload-single-netex-file");
