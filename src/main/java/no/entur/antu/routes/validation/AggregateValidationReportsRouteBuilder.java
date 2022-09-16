@@ -133,14 +133,14 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                         .append("/")
                         .append(header(NETEX_FILE_NAME))
                         .append(VALIDATION_REPORT_SUFFIX))
-                .log(LoggingLevel.INFO, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Downloading Validation Report from GCS file ${header." + FILE_HANDLE + "}")
                 .doTry()
                 .to("direct:downloadBlobFromMemoryStore")
                 .doCatch(AntuMemoryStoreFileNotFoundException.class)
                 .log(LoggingLevel.WARN, correlation() + "Line validation report ${header." + FILE_HANDLE + "} has already been aggregated and removed from the memory store. Ignoring.")
                 .stop()
                 .end()
-                .log(LoggingLevel.INFO, correlation() + "Downloaded Validation Report from GCS file ${header." + FILE_HANDLE + "}")
+                .log(LoggingLevel.DEBUG, correlation() + "Downloaded Validation Report from GCS file ${header." + FILE_HANDLE + "}")
                 .routeId("download-validation-report");
 
 
