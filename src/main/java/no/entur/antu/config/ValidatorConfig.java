@@ -47,6 +47,7 @@ import java.util.Map;
 
 import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_FLEX;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
 
 @Configuration
@@ -109,12 +110,14 @@ public class ValidatorConfig {
 
     @Bean
     public NetexValidationProfile netexValidationProfile(@Qualifier("timetableDataValidatorsRunner") NetexValidatorsRunner timetableDataValidatorsRunner,
+                                                         @Qualifier("flexTimetableDataValidatorsRunner") NetexValidatorsRunner flexTimetableDataValidatorsRunner,
                                                          @Qualifier("swedenTimetableDataSwedenValidatorsRunner") NetexValidatorsRunner timetableSwedenDataValidatorsRunner,
                                                          @Qualifier("stopPlaceDataValidatorsRunner") NetexValidatorsRunner stopDataValidatorsRunner,
                                                          @Value("${antu.netex.validation.schema.skip:false}") boolean skipSchemaValidation,
                                                          @Value("${antu.netex.validation.validators.skip:false}") boolean skipNetexValidators) {
         return new NetexValidationProfile(Map.of(
                 VALIDATION_PROFILE_TIMETABLE, timetableDataValidatorsRunner,
+                VALIDATION_PROFILE_TIMETABLE_FLEX, flexTimetableDataValidatorsRunner,
                 VALIDATION_PROFILE_TIMETABLE_SWEDEN, timetableSwedenDataValidatorsRunner,
                 VALIDATION_PROFILE_STOP, stopDataValidatorsRunner
         ), skipSchemaValidation, skipNetexValidators);
