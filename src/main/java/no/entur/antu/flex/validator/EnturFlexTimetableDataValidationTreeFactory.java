@@ -27,7 +27,7 @@ public class EnturFlexTimetableDataValidationTreeFactory extends EnturTimetableD
     protected List<ValidationRule> getCompositeFrameBaseValidationRules() {
         List<ValidationRule> compositeFrameBaseValidationRules = super.getCompositeFrameBaseValidationRules();
         // allow common files that contain  a SiteFrame
-        compositeFrameBaseValidationRules.removeIf(validationRule -> validationRule.getCode().equals("SITE_FRAME_IN_COMMON_FILE"));
+        compositeFrameBaseValidationRules.removeIf(validationRule -> validationRule.getCode().equals("COMPOSITE_SITE_FRAME_IN_COMMON_FILE"));
 
         return compositeFrameBaseValidationRules;
     }
