@@ -59,7 +59,7 @@ public class TimetableDataValidatorConfig {
                                                                VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                NeTexReferenceValidator neTexReferenceValidator,
-                                                               NetexIdUniquenessValidator netexIdUniquenessValidator) {
+                                                               @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator) {
         List<NetexValidator> netexValidators = List.of(xpathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, neTexReferenceValidator, netexIdUniquenessValidator);
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);

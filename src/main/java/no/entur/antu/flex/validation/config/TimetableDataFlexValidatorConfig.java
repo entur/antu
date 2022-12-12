@@ -14,9 +14,9 @@
  *
  */
 
-package no.entur.antu.flex.config;
+package no.entur.antu.flex.validation.config;
 
-import no.entur.antu.flex.validator.EnturFlexTimetableDataValidationTreeFactory;
+import no.entur.antu.flex.validation.validator.EnturFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.id.NetexIdValidator;
 import org.entur.netex.validation.validator.NetexValidator;
@@ -62,7 +62,7 @@ public class TimetableDataFlexValidatorConfig {
                                                                    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                    NeTexReferenceValidator neTexReferenceValidator,
-                                                                   NetexIdUniquenessValidator netexIdUniquenessValidator) {
+                                                                   @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator) {
         List<NetexValidator> netexValidators = List.of(flexXPathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, neTexReferenceValidator, netexIdUniquenessValidator);
         // do not ignore SiteFrame
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());

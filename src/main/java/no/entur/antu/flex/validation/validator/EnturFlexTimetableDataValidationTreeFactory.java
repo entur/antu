@@ -1,4 +1,4 @@
-package no.entur.antu.flex.validator;
+package no.entur.antu.flex.validation.validator;
 
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
