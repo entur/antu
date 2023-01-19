@@ -1,0 +1,90 @@
+apiVersion: v1
+data:
+  application.properties: |+
+
+    # Spring
+    spring.main.sources=no.entur.antu
+    spring.profiles.active=gcs-blobstore
+    server.port={{ .Values.service.http.internalPort }}
+
+    # Camel
+    camel.springboot.name=antu
+    camel.dataformat.jackson.module-refs=jacksonJavaTimeModule
+    camel.dataformat.jackson.include=NON_NULL
+    camel.cluster.kubernetes.enabled=true
+    camel.cluster.kubernetes.cluster-labels[app]=antu
+    camel.cluster.kubernetes.config-map-name=antu-leaders
+    camel.servlet.mapping.context-path=/services/*
+    camel.springboot.streamCachingEnabled=false
+    camel.springboot.streamCachingSpoolEnabled=true
+    # the Camel shutdown timeout must be shorter than the Kubernetes terminationGracePeriod
+    antu.shutdown.timeout=75
+    antu.camel.redelivery.max=0
+
+    # Organisation register
+    antu.organisation.registry.url={{ .Values.organisationRegistryUrl }}
+    antu.organisation.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
+
+    # Stop place register
+    antu.stop.registry.id.url={{ .Values.tiamatUrl }}/services/stop_places
+    antu.stop.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
+
+
+    # Validators
+    antu.schema.validation.enabled=true
+
+    # Kubernetes
+    antu.kubernetes.namespace={{ .Values.kubernetes.namespace }}
+    antu.kubernetes.maxpods={{ .Values.kubernetes.maxPods }}
+
+    # PubSub
+    antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}
+    spring.cloud.gcp.project-id=${antu.pubsub.project.id}
+
+    camel.component.google-pubsub.synchronous-pull-retryable-codes=DEADLINE_EXCEEDED
+
+    #OAuth2 Resource Server
+    spring.security.oauth2.resourceserver.jwt.issuer-uri={{ .Values.auth0.ror.url }}
+    antu.oauth2.resourceserver.auth0.ror.jwt.audience={{ .Values.auth0.ror.audience }}
+    antu.oauth2.resourceserver.auth0.ror.claim.namespace=https://ror.entur.io/
+
+    #Oauth2 Client
+    spring.security.oauth2.client.provider.orgregister.token-uri={{ .Values.auth0.partner.tokenUri }}
+    spring.security.oauth2.client.registration.orgregister.client-id={{ .Values.auth0.partner.clientId }}
+    spring.security.oauth2.client.registration.orgregister.authorization-grant-type=client_credentials
+    orgregister.oauth2.client.audience={{ .Values.auth0.partner.orgregister.audience }}
+
+    # Blobstore
+    blobstore.gcs.project.id={{ .Values.gcp.blobstoreProjectId }}
+    blobstore.gcs.marduk.container.name={{ .Values.gcp.marduk.bucketName }}
+    blobstore.gcs.antu.container.name={{ .Values.gcp.antu.bucketName }}
+
+    # Redis
+    spring.redis.host=${REDIS_HOST}
+    spring.redis.port=${REDIS_PORT}
+    antu.redis.server.trust.store.file=/deployments/truststore/redis-server-ca.jks
+
+    # Actuator
+    management.endpoints.enabled-by-default=false
+    management.endpoint.health.enabled=true
+    management.health.defaults.enabled=false
+    management.endpoint.health.probes.enabled=true
+    management.endpoint.health.group.readiness.include=readinessState
+    management.endpoint.prometheus.enabled=true
+    management.endpoints.web.exposure.include=health,prometheus
+    management.endpoints.jmx.exposure.exclude=*
+
+
+    # Logging
+    logging.config=classpath:logback.xml
+    logging.level.no.entur=INFO
+    logging.level.no.entur.antu=INFO
+    logging.level.org.apache=INFO
+    logging.level.org.apache.camel.component.http.HttpComponent=WARN
+
+kind: ConfigMap
+metadata:
+  name: {{ template "antu.name" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "common.labels" . | indent 4 }}

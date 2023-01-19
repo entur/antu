@@ -1,0 +1,155 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "antu.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "common.labels" . | indent 4 }}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: {{ .Values.replicas }}
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: antu
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: "{{ .Values.service.http.internalPort }}"
+        prometheus.io/scrape: "true"
+      labels:
+    {{- include "common.labels" . | indent 8 }}
+    spec:
+      serviceAccountName: application
+      containers:
+        - name: antu
+          image: {{ .Values.image.identifier }}
+          env:
+            - name: JDK_JAVA_OPTIONS
+              value: -server -Xmx{{ .Values.resources.xmx }} -Xss512k -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
+                -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:ActiveProcessorCount={{ .Values.resources.cpuRequest }}
+                --add-opens=java.base/java.nio=ALL-UNNAMED
+                --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+                -Dspring.config.location=/etc/application-config/application.properties
+                -Dfile.encoding=UTF-8  {{- if .Values.monitoringEnabled}} -Dcom.sun.management.jmxremote.port=9999  -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+            {{- end}}
+            - name: TZ
+              value: Europe/Oslo
+            - name: ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis-server-trust-store-password
+                  name: ror-antu-secret
+            - name: ANTU_REDIS_AUTHENTICATION_STRING
+              valueFrom:
+                secretKeyRef:
+                  key: redis-authentication-string
+                  name: ror-antu-secret
+            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ORGREGISTER_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: partner-auth0-secret
+                  name: ror-antu-secret
+          envFrom:
+            - configMapRef:
+                name: antu-redis-configmap
+          ports:
+            - containerPort: {{ .Values.service.http.internalPort }}
+              name: http
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: {{ .Values.service.http.internalPort }}
+              scheme: HTTP
+            initialDelaySeconds: 140
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: {{ .Values.service.http.internalPort }}
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+            timeoutSeconds: 10
+          resources:
+            limits:
+              cpu: {{ .Values.resources.cpuLimit }}
+              memory: {{ .Values.resources.memLimit }}
+            requests:
+              cpu: {{ .Values.resources.cpuRequest }}
+              memory: {{ .Values.resources.memRequest }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: [ "ALL" ]
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /etc/antu-redis-config
+              name: antu-redis-config
+              readOnly: true
+            - mountPath: /etc/application-config
+              name: application-config
+              readOnly: true
+            - mountPath: "/deployments/truststore"
+              name: truststore
+      initContainers:
+        - name: antu-init-trust-store
+          image: {{ .Values.image.identifier }}
+          imagePullPolicy: "Always"
+          env:
+            - name: ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: redis-server-trust-store-password
+                  name: ror-antu-secret
+          command: [ "keytool" ]
+          args: [ "-importcert", "-v", "-noprompt", "-file", "/etc/antu-redis-config/redis-server-ca.pem", "-keystore", "/deployments/truststore/redis-server-ca.jks", "-storepass", "$(ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD)" ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop: [ "ALL" ]
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - mountPath: /etc/antu-redis-config
+              name: antu-redis-config
+              readOnly: true
+            - mountPath: "/deployments/truststore"
+              name: truststore
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      serviceAccountName: antu-service-account
+      terminationGracePeriodSeconds: 80
+      volumes:
+        - name: application-config
+          configMap:
+            defaultMode: 420
+            name: antu-config
+        - name: antu-redis-config
+          configMap:
+            defaultMode: 420
+            name: antu-redis-configmap
+        - name: truststore
+          emptyDir: { }
+

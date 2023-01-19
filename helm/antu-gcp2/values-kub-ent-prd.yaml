@@ -1,0 +1,32 @@
+env: prod
+replicas: 2
+
+gcp:
+  blobstoreProjectId: entur-ror-prod
+  pubsubProjectId: entur-ror-prod
+
+  marduk:
+    bucketName: marduk-production
+
+  antu:
+    bucketName: ror-antu-production
+
+tiamatUrl: http://tiamat.prd.entur.internal
+
+organisationRegistryUrl: https://api.entur.io/organisations/v1/register/organisations
+
+auth0:
+  ror:
+    url: https://auth2.entur.org/
+    audience: https://ror.api.entur.io
+  partner:
+    tokenUri: https://partner.entur.org/oauth/token
+    clientId: ms08sY6rN2fjlNst881de632KNGyvgcY
+    orgregister:
+      audience: https://api.entur.io
+
+
+monitoringEnabled: false
+
+ingress:
+  domainName: .entur.io
