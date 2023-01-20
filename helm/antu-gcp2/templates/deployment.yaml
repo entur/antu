@@ -139,7 +139,7 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-      serviceAccountName: antu-service-account
+      serviceAccountName: application
       terminationGracePeriodSeconds: 80
       volumes:
         - name: application-config
