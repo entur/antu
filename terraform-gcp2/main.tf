@@ -5,6 +5,7 @@ terraform {
     google = {
       source  = "hashicorp/google"
       version = "~> 4.32.0"
+      region  = var.gcp_region
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"

@@ -3,6 +3,11 @@ variable "env" {
   description = "Kubernetes deployment environment"
 }
 
+variable "gcp_region" {
+  description = "The GCP region"
+  default     = "europe-west1"
+}
+
 variable "bucket_location" {
   description = "GCP bucket location"
   default = "europe-west1"
