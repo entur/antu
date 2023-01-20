@@ -5,7 +5,6 @@ terraform {
     google = {
       source  = "hashicorp/google"
       version = "~> 4.32.0"
-      region  = var.gcp_region
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -123,7 +122,8 @@ resource "google_redis_instance" "antu-redis" {
 
   redis_version           = "REDIS_6_X"
   authorized_network      = data.google_compute_network.main_network_project_vpc.id
-  connect_mode             = "PRIVATE_SERVICE_ACCESS"
+  connect_mode            = "PRIVATE_SERVICE_ACCESS"
+  region                  = var.gcp_region
   location_id             = var.redis_zone
   transit_encryption_mode = "SERVER_AUTHENTICATION"
   auth_enabled = "true"
