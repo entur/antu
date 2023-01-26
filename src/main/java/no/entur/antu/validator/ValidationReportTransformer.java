@@ -35,8 +35,8 @@ public class ValidationReportTransformer {
         Collection<ValidationReportEntry> validationReportEntries = validationReport.getValidationReportEntries();
         int nbEntries = validationReportEntries.size();
         Map<String, List<ValidationReportEntry>> validationReportEntriesByRuleName = validationReportEntries.stream().collect(Collectors.groupingBy(ValidationReportEntry::getName));
-        validationReportEntriesByRuleName.replaceAll((ruleName, reportEntries) -> reportEntries.stream().limit(maxValidationReportEntriesPerRule).collect(Collectors.toList()));
-        List<ValidationReportEntry> truncatedValidationReportEntries = validationReportEntriesByRuleName.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        validationReportEntriesByRuleName.replaceAll((ruleName, reportEntries) -> reportEntries.stream().limit(maxValidationReportEntriesPerRule).toList());
+        List<ValidationReportEntry> truncatedValidationReportEntries = validationReportEntriesByRuleName.values().stream().flatMap(Collection::stream).toList();
         if (truncatedValidationReportEntries.size() < nbEntries) {
             validationReportEntries.clear();
             validationReportEntries.addAll(truncatedValidationReportEntries);
