@@ -236,7 +236,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         public static List<String> split(Exchange exchange) {
             String fileNameList = exchange.getMessage().getBody(String.class);
-            return Arrays.stream(fileNameList.split(FILENAME_DELIMITER)).sorted(Collections.reverseOrder()).collect(Collectors.toList());
+            return Arrays.stream(fileNameList.split(FILENAME_DELIMITER)).sorted(Collections.reverseOrder()).toList();
         }
     }
 }

@@ -36,9 +36,6 @@
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-
 
     </properties>
 

@@ -50,7 +50,7 @@ public class NetexIdValidator extends AbstractNetexValidator {
 
         Set<String> validNetexCodespaces = NetexCodespace.getValidNetexCodespacesFor(validationContext.getCodespace())
                 .stream()
-                .map(NetexCodespace::getXmlns)
+                .map(NetexCodespace::xmlns)
                 .collect(Collectors.toSet());
         String validNetexCodespaceList = String.join(",", validNetexCodespaces);
 
