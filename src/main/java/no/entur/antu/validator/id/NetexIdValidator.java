@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,20 +24,28 @@ import java.util.stream.Collectors;
  */
 public class NetexIdValidator extends AbstractNetexValidator {
 
+    static final String RULE_CODE_NETEX_ID_2 = "NETEX_ID_2";
+    static final String RULE_CODE_NETEX_ID_3 = "NETEX_ID_3";
+    static final String RULE_CODE_NETEX_ID_4 = "NETEX_ID_4";
+    static final String RULE_CODE_NETEX_ID_5 = "NETEX_ID_5";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(NetexIdValidator.class);
 
     private static final String REGEXP_VALID_ID = "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$";
     private static final Pattern PATTERN_VALID_ID = Pattern.compile(REGEXP_VALID_ID);
-
     private static final String MESSAGE_FORMAT_INVALID_ID_STRUCTURE = "Invalid id structure on element";
     private static final String MESSAGE_FORMAT_INVALID_ID_NAME = "Invalid structure on id %s. Expected %s";
     private static final String MESSAGE_FORMAT_UNAPPROVED_CODESPACE = "Use of unapproved codespace. Approved codespaces are %s";
-    public static final String RULE_CODE_NETEX_ID_2 = "NETEX_ID_2";
-    public static final String RULE_CODE_NETEX_ID_3 = "NETEX_ID_3";
-    public static final String RULE_CODE_NETEX_ID_4 = "NETEX_ID_4";
+
+    private final Set<String> entityTypesReportedAsWarningForUnapprovedCodespace;
 
     public NetexIdValidator(ValidationReportEntryFactory validationReportEntryFactory) {
+        this(validationReportEntryFactory, Set.of());
+    }
+
+    public NetexIdValidator(ValidationReportEntryFactory validationReportEntryFactory, Set<String> entityTypesReportedAsWarningForUnapprovedCodespace) {
         super(validationReportEntryFactory);
+        this.entityTypesReportedAsWarningForUnapprovedCodespace = Objects.requireNonNull(entityTypesReportedAsWarningForUnapprovedCodespace);
     }
 
     @Override
@@ -71,8 +80,12 @@ public class NetexIdValidator extends AbstractNetexValidator {
                 String prefix = m.group(1);
                 if (!validNetexCodespaces.contains(prefix)) {
                     String validationReportEntryMessage = String.format(MESSAGE_FORMAT_UNAPPROVED_CODESPACE, validNetexCodespaceList);
-                    validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_4, dataLocation, validationReportEntryMessage));
                     LOGGER.debug("Id {} uses an unapproved codespace prefix. Approved codespaces are: {}", id, validNetexCodespaceList);
+                    if (entityTypesReportedAsWarningForUnapprovedCodespace.contains(id.getElementName())) {
+                        validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_5, dataLocation, validationReportEntryMessage));
+                    } else {
+                        validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_4, dataLocation, validationReportEntryMessage));
+                    }
                 }
 
             }
@@ -84,7 +97,8 @@ public class NetexIdValidator extends AbstractNetexValidator {
     public Set<String> getRuleDescriptions() {
         return Set.of(createRuleDescription(RULE_CODE_NETEX_ID_2, MESSAGE_FORMAT_INVALID_ID_STRUCTURE),
                 createRuleDescription(RULE_CODE_NETEX_ID_3, MESSAGE_FORMAT_INVALID_ID_NAME),
-                createRuleDescription((RULE_CODE_NETEX_ID_4), MESSAGE_FORMAT_UNAPPROVED_CODESPACE));
+                createRuleDescription((RULE_CODE_NETEX_ID_4), MESSAGE_FORMAT_UNAPPROVED_CODESPACE),
+                createRuleDescription((RULE_CODE_NETEX_ID_5), MESSAGE_FORMAT_UNAPPROVED_CODESPACE));
     }
 
 }

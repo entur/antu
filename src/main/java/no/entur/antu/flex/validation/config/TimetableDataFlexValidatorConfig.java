@@ -55,9 +55,15 @@ public class TimetableDataFlexValidatorConfig {
     }
 
     @Bean
+    public NetexIdValidator flexNetexIdValidator(@Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+        // TODO temporarily ignore unapproved codespace for Operator
+        return new NetexIdValidator(validationReportEntryFactory, Set.of("Operator"));
+    }
+
+    @Bean
     public NetexValidatorsRunner flexTimetableDataValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
                                                                    @Qualifier("flexTimetableDataXPathValidator") XPathValidator flexXPathValidator,
-                                                                   NetexIdValidator netexIdValidator,
+                                                                   @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
                                                                    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
                                                                    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,

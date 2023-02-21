@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-class ValidatedAllowedCodespacesTest {
+class ValidateAllowedCodespacesTest {
 
     public static final String TEST_CODESPACE = "FLB";
     public static final String TEST_FILE_VALID_CODESPACE = "FLB_FLB-Line-42_42_Flamsbana.xml";
