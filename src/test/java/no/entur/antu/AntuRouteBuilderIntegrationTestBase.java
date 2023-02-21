@@ -39,6 +39,7 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.DirtiesContext;
@@ -80,6 +81,11 @@ public abstract class AntuRouteBuilderIntegrationTestBase {
     void initInMemoryBlobStoreRepositories() {
         mardukInMemoryBlobStoreRepository.setContainerName(mardukContainerName);
         antuInMemoryBlobStoreRepository.setContainerName(antuContainerName);
+    }
+
+    @AfterEach
+    void stopContext() {
+        context.stop();
     }
 
 }
