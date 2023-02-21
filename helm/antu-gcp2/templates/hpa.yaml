@@ -19,11 +19,17 @@ spec:
           name: pubsub.googleapis.com|subscription|num_undelivered_messages
           selector:
             matchLabels:
-              resource.labels.project_id: ent-antu-dev
+              resource.labels.project_id: {{ .Values.horizontalPodAutoscaler.project}}
               resource.labels.subscription_id: AntuJobQueue
         target:
           type: AverageValue
           averageValue: "0.1"
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.horizontalPodAutoscaler.targetCPUUtilizationPercentage | default "80" }}
   behavior:
     scaleDown:
       policies:
