@@ -29,3 +29,6 @@ monitoringEnabled: true
 
 ingress:
   domainName: .dev.entur.io
+
+horizontalPodAutoscaler:
+  project: ent-antu-dev

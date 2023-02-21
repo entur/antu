@@ -30,3 +30,6 @@ monitoringEnabled: false
 
 ingress:
   domainName: .entur.io
+
+horizontalPodAutoscaler:
+  project: ent-antu-prd

@@ -30,3 +30,6 @@ monitoringEnabled: true
 
 ingress:
   domainName: .staging.entur.io
+
+horizontalPodAutoscaler:
+  project: ent-antu-tst
