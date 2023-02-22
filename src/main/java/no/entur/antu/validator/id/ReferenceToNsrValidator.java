@@ -5,6 +5,7 @@ import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.IdVersion;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -15,11 +16,12 @@ public class ReferenceToNsrValidator implements ExternalReferenceValidator {
     private final StopPlaceRepository stopPlaceRepository;
 
     public ReferenceToNsrValidator(StopPlaceRepository stopPlaceRepository) {
-        this.stopPlaceRepository = stopPlaceRepository;
+        this.stopPlaceRepository = Objects.requireNonNull(stopPlaceRepository);
     }
 
     @Override
     public Set<IdVersion> validateReferenceIds(Set<IdVersion> externalIds) {
+        Objects.requireNonNull(externalIds);
         Set<String> stopPlaceIds = stopPlaceRepository.getStopPlaceIds();
         Set<String> quayIds = stopPlaceRepository.getQuayIds();
         Set<IdVersion> validIds = new HashSet<>();
