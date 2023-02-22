@@ -79,7 +79,7 @@ class NetexIdValidatorTest {
         ValidationContext validationContext = new ValidationContext(null, null, TEST_CODESPACE, null, localIds, List.of());
         netexIdValidator.validate(validationReport, validationContext);
         Assertions.assertFalse(validationReport.getValidationReportEntries().isEmpty());
-        Assertions.assertTrue(validationReport.getValidationReportEntries().stream().anyMatch(validationReportEntry -> validationReportEntry.getName().equals(NetexIdValidator.RULE_CODE_NETEX_ID_5)));
+        Assertions.assertTrue(validationReport.getValidationReportEntries().stream().anyMatch(validationReportEntry -> validationReportEntry.getName().equals(NetexIdValidator.RULE_CODE_NETEX_ID_4W)));
     }
 
     @Test
