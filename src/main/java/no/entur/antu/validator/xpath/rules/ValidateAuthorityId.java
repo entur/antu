@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -32,7 +33,7 @@ public class ValidateAuthorityId extends AbstractXPathValidationRule {
     private final OrganisationRepository organisationRepository;
 
     public ValidateAuthorityId(OrganisationRepository organisationRepository) {
-        this.organisationRepository = organisationRepository;
+        this.organisationRepository = Objects.requireNonNull(organisationRepository);
     }
 
     @Override

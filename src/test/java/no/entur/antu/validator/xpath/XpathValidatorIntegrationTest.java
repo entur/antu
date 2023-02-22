@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-class XpathValidatorTest {
+class XpathValidatorIntegrationTest {
 
     private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME = "rb_flb-aggregated-netex.zip";
     private static final String CONFIGURATION_ANTU_YAML = "configuration.antu.yaml";
@@ -52,7 +52,7 @@ class XpathValidatorTest {
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
                 byte[] content = zipInputStream.readAllBytes();
-                XdmNode document = netexXMLParser.parseFileToXdmNode(content);
+                XdmNode document = netexXMLParser.parseByteArrayToXdmNode(content);
                 XPathValidationContext xPathValidationContext = new XPathValidationContext(document, netexXMLParser, "FLB", zipEntry.getName());
                 validationReportEntries.addAll(xPathValidator.validate(xPathValidationContext));
                 zipEntry = zipInputStream.getNextEntry();
