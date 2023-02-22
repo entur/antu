@@ -1,5 +1,6 @@
 package no.entur.antu.sweden.validator;
 
+import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
@@ -7,6 +8,7 @@ import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * XPath validation tree for timetable data from Sweden.
@@ -14,7 +16,17 @@ import java.util.List;
  */
 public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetableDataValidationTreeFactory {
     public EnturTimetableDataSwedenValidationTreeFactory() {
-        super(null);
+        super(new OrganisationRepository() {
+            @Override
+            public void refreshCache() {
+
+            }
+
+            @Override
+            public Set<String> getWhitelistedAuthorityIds(String codespace) {
+                return Set.of();
+            }
+        });
     }
 
     @Override

@@ -17,6 +17,7 @@ import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,7 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
 
     @Override
     public List<XPathValidationReportEntry> validate(XPathValidationContext validationContext) {
+        Objects.requireNonNull(validationContext);
         List<XPathValidationReportEntry> validationReportEntries = new ArrayList<>();
         Set<NetexCodespace> validCodespaces = NetexCodespace.getValidNetexCodespacesFor(validationContext.getCodespace());
         try {

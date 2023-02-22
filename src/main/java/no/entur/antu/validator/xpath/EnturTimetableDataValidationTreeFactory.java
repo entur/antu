@@ -9,6 +9,7 @@ import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Build the tree of XPath validation rules with Entur-specific rules.
@@ -18,7 +19,7 @@ public class EnturTimetableDataValidationTreeFactory extends DefaultValidationTr
     private final OrganisationRepository organisationRepository;
 
     public EnturTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
-        this.organisationRepository = organisationRepository;
+        this.organisationRepository = Objects.requireNonNull(organisationRepository);
     }
 
     @Override

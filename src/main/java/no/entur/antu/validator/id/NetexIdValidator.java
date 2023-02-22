@@ -27,7 +27,7 @@ public class NetexIdValidator extends AbstractNetexValidator {
     static final String RULE_CODE_NETEX_ID_2 = "NETEX_ID_2";
     static final String RULE_CODE_NETEX_ID_3 = "NETEX_ID_3";
     static final String RULE_CODE_NETEX_ID_4 = "NETEX_ID_4";
-    static final String RULE_CODE_NETEX_ID_5 = "NETEX_ID_5";
+    static final String RULE_CODE_NETEX_ID_4W = "NETEX_ID_4W";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NetexIdValidator.class);
 
@@ -82,7 +82,7 @@ public class NetexIdValidator extends AbstractNetexValidator {
                     String validationReportEntryMessage = String.format(MESSAGE_FORMAT_UNAPPROVED_CODESPACE, validNetexCodespaceList);
                     LOGGER.debug("Id {} uses an unapproved codespace prefix. Approved codespaces are: {}", id, validNetexCodespaceList);
                     if (entityTypesReportedAsWarningForUnapprovedCodespace.contains(id.getElementName())) {
-                        validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_5, dataLocation, validationReportEntryMessage));
+                        validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_4W, dataLocation, validationReportEntryMessage));
                     } else {
                         validationReportEntries.add(createValidationReportEntry(RULE_CODE_NETEX_ID_4, dataLocation, validationReportEntryMessage));
                     }
@@ -98,7 +98,7 @@ public class NetexIdValidator extends AbstractNetexValidator {
         return Set.of(createRuleDescription(RULE_CODE_NETEX_ID_2, MESSAGE_FORMAT_INVALID_ID_STRUCTURE),
                 createRuleDescription(RULE_CODE_NETEX_ID_3, MESSAGE_FORMAT_INVALID_ID_NAME),
                 createRuleDescription((RULE_CODE_NETEX_ID_4), MESSAGE_FORMAT_UNAPPROVED_CODESPACE),
-                createRuleDescription((RULE_CODE_NETEX_ID_5), MESSAGE_FORMAT_UNAPPROVED_CODESPACE));
+                createRuleDescription((RULE_CODE_NETEX_ID_4W), MESSAGE_FORMAT_UNAPPROVED_CODESPACE));
     }
 
 }
