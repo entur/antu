@@ -31,7 +31,7 @@ import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.BlockJourneyReferencesIgnorer;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
-import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
+import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
@@ -79,13 +79,13 @@ public class TimetableDataSwedenValidatorConfig {
     }
 
     @Bean
-    public NeTexReferenceValidator swedenNeTexReferenceValidator(NetexIdRepository netexIdRepository, @Qualifier("swedenValidationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+    public NetexReferenceValidator swedenNetexReferenceValidator(NetexIdRepository netexIdRepository, @Qualifier("swedenValidationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
         List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
         externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
         externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
         externalReferenceValidators.add(new OrganisationRefOnStopPlaceIgnorer());
         externalReferenceValidators.add(new LineRefOnGroupOfLinesIgnorer());
-        return new NeTexReferenceValidator(netexIdRepository, externalReferenceValidators, validationReportEntryFactory);
+        return new NetexReferenceValidator(netexIdRepository, externalReferenceValidators, validationReportEntryFactory);
     }
 
     @Bean
@@ -107,9 +107,9 @@ public class TimetableDataSwedenValidatorConfig {
                                                                            VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                            ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                            SwedenStopPlaceValidator swedenStopPlaceValidator,
-                                                                           @Qualifier("swedenNeTexReferenceValidator") NeTexReferenceValidator swedenNeTexReferenceValidator,
+                                                                           @Qualifier("swedenNetexReferenceValidator") NetexReferenceValidator swedenNetexReferenceValidator,
                                                                            NetexIdUniquenessValidator netexIdUniquenessValidator) {
-        List<NetexValidator> netexValidators = List.of(swedenXPathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, swedenStopPlaceValidator, swedenNeTexReferenceValidator, netexIdUniquenessValidator);
+        List<NetexValidator> netexValidators = List.of(swedenXPathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, swedenStopPlaceValidator, swedenNetexReferenceValidator, netexIdUniquenessValidator);
         // ignore navigationPaths and equipments elements
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("navigationPaths", "equipments"));
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);

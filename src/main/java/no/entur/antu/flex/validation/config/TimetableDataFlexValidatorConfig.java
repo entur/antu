@@ -22,7 +22,7 @@ import no.entur.antu.validator.id.NetexIdValidator;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
+import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
@@ -67,9 +67,9 @@ public class TimetableDataFlexValidatorConfig {
                                                                    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
                                                                    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
-                                                                   NeTexReferenceValidator neTexReferenceValidator,
+                                                                   NetexReferenceValidator netexReferenceValidator,
                                                                    @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator) {
-        List<NetexValidator> netexValidators = List.of(flexXPathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, neTexReferenceValidator, netexIdUniquenessValidator);
+        List<NetexValidator> netexValidators = List.of(flexXPathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, netexReferenceValidator, netexIdUniquenessValidator);
         // do not ignore SiteFrame
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);

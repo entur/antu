@@ -28,7 +28,7 @@ import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.BlockJourneyReferencesIgnorer;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
-import org.entur.netex.validation.validator.id.NeTexReferenceValidator;
+import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
@@ -95,13 +95,13 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public NeTexReferenceValidator neTexReferenceValidator(NetexIdRepository netexIdRepository, ReferenceToNsrValidator referenceToNsrValidator, @Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+    public NetexReferenceValidator netexReferenceValidator(NetexIdRepository netexIdRepository, ReferenceToNsrValidator referenceToNsrValidator, @Qualifier("validationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
         List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
         externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
         externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
         externalReferenceValidators.add(new TrainElementRegistryIdValidator());
         externalReferenceValidators.add(referenceToNsrValidator);
-        return new NeTexReferenceValidator(netexIdRepository, externalReferenceValidators, validationReportEntryFactory);
+        return new NetexReferenceValidator(netexIdRepository, externalReferenceValidators, validationReportEntryFactory);
     }
 
     @Bean
