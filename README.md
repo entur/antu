@@ -32,4 +32,51 @@ This means that validation of individual line files can be run in parallel and m
  * **validating references** from a line file to a shared object in a "common file" requires that common files are processed first, and line files afterwards, so that all shared ids can be collected before validating the line files. 
  * **validating NeTEx ids uniqueness** across the dataset needs to be synchronized.
 Antu uses distributed locks and distributed collections stored in Redis to ensure proper synchronization between concurrent jobs.
- 
+
+# Local environment configuration
+
+A minimal local setup requires a Redis memory store, a Google PubSub emulator and access to the stop place registry ([Baba](https://github.com/entur/tiamat)) and the organization registry.
+
+## Redis memory store
+Antu uses a memory store to store the cache of stop places and organizations, as well as temporary files created during the validation process.  
+A Docker Redis memory store instance can be used for local testing:
+```
+docker run -p 6379:6379 --name redis-antu redis:6
+```
+
+## Google PubSub emulator
+See https://cloud.google.com/pubsub/docs/emulator for details on how to install the Google PubSub emulator.  
+The emulator is started with the following command:
+```
+gcloud beta emulators pubsub start
+```
+and will listen by default on port 8085.
+
+The emulator port must be set in the Spring Boot application.properties file as well:
+
+```
+spring.cloud.gcp.pubsub.emulatorHost=localhost:8085
+camel.component.google-pubsub.endpoint=localhost:8085
+```
+
+## Access to the stop place registry
+Access to the stop place registry is configured in the Spring Boot application.properties file:
+```
+antu.stop.registry.id.url=https://tiamat
+```
+
+## Access to the organization registry
+Access to the organization registry is configured in the Spring Boot application.properties file:
+```
+antu.organisation.registry.url=https://org-reg
+```
+
+## Spring boot configuration file
+The application.properties file used in unit tests src/test/resources/application.properties can be used as a template.  
+The Kubernetes configmap helm/antu/templates/configmap.yaml can also be used as a template.
+
+## Starting the application locally
+- Run `mvn package` to generate the Spring Boot jar.
+- The application can be started with the following command line:  
+  ```java -Xmx500m -Dspring.config.location=/path/to/application.properties -Dfile.encoding=UTF-8 -jar target/antu-0.0.1-SNAPSHOT.jar```
+
