@@ -21,3 +21,9 @@ validationRuleConfigs:
   - code: NETEX_ID_4W
     name: NeTEx ID with unapproved codespace
     severity: WARNING
+  - code: NETEX_FILE_NAME_1
+    name: Invalid file name
+    severity: ERROR
+  - code: LINE_10
+    name: Line not allowed in imported flexible line files
+    severity: ERROR

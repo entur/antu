@@ -45,11 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_FLEX;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_FLEX_MERGING;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
+import static no.entur.antu.Constants.*;
 
 @Configuration
 public class ValidatorConfig {
@@ -112,6 +108,7 @@ public class ValidatorConfig {
     @Bean
     public NetexValidationProfile netexValidationProfile(@Qualifier("timetableDataValidatorsRunner") NetexValidatorsRunner timetableDataValidatorsRunner,
                                                          @Qualifier("flexTimetableDataValidatorsRunner") NetexValidatorsRunner flexTimetableDataValidatorsRunner,
+                                                         @Qualifier("importFlexTimetableDataValidatorsRunner") NetexValidatorsRunner importFlexTimetableDataValidatorsRunner,
                                                          @Qualifier("flexMergingTimetableDataValidatorsRunner") NetexValidatorsRunner flexMergingTimetableDataValidatorsRunner,
                                                          @Qualifier("swedenTimetableDataSwedenValidatorsRunner") NetexValidatorsRunner timetableSwedenDataValidatorsRunner,
                                                          @Qualifier("stopPlaceDataValidatorsRunner") NetexValidatorsRunner stopDataValidatorsRunner,
@@ -120,6 +117,7 @@ public class ValidatorConfig {
         return new NetexValidationProfile(Map.of(
                 VALIDATION_PROFILE_TIMETABLE, timetableDataValidatorsRunner,
                 VALIDATION_PROFILE_TIMETABLE_FLEX, flexTimetableDataValidatorsRunner,
+                VALIDATION_PROFILE_IMPORT_TIMETABLE_FLEX, importFlexTimetableDataValidatorsRunner,
                 VALIDATION_PROFILE_TIMETABLE_FLEX_MERGING, flexMergingTimetableDataValidatorsRunner,
                 VALIDATION_PROFILE_TIMETABLE_SWEDEN, timetableSwedenDataValidatorsRunner,
                 VALIDATION_PROFILE_STOP, stopDataValidatorsRunner

@@ -17,6 +17,8 @@
 package no.entur.antu.flex.validation.config;
 
 import no.entur.antu.flex.validation.validator.EnturFlexTimetableDataValidationTreeFactory;
+import no.entur.antu.flex.validation.validator.EnturImportFlexTimetableDataValidationTreeFactory;
+import no.entur.antu.flex.validation.validator.FileNameValidator;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.id.NetexIdValidator;
 import org.entur.netex.validation.validator.NetexValidator;
@@ -50,7 +52,19 @@ public class TimetableDataFlexValidatorConfig {
     }
 
     @Bean
-    public XPathValidator flexTimetableDataXPathValidator(@Qualifier("flexTimetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory, ValidationReportEntryFactory validationReportEntryFactory) {
+    public ValidationTreeFactory importFlexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
+        return new EnturImportFlexTimetableDataValidationTreeFactory(organisationRepository);
+    }
+
+    @Bean
+    public XPathValidator flexTimetableDataXPathValidator(@Qualifier("flexTimetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory,
+                                                          ValidationReportEntryFactory validationReportEntryFactory) {
+        return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
+    }
+
+    @Bean
+    public XPathValidator importFlexTimetableDataXPathValidator(@Qualifier("importFlexTimetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory,
+                                                                ValidationReportEntryFactory validationReportEntryFactory) {
         return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
     }
 
@@ -61,18 +75,58 @@ public class TimetableDataFlexValidatorConfig {
     }
 
     @Bean
-    public NetexValidatorsRunner flexTimetableDataValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
-                                                                   @Qualifier("flexTimetableDataXPathValidator") XPathValidator flexXPathValidator,
+    public FileNameValidator fileNameValidator(@Qualifier("validationReportEntryFactory")
+                                               ValidationReportEntryFactory validationReportEntryFactory) {
+        return new FileNameValidator(validationReportEntryFactory);
+    }
+
+    @Bean
+    public NetexValidatorsRunner flexTimetableDataValidatorsRunner(@Qualifier("flexTimetableDataXPathValidator") XPathValidator flexXPathValidator,
                                                                    @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
+                                                                   @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator,
+                                                                   NetexSchemaValidator netexSchemaValidator,
                                                                    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
                                                                    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                    NetexReferenceValidator netexReferenceValidator,
-                                                                   @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator) {
-        List<NetexValidator> netexValidators = List.of(flexXPathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, netexReferenceValidator, netexIdUniquenessValidator);
+                                                                   FileNameValidator fileNameValidator) {
+        List<NetexValidator> netexValidators = List.of(
+                fileNameValidator,
+                flexXPathValidator,
+                netexIdValidator,
+                versionOnLocalNetexIdValidator,
+                versionOnRefToLocalNetexIdValidator,
+                referenceToValidEntityTypeValidator,
+                netexReferenceValidator,
+                netexIdUniquenessValidator
+        );
         // do not ignore SiteFrame
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
     }
 
+    @Bean
+    public NetexValidatorsRunner importFlexTimetableDataValidatorsRunner(@Qualifier("importFlexTimetableDataXPathValidator") XPathValidator flexXPathValidator,
+                                                                         @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
+                                                                         @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator,
+                                                                         NetexSchemaValidator netexSchemaValidator,
+                                                                         VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
+                                                                         VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
+                                                                         ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
+                                                                         NetexReferenceValidator netexReferenceValidator,
+                                                                         FileNameValidator fileNameValidator) {
+        List<NetexValidator> netexValidators = List.of(
+                fileNameValidator,
+                flexXPathValidator,
+                netexIdValidator,
+                versionOnLocalNetexIdValidator,
+                versionOnRefToLocalNetexIdValidator,
+                referenceToValidEntityTypeValidator,
+                netexReferenceValidator,
+                netexIdUniquenessValidator
+        );
+        // do not ignore SiteFrame
+        NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
+        return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
+    }
 }
