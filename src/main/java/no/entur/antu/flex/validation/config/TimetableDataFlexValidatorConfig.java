@@ -80,6 +80,9 @@ public class TimetableDataFlexValidatorConfig {
         return new FileNameValidator(validationReportEntryFactory);
     }
 
+    /**
+     * This validation runner is used for the flexible line data exported from Nplan.
+     */
     @Bean
     public NetexValidatorsRunner flexTimetableDataValidatorsRunner(@Qualifier("flexTimetableDataXPathValidator") XPathValidator flexXPathValidator,
                                                                    @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
@@ -105,6 +108,9 @@ public class TimetableDataFlexValidatorConfig {
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
     }
 
+    /**
+     * This validation runner is used for the flexible line data imported from operatørPortalen.
+     */
     @Bean
     public NetexValidatorsRunner importFlexTimetableDataValidatorsRunner(@Qualifier("importFlexTimetableDataXPathValidator") XPathValidator flexXPathValidator,
                                                                          @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,

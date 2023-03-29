@@ -16,31 +16,42 @@ class ValidateNoLineInImportedFlexDatasetTest {
     public static final String TEST_CODESPACE = "ATB";
     private static final NetexXMLParser NETEX_XML_PARSER = new NetexXMLParser(Set.of("SiteFrame"));
 
-    private static final String NETEX_FRAGMENT = """
+    private final ValidateNotExist validateLineNotExist =
+            new ValidateNotExist("ServiceFrame/lines/Line", "Line not allowed in imported flexible line files", "LINE_10");
+
+    private static final String NETEX_FRAGMENT_LINE = """
             <ServiceFrame xmlns="http://www.netex.org.uk/netex" id="ATB:ServiceFrame:1" version="2223">
               <lines>
                 <Line id="ATB:Line:2_1" version="2223">
-                  <Name>Ranheim - Strindheim - sentrum - Tiller - Heimdal - Kattem</Name>
-                  <TransportMode>bus</TransportMode>
-                  <TransportSubmode>
-                    <BusSubmode>localBus</BusSubmode>
-                  </TransportSubmode>
-                  <PublicCode>1</PublicCode>
-                  <PrivateCode>1</PrivateCode>
-                  <OperatorRef ref="ATB:Operator:170" />
-                  <RepresentedByGroupRef ref="ATB:GroupOfLines:bus_1" />
                 </Line>
               </lines>
             </ServiceFrame>
-                """;
+            """;
+
+    private static final String NETEX_FRAGMENT_FLEXIBLE_LINE = """
+            <ServiceFrame xmlns="http://www.netex.org.uk/netex" id="ATB:ServiceFrame:1" version="2223">
+              <lines>
+                <FlexibleLine version="12" id="ATB:FlexibleLine:0e5b97ec-b755-5bd8-b9f1-f9a8db304139">
+                </FlexibleLine>
+              </lines>
+            </ServiceFrame>
+            """;
 
     @Test
-    void testMissingNSRCodeSpace() {
-        ValidateNotExist validateNotExist = new ValidateNotExist("ServiceFrame/lines/Line", "Line not allowed in imported flexible line files", "LINE_10");
-        XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(NETEX_FRAGMENT);
+    void testLineNotAllowedInServiceFrame() {
+        XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(NETEX_FRAGMENT_LINE);
         XPathValidationContext xpathValidationContext = new XPathValidationContext(document, NETEX_XML_PARSER, TEST_CODESPACE, null);
-        List<XPathValidationReportEntry> xPathValidationReportEntries = validateNotExist.validate(xpathValidationContext);
+        List<XPathValidationReportEntry> xPathValidationReportEntries = validateLineNotExist.validate(xpathValidationContext);
         Assertions.assertNotNull(xPathValidationReportEntries);
         Assertions.assertFalse(xPathValidationReportEntries.isEmpty());
+    }
+
+    @Test
+    void testFlexibleLineAllowedInServiceFrame() {
+        XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(NETEX_FRAGMENT_FLEXIBLE_LINE);
+        XPathValidationContext xpathValidationContext = new XPathValidationContext(document, NETEX_XML_PARSER, TEST_CODESPACE, null);
+        List<XPathValidationReportEntry> xPathValidationReportEntries = validateLineNotExist.validate(xpathValidationContext);
+        Assertions.assertNotNull(xPathValidationReportEntries);
+        Assertions.assertTrue(xPathValidationReportEntries.isEmpty());
     }
 }

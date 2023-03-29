@@ -4,6 +4,7 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
+import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 import java.util.List;
 
@@ -26,9 +27,26 @@ public class EnturFlexTimetableDataValidationTreeFactory extends EnturTimetableD
     @Override
     protected List<ValidationRule> getCompositeFrameBaseValidationRules() {
         List<ValidationRule> compositeFrameBaseValidationRules = super.getCompositeFrameBaseValidationRules();
-        // allow common files that contain  a SiteFrame
+        // allow common files that contain a SiteFrame
         compositeFrameBaseValidationRules.removeIf(validationRule -> validationRule.getCode().equals("COMPOSITE_SITE_FRAME_IN_COMMON_FILE"));
 
         return compositeFrameBaseValidationRules;
+    }
+
+    @Override
+    protected ValidationTree getCompositeFrameValidationTreeForCommonFile() {
+        ValidationTree validationTree = super.getCompositeFrameValidationTreeForCommonFile();
+
+        validationTree.addSubTree(getSiteFrameValidationTreeForCommonFile("frames/SiteFrame"));
+
+        return validationTree;
+    }
+
+    protected ValidationTree getSiteFrameValidationTreeForCommonFile(String path) {
+        ValidationTree siteFrameValidationTree = new ValidationTree("Site frame in common file", path);
+
+        siteFrameValidationTree.addValidationRule(new ValidateNotExist("stopPlaces", "stopPlaces not allowed in flexible shared files", "SITE_FRAME_IN_COMMON_FILE_1"));
+
+        return siteFrameValidationTree;
     }
 }
