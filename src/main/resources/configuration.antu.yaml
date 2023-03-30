@@ -28,5 +28,5 @@ validationRuleConfigs:
     name: Line not allowed in imported flexible line files
     severity: ERROR
   - code: SITE_FRAME_IN_COMMON_FILE_1
-    name: Line not allowed in imported flexible line files
+    name: stopPlaces not allowed in flexible line files
     severity: ERROR

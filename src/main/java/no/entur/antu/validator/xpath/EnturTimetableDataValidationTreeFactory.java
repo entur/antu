@@ -7,7 +7,6 @@ import no.entur.antu.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.xpath.DefaultValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
-import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 import java.util.List;
 import java.util.Objects;
