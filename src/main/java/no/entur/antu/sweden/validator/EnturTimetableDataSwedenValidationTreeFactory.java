@@ -72,4 +72,12 @@ public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetabl
         resourceFrameValidationTree.removeValidationRule("AUTHORITY_ID");
         return resourceFrameValidationTree;
     }
+
+    @Override
+    protected List<ValidationRule> getServiceFrameBaseValidationRules() {
+        List<ValidationRule> serviceFrameBaseValidationRules = super.getServiceFrameBaseValidationRules();
+        // remove time-consuming rule
+        serviceFrameBaseValidationRules.removeIf(validationRule -> "PASSENGER_STOP_ASSIGNMENT_3".equals(validationRule.getCode()));
+        return serviceFrameBaseValidationRules;
+    }
 }

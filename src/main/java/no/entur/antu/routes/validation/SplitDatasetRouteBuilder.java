@@ -23,6 +23,7 @@ import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.AggregationStrategy;
 import org.apache.camel.Exchange;
+import org.apache.camel.Header;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.dataformat.zipfile.ZipSplitter;
 import org.apache.camel.util.StopWatch;
@@ -94,6 +95,10 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
         from("direct:uploadSingleNetexFiles")
                 .split(new ZipSplitter()).aggregationStrategy(new SingleNetexFileAggregationStrategy())
                 .streaming()
+                .filter().method(NetexFileCounter.class, "everyHundredFiles")
+                .log(LoggingLevel.INFO, correlation() + "Uploaded ${header.CamelSplitIndex} NeTEx files")
+                .process(this::extendAckDeadline)
+                .end()
                 .log(LoggingLevel.DEBUG, correlation() + "Processing NeTEx file ${header." + Exchange.FILE_NAME + "}")
                 .choice()
                 .when(header(Exchange.FILE_NAME).endsWith(".xml"))
@@ -157,5 +162,13 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
         private String removeZipExtension(String currentFileName) {
             return currentFileName.substring(0, currentFileName.length() - 4);
         }
+    }
+
+    private static class NetexFileCounter {
+
+        public static boolean everyHundredFiles(@Header("CamelSplitIndex") int index) {
+            return index % 100 == 0;
+        }
+
     }
 }

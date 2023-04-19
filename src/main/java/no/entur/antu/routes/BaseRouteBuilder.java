@@ -22,7 +22,6 @@ import com.google.cloud.pubsub.v1.stub.SubscriberStub;
 import com.google.pubsub.v1.ModifyAckDeadlineRequest;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import no.entur.antu.Constants;
-import no.entur.antu.exception.RetryableAntuException;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExtendedExchange;
 import org.apache.camel.Message;
@@ -162,7 +161,8 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
         try (SubscriberStub subscriberStub = fromEndpoint.getComponent().getSubscriberStub(fromEndpoint)) {
             subscriberStub.modifyAckDeadlineCallable().call(modifyAckDeadlineRequest);
         } catch (IOException e) {
-            throw new RetryableAntuException("Exception while extending the deadline", e);
+            String correlation = simple(correlation(), String.class).evaluate(exchange, String.class);
+            log.warn("{} Ack deadline extension failed", correlation, e);
         }
     }
 

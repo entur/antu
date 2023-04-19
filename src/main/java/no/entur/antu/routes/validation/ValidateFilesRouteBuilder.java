@@ -100,7 +100,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .routeId("download-single-netex-file");
 
         from("direct:runNetexValidators").streamCaching()
-                .log(LoggingLevel.DEBUG, correlation() + "Running NeTEx validators")
+                .log(LoggingLevel.DEBUG, correlation() + "Running NeTEx validators using validation profile ${header." + VALIDATION_PROFILE_HEADER + "}")
                 .validate(header(VALIDATION_PROFILE_HEADER).isNotNull())
                 .validate(header(DATASET_CODESPACE).isNotNull())
                 .process(exchange -> exchange.setProperty(PROP_NETEX_VALIDATION_CALLBACK, new AntuNetexValidationProgressCallback(this, exchange)))
