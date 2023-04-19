@@ -31,6 +31,7 @@ public class RedisSwedenStopPlaceNetexIdRepository implements SwedenStopPlaceNet
     @Override
     public Set<String> getSharedStopPlaceAndQuayIds(String reportId) {
         RSemaphore semaphore = redissonClient.getSemaphore(getStopPlaceIdCacheSemaphoreKey(reportId));
+        semaphore.trySetPermits(1);
         boolean cacheEntryAvailable;
         try {
             cacheEntryAvailable = semaphore.tryAcquire(1, TimeUnit.MINUTES);
