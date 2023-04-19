@@ -31,7 +31,7 @@ data:
 
 
     # Validators
-    antu.schema.validation.enabled=true
+    antu.netex.validation.schema.skip=false
 
     # Kubernetes
     antu.kubernetes.namespace={{ .Values.kubernetes.namespace }}
