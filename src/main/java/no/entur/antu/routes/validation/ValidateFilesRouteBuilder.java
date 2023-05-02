@@ -53,7 +53,10 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
     private static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
+    protected static final String PROP_VALIDATION_REPORT = "VALIDATION_REPORT";
     private static final String PROP_ALL_NETEX_FILE_NAMES = "ALL_NETEX_FILE_NAMES";
+
+    private static final ValidationReportTransformer VALIDATION_REPORT_TRANSFORMER = new ValidationReportTransformer(50);
     private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
     private static final String PROP_NETEX_VALIDATION_CALLBACK = "PROP_NETEX_VALIDATION_CALLBACK";
 
@@ -102,6 +105,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .validate(header(DATASET_CODESPACE).isNotNull())
                 .process(exchange -> exchange.setProperty(PROP_NETEX_VALIDATION_CALLBACK, new AntuNetexValidationProgressCallback(this, exchange)))
                 .bean("netexValidationProfile", "validate(${header." + VALIDATION_PROFILE_HEADER + "}, ${header." + DATASET_CODESPACE + "},${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + NETEX_FILE_NAME + "},${exchangeProperty." + PROP_NETEX_FILE_CONTENT + "},${exchangeProperty." + PROP_NETEX_VALIDATION_CALLBACK + "})")
+                .setProperty(PROP_VALIDATION_REPORT, body())
                 .log(LoggingLevel.DEBUG, correlation() + "Completed all NeTEx validators")
                 .routeId("run-netex-validators");
 
@@ -111,20 +115,21 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                     String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
                     ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
                     String fileName = exchange.getIn().getHeader(NETEX_FILE_NAME, String.class);
-                    ValidationReportEntry validationReportEntry = new ValidationReportEntry("System error while validating the file " + exchange.getIn().getHeader(NETEX_FILE_NAME), "SYSTEM_ERROR", ValidationReportEntrySeverity.ERROR, new DataLocation(null, fileName, null, null));
+                    ValidationReportEntry validationReportEntry = new ValidationReportEntry("System error while validating the  file " + exchange.getIn().getHeader(NETEX_FILE_NAME), "SYSTEM_ERROR", ValidationReportEntrySeverity.ERROR, new DataLocation(null, fileName, null, null));
                     validationReport.addValidationReportEntry(validationReportEntry);
-                    exchange.getIn().setBody(validationReport, ValidationReport.class);
+                    exchange.setProperty(PROP_VALIDATION_REPORT, validationReport);
                 })
                 .routeId("report-system-error");
 
         from("direct:truncateReport")
                 .log(LoggingLevel.DEBUG, correlation() + "Truncating validation report")
-                .bean(new ValidationReportTransformer(50))
+                .bean(VALIDATION_REPORT_TRANSFORMER, "truncate(${exchangeProperty." + PROP_VALIDATION_REPORT + "})")
                 .log(LoggingLevel.DEBUG, correlation() + "Truncated validation report")
                 .routeId("truncate-validation-report");
 
         from("direct:saveValidationReport")
                 .log(LoggingLevel.DEBUG, correlation() + "Saving validation report")
+                .setBody(exchangeProperty(PROP_VALIDATION_REPORT))
                 .marshal().json(JsonLibrary.Jackson)
                 .to("direct:uploadValidationReport")
                 .log(LoggingLevel.DEBUG, correlation() + "Saved validation report")

@@ -1,6 +1,5 @@
 package no.entur.antu.validator;
 
-import org.apache.camel.Handler;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.slf4j.Logger;
@@ -31,23 +30,18 @@ public class ValidationReportTransformer {
      * Limit the number of validation entries per rule.
      *
      * @param validationReport the report to truncate.
-     * @return ValidationReport with the truncated validationReportEntries.
      */
-    @Handler
-    public ValidationReport truncate(ValidationReport validationReport) {
+    public void truncate(ValidationReport validationReport) {
         Collection<ValidationReportEntry> validationReportEntries = validationReport.getValidationReportEntries();
         int nbEntries = validationReportEntries.size();
         Map<String, List<ValidationReportEntry>> validationReportEntriesByRuleName = validationReportEntries.stream().collect(Collectors.groupingBy(ValidationReportEntry::getName));
         validationReportEntriesByRuleName.replaceAll((ruleName, reportEntries) -> reportEntries.stream().limit(maxValidationReportEntriesPerRule).toList());
         List<ValidationReportEntry> truncatedValidationReportEntries = validationReportEntriesByRuleName.values().stream().flatMap(Collection::stream).toList();
         if (truncatedValidationReportEntries.size() < nbEntries) {
-            LOGGER.info("Truncated {} entries in the validation report {}", nbEntries - truncatedValidationReportEntries.size(), validationReport.getValidationReportId());
+            validationReportEntries.clear();
+            validationReportEntries.addAll(truncatedValidationReportEntries);
+            LOGGER.info("Truncated {} entries in the validation report {}", nbEntries - validationReportEntries.size(), validationReport.getValidationReportId());
         }
-        return new ValidationReport(
-                validationReport.getCodespace(),
-                validationReport.getValidationReportId(),
-                truncatedValidationReportEntries,
-                validationReport.getNumberOfValidationEntriesPerRule()
-        );
     }
+
 }

@@ -28,10 +28,10 @@ class ValidationReportTransformerTest {
         );
         ValidationReport validationReport = new ValidationReport("codespace", "report-id", entries);
         ValidationReportTransformer validationReportTransformer = new ValidationReportTransformer(2);
-        ValidationReport truncatedValidationReport = validationReportTransformer.truncate(validationReport);
-        Assertions.assertEquals(1, truncatedValidationReport.getValidationReportEntries().stream().filter(validationReportEntry -> RULE_1.equals(validationReportEntry.getName())).count());
-        Assertions.assertEquals(2, truncatedValidationReport.getValidationReportEntries().stream().filter(validationReportEntry -> RULE_2.equals(validationReportEntry.getName())).count());
-        Assertions.assertEquals(2, truncatedValidationReport.getValidationReportEntries().stream().filter(validationReportEntry -> RULE_3.equals(validationReportEntry.getName())).count());
+        validationReportTransformer.truncate(validationReport);
+        Assertions.assertEquals(1, validationReport.getValidationReportEntries().stream().filter(validationReportEntry -> RULE_1.equals(validationReportEntry.getName())).count());
+        Assertions.assertEquals(2, validationReport.getValidationReportEntries().stream().filter(validationReportEntry -> RULE_2.equals(validationReportEntry.getName())).count());
+        Assertions.assertEquals(2, validationReport.getValidationReportEntries().stream().filter(validationReportEntry -> RULE_3.equals(validationReportEntry.getName())).count());
 
     }
 }
