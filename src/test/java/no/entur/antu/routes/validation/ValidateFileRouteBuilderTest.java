@@ -73,7 +73,7 @@ class ValidateFileRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
 
         AdviceWith.adviceWith(context, "save-validation-report", a -> {
 
-                    a.weaveAddFirst().process(exchange -> exchange.setProperty(ValidateFilesRouteBuilder.PROP_VALIDATION_REPORT, validationReport ));
+                    a.weaveAddFirst().process(exchange -> exchange.getIn().setBody(validationReport, ValidationReport.class));
 
             a.interceptSendToEndpoint("direct:uploadValidationReport").skipSendToOriginalEndpoint()
                     .to("mock:uploadValidationReport");
