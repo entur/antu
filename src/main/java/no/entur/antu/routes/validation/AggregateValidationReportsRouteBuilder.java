@@ -21,6 +21,7 @@ package no.entur.antu.routes.validation;
 
 import no.entur.antu.Constants;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
+import no.entur.antu.metrics.AntuPrometheusMetricsService;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
@@ -67,6 +68,11 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(AggregateValidationReportsRouteBuilder.class);
 
     private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
+    private final AntuPrometheusMetricsService antuPrometheusMetricsService;
+
+    public AggregateValidationReportsRouteBuilder(AntuPrometheusMetricsService antuPrometheusMetricsService) {
+        this.antuPrometheusMetricsService = antuPrometheusMetricsService;
+    }
 
     @Override
     public void configure() throws Exception {
@@ -99,11 +105,12 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Completed reports merging in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
                 .choice()
                 .when(simple("${body.hasError()}"))
-                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
-                .log(LoggingLevel.INFO, correlation() + "Validation errors found")
+                    .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
+                    .log(LoggingLevel.INFO, correlation() + "Validation errors found")
                 .otherwise()
-                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
-                .log(LoggingLevel.INFO, correlation() + "No validation error")
+                    .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
+                    .log(LoggingLevel.INFO, correlation() + "No validation error")
+                    .to("direct:uploadValidationReportMetrics")
                 .end()
                 .marshal().json(JsonLibrary.Jackson)
                 .to("direct:uploadAggregatedValidationReport")
@@ -112,6 +119,10 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .to("direct:createValidationReportStatusFile")
                 .to("direct:cleanUpCache")
                 .routeId("aggregate-reports");
+
+        from("direct:uploadValidationReportMetrics")
+                .bean(antuPrometheusMetricsService)
+                .routeId("upload-validation-report-metrics");
 
         from("direct:downloadValidationReport")
                 .setHeader(TEMPORARY_FILE_NAME, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
