@@ -3,7 +3,7 @@ replicas: 2
 
 gcp:
   blobstoreProjectId: entur-ror-dev
-  pubsubProjectId: entur-ror-dev
+  pubsubProjectId: ent-antu-dev
 
   marduk:
     bucketName: marduk-dev
