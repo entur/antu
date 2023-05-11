@@ -21,25 +21,25 @@ package no.entur.antu.routes.validation;
 
 import no.entur.antu.Constants;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
+import no.entur.antu.metrics.AntuPrometheusMetricsService;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.apache.camel.util.StopWatch;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static no.entur.antu.Constants.AGGREGATED_VALIDATION_REPORT;
 import static no.entur.antu.Constants.DATASET_CODESPACE;
 import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
@@ -68,6 +68,11 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(AggregateValidationReportsRouteBuilder.class);
 
     private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
+    private final AntuPrometheusMetricsService antuPrometheusMetricsService;
+
+    public AggregateValidationReportsRouteBuilder(AntuPrometheusMetricsService antuPrometheusMetricsService) {
+        this.antuPrometheusMetricsService = antuPrometheusMetricsService;
+    }
 
     @Override
     public void configure() throws Exception {
@@ -75,7 +80,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
         from("master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue?concurrentConsumers=10")
                 .process(this::removeSynchronizationForAggregatedExchange)
-                .aggregate(header(VALIDATION_REPORT_ID_HEADER)).aggregationStrategy(new ValidationReportAggregationStrategy()).completionTimeout(1800000)
+                .aggregate(header(VALIDATION_REPORT_ID_HEADER)).aggregationStrategy(new CollectIndividualReportsAggregationStrategy()).completionTimeout(1800000)
                 .process(this::addSynchronizationForAggregatedExchange)
                 .log(LoggingLevel.INFO, correlation() + "Aggregated ${exchangeProperty.CamelAggregatedSize} validation reports (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy}).")
 
@@ -87,35 +92,25 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         from("direct:aggregateReports")
                 .log(LoggingLevel.INFO, correlation() + "Merging individual reports")
                 .setProperty(PROP_STOP_WATCH, StopWatch::new)
-                .process(exchange -> {
-                    String codespace = exchange.getIn().getHeader(DATASET_CODESPACE, String.class);
-                    String validationReportId = exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
-                    ValidationReport validationReport = new ValidationReport(codespace, validationReportId);
-                    exchange.getIn().setHeader(AGGREGATED_VALIDATION_REPORT, validationReport);
-                })
                 .convertBodyTo(String.class)
-                .split(method(ReverseSortedFileNameSplitter.class, "split")).delimiter(FILENAME_DELIMITER)
-                .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
-                .setHeader(NETEX_FILE_NAME, body())
-                .to("direct:downloadValidationReport")
-                .unmarshal().json(JsonLibrary.Jackson, ValidationReport.class)
-                .process(exchange -> {
-                    ValidationReport validationReport = exchange.getIn().getBody(ValidationReport.class);
-                    ValidationReport aggregatedValidationReport = exchange.getIn().getHeader(AGGREGATED_VALIDATION_REPORT, ValidationReport.class);
-                    aggregatedValidationReport.addAllValidationReportEntries(validationReport.getValidationReportEntries());
-
-                })
+                .split(method(ReverseSortedFileNameSplitter.class, "split"))
+                    .delimiter(FILENAME_DELIMITER)
+                    .aggregationStrategy(new AggregateValidationReportsAggregationStrategy())
+                    .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
+                    .setHeader(NETEX_FILE_NAME, body())
+                    .to("direct:downloadValidationReport")
+                    .unmarshal().json(JsonLibrary.Jackson, ValidationReport.class)
                 // end splitter
                 .end()
                 .log(LoggingLevel.INFO, correlation() + "Completed reports merging in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
-                .setBody(header(AGGREGATED_VALIDATION_REPORT))
                 .choice()
                 .when(simple("${body.hasError()}"))
-                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
-                .log(LoggingLevel.INFO, correlation() + "Validation errors found")
+                    .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
+                    .log(LoggingLevel.INFO, correlation() + "Validation errors found")
                 .otherwise()
-                .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
-                .log(LoggingLevel.INFO, correlation() + "No validation error")
+                    .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_OK))
+                    .log(LoggingLevel.INFO, correlation() + "No validation error")
+                    .to("direct:uploadValidationReportMetrics")
                 .end()
                 .marshal().json(JsonLibrary.Jackson)
                 .to("direct:uploadAggregatedValidationReport")
@@ -124,6 +119,10 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                 .to("direct:createValidationReportStatusFile")
                 .to("direct:cleanUpCache")
                 .routeId("aggregate-reports");
+
+        from("direct:uploadValidationReportMetrics")
+                .bean(antuPrometheusMetricsService)
+                .routeId("upload-validation-report-metrics");
 
         from("direct:downloadValidationReport")
                 .setHeader(TEMPORARY_FILE_NAME, constant(Constants.BLOBSTORE_PATH_ANTU_WORK)
@@ -193,11 +192,42 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
     }
 
+    private static class AggregateValidationReportsAggregationStrategy extends GroupedMessageAggregationStrategy {
+        @Override
+        public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+            if (oldExchange == null) {
+                return newExchange;
+            }
+
+            ValidationReport oldValidationReport = oldExchange.getIn().getBody(ValidationReport.class);
+            ValidationReport newValidationReport = newExchange.getIn().getBody(ValidationReport.class);
+
+            List<ValidationReportEntry> validationReportEntries = Stream.concat(
+                    oldValidationReport.getValidationReportEntries().stream(),
+                    newValidationReport.getValidationReportEntries().stream()
+            ).toList();
+
+            Map<String, Long> numberOfValidationEntriesPerRule = Stream.concat(
+                    oldValidationReport.getNumberOfValidationEntriesPerRule().entrySet().stream(),
+                    newValidationReport.getNumberOfValidationEntriesPerRule().entrySet().stream()
+            ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Long::sum));
+
+            oldExchange.getIn().setBody(
+                    new ValidationReport(
+                            oldExchange.getIn().getHeader(DATASET_CODESPACE, String.class),
+                            oldExchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class),
+                            validationReportEntries,
+                            numberOfValidationEntriesPerRule));
+
+            return oldExchange;
+        }
+    }
+
     /**
      * Complete the aggregation when all the individual reports have been received.
      * The total number of reports to process is stored in a header that is included in every incoming message.
      */
-    private static class ValidationReportAggregationStrategy extends AntuGroupedMessageAggregationStrategy {
+    private static class CollectIndividualReportsAggregationStrategy extends AntuGroupedMessageAggregationStrategy {
 
         @Override
         public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
@@ -216,9 +246,9 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             List<Message> aggregatedMessages = aggregatedExchange.getProperty(ExchangePropertyKey.GROUPED_EXCHANGE, List.class);
             Set<String> aggregatedFileNames = aggregatedMessages.stream().map(message -> message.getHeader(NETEX_FILE_NAME, String.class)).collect(Collectors.toSet());
 
-            if(LOGGER.isTraceEnabled()) {
+            if (LOGGER.isTraceEnabled()) {
                 String reportId = aggregatedExchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
-                String receivedFileNames = Arrays.stream(aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES,String.class).split(FILENAME_DELIMITER)).sorted().collect(Collectors.joining(FILENAME_DELIMITER));
+                String receivedFileNames = Arrays.stream(aggregatedExchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES, String.class).split(FILENAME_DELIMITER)).sorted().collect(Collectors.joining(FILENAME_DELIMITER));
                 LOGGER.trace("Received file {} for report {}. All received files: {}", incomingNetexFileName, reportId, receivedFileNames);
             }
 
