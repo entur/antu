@@ -63,6 +63,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
             Constants.VALIDATION_CORRELATION_ID_HEADER,
             Constants.VALIDATION_REPORT_ID_HEADER,
             Constants.VALIDATION_STAGE_HEADER,
+            Constants.VALIDATION_IMPORT_TYPE,
             Constants.VALIDATION_CLIENT_HEADER,
             Constants.VALIDATION_PROFILE_HEADER};
 

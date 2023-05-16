@@ -58,6 +58,7 @@ public final class Constants {
      * Headers originating from the validation client that must be sent back when notifying the validation client
      */
     public static final String VALIDATION_STAGE_HEADER = "EnturValidationStage";
+    public static final String VALIDATION_IMPORT_TYPE = "EnturValidationImportType";
     public static final String VALIDATION_CLIENT_HEADER = "EnturValidationClient";
     public static final String VALIDATION_PROFILE_HEADER = "EnturValidationProfile";
     public static final String VALIDATION_DATASET_FILE_HANDLE_HEADER = "EnturValidationDatasetFileHandle";
