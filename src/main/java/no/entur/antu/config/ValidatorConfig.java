@@ -35,6 +35,7 @@ import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidat
 import org.entur.netex.validation.validator.id.ServiceJourneyInterchangeIgnorer;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
+import org.entur.netex.validation.validator.id.InterchangeRuleReferencesIgnorer;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,6 +96,7 @@ public class ValidatorConfig {
         List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
         externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
         externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
+        externalReferenceValidators.add(new InterchangeRuleReferencesIgnorer());
         externalReferenceValidators.add(new TrainElementRegistryIdValidator());
         externalReferenceValidators.add(referenceToNsrValidator);
         return new NetexReferenceValidator(netexIdRepository, externalReferenceValidators, validationReportEntryFactory);
