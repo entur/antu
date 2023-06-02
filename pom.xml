@@ -33,6 +33,7 @@
         <redisson.version>3.21.3</redisson.version>
         <kryo.version>5.5.0</kryo.version>
         <embedded-redis.version>0.8.3</embedded-redis.version>
+        <netex-parser-java.version>2.0.1</netex-parser-java.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
@@ -89,6 +90,11 @@
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>oauth2</artifactId>
             <version>${entur.helpers.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-parser-java</artifactId>
+            <version>${netex-parser-java.version}</version>
         </dependency>
 
         <!-- Spring Boot -->
