@@ -195,7 +195,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
     private static class AggregateValidationReportsAggregationStrategy extends GroupedMessageAggregationStrategy {
         @Override
         public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
-            if (oldExchange == null) {
+            if (oldExchange == null || oldExchange.getIn().getBody(ValidationReport.class) == null) {
                 return newExchange;
             }
 
