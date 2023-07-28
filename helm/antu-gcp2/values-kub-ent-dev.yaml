@@ -2,14 +2,14 @@ env: dev
 replicas: 2
 
 gcp:
-  blobstoreProjectId: entur-ror-dev
+  blobstoreProjectId: en-antu-dev
   pubsubProjectId: ent-antu-dev
 
   marduk:
     bucketName: marduk-dev
 
   antu:
-    bucketName: ror-antu-dev
+    bucketName: ror-antu-gcp2-dev
 
 tiamatUrl: http://tiamat.dev.entur.internal
 
