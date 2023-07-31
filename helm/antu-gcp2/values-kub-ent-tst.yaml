@@ -9,7 +9,7 @@ gcp:
     bucketName: marduk-test
 
   antu:
-    bucketName: ror-antu-test
+    bucketName: ror-antu-gcp2-test
 
 tiamatUrl: http://tiamat.tst.entur.internal
 
