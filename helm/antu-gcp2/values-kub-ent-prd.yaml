@@ -9,7 +9,7 @@ gcp:
     bucketName: marduk-production
 
   antu:
-    bucketName: ror-antu-production
+    bucketName: ror-antu-gcp2-production
 
 tiamatUrl: http://tiamat.prd.entur.internal
 
