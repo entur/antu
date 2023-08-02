@@ -58,6 +58,7 @@ data:
     blobstore.gcs.project.id={{ .Values.gcp.blobstoreProjectId }}
     blobstore.gcs.marduk.container.name={{ .Values.gcp.marduk.bucketName }}
     blobstore.gcs.antu.container.name={{ .Values.gcp.antu.bucketName }}
+    antu.netex.stop.current.filename=tiamat/Current_latest.zip
 
     # Redis
     spring.redis.host=${REDIS_HOST}

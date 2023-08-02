@@ -18,4 +18,6 @@ public interface StopPlaceResource {
      * @return all stop place ids, present and future.
      */
     Set<String> getStopPlaceIds();
+
+    void loadStopPlacesDataset();
 }

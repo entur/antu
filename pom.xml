@@ -33,6 +33,8 @@
         <redisson.version>3.23.2</redisson.version>
         <kryo.version>5.5.0</kryo.version>
         <embedded-redis.version>0.8.3</embedded-redis.version>
+        <netex-parser-java.version>2.1.0</netex-parser-java.version>
+        <netex-java-model.version>1.0.14</netex-java-model.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
@@ -56,6 +58,16 @@
     <dependencies>
 
         <!-- Entur -->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-parser-java</artifactId>
+            <version>${netex-parser-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-java-model</artifactId>
+            <version>${netex-java-model.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-validator-java</artifactId>
@@ -92,7 +104,6 @@
         </dependency>
 
         <!-- Spring Boot -->
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -122,12 +133,10 @@
         </dependency>
 
         <!-- Camel -->
-
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-spring-boot-starter</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-google-pubsub-starter</artifactId>
@@ -179,8 +188,6 @@
             <artifactId>camel-kubernetes-starter</artifactId>
         </dependency>
 
-
-
         <!-- Redis -->
         <dependency>
             <groupId>org.redisson</groupId>
@@ -203,19 +210,15 @@
             <version>${kryo.version}</version>
         </dependency>
 
-
         <!-- Other -->
-
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
-
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
-
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
@@ -228,13 +231,11 @@
             <artifactId>janino</artifactId>
             <scope>runtime</scope>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <scope>runtime</scope>
         </dependency>
-
 
         <!-- testing -->
         <dependency>
@@ -259,7 +260,6 @@
             <version>${embedded-redis.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>

@@ -20,7 +20,6 @@ package no.entur.antu.services;
 
 import no.entur.antu.Constants;
 import no.entur.antu.repository.BlobStoreRepository;
-import org.apache.camel.Exchange;
 import org.apache.camel.Header;
 
 import java.io.InputStream;
@@ -34,18 +33,15 @@ public abstract class AbstractBlobStoreService {
         this.repository.setContainerName(containerName);
     }
 
-    public boolean existBlob(@Header(value = Constants.FILE_HANDLE) String name, Exchange exchange) {
+    public boolean existBlob(@Header(value = Constants.FILE_HANDLE) String name) {
         return repository.existBlob(name);
     }
 
-    public InputStream getBlob(@Header(value = Constants.FILE_HANDLE) String name, Exchange exchange) {
+    public InputStream getBlob(@Header(value = Constants.FILE_HANDLE) String name) {
         return repository.getBlob(name);
     }
 
-
-    public void uploadBlob(@Header(value = Constants.FILE_HANDLE) String name, InputStream inputStream, Exchange exchange) {
+    public void uploadBlob(@Header(value = Constants.FILE_HANDLE) String name, InputStream inputStream) {
         repository.uploadBlob(name, inputStream);
     }
-
-
 }

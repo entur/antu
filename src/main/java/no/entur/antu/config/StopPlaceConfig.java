@@ -16,10 +16,10 @@
 
 package no.entur.antu.config;
 
-import no.entur.antu.stop.DefaultStopPlaceRepository;
+import no.entur.antu.stop.CurrentStopPlaceResource;
+import no.entur.antu.stop.StopPlaceRepositoryImpl;
 import no.entur.antu.stop.DefaultStopPlaceResource;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.stop.StopPlaceResource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,17 +33,27 @@ import java.util.Set;
 @Configuration
 public class StopPlaceConfig {
 
-
     @Bean
     @Profile("!test")
-    StopPlaceResource stopPlaceResource(@Value("${antu.stop.registry.id.url}") String stopIdsEndpoint, WebClient.Builder webClientBuilder) {
+    DefaultStopPlaceResource defaultStopPlaceResource(@Value("${antu.stop.registry.id.url}")
+                                                      String stopIdsEndpoint,
+                                                      WebClient.Builder webClientBuilder) {
         return new DefaultStopPlaceResource(stopIdsEndpoint, webClientBuilder);
     }
 
     @Bean
     @Profile("!test")
-    StopPlaceRepository stopPlaceRepository(StopPlaceResource stopPlaceResource, @Qualifier("stopPlaceAndQuayCache") Map<String, Set<String>> stopPlaceCache) {
-        return new DefaultStopPlaceRepository(stopPlaceResource, stopPlaceCache);
+    StopPlaceRepository defaultStopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
+                                                   Map<String, Set<String>> stopPlaceCache,
+                                                   DefaultStopPlaceResource defaultStopPlaceResource) {
+        return new StopPlaceRepositoryImpl(defaultStopPlaceResource, stopPlaceCache);
     }
 
+    @Bean
+    @Profile("!test")
+    StopPlaceRepository currentStopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
+                                                   Map<String, Set<String>> stopPlaceCache,
+                                                   CurrentStopPlaceResource currentStopPlaceResource) {
+        return new StopPlaceRepositoryImpl(currentStopPlaceResource, stopPlaceCache);
+    }
 }
