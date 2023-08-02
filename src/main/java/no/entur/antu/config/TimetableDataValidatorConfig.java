@@ -47,7 +47,8 @@ public class TimetableDataValidatorConfig {
     }
 
     @Bean
-    public XPathValidator timetableDataXPathValidator(@Qualifier("timetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory, ValidationReportEntryFactory validationReportEntryFactory) {
+    public XPathValidator timetableDataXPathValidator(@Qualifier("timetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory,
+                                                      ValidationReportEntryFactory validationReportEntryFactory) {
         return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
     }
 
@@ -60,7 +61,15 @@ public class TimetableDataValidatorConfig {
                                                                ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                NetexReferenceValidator netexReferenceValidator,
                                                                @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator) {
-        List<NetexValidator> netexValidators = List.of(xpathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, netexReferenceValidator, netexIdUniquenessValidator);
+        List<NetexValidator> netexValidators = List.of(
+                xpathValidator,
+                netexIdValidator,
+                versionOnLocalNetexIdValidator,
+                versionOnRefToLocalNetexIdValidator,
+                referenceToValidEntityTypeValidator,
+                netexReferenceValidator,
+                netexIdUniquenessValidator
+        );
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
     }

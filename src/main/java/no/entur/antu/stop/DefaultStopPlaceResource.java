@@ -1,6 +1,8 @@
 package no.entur.antu.stop;
 
 import no.entur.antu.exception.AntuException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,6 +18,8 @@ import java.util.Set;
  * This includes both the official stop and quay ids (NSR:StopPlace:* and NSR:Quay:*) and the "local references" that are unofficial, provider-specific ids (example: RUT:StopPlace:* and RUT:Quay:*)
  */
 public class DefaultStopPlaceResource implements StopPlaceResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStopPlaceResource.class);
 
     private static final int MAX_DOWNLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
 
@@ -73,5 +77,10 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+    }
+
+    @Override
+    public void loadStopPlacesDataset() {
+        LOGGER.debug("Loading stop places dataset is not needed in DefaultStopPlaceResource");
     }
 }

@@ -45,7 +45,8 @@ public class StopPlaceDataValidatorConfig {
     }
 
     @Bean
-    public XPathValidator stopPlaceDataXPathValidator(@Qualifier("stopPlaceDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory, ValidationReportEntryFactory validationReportEntryFactory) {
+    public XPathValidator stopPlaceDataXPathValidator(@Qualifier("stopPlaceDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory,
+                                                      ValidationReportEntryFactory validationReportEntryFactory) {
         return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
     }
 
@@ -58,10 +59,16 @@ public class StopPlaceDataValidatorConfig {
                                                                ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                NetexReferenceValidator netexReferenceValidator,
                                                                NetexIdUniquenessValidator netexIdUniquenessValidator) {
-        List<NetexValidator> netexValidators = List.of(xpathValidator, netexIdValidator, versionOnLocalNetexIdValidator, versionOnRefToLocalNetexIdValidator, referenceToValidEntityTypeValidator, netexReferenceValidator, netexIdUniquenessValidator);
+        List<NetexValidator> netexValidators = List.of(
+                xpathValidator,
+                netexIdValidator,
+                versionOnLocalNetexIdValidator,
+                versionOnRefToLocalNetexIdValidator,
+                referenceToValidEntityTypeValidator,
+                netexReferenceValidator,
+                netexIdUniquenessValidator
+        );
         NetexXMLParser netexXMLParser = new NetexXMLParser();
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
     }
-
-
 }

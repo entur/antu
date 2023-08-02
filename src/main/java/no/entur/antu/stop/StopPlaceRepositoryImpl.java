@@ -25,17 +25,18 @@ import java.util.Set;
 /**
  * StopPlaceRepository implementation using the new API exposed in Tiamat.
  */
-public class DefaultStopPlaceRepository implements StopPlaceRepository {
+public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     public static final String STOP_PLACE_CACHE_KEY = "stopPlaceCache";
     public static final String QUAY_CACHE_KEY = "quayCache";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultStopPlaceRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StopPlaceRepositoryImpl.class);
 
     private final StopPlaceResource stopPlaceResource;
     private final Map<String, Set<String>> stopPlaceCache;
 
-    public DefaultStopPlaceRepository(StopPlaceResource stopPlaceResource, Map<String, Set<String>> stopPlaceCache) {
+    public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
+                                   Map<String, Set<String>> stopPlaceCache) {
         this.stopPlaceResource = stopPlaceResource;
         this.stopPlaceCache = stopPlaceCache;
     }
@@ -60,12 +61,12 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
 
     @Override
     public void refreshCache() {
+        stopPlaceResource.loadStopPlacesDataset();
         stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceResource.getStopPlaceIds());
         stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
 
-        LOGGER.debug("Updated stop places and quays cache. Cache now has {} stop places and {} quays", stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(), stopPlaceCache.get(QUAY_CACHE_KEY).size());
-
+        LOGGER.debug("Updated stop places and quays cache. Cache now has {} stop places and {} quays",
+                stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(),
+                stopPlaceCache.get(QUAY_CACHE_KEY).size());
     }
-
-
 }

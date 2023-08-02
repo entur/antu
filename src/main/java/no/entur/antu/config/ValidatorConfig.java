@@ -87,7 +87,7 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public ReferenceToNsrValidator nsrRefValidator(@Qualifier("stopPlaceRepository")  StopPlaceRepository stopPlaceRepository) {
+    public ReferenceToNsrValidator nsrRefValidator(@Qualifier("currentStopPlaceRepository")  StopPlaceRepository stopPlaceRepository) {
         return new ReferenceToNsrValidator(stopPlaceRepository);
     }
 
