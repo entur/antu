@@ -2,7 +2,17 @@
 <ProxyEndpoint name="timetable-validation-v1">
     <Description></Description>
     <FaultRules/>
-    <Flows/>
+    <Flows>
+        <Flow name="OptionsPreFlight">
+            <Request/>
+            <Response>
+                <Step>
+                    <Name>assignMessage.addCors</Name>
+                </Step>
+            </Response>
+            <Condition>request.verb == "OPTIONS" AND request.header.origin != null AND request.header.Access-Control-Request-Method != null</Condition>
+        </Flow>
+    </Flows>
     <PostFlow name="PostFlow">
         <Request/>
         <Response/>
@@ -32,6 +42,9 @@
         </Properties>
         <VirtualHost>entur</VirtualHost>
     </HTTPProxyConnection>
+    <RouteRule name="NoRoute">
+        <Condition>request.verb == "OPTIONS" AND request.header.origin != null AND request.header.Access-Control-Request-Method != null</Condition>
+    </RouteRule>
     <RouteRule name="timetable-validation-v1">
         <TargetEndpoint>timetable-validation-v1</TargetEndpoint>
     </RouteRule>
