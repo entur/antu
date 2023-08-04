@@ -93,3 +93,6 @@ validationRuleConfigs:
   - code: SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN
     name: Same quay refs in consecutive stop points in journey pattern
     severity: WARNING
+  - code: IDENTICAL_STOP_POINTS_IN_JOURNEY_PATTERNS
+    name: Identical stop points in journey patterns
+    severity: INFO

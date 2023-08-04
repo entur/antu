@@ -24,6 +24,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceValidator;
+import no.entur.antu.validation.validator.journeypattern.stoppoint.identicalstoppoints.IdenticalStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRefValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoints.SameStopPoints;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount.StopPointsCount;
@@ -163,7 +164,7 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public SameQuayRefValidator sameQuayRef(
+  public SameQuayRefValidator sameQuayRefValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
@@ -171,6 +172,21 @@ public class TimetableDataValidatorConfig {
     StopPlaceRepository stopPlaceRepository
   ) {
     return new SameQuayRefValidator(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
+  }
+
+  @Bean
+  public IdenticalStopPointsValidator identicalStopPoints(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new IdenticalStopPointsValidator(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -227,7 +243,8 @@ public class TimetableDataValidatorConfig {
     SameStopPoints sameStopPoints,
     StopPointsCount stopPointsCount,
     UnexpectedDistanceValidator unexpectedDistanceValidator,
-    SameQuayRefValidator sameQuayRefValidator
+    SameQuayRefValidator sameQuayRefValidator,
+    IdenticalStopPointsValidator identicalStopPointsValidator
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -245,7 +262,8 @@ public class TimetableDataValidatorConfig {
       sameStopPoints,
       stopPointsCount,
       unexpectedDistanceValidator,
-      sameQuayRefValidator
+      sameQuayRefValidator,
+      identicalStopPointsValidator
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
