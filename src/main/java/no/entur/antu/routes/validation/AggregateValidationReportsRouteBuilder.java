@@ -25,10 +25,13 @@ import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
+import static no.entur.antu.Constants.JOB_TYPE_VALIDATE_DATASET;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.REPORT_CREATION_DATE;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_STATUS_SUFFIX;
@@ -46,6 +49,7 @@ import no.entur.antu.Constants;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.metrics.AntuPrometheusMetricsService;
 import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.validation.AntuNetexValidationProgressCallback;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
@@ -65,9 +69,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
-  public static final String REPORT_CREATION_DATE = "reportCreationDate";
   private static final String PROP_DATASET_NETEX_FILE_NAMES =
     "EnturDatasetNetexFileNames";
+  private static final String PROP_NETEX_VALIDATION_CALLBACK =
+    "PROP_NETEX_VALIDATION_CALLBACK";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     AggregateValidationReportsRouteBuilder.class
@@ -125,6 +130,48 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         PROP_STOP_WATCH +
         ".taken()} ms"
       )
+      .marshal()
+      .json(JsonLibrary.Jackson)
+      .to("direct:uploadValidationReport")
+      .setBody(header(NETEX_FILE_NAME))
+      .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE_DATASET))
+      .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
+      .routeId("aggregate-reports");
+
+    from("direct:validateDataset")
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() + "Downloading the aggregated validation report"
+      )
+      .convertBodyTo(String.class)
+      .setHeader(NETEX_FILE_NAME, body())
+      .to("direct:downloadValidationReport")
+      .unmarshal()
+      .json(JsonLibrary.Jackson, ValidationReport.class)
+      .process(exchange ->
+        exchange.setProperty(
+          PROP_NETEX_VALIDATION_CALLBACK,
+          new AntuNetexValidationProgressCallback(this, exchange)
+        )
+      )
+      .bean(
+        "netexValidationProfile",
+        "validateDataset(" +
+        "${body}, " +
+        "${header." +
+        VALIDATION_PROFILE_HEADER +
+        "},${exchangeProperty." +
+        PROP_NETEX_VALIDATION_CALLBACK +
+        "})"
+      )
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() + "Completed all NeTEx dataset validators"
+      )
+      .to("direct:completeValidation")
+      .routeId("validate-dataset");
+
+    from("direct:completeValidation")
       .choice()
       .when(simple("${body.hasError()}"))
       .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
@@ -141,9 +188,20 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .to("direct:notifyStatus")
       .to("direct:createValidationReportStatusFile")
       .to("direct:cleanUpCache")
-      .routeId("aggregate-reports");
+      .routeId("complete-validation");
 
     from("direct:uploadValidationReportMetrics")
+      .process(exchange -> {
+        String reportCreationDate = exchange
+          .getIn()
+          .getHeader(REPORT_CREATION_DATE, String.class);
+        exchange
+          .getIn()
+          .setHeader(
+            REPORT_CREATION_DATE,
+            LocalDateTime.parse(reportCreationDate)
+          );
+      })
       .bean(antuPrometheusMetricsService)
       .routeId("upload-validation-report-metrics");
 

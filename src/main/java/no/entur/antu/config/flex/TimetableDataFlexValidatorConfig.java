@@ -119,15 +119,9 @@ public class TimetableDataFlexValidatorConfig {
   public InvalidFlexibleAreaValidator flexibleAreaValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new InvalidFlexibleAreaValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new InvalidFlexibleAreaValidator(validationReportEntryFactory);
   }
 
   /**
@@ -148,7 +142,9 @@ public class TimetableDataFlexValidatorConfig {
     ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
-    InvalidFlexibleAreaValidator invalidFlexibleAreaValidator
+    InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
     List<NetexValidator> netexValidators = List.of(
       fileNameValidator,
@@ -166,7 +162,9 @@ public class TimetableDataFlexValidatorConfig {
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
       netexXMLParser,
       netexSchemaValidator,
-      netexValidators
+      netexValidators,
+      commonDataRepository,
+      stopPlaceRepository
     );
   }
 
@@ -188,7 +186,9 @@ public class TimetableDataFlexValidatorConfig {
     ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
-    InvalidFlexibleAreaValidator invalidFlexibleAreaValidator
+    InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
     List<NetexValidator> netexValidators = List.of(
       fileNameValidator,
@@ -206,7 +206,9 @@ public class TimetableDataFlexValidatorConfig {
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
       netexXMLParser,
       netexSchemaValidator,
-      netexValidators
+      netexValidators,
+      commonDataRepository,
+      stopPlaceRepository
     );
   }
 }

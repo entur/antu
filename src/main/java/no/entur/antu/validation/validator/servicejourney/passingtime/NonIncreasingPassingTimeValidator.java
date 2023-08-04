@@ -2,8 +2,6 @@ package no.entur.antu.validation.validator.servicejourney.passingtime;
 
 import java.util.List;
 import java.util.function.Consumer;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
 import no.entur.antu.validation.AntuNetexData;
@@ -29,15 +27,9 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
   );
 
   public NonIncreasingPassingTimeValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -48,14 +40,10 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating ServiceJourney non-increasing passing time");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     antuNetexData
       .validServiceJourneys()
@@ -76,7 +64,8 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // ServiceJourneys and Line only appear in the Line file.
   }

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.NetexParser;
@@ -86,9 +87,10 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
     String testFile,
     CommonDataRepository commonDataRepository
   ) throws IOException {
+    String validationReportId = "Test1122";
     ValidationReport testValidationReport = new ValidationReport(
       TEST_CODESPACE,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -103,9 +105,6 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       ValidationContextWithNetexEntitiesIndex validationContext = mock(
         ValidationContextWithNetexEntitiesIndex.class
       );
-      when(validationContext.getNetexEntitiesIndex())
-        .thenReturn(netexEntitiesIndex);
-      when(validationContext.isCommonFile()).thenReturn(false);
 
       StopPlaceRepository stopPlaceRepository = Mockito.mock(
         StopPlaceRepository.class
@@ -114,16 +113,25 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       when(stopPlaceRepository.getStopPlaceNameForQuayId(any()))
         .thenReturn("TestName");
 
+      when(validationContext.isCommonFile()).thenReturn(false);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(
+            validationReportId,
+            netexEntitiesIndex,
+            commonDataRepository,
+            stopPlaceRepository
+          )
+        );
+
       MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator =
         new MissingPassengerStopAssignmentValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          commonDataRepository,
-          stopPlaceRepository
+            (code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       missingPassengerStopAssignmentValidator.validate(

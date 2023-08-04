@@ -2,12 +2,9 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.identicalsto
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -28,15 +25,9 @@ public class IdenticalStopPointsValidator extends AntuNetexValidator {
   );
 
   public IdenticalStopPointsValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -47,24 +38,16 @@ public class IdenticalStopPointsValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating identical Journey Patterns");
-
-    NetexEntitiesIndex index = getNetexEntitiesIndex(validationContext);
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     IdenticalStopPointsContext.Builder builder =
       IdenticalStopPointsContext.builder(antuNetexData);
 
-    index
-      .getJourneyPatternIndex()
-      .getAll()
-      .stream()
+    antuNetexData
+      .journeyPatterns()
       .map(builder::build)
       .collect(
         // Two IdenticalStopPointsContexts are equal if their StopPointsContexts are equal
@@ -92,7 +75,8 @@ public class IdenticalStopPointsValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // JourneyPatterns only appear in the Line file.
   }

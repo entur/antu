@@ -1,8 +1,6 @@
 package no.entur.antu.validation.validator.interchange.mandatoryfields;
 
 import java.util.function.Consumer;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -22,15 +20,9 @@ import org.entur.netex.validation.validator.xpath.ValidationContext;
 public class MandatoryFieldsValidator extends AntuNetexValidator {
 
   public MandatoryFieldsValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -41,7 +33,8 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // ServiceJourneyInterchanges exists only in line files,
     // as they have reference to serviceJourneys.
@@ -50,13 +43,9 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
-
     antuNetexData
       .serviceJourneyInterchanges()
       .map(MandatoryFieldsContext::of)
