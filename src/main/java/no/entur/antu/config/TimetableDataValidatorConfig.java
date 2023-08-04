@@ -23,6 +23,7 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.identicalstoppoints.IdenticalStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRefValidator;
@@ -240,6 +241,21 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public MandatoryFieldsValidator mandatoryFieldsValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new MandatoryFieldsValidator(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
+  }
+
+  @Bean
   public NetexValidatorsRunner timetableDataValidatorsRunner(
     NetexSchemaValidator netexSchemaValidator,
     @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
@@ -261,7 +277,8 @@ public class TimetableDataValidatorConfig {
     UnexpectedSpeedValidator unexpectedSpeedValidator,
     MismatchedTransportModeValidator mismatchedTransportModeValidator,
     UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator,
-    MismatchedStopPointsValidator mismatchedStopPointsValidator
+    MismatchedStopPointsValidator mismatchedStopPointsValidator,
+    MandatoryFieldsValidator mandatoryFieldsValidator
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -281,7 +298,8 @@ public class TimetableDataValidatorConfig {
       unexpectedSpeedValidator,
       mismatchedTransportModeValidator,
       unexpectedDistanceInServiceLinkValidator,
-      mismatchedStopPointsValidator
+      mismatchedStopPointsValidator,
+      mandatoryFieldsValidator
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
