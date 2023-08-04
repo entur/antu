@@ -23,16 +23,27 @@ import org.slf4j.LoggerFactory;
  * The distance is expected to be within a configured 'WARNING' and 'MAX' limits, and if it exceeds the limit,
  * a warning or an error is added to the validation report.
  */
+<<<<<<<< HEAD:src/main/java/no/entur/antu/validation/validator/servicelink/distance/UnexpectedDistance.java
 public class UnexpectedDistance extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     UnexpectedDistance.class
+========
+public class UnexpectedDistanceValidator extends AntuNetexValidator {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    UnexpectedDistanceValidator.class
+>>>>>>>> 93b56ea (Validating the identical stop points in journey pattern):src/main/java/no/entur/antu/validation/validator/servicelink/distance/UnexpectedDistanceValidator.java
   );
 
   private static final double DISTANCE_WARNING = 20;
   private static final double DISTANCE_MAX = 100;
 
+<<<<<<<< HEAD:src/main/java/no/entur/antu/validation/validator/servicelink/distance/UnexpectedDistance.java
   public UnexpectedDistance(
+========
+  public UnexpectedDistanceValidator(
+>>>>>>>> 93b56ea (Validating the identical stop points in journey pattern):src/main/java/no/entur/antu/validation/validator/servicelink/distance/UnexpectedDistanceValidator.java
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository

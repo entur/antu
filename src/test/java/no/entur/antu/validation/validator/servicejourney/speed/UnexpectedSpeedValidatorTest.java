@@ -18,12 +18,12 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
 
-class UnexpectedSpeedTest extends ValidationTest {
+class UnexpectedSpeedValidatorTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    return runValidationOnLineFile(netexEntitiesIndex, UnexpectedSpeed.class);
+    return runValidationOnLineFile(netexEntitiesIndex, UnexpectedSpeedValidator.class);
   }
 
   @Test

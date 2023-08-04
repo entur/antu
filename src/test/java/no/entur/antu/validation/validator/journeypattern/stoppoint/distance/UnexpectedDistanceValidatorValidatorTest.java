@@ -21,7 +21,7 @@ import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Route;
 
-class UnexpectedDistanceValidatorTest extends ValidationTest {
+class UnexpectedDistanceValidatorValidatorTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex

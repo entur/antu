@@ -1,7 +1,7 @@
-package no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount;
+package no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoints;
 
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
@@ -14,17 +14,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Validates that the number of stop points in a journey pattern
- * should and should only be 1 more than the service links in
- * the journey pattern.
+ * Validate that the same stop points are not used
+ * in multiple journey patterns.
+ * If the same stop points are used in multiple journey patterns,
+ * it is an error.
  */
-public class StopPointsCount extends AntuNetexValidator {
+public class SameStopPointsValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    StopPointsCount.class
+    SameStopPointsValidator.class
   );
 
-  public StopPointsCount(
+  public SameStopPointsValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -38,7 +39,7 @@ public class StopPointsCount extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return StopPointsCountError.RuleCode.values();
+    return SameStopPointsError.RuleCode.values();
   }
 
   @Override
@@ -46,7 +47,7 @@ public class StopPointsCount extends AntuNetexValidator {
     ValidationReport validationReport,
     ValidationContext validationContext
   ) {
-    LOGGER.debug("Validating Stop points or service links In Journey Patterns");
+    LOGGER.debug("Validating Same Stops In Journey Patterns");
 
     AntuNetexData antuNetexData = createAntuNetexData(
       validationReport,
@@ -55,16 +56,25 @@ public class StopPointsCount extends AntuNetexValidator {
 
     antuNetexData
       .journeyPatterns()
-      .map(StopPointsCountContext::of)
-      .filter(Objects::nonNull)
-      .filter(Predicate.not(StopPointsCountContext::isValid))
-      .forEach(stopPointsCountContext ->
+      .map(SameStopPointsContext::of)
+      .collect(
+        // Two SameStopPointsContexts are equal if their Stop points are equal
+        Collectors.groupingBy(Function.identity(), Collectors.toList())
+      )
+      .entrySet()
+      .stream()
+      .filter(entry -> entry.getValue().size() > 1)
+      .forEach(entry ->
         addValidationReportEntry(
           validationReport,
           validationContext,
-          new StopPointsCountError(
-            StopPointsCountError.RuleCode.INVALID_NUMBER_OF_STOP_POINTS_IN_JOURNEY_PATTERN,
-            stopPointsCountContext.journeyPatternId()
+          new SameStopPointsError(
+            SameStopPointsError.RuleCode.SAME_STOP_POINT_IN_JOURNEY_PATTERNS,
+            entry
+              .getValue()
+              .stream()
+              .map(SameStopPointsContext::journeyPatternId)
+              .toList()
           )
         )
       );
