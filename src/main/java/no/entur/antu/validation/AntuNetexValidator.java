@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -36,22 +35,54 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     ValidationReport validationReport,
     ValidationContext validationContext
   ) {
+    AntuNetexData antuNetexData = getAntuNetexData(
+      validationReport,
+      validationContext
+    );
+
     if (validationContext.isCommonFile()) {
-      validateCommonFile(validationReport, validationContext);
+      validateCommonFile(validationReport, validationContext, antuNetexData);
     }
 
     if (!validationContext.isCommonFile()) {
-      validateLineFile(validationReport, validationContext);
+      handleLineFileValidation(
+        validationReport,
+        validationContext,
+        antuNetexData
+      );
     }
   }
 
-  protected NetexEntitiesIndex getNetexEntitiesIndex(
+  private void handleLineFileValidation(
+    ValidationReport validationReport,
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
+  ) {
+    // TODO: We are caching the data per validation rule, we actually need to do it per file.
+    //  We are checking the file name already exists in side the method. But will be fine if we
+    //  can do it one per dataset. How?
+
+    commonDataRepository.addLineName(
+      validationReport.getValidationReportId(),
+      validationContext.getFileName(),
+      antuNetexData.getLineInfo()
+    );
+
+    validateLineFile(validationReport, validationContext, antuNetexData);
+  }
+
+  private AntuNetexData getAntuNetexData(
+    ValidationReport validationReport,
     ValidationContext validationContext
   ) {
     if (
       validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
     ) {
-      return validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
+      return validationContextWithNetexEntitiesIndex.getAntuNetexData(
+        validationReport.getValidationReportId(),
+        commonDataRepository,
+        stopPlaceRepository
+      );
     } else {
       throw new AntuException("Netex entities index not available in context");
     }
@@ -59,25 +90,15 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
 
   protected abstract void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   );
 
   protected abstract void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   );
-
-  protected AntuNetexData createAntuNetexData(
-    ValidationReport validationReport,
-    ValidationContext validationContext
-  ) {
-    return new AntuNetexData(
-      validationReport.getValidationReportId(),
-      getNetexEntitiesIndex(validationContext),
-      commonDataRepository,
-      stopPlaceRepository
-    );
-  }
 
   protected void addValidationReportEntry(
     ValidationReport validationReport,

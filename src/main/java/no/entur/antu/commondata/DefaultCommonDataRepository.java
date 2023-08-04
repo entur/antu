@@ -7,6 +7,7 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
 import no.entur.antu.model.ServiceLinkId;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +79,30 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
     );
   }
 
+/*
+  @Override
+  public Map<String, LineInfo> getLineNames(String validationReportId) {
+    Map<String, String> lineNamesForReportId = lineNamesCache.get(
+      validationReportId
+    );
+    if (lineNamesForReportId == null) {
+      throw new AntuException(
+        "Line names not found for validation report with id: " +
+        validationReportId
+      );
+    }
+    return lineNamesForReportId
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          Map.Entry::getKey,
+          entry -> LineInfo.fromString(entry.getValue())
+        )
+      );
+  }
+*/
+
   @Override
   public void loadCommonDataCache(
     byte[] fileContent,
@@ -121,5 +146,6 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   @Override
   public void cleanUp(String validationReportId) {
     scheduledStopPointAndQuayIdCache.remove(validationReportId);
+    serviceLinksAndScheduledStopPointIdsCache.remove(validationReportId);
   }
 }

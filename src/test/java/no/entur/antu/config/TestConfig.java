@@ -1,8 +1,11 @@
 package no.entur.antu.config;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
@@ -42,6 +45,20 @@ public class TestConfig {
         String validationReportId
       ) {
         return null;
+      }
+
+      @Override
+      public Map<String, LineInfo> getLineNames(String validationReportId) {
+        return Map.of();
+      }
+
+      @Override
+      public void addLineName(
+        String validationReportId,
+        String fileName,
+        LineInfo lineInfo
+      ) {
+        /* Nothing here */
       }
 
       @Override

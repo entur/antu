@@ -63,7 +63,8 @@ public class MismatchedStopPoints extends AntuNetexValidator {
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // Journey pattern are only in line file.
   }
@@ -71,14 +72,10 @@ public class MismatchedStopPoints extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating ServiceLinks");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     MismatchedStopPointsContext.Builder contextBuilder =
       new MismatchedStopPointsContext.Builder(antuNetexData);

@@ -54,14 +54,10 @@ public class UnexpectedDistanceInServiceLinkValidator
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating ServiceLinks");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     UnexpectedDistanceInServiceLinkContext.Builder contextBuilder =
       new UnexpectedDistanceInServiceLinkContext.Builder(antuNetexData);
@@ -83,7 +79,8 @@ public class UnexpectedDistanceInServiceLinkValidator
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     /*
     No validation needed for line file

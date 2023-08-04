@@ -69,4 +69,38 @@ public class NetexValidationProfile {
       );
     }
   }
+
+  /**
+   * Validate a NeTEx file according to a validation profile
+   *
+   * @param filename           the name of the NeTEx file.
+   * @return a ValidationReport listing the findings for this NeTEx file.
+   */
+  public ValidationReport validateDataset(
+    ValidationReport validationReport,
+    String validationProfile,
+    String filename,
+    NetexValidationProgressCallBack netexValidationProgressCallBack
+  ) {
+    if (validationReport == null) {
+      throw new AntuException("Missing validation report");
+    }
+    if (validationProfile == null) {
+      throw new AntuException("Missing validation profile");
+    }
+    NetexValidatorsRunner netexValidatorsRunner = netexValidatorsRunners.get(
+      validationProfile
+    );
+    if (netexValidatorsRunner == null) {
+      throw new AntuException(
+        "Unknown validation profile " + validationProfile
+      );
+    } else {
+      return netexValidatorsRunner.runNetexDatasetValidators(
+        validationReport,
+        filename,
+        netexValidationProgressCallBack
+      );
+    }
+  }
 }

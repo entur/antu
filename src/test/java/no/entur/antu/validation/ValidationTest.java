@@ -1,5 +1,6 @@
 package no.entur.antu.validation;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -147,10 +148,12 @@ public class ValidationTest {
     ValidationContextWithNetexEntitiesIndex validationContext = mock(
       ValidationContextWithNetexEntitiesIndex.class
     );
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-
     when(validationContext.isCommonFile()).thenReturn(mockAsCommonFile);
+
+    AntuNetexData antuNetexData = mock(AntuNetexData.class);
+    when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
+    when(validationContext.getAntuNetexData(anyString(), any(), any()))
+      .thenReturn(antuNetexData);
 
     try {
       V validator = validatorClass

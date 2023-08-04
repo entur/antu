@@ -35,7 +35,10 @@ import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validation.AntuNetexValidationProgressCallback;
 import no.entur.antu.validation.ValidationReportTransformer;
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.Message;
+import org.apache.camel.Processor;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.util.StopWatch;
 import org.entur.netex.validation.exception.RetryableNetexValidationException;
@@ -75,7 +78,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .to("direct:downloadSingleNetexFileFromMemoryStore")
       .setProperty(PROP_NETEX_FILE_CONTENT, body())
       .to("direct:runNetexValidators")
-      // Duplicated PubSub messages are detected when trying to download the NeTEx file: it does not exist anymore after the report is generated and all temporary files are deleted
+      // Duplicated PubSub messages are detected when trying to download the NeTEx file:
+      // it does not exist anymore after the report is generated and all temporary files are deleted
       .doCatch(AntuMemoryStoreFileNotFoundException.class)
       .log(
         LoggingLevel.WARN,

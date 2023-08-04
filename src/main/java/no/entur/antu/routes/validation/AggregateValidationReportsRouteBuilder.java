@@ -29,6 +29,7 @@ import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_STATUS_SUFFIX;
@@ -46,10 +47,12 @@ import no.entur.antu.Constants;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.metrics.AntuPrometheusMetricsService;
 import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.validation.AntuNetexValidationProgressCallback;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
+import org.apache.camel.Processor;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.apache.camel.util.StopWatch;
@@ -68,6 +71,8 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
   public static final String REPORT_CREATION_DATE = "reportCreationDate";
   private static final String PROP_DATASET_NETEX_FILE_NAMES =
     "EnturDatasetNetexFileNames";
+  private static final String PROP_NETEX_VALIDATION_CALLBACK =
+    "PROP_NETEX_VALIDATION_CALLBACK";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     AggregateValidationReportsRouteBuilder.class
@@ -125,6 +130,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         PROP_STOP_WATCH +
         ".taken()} ms"
       )
+      .to("direct:validateDataset")
       .choice()
       .when(simple("${body.hasError()}"))
       .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
@@ -142,6 +148,29 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .to("direct:createValidationReportStatusFile")
       .to("direct:cleanUpCache")
       .routeId("aggregate-reports");
+
+    from("direct:validateDataset")
+      .process(exchange ->
+        exchange.setProperty(
+          PROP_NETEX_VALIDATION_CALLBACK,
+          new AntuNetexValidationProgressCallback(this, exchange)
+        )
+      )
+      .bean(
+        "netexValidationProfile",
+        "validateDataset(" +
+        "${body}, " +
+        "${header." +
+        VALIDATION_PROFILE_HEADER +
+        "},${header.RutebankenFileName" + // TODO: Hva med file navn?
+        "},${exchangeProperty." +
+        PROP_NETEX_VALIDATION_CALLBACK +
+        "})"
+      )
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() + "Completed all NeTEx dataset validators"
+      );
 
     from("direct:uploadValidationReportMetrics")
       .bean(antuPrometheusMetricsService)

@@ -46,15 +46,11 @@ public class SameQuayRefValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug(
       "Validating Same quayRefs in two consecutive Stop points In Journey Patterns"
-    );
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
     );
 
     SameQuayRefContext.Builder builder = SameQuayRefContext.builder(
@@ -77,7 +73,8 @@ public class SameQuayRefValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // JourneyPatterns only appear in the Line file.
   }

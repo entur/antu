@@ -1,5 +1,7 @@
 package no.entur.antu.commondata;
 
+import java.util.Map;
+import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;

@@ -1,7 +1,7 @@
 package no.entur.antu.config;
 
-import static no.entur.antu.config.CacheConfig.SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE;
-import static no.entur.antu.config.CacheConfig.SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE;
 
 import java.util.Map;
 import no.entur.antu.commondata.CommonDataRepository;

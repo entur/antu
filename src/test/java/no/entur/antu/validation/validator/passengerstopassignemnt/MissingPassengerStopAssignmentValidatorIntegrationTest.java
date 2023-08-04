@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.NetexParser;
@@ -103,9 +104,12 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       ValidationContextWithNetexEntitiesIndex validationContext = mock(
         ValidationContextWithNetexEntitiesIndex.class
       );
-      when(validationContext.getNetexEntitiesIndex())
-        .thenReturn(netexEntitiesIndex);
+
+      AntuNetexData antuNetexData = mock(AntuNetexData.class);
+      when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
       when(validationContext.isCommonFile()).thenReturn(false);
+      when(validationContext.getAntuNetexData(anyString(), any(), any()))
+        .thenReturn(antuNetexData);
 
       StopPlaceRepository stopPlaceRepository = Mockito.mock(
         StopPlaceRepository.class
