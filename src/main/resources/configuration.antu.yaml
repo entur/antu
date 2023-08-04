@@ -54,3 +54,6 @@ validationRuleConfigs:
   - code: SAME_DEPARTURE_ARRIVAL_TIME
     name: Same departure/arrival time for consecutive stops
     severity: INFO
+  - code: MISSING_SCHEDULED_STOP_ASSIGNMENT
+    name: Missing ScheduledStopAssignment for StopPointInJourneyPattern
+    severity: ERROR
