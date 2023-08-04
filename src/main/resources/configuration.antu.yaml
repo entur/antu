@@ -63,6 +63,12 @@ validationRuleConfigs:
   - code: JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP
     name: First StopPointInJourneyPattern must not allow alighting
     severity: ERROR
+  - code: DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED
+    name: Distance between stop points is more than expected
+    severity: WARNING
+  - code: DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED
+    name: Distance between stop points is less than expected
+    severity: WARNING
   - code: DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
     name: Distance between stop point and start of linestring, exceeds max limit, in LinkSequenceProjection
     severity: WARNING

@@ -1,7 +1,7 @@
 package no.entur.antu.validation.validator.servicejourney.speed;
 
 import no.entur.antu.validation.ValidationError;
-import no.entur.antu.validation.validator.Comparison;
+import no.entur.antu.validation.utilities.Comparison;
 
 public record UnexpectedSpeedError(
   String serviceJourneyId,
