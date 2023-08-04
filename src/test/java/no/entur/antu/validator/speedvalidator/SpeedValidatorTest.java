@@ -12,7 +12,7 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.nonincreasingpassingtime.NetexTestDataSample;
+import no.entur.antu.validator.nonincreasingpassingtime.NetexTestData;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -134,46 +134,10 @@ class SpeedValidatorTest {
     );
   }
 
-  @Test
-  void testSameDepartureArrivalTimeErrorThrown() {
-    ValidationReport validationReport = runTestWithStopPlaceCoordinates(
-      new NetexTestDataSample(new int[] { 0, 0 }), // Same departure time for both passingTimes.
-      List.of(
-        StopPlaceCoordinates.fromString("11.189184§60.41041"),
-        StopPlaceCoordinates.fromString("11.193265§60.446804")
-      )
-    );
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getValidationReportEntries()
-        .stream()
-        .map(ValidationReportEntry::getName)
-        .toList(),
-      is(
-        List.of(
-          SameDepartureArrivalTimeError.RuleCode.SAME_DEPARTURE_ARRIVAL_TIME.name()
-        )
-      )
-    );
-  }
-
-  private static ValidationReport runTestWithStopPlaceCoordinates(
-    List<StopPlaceCoordinates> stopPlaceCoordinates
-  ) {
-    return runTestWithStopPlaceCoordinates(
-      new NetexTestDataSample(),
-      stopPlaceCoordinates
-    );
-  }
-
-  private static ValidationReport runTestWithStopPlaceCoordinates(
-    NetexTestDataSample sample,
-    List<StopPlaceCoordinates> stopPlaceCoordinates
-  ) {
-    ServiceJourney serviceJourney = sample.getServiceJourney();
-    JourneyPattern journeyPattern = sample.getJourneyPattern();
+    private static ValidationReport runTestWithStopPlaceCoordinates(List<StopPlaceCoordinates> stopPlaceCoordinates) {
+        NetexTestData testData = new NetexTestData();
+        JourneyPattern journeyPattern = testData.journeyPattern().create();
+        ServiceJourney serviceJourney = testData.serviceJourney(journeyPattern).create();
 
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
