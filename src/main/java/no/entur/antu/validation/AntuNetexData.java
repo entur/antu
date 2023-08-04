@@ -35,6 +35,7 @@ import org.rutebanken.netex.model.Service_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.Timetable_VersionFrameStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
 import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
