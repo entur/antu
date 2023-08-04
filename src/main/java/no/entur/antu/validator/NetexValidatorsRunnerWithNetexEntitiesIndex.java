@@ -20,12 +20,12 @@ import org.entur.netex.validation.xml.NetexXMLParser;
 /**
  * Represents a Netex validator runner with NetexEntitiesIndex.
  */
-public class NetexValidatorRunnerWithNetexEntitiesIndex
+public class NetexValidatorsRunnerWithNetexEntitiesIndex
   extends NetexValidatorsRunner {
 
   private final NetexXMLParser netexXMLParser;
 
-  public NetexValidatorRunnerWithNetexEntitiesIndex(
+  public NetexValidatorsRunnerWithNetexEntitiesIndex(
     NetexXMLParser netexXMLParser,
     NetexSchemaValidator netexSchemaValidator,
     List<NetexValidator> netexValidators

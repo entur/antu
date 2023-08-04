@@ -21,7 +21,7 @@ import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
+import no.entur.antu.validator.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.passengerstopassignment.MissingPassengerStopAssignment;
 import no.entur.antu.validator.servicejourney.passingtime.NonIncreasingPassingTime;
@@ -168,7 +168,7 @@ public class TimetableDataValidatorConfig {
       invalidServiceLinks
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
-    return new NetexValidatorRunnerWithNetexEntitiesIndex(
+    return new NetexValidatorsRunnerWithNetexEntitiesIndex(
       netexXMLParser,
       netexSchemaValidator,
       netexValidators
