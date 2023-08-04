@@ -1,6 +1,7 @@
 package no.entur.antu.validation.validator.servicejourney.speed;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -36,9 +38,10 @@ class UnexpectedSpeedValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(String testFile)
     throws IOException {
+    String validationReportId = "Test1122";
     ValidationReport testValidationReport = new ValidationReport(
       TEST_CODESPACE,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -53,31 +56,33 @@ class UnexpectedSpeedValidatorIntegrationTest {
       ValidationContextWithNetexEntitiesIndex validationContext = mock(
         ValidationContextWithNetexEntitiesIndex.class
       );
-      when(validationContext.getNetexEntitiesIndex())
-        .thenReturn(netexEntitiesIndex);
-      when(validationContext.isCommonFile()).thenReturn(false);
 
       CommonDataRepository commonDataRepository = Mockito.mock(
         CommonDataRepository.class
-      );
-      StopPlaceRepository stopPlaceRepository = Mockito.mock(
-        StopPlaceRepository.class
       );
 
       Mockito
         .when(commonDataRepository.hasQuayIds(anyString()))
         .thenReturn(false);
 
+      when(validationContext.isCommonFile()).thenReturn(false);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(
+            validationReportId,
+            netexEntitiesIndex,
+            commonDataRepository,
+            Mockito.mock(StopPlaceRepository.class)
+          )
+        );
+
       UnexpectedSpeedValidator unexpectedSpeedValidator =
-        new UnexpectedSpeedValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          commonDataRepository,
-          stopPlaceRepository
+        new UnexpectedSpeedValidator((code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       unexpectedSpeedValidator.validate(

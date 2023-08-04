@@ -42,15 +42,9 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
   );
 
   public UnexpectedSpeedValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -67,14 +61,10 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating Speed");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     UnexpectedSpeedContext.Builder contextBuilder =
       new UnexpectedSpeedContext.Builder(antuNetexData);
@@ -96,7 +86,8 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // ServiceJourneys and Line only appear in the Line file.
   }

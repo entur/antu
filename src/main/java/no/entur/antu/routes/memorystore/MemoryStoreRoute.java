@@ -17,12 +17,17 @@
 
 package no.entur.antu.routes.memorystore;
 
+import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_WORK;
+import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
+import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,6 +42,42 @@ public class MemoryStoreRoute extends BaseRouteBuilder {
 
   @Override
   public void configure() {
+    from("direct:saveValidationReport")
+      .log(LoggingLevel.DEBUG, correlation() + "Saving validation report")
+      .marshal()
+      .json(JsonLibrary.Jackson)
+      .to("direct:uploadValidationReport")
+      .log(LoggingLevel.DEBUG, correlation() + "Saved validation report")
+      .routeId("save-validation-report");
+
+    from("direct:uploadValidationReport")
+      .setHeader(
+        TEMPORARY_FILE_NAME,
+        constant(BLOBSTORE_PATH_ANTU_WORK)
+          .append(header(DATASET_REFERENTIAL))
+          .append("/")
+          .append(header(VALIDATION_REPORT_ID_HEADER))
+          .append("/")
+          .append(header(NETEX_FILE_NAME))
+          .append(VALIDATION_REPORT_SUFFIX)
+      )
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() +
+        "Uploading Validation Report  to GCS file ${header." +
+        TEMPORARY_FILE_NAME +
+        "}"
+      )
+      .to("direct:uploadBlobToMemoryStore")
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() +
+        "Uploaded Validation Report to GCS file ${header." +
+        TEMPORARY_FILE_NAME +
+        "}"
+      )
+      .routeId("upload-validation-report");
+
     from("direct:downloadBlobFromMemoryStore")
       .bean(
         "temporaryFileRepository",

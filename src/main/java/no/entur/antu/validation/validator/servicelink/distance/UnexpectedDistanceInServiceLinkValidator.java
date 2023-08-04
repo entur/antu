@@ -35,15 +35,9 @@ public class UnexpectedDistanceInServiceLinkValidator
   private static final double DISTANCE_MAX = 100;
 
   public UnexpectedDistanceInServiceLinkValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -54,14 +48,10 @@ public class UnexpectedDistanceInServiceLinkValidator
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating ServiceLinks");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     UnexpectedDistanceInServiceLinkContext.Builder contextBuilder =
       new UnexpectedDistanceInServiceLinkContext.Builder(antuNetexData);
@@ -83,7 +73,8 @@ public class UnexpectedDistanceInServiceLinkValidator
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     /*
     No validation needed for line file

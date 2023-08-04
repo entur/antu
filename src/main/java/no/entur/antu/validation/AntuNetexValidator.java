@@ -3,10 +3,7 @@ package no.entur.antu.validation;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.stop.StopPlaceRepository;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -17,17 +14,10 @@ import org.entur.netex.validation.validator.xpath.ValidationContext;
 
 public abstract class AntuNetexValidator extends AbstractNetexValidator {
 
-  private final CommonDataRepository commonDataRepository;
-  private final StopPlaceRepository stopPlaceRepository;
-
   protected AntuNetexValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
     super(validationReportEntryFactory);
-    this.commonDataRepository = commonDataRepository;
-    this.stopPlaceRepository = stopPlaceRepository;
   }
 
   protected abstract RuleCode[] getRuleCodes();
@@ -36,47 +26,41 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     ValidationReport validationReport,
     ValidationContext validationContext
   ) {
+    AntuNetexData antuNetexData = getAntuNetexData(validationContext);
+
     if (validationContext.isCommonFile()) {
-      validateCommonFile(validationReport, validationContext);
+      validateCommonFile(validationReport, validationContext, antuNetexData);
     }
 
     if (!validationContext.isCommonFile()) {
-      validateLineFile(validationReport, validationContext);
+      validateLineFile(validationReport, validationContext, antuNetexData);
     }
   }
 
-  protected NetexEntitiesIndex getNetexEntitiesIndex(
-    ValidationContext validationContext
-  ) {
+  private AntuNetexData getAntuNetexData(ValidationContext validationContext) {
     if (
       validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
     ) {
-      return validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
+      return validationContextWithNetexEntitiesIndex.getAntuNetexData();
     } else {
-      throw new AntuException("Netex entities index not available in context");
+      throw new AntuException("Netex data not available in context");
     }
   }
 
-  protected abstract void validateCommonFile(
+  protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
-  );
-
-  protected abstract void validateLineFile(
-    ValidationReport validationReport,
-    ValidationContext validationContext
-  );
-
-  protected AntuNetexData createAntuNetexData(
-    ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
-    return new AntuNetexData(
-      validationReport.getValidationReportId(),
-      getNetexEntitiesIndex(validationContext),
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    // Nothing here
+  }
+
+  protected void validateLineFile(
+    ValidationReport validationReport,
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
+  ) {
+    // Nothing here
   }
 
   protected void addValidationReportEntry(

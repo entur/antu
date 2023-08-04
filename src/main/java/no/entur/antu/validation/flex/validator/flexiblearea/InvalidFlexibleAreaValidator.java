@@ -1,13 +1,11 @@
 package no.entur.antu.validation.flex.validator.flexiblearea;
 
-import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.utilities.GeometryUtilities;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -33,15 +31,9 @@ public class InvalidFlexibleAreaValidator extends AntuNetexValidator {
   );
 
   public InvalidFlexibleAreaValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -52,43 +44,39 @@ public class InvalidFlexibleAreaValidator extends AntuNetexValidator {
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating flexible area");
 
-    NetexEntitiesIndex netexEntitiesIndex = getNetexEntitiesIndex(
-      validationContext
-    );
-
-    InvalidFlexibleAreaContextBuilder invalidFlexibleAreaContextBuilder =
-      new InvalidFlexibleAreaContextBuilder();
-
-    List<InvalidFlexibleAreaContextBuilder.InvalidFlexibleAreaContext> invalidFlexibleAreaContexts =
-      invalidFlexibleAreaContextBuilder.build(netexEntitiesIndex);
-
-    invalidFlexibleAreaContexts.forEach(invalidFlexibleAreaContext ->
-      validateFlexibleArea(
-        invalidFlexibleAreaContext,
-        invalidFlexibleAreaError ->
-          addValidationReportEntry(
-            validationReport,
-            validationContext,
-            invalidFlexibleAreaError
-          )
-      )
-    );
+    antuNetexData
+      .flexibleStopPlaces()
+      .map(InvalidFlexibleAreaContext::of)
+      .filter(Objects::nonNull)
+      .forEach(invalidFlexibleAreaContext ->
+        validateFlexibleArea(
+          invalidFlexibleAreaContext,
+          invalidFlexibleAreaError ->
+            addValidationReportEntry(
+              validationReport,
+              validationContext,
+              invalidFlexibleAreaError
+            )
+        )
+      );
   }
 
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // Flexible areas only appear in the Common file.
   }
 
   private void validateFlexibleArea(
-    InvalidFlexibleAreaContextBuilder.InvalidFlexibleAreaContext invalidFlexibleAreaContext,
+    InvalidFlexibleAreaContext invalidFlexibleAreaContext,
     Consumer<InvalidFlexibleAreaError> flexibleAreaError
   ) {
     if (
