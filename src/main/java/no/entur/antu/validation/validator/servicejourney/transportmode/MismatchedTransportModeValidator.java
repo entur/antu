@@ -8,6 +8,7 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -37,11 +38,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
     this.stopPlaceRepository = stopPlaceRepository;
     this.commonDataRepository = commonDataRepository;
   }
@@ -52,10 +49,15 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
   }
 
   @Override
-  public void validateLineFile(
+  public void validate(
     ValidationReport validationReport,
     ValidationContext validationContext
   ) {
+    if (validationContext.isCommonFile()) {
+      // ServiceJourneys and Line only appear in the Line file.
+      return;
+    }
+
     LOGGER.debug("Validating Transport mode");
 
     MismatchedTransportModeContext.Builder builder =
@@ -84,14 +86,6 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
             )
         )
       );
-  }
-
-  @Override
-  protected void validateCommonFile(
-    ValidationReport validationReport,
-    ValidationContext validationContext
-  ) {
-    // ServiceJourneys and Line only appear in the Line file.
   }
 
   private void validateServiceJourney(
@@ -215,8 +209,6 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
             )
           );
         }
-      } else {
-        return;
       }
     } else {
       validationError.accept(

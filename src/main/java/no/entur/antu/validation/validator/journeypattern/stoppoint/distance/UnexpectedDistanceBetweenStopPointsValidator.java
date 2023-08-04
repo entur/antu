@@ -30,15 +30,9 @@ public class UnexpectedDistanceBetweenStopPointsValidator
   );
 
   public UnexpectedDistanceBetweenStopPointsValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -49,14 +43,10 @@ public class UnexpectedDistanceBetweenStopPointsValidator
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating distance between stops in journey patterns");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     UnexpectedDistanceBetweenStopPointsContext.Builder builder =
       new UnexpectedDistanceBetweenStopPointsContext.Builder(antuNetexData);
@@ -82,7 +72,8 @@ public class UnexpectedDistanceBetweenStopPointsValidator
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // JourneyPatterns only appear in the Line file.
   }

@@ -3,12 +3,14 @@ package no.entur.antu.validation;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
@@ -19,6 +21,8 @@ import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
+import org.rutebanken.netex.model.FlexibleStopPlace;
+import org.rutebanken.netex.model.FlexibleStopPlacesInFrame_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LinkInJourneyPattern;
@@ -32,6 +36,7 @@ import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
 import org.rutebanken.netex.model.Service_VersionFrameStructure;
+import org.rutebanken.netex.model.Site_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.Timetable_VersionFrameStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
@@ -190,6 +195,26 @@ public record AntuNetexData(
       return flexibleLine.getTransportMode();
     }
     return null;
+  }
+
+  public LineInfo getLineInfo(String fileName) {
+    return netexEntitiesIndex
+      .getLineIndex()
+      .getAll()
+      .stream()
+      .findFirst()
+      .map(line -> LineInfo.of(line, fileName))
+      .orElse(null);
+  }
+
+  public Stream<FlexibleStopPlace> flexibleStopPlaces() {
+    return netexEntitiesIndex
+      .getSiteFrames()
+      .stream()
+      .map(Site_VersionFrameStructure::getFlexibleStopPlaces)
+      .filter(Objects::nonNull)
+      .map(FlexibleStopPlacesInFrame_RelStructure::getFlexibleStopPlace)
+      .flatMap(List::stream);
   }
 
   public Stream<ServiceLink> serviceLinks() {

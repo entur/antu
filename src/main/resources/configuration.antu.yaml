@@ -108,3 +108,6 @@ validationRuleConfigs:
   - code: DUPLICATE_INTERCHANGES
     name: Duplicate Interchanges found
     severity: WARNING
+  - code: DUPLICATE_LINE_NAME
+    name: Duplicate line names found
+    severity: WARNING
