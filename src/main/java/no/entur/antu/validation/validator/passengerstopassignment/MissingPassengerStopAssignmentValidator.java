@@ -9,7 +9,6 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -29,10 +28,10 @@ import org.slf4j.LoggerFactory;
  * Missing SPA -> Yes DeadRun -> Yes SJ -> Error
  * Missing SPA -> Yes DeadRun -> No SJ -> OK
  */
-public class MissingPassengerStopAssignment extends AntuNetexValidator {
+public class MissingPassengerStopAssignmentValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    MissingPassengerStopAssignment.class
+    MissingPassengerStopAssignmentValidator.class
   );
 
   @Override
@@ -40,7 +39,7 @@ public class MissingPassengerStopAssignment extends AntuNetexValidator {
     return MissingPassengerStopAssignmentError.RuleCode.values();
   }
 
-  public MissingPassengerStopAssignment(
+  public MissingPassengerStopAssignmentValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository

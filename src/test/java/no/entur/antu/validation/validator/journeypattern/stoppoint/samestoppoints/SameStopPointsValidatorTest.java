@@ -12,12 +12,12 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.JourneyPattern;
 
-class SameStopPointsTest extends ValidationTest {
+class SameStopPointsValidatorTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    return runValidationOnLineFile(netexEntitiesIndex, SameStopPoints.class);
+    return runValidationOnLineFile(netexEntitiesIndex, SameStopPointsValidator.class);
   }
 
   @Test

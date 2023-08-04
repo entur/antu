@@ -27,7 +27,7 @@ import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 
-class MismatchedTransportModeTest {
+class MismatchedTransportModeValidatorTest {
 
   private static final NetexXMLParser NETEX_XML_PARSER = new NetexXMLParser();
 
@@ -955,7 +955,7 @@ class MismatchedTransportModeTest {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    MismatchedTransportMode validator = new MismatchedTransportMode(
+    MismatchedTransportModeValidator validator = new MismatchedTransportModeValidator(
       (code, message, dataLocation) ->
         new ValidationReportEntry(
           message,

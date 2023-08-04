@@ -22,7 +22,7 @@ import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 
-class MismatchedTransportModeIntegrationTest {
+class MismatchedTransportModeValidatorIntegrationTest {
 
   public static final String TEST_FILE_MISSING_TRANSPORT_MODE =
     "NWY_Line_8600_20240131_Missing_transport_mode.xml";
@@ -103,8 +103,8 @@ class MismatchedTransportModeIntegrationTest {
           )
         );
 
-      MismatchedTransportMode mismatchedTransportMode =
-        new MismatchedTransportMode(
+      MismatchedTransportModeValidator mismatchedTransportModeValidator =
+        new MismatchedTransportModeValidator(
           (code, message, dataLocation) ->
             new ValidationReportEntry(
               message,
@@ -115,7 +115,7 @@ class MismatchedTransportModeIntegrationTest {
           stopPlaceRepository
         );
 
-      mismatchedTransportMode.validate(testValidationReport, validationContext);
+      mismatchedTransportModeValidator.validate(testValidationReport, validationContext);
     }
 
     return testValidationReport;

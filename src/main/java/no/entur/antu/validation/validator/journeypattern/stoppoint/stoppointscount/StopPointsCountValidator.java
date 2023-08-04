@@ -1,13 +1,12 @@
-package no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoints;
+package no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount;
 
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.function.Predicate;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -15,18 +14,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Validate that the same stop points are not used
- * in multiple journey patterns.
- * If the same stop points are used in multiple journey patterns,
- * it is an error.
+ * Validates that the number of stop points in a journey pattern
+ * should and should only be 1 more than the service links in
+ * the journey pattern.
  */
-public class SameStopPoints extends AntuNetexValidator {
+public class StopPointsCountValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    SameStopPoints.class
+    StopPointsCountValidator.class
   );
 
-  public SameStopPoints(
+  public StopPointsCountValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -40,7 +38,7 @@ public class SameStopPoints extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return SameStopPointsError.RuleCode.values();
+    return StopPointsCountError.RuleCode.values();
   }
 
   @Override
@@ -48,7 +46,7 @@ public class SameStopPoints extends AntuNetexValidator {
     ValidationReport validationReport,
     ValidationContext validationContext
   ) {
-    LOGGER.debug("Validating Same Stops In Journey Patterns");
+    LOGGER.debug("Validating Stop points or service links In Journey Patterns");
 
     AntuNetexData antuNetexData = createAntuNetexData(
       validationReport,
@@ -57,25 +55,16 @@ public class SameStopPoints extends AntuNetexValidator {
 
     antuNetexData
       .journeyPatterns()
-      .map(SameStopPointsContext::of)
-      .collect(
-        // Two SameStopPointsContexts are equal if their Stop points are equal
-        Collectors.groupingBy(Function.identity(), Collectors.toList())
-      )
-      .entrySet()
-      .stream()
-      .filter(entry -> entry.getValue().size() > 1)
-      .forEach(entry ->
+      .map(StopPointsCountContext::of)
+      .filter(Objects::nonNull)
+      .filter(Predicate.not(StopPointsCountContext::isValid))
+      .forEach(stopPointsCountContext ->
         addValidationReportEntry(
           validationReport,
           validationContext,
-          new SameStopPointsError(
-            SameStopPointsError.RuleCode.SAME_STOP_POINT_IN_JOURNEY_PATTERNS,
-            entry
-              .getValue()
-              .stream()
-              .map(SameStopPointsContext::journeyPatternId)
-              .toList()
+          new StopPointsCountError(
+            StopPointsCountError.RuleCode.INVALID_NUMBER_OF_STOP_POINTS_IN_JOURNEY_PATTERN,
+            stopPointsCountContext.journeyPatternId()
           )
         )
       );

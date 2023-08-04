@@ -20,7 +20,7 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 
-class NonIncreasingPassingTimeIntegrationTest {
+class NonIncreasingPassingTimeValidatorIntegrationTest {
 
   public static final String TEST_CODESPACE = "FLB";
   public static final String TEST_FILE_VALID =
@@ -75,8 +75,8 @@ class NonIncreasingPassingTimeIntegrationTest {
 
       StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);
 
-      NonIncreasingPassingTime nonIncreasingPassingTime =
-        new NonIncreasingPassingTime(
+      NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator =
+        new NonIncreasingPassingTimeValidator(
           (code, message, dataLocation) ->
             new ValidationReportEntry(
               message,
@@ -87,7 +87,7 @@ class NonIncreasingPassingTimeIntegrationTest {
           stopPlaceRepository
         );
 
-      nonIncreasingPassingTime.validate(
+      nonIncreasingPassingTimeValidator.validate(
         testValidationReport,
         validationContext
       );
