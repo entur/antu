@@ -3,27 +3,32 @@ package no.entur.antu.validation.flex.validator.flexiblearea;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import no.entur.antu.netextestdata.NetexTestFragment;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
+import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 
-class InvalidFlexibleAreaTest {
+class InvalidFlexibleAreaTest extends ValidationTest {
+
+  private ValidationReport runValidation(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return runValidationOnCommonFile(
+      netexEntitiesIndex,
+      InvalidFlexibleArea.class
+    );
+  }
 
   @Test
   void testDataSetWithoutFlexibleStopPlacesShouldBeIgnoredGracefully() {
     NetexTestFragment testData = new NetexTestFragment();
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex().create()
     );
 
@@ -177,7 +182,7 @@ class InvalidFlexibleAreaTest {
     FlexibleStopPlace flexibleStopPlace =
       new NetexTestFragment.CreateFlexibleStopPlace().create();
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex(flexibleStopPlace).create()
     );
 
@@ -194,14 +199,14 @@ class InvalidFlexibleAreaTest {
       .flexibleStopPlace(flexibleArea.withPolygon(null))
       .create();
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex(flexibleStopPlace).create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
 
-  private static ValidationReport runTestWithGivenCoordinates(
+  private ValidationReport runTestWithGivenCoordinates(
     List<Double> coordinates
   ) {
     NetexTestFragment testData = new NetexTestFragment();
@@ -215,39 +220,8 @@ class InvalidFlexibleAreaTest {
       .flexibleStopPlace(flexibleArea)
       .create();
 
-    return setupAndRunValidation(
+    return runValidation(
       testData.netexEntitiesIndex(flexibleStopPlace).create()
     );
-  }
-
-  private static ValidationReport setupAndRunValidation(
-    NetexEntitiesIndex netexEntitiesIndex
-  ) {
-    InvalidFlexibleArea invalidFlexibleArea = new InvalidFlexibleArea(
-      (code, message, dataLocation) ->
-        new ValidationReportEntry(
-          message,
-          code,
-          ValidationReportEntrySeverity.ERROR
-        ),
-      null,
-      null
-    );
-
-    ValidationReport testValidationReport = new ValidationReport(
-      "TST",
-      "Test1122"
-    );
-
-    ValidationContextWithNetexEntitiesIndex validationContext = mock(
-      ValidationContextWithNetexEntitiesIndex.class
-    );
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-    when(validationContext.isCommonFile()).thenReturn(true);
-
-    invalidFlexibleArea.validate(testValidationReport, validationContext);
-
-    return testValidationReport;
   }
 }

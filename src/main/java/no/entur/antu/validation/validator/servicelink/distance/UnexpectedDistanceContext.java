@@ -1,4 +1,4 @@
-package no.entur.antu.validation.validator.servicelink;
+package no.entur.antu.validation.validator.servicelink.distance;
 
 import jakarta.xml.bind.JAXBElement;
 import java.util.List;
@@ -19,7 +19,7 @@ import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record InvalidServiceLinkContext(
+public record UnexpectedDistanceContext(
   String serviceLinkId,
   ScheduledStopPointId fromScheduledStopPointId,
   ScheduledStopPointId toScheduledStopPointId,
@@ -37,7 +37,7 @@ public record InvalidServiceLinkContext(
       this.antuNetexData = antuNetexData;
     }
 
-    public InvalidServiceLinkContext build(ServiceLink serviceLink) {
+    public UnexpectedDistanceContext build(ServiceLink serviceLink) {
       QuayId fromQuayId = getQuayId(serviceLink.getFromPointRef());
       QuayId toQuayId = getQuayId(serviceLink.getToPointRef());
 
@@ -70,7 +70,7 @@ public record InvalidServiceLinkContext(
         return null;
       }
 
-      return new InvalidServiceLinkContext(
+      return new UnexpectedDistanceContext(
         serviceLink.getId(),
         new ScheduledStopPointId(serviceLink.getFromPointRef().getRef()),
         new ScheduledStopPointId(serviceLink.getToPointRef().getRef()),
