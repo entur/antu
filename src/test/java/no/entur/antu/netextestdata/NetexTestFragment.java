@@ -458,6 +458,10 @@ public class NetexTestFragment {
       return this;
     }
 
+    public int id() {
+      return id;
+    }
+
     public JourneyPattern create() {
       JourneyPattern journeyPattern = new JourneyPattern()
         .withId("TST:JourneyPattern:" + id);
@@ -548,6 +552,8 @@ public class NetexTestFragment {
     private int order = 1;
     private int scheduledStopPointId = 1;
     private int destinationDisplayId = -1;
+    private boolean forAlighting = false;
+    private boolean forBoarding = false;
 
     public CreateStopPointInJourneyPattern(
       CreateJourneyPattern journeyPattern
@@ -583,6 +589,20 @@ public class NetexTestFragment {
       return this;
     }
 
+    public CreateStopPointInJourneyPattern withForAlighting(
+      boolean forAlighting
+    ) {
+      this.forAlighting = forAlighting;
+      return this;
+    }
+
+    public CreateStopPointInJourneyPattern withForBoarding(
+      boolean forBoarding
+    ) {
+      this.forBoarding = forBoarding;
+      return this;
+    }
+
     public StopPointInJourneyPattern create() {
       StopPointInJourneyPattern stopPointInJourneyPattern =
         new StopPointInJourneyPattern()
@@ -603,6 +623,10 @@ public class NetexTestFragment {
             .getValue()
         );
       }
+
+      stopPointInJourneyPattern.withForAlighting(forAlighting);
+      stopPointInJourneyPattern.withForBoarding(forBoarding);
+
       return stopPointInJourneyPattern;
     }
   }
