@@ -35,7 +35,11 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_STATUS_SUFFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.entur.antu.Constants;
