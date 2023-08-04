@@ -18,7 +18,14 @@
 
 package no.entur.antu.routes.validation;
 
-import static no.entur.antu.Constants.*;
+import static no.entur.antu.Constants.DATASET_CODESPACE;
+import static no.entur.antu.Constants.DATASET_REFERENTIAL;
+import static no.entur.antu.Constants.JOB_TYPE;
+import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
+import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
+import static no.entur.antu.Constants.JOB_TYPE_SPLIT;
+import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
+import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
