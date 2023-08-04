@@ -46,13 +46,12 @@ public class StopPlacesDatasetLoader {
      */
     private void parseDataset(ZipInputStream zipInputStream,
                               NetexEntitiesIndex index) throws IOException {
-        //NOSONAR
+
         ZipEntry zipEntry = zipInputStream.getNextEntry();
         NetexParser netexParser = new NetexParser();
         while (zipEntry != null) {
             byte[] allBytes = zipInputStream.readAllBytes();
             netexParser.parse(new ByteArrayInputStream(allBytes), index);
-            //NOSONAR
             zipEntry = zipInputStream.getNextEntry();
         }
     }

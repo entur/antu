@@ -133,12 +133,12 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
             return new StopPlaceRepository() {
                 @Override
                 public boolean hasStopPlaceId(String stopPlaceId) {
-                    return true;
+                    return false;
                 }
 
                 @Override
                 public boolean hasQuayId(String quayId) {
-                    return true;
+                    return false;
                 }
 
                 @Override
