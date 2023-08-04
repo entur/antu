@@ -33,6 +33,7 @@ import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
 import org.rutebanken.netex.model.FlexibleStopPlacesInFrame_RelStructure;
+import org.rutebanken.netex.model.Interchange_VersionStructure;
 import org.rutebanken.netex.model.JourneyInterchangesInFrame_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
@@ -946,7 +947,7 @@ public class NetexTestFragment {
     private Route route;
     private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
     private final List<Journey_VersionStructure> journeys = new ArrayList<>();
-    private final List<ServiceJourneyInterchange> interchanges =
+    private final List<Interchange_VersionStructure> interchanges =
       new ArrayList<>();
     private final List<ServiceLink> serviceLinks = new ArrayList<>();
     private final List<FlexibleStopPlace> flexibleStopPlaces =
@@ -1019,10 +1020,9 @@ public class NetexTestFragment {
     public NetexEntitiesIndex create() {
       NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
 
-      TimetableFrame timetableFrame = new TimetableFrame()
-        .withVehicleJourneys(
-          new JourneysInFrame_RelStructure().withId("TST:123")
-        );
+      TimetableFrame timetableFrame = new TimetableFrame();
+      SiteFrame siteFrame = new SiteFrame();
+      ServiceFrame serviceFrame = new ServiceFrame();
 
       if (line != null) {
         netexEntitiesIndex.getLineIndex().put(line.getId(), line);
@@ -1032,57 +1032,38 @@ public class NetexTestFragment {
         netexEntitiesIndex.getRouteIndex().put(route.getId(), route);
       }
 
-      journeyPatterns.forEach(journeyPattern ->
-        netexEntitiesIndex
-          .getJourneyPatternIndex()
-          .put(journeyPattern.getId(), journeyPattern)
-      );
-
-      journeys.forEach(journey ->
-        timetableFrame.withVehicleJourneys(
-          new JourneysInFrame_RelStructure()
-            .withId("JR:123")
-            .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-              journey
-            )
-        )
-      );
-
-      interchanges.forEach(interchange ->
-        timetableFrame.withJourneyInterchanges(
-          new JourneyInterchangesInFrame_RelStructure()
-            .withId("TST:123")
-            .withServiceJourneyPatternInterchangeOrServiceJourneyInterchange(
-              interchange
-            )
-        )
-      );
-
-      serviceLinks.forEach(serviceLink ->
-        netexEntitiesIndex
-          .getServiceFrames()
-          .add(
-            new ServiceFrame()
-              .withServiceLinks(
-                new ServiceLinksInFrame_RelStructure()
-                  .withServiceLink(serviceLink)
-              )
+      timetableFrame.withVehicleJourneys(
+        new JourneysInFrame_RelStructure()
+          .withId("JR:123")
+          .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
+            journeys
           )
       );
 
-      flexibleStopPlaces.forEach(flexibleStopPlace ->
-        netexEntitiesIndex
-          .getSiteFrames()
-          .add(
-            new SiteFrame()
-              .withFlexibleStopPlaces(
-                new FlexibleStopPlacesInFrame_RelStructure()
-                  .withFlexibleStopPlace(flexibleStopPlace)
-              )
+      timetableFrame.withJourneyInterchanges(
+        new JourneyInterchangesInFrame_RelStructure()
+          .withId("TST:123")
+          .withServiceJourneyPatternInterchangeOrServiceJourneyInterchange(
+            interchanges
           )
+      );
+
+      serviceFrame.withServiceLinks(
+        new ServiceLinksInFrame_RelStructure()
+          .withId("TST:123")
+          .withServiceLink(serviceLinks)
+      );
+
+      siteFrame.withFlexibleStopPlaces(
+        new FlexibleStopPlacesInFrame_RelStructure()
+          .withId("TST:123")
+          .withFlexibleStopPlace(flexibleStopPlaces)
       );
 
       netexEntitiesIndex.getTimetableFrames().add(timetableFrame);
+      netexEntitiesIndex.getServiceFrames().add(serviceFrame);
+      netexEntitiesIndex.getSiteFrames().add(siteFrame);
+
       fillIndexes(netexEntitiesIndex);
       return netexEntitiesIndex;
     }
@@ -1112,11 +1093,21 @@ public class NetexTestFragment {
           );
       });
 
-      interchanges.forEach(interchange -> {
+      journeyPatterns.forEach(journeyPattern ->
         netexEntitiesIndex
-          .getServiceJourneyInterchangeIndex()
-          .put(interchange.getId(), interchange);
-      });
+          .getJourneyPatternIndex()
+          .put(journeyPattern.getId(), journeyPattern)
+      );
+
+      interchanges
+        .stream()
+        .filter(ServiceJourneyInterchange.class::isInstance)
+        .map(ServiceJourneyInterchange.class::cast)
+        .forEach(interchange ->
+          netexEntitiesIndex
+            .getServiceJourneyInterchangeIndex()
+            .put(interchange.getId(), interchange)
+        );
 
       journeys
         .stream()
