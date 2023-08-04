@@ -26,8 +26,7 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
     }
 
     @Override
-    public QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint,
-                                                  String validationReportId) {
+    public QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint, String validationReportId) {
 
         Map<String, QuayId> idsForReport = scheduledStopPointAndQuayIdCache.get(validationReportId);
         if (idsForReport == null) {
@@ -37,8 +36,7 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
     }
 
     @Override
-    public void loadCommonDataCache(byte[] fileContent,
-                                    String validationReportId) {
+    public void loadCommonDataCache(byte[] fileContent, String validationReportId) {
 
         commonDataResource.loadCommonData(fileContent);
         // Merging with the existing map, for handing the case where there are

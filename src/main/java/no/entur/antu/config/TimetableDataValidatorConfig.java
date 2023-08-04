@@ -20,6 +20,7 @@ import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
+import no.entur.antu.validator.stoppointinjourneypatternvalidator.StopPointInJourneyPatternValidator;
 import no.entur.antu.validator.speedprogressionvalidator.SpeedProgressionValidator;
 import no.entur.antu.validator.transportmodevalidator.TransportModeValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
@@ -81,6 +82,13 @@ public class TimetableDataValidatorConfig {
     }
 
     @Bean
+    public StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator(@Qualifier("validationReportEntryFactory")
+                                                                                 ValidationReportEntryFactory validationReportEntryFactory,
+                                                                                 CommonDataRepository commonDataRepository) {
+        return new StopPointInJourneyPatternValidator(validationReportEntryFactory, commonDataRepository);
+    }
+
+    @Bean
     public NetexValidatorsRunner timetableDataValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
                                                                @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
                                                                NetexIdValidator netexIdValidator,
@@ -91,7 +99,8 @@ public class TimetableDataValidatorConfig {
                                                                @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator,
                                                                TransportModeValidator transportModeValidator,
                                                                NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator,
-                                                               SpeedProgressionValidator speedProgressionValidator) {
+                                                               SpeedProgressionValidator speedProgressionValidator,
+                                                               StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator) {
         List<NetexValidator> netexValidators = List.of(
                 xpathValidator,
                 netexIdValidator,
@@ -102,7 +111,8 @@ public class TimetableDataValidatorConfig {
                 netexIdUniquenessValidator,
                 transportModeValidator,
                 nonIncreasingPassingTimeValidator,
-                speedProgressionValidator
+                speedProgressionValidator,
+                stopPointInJourneyPatternValidator
         );
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
         return new NetexValidatorRunnerWithNetexEntitiesIndex(netexXMLParser, netexSchemaValidator, netexValidators);
