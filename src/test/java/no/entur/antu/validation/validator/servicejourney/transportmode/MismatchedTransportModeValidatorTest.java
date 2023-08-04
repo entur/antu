@@ -224,7 +224,7 @@ class MismatchedTransportModeValidatorTest {
 
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -269,7 +269,7 @@ class MismatchedTransportModeValidatorTest {
 
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -316,7 +316,7 @@ class MismatchedTransportModeValidatorTest {
 
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -359,7 +359,7 @@ class MismatchedTransportModeValidatorTest {
 
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -409,7 +409,7 @@ class MismatchedTransportModeValidatorTest {
     // Mock findQuayId
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -480,7 +480,7 @@ class MismatchedTransportModeValidatorTest {
     // Mock findQuayId
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -526,7 +526,7 @@ class MismatchedTransportModeValidatorTest {
     // Mock findQuayId
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -572,7 +572,7 @@ class MismatchedTransportModeValidatorTest {
     // Mock findQuayId
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -618,7 +618,7 @@ class MismatchedTransportModeValidatorTest {
     // Mock findQuayId
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -664,7 +664,7 @@ class MismatchedTransportModeValidatorTest {
     // Mock findQuayId
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -726,7 +726,7 @@ class MismatchedTransportModeValidatorTest {
     // Mock findQuayId
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -770,7 +770,7 @@ class MismatchedTransportModeValidatorTest {
     // Mock findQuayId
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -835,7 +835,7 @@ class MismatchedTransportModeValidatorTest {
 
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -880,7 +880,7 @@ class MismatchedTransportModeValidatorTest {
 
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )
@@ -926,7 +926,7 @@ class MismatchedTransportModeValidatorTest {
 
     Mockito
       .when(
-        commonDataRepository.findQuayIdForScheduledStopPoint(
+        commonDataRepository.quayIdForScheduledStopPoint(
           TestData.SCHEDULED_STOP_POINT_REF,
           TestData.VALIDATION_REPORT_ID
         )

@@ -138,12 +138,10 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       reportError.accept(
         new SameDepartureArrivalTimeError(
           serviceJourney.getId(),
-          antuNetexData.getStopPointName(
+          antuNetexData.stopPointName(
             passingTimes.from().scheduledStopPointId()
           ),
-          antuNetexData.getStopPointName(
-            passingTimes.to().scheduledStopPointId()
-          ),
+          antuNetexData.stopPointName(passingTimes.to().scheduledStopPointId()),
           SameDepartureArrivalTimeError.RuleCode.SAME_DEPARTURE_ARRIVAL_TIME
         )
       );
@@ -224,12 +222,10 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       reportError.accept(
         new UnexpectedSpeedError(
           context.serviceJourney().getId(),
-          antuNetexData.getStopPointName(
+          antuNetexData.stopPointName(
             passingTimes.from().scheduledStopPointId()
           ),
-          antuNetexData.getStopPointName(
-            passingTimes.to().scheduledStopPointId()
-          ),
+          antuNetexData.stopPointName(passingTimes.to().scheduledStopPointId()),
           UnexpectedSpeedError.RuleCode.LOW_SPEED,
           Comparison.of(
             Long.toString(expectedSpeed.minSpeed()),
@@ -243,10 +239,10 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
         reportError.accept(
           new UnexpectedSpeedError(
             context.serviceJourney().getId(),
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               passingTimes.from().scheduledStopPointId()
             ),
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               passingTimes.to().scheduledStopPointId()
             ),
             UnexpectedSpeedError.RuleCode.HIGH_SPEED,
@@ -260,10 +256,10 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
         reportError.accept(
           new UnexpectedSpeedError(
             context.serviceJourney().getId(),
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               passingTimes.from().scheduledStopPointId()
             ),
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               passingTimes.to().scheduledStopPointId()
             ),
             UnexpectedSpeedError.RuleCode.WARNING_SPEED,

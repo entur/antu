@@ -79,7 +79,8 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
       })
       .choice()
       .when(header(DATASET_NB_COMMON_FILES).isGreaterThan(0))
-      .to("direct:parseAndStoreCommonData")
+      // TODO: Stopping the common data caching her. Trying the new scrapers.
+      //  .to("direct:parseAndStoreCommonData")
       .to("direct:createCommonFilesValidationJobs")
       .otherwise()
       // skip the common file barrier and go directly to the line file job creation step

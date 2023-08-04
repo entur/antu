@@ -104,7 +104,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
         reportError.accept(
           new NonIncreasingPassingTimeError(
             NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME,
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               previousPassingTime.scheduledStopPointId()
             ),
             serviceJourney.getId()
@@ -127,7 +127,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
       reportError.accept(
         new NonIncreasingPassingTimeError(
           NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
-          antuNetexData.getStopPointName(stopTime.scheduledStopPointId()),
+          antuNetexData.stopPointName(stopTime.scheduledStopPointId()),
           serviceJourney.getId()
         )
       );
@@ -137,7 +137,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
       reportError.accept(
         new NonIncreasingPassingTimeError(
           NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
-          antuNetexData.getStopPointName(stopTime.scheduledStopPointId()),
+          antuNetexData.stopPointName(stopTime.scheduledStopPointId()),
           serviceJourney.getId()
         )
       );

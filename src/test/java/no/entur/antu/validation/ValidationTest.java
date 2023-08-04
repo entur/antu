@@ -5,12 +5,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -49,7 +51,7 @@ public class ValidationTest {
   protected void mockGetStopName(ScheduledStopPointId scheduledStopPointId) {
     QuayId quayId = new QuayId("TST:Quay:007");
     when(
-      commonDataRepositoryMock.findQuayIdForScheduledStopPoint(
+      commonDataRepositoryMock.quayIdForScheduledStopPoint(
         scheduledStopPointId,
         VALIDATION_REPORT_ID
       )
@@ -74,7 +76,7 @@ public class ValidationTest {
   ) {
     Mockito
       .when(
-        commonDataRepositoryMock.findQuayIdForScheduledStopPoint(
+        commonDataRepositoryMock.quayIdForScheduledStopPoint(
           eq(scheduledStopPointId),
           anyString()
         )
@@ -97,12 +99,26 @@ public class ValidationTest {
   ) {
     Mockito
       .when(
-        commonDataRepositoryMock.findScheduledStopPointIdsForServiceLink(
+        commonDataRepositoryMock.scheduledStopPointIdsForServiceLink(
           eq(serviceLinkId),
           anyString()
         )
       )
       .thenReturn(scheduledStopPointIds);
+  }
+
+  protected void mockGetServiceJourneyStops(
+    String serviceJourneyId,
+    List<ServiceJourneyStop> serviceJourneyStops
+  ) {
+    Mockito
+      .when(
+        commonDataRepositoryMock.serviceJourneyStops(
+          eq(serviceJourneyId),
+          anyString()
+        )
+      )
+      .thenReturn(serviceJourneyStops);
   }
 
   protected <

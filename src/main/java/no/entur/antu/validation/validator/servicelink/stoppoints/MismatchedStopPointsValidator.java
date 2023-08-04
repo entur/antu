@@ -97,7 +97,7 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
         Optional
           .ofNullable(scheduledStopPointIds)
           .map(getStopPointId)
-          .map(antuNetexData::getStopPointName)
+          .map(antuNetexData::stopPointName)
           .orElse("unknown");
 
     context
