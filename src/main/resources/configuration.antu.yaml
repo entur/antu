@@ -105,3 +105,6 @@ validationRuleConfigs:
   - code: MISSING_MANDATORY_FIELDS_IN_INTERCHANGE
     name: Missing mandatory fields in Interchange
     severity: ERROR
+  - code: DUPLICATE_INTERCHANGES
+    name: Duplicate Interchanges found
+    severity: WARNING
