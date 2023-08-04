@@ -28,14 +28,15 @@ import org.slf4j.LoggerFactory;
  * The expected speed is based on the transport mode of the service journey.
  * The speed is calculated based on the distance between two stops
  * and the time it takes to travel between them.
+ * Chouette reference: 3-VehicleJourney-2
  */
-public class UnexpectedSpeed extends AntuNetexValidator {
+public class UnexpectedSpeedValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    UnexpectedSpeed.class
+    UnexpectedSpeedValidator.class
   );
 
-  public UnexpectedSpeed(
+  public UnexpectedSpeedValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -271,6 +272,7 @@ public class UnexpectedSpeed extends AntuNetexValidator {
             Comparison.of(
               Long.toString(expectedSpeed.warningSpeed()),
               Double.toString(pessimisticSpeed)
+              // TODO: 2 decimal points
             )
           )
         );

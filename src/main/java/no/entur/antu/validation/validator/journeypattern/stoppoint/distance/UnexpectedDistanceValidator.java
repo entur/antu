@@ -9,8 +9,6 @@ import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
 import no.entur.antu.validation.utilities.Comparison;
 import no.entur.antu.validation.utilities.SphericalDistanceLibrary;
-import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceContextBuilder.ScheduledStopPointCoordinates;
-import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceContextBuilder.UnexpectedDistanceContext;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -56,8 +54,8 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
       validationContext
     );
 
-    UnexpectedDistanceContextBuilder builder =
-      new UnexpectedDistanceContextBuilder(antuNetexData);
+    UnexpectedDistanceContext.Builder builder =
+      new UnexpectedDistanceContext.Builder(antuNetexData);
 
     antuNetexData
       .journeyPatterns()
@@ -94,7 +92,7 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
       distanceContext.transportMode()
     );
 
-    ScheduledStopPointCoordinates previous = distanceContext
+    UnexpectedDistanceContext.ScheduledStopPointCoordinates previous = distanceContext
       .scheduledStopPointCoordinates()
       .get(0);
 

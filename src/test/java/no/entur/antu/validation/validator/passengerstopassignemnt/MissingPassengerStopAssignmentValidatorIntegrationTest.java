@@ -13,7 +13,7 @@ import java.io.InputStream;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignment;
+import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -22,7 +22,7 @@ import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-class MissingPassengerStopAssignmentIntegrationTest {
+class MissingPassengerStopAssignmentValidatorIntegrationTest {
 
   public static final String TEST_CODESPACE = "ENT";
   public static final String TEST_FILE_WITH_NO_COMPOSITE_FRAME =
@@ -114,8 +114,8 @@ class MissingPassengerStopAssignmentIntegrationTest {
       when(stopPlaceRepository.getStopPlaceNameForQuayId(any()))
         .thenReturn("TestName");
 
-      MissingPassengerStopAssignment missingPassengerStopAssignment =
-        new MissingPassengerStopAssignment(
+      MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator =
+        new MissingPassengerStopAssignmentValidator(
           (code, message, dataLocation) ->
             new ValidationReportEntry(
               message,
@@ -126,7 +126,7 @@ class MissingPassengerStopAssignmentIntegrationTest {
           stopPlaceRepository
         );
 
-      missingPassengerStopAssignment.validate(
+      missingPassengerStopAssignmentValidator.validate(
         testValidationReport,
         validationContext
       );

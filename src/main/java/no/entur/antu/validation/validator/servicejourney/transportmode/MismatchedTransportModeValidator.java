@@ -22,16 +22,16 @@ import org.slf4j.LoggerFactory;
  * Validates that the transport mode of a service journey matches the quays it visits.
  * The transport mode of a service journey must be matched for the quays it visits.
  */
-public class MismatchedTransportMode extends AntuNetexValidator {
+public class MismatchedTransportModeValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    MismatchedTransportMode.class
+    MismatchedTransportModeValidator.class
   );
   private final CommonDataRepository commonDataRepository;
 
   private final StopPlaceRepository stopPlaceRepository;
 
-  public MismatchedTransportMode(
+  public MismatchedTransportModeValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository

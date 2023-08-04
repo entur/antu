@@ -18,14 +18,22 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ServiceLink;
 
+<<<<<<<< HEAD:src/test/java/no/entur/antu/validation/validator/servicelink/distance/UnexpectedDistanceTest.java
 class UnexpectedDistanceTest extends ValidationTest {
+========
+class UnexpectedDistanceValidatorTest extends ValidationTest {
+>>>>>>>> 93b56ea (Validating the identical stop points in journey pattern):src/test/java/no/entur/antu/validation/validator/servicelink/distance/UnexpectedDistanceValidatorTest.java
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnCommonFile(
       netexEntitiesIndex,
+<<<<<<<< HEAD:src/test/java/no/entur/antu/validation/validator/servicelink/distance/UnexpectedDistanceTest.java
       UnexpectedDistance.class
+========
+      UnexpectedDistanceValidator.class
+>>>>>>>> 93b56ea (Validating the identical stop points in journey pattern):src/test/java/no/entur/antu/validation/validator/servicelink/distance/UnexpectedDistanceValidatorTest.java
     );
   }
 
