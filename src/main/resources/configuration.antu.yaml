@@ -54,3 +54,18 @@ validationRuleConfigs:
   - code: SAME_DEPARTURE_ARRIVAL_TIME
     name: Same departure/arrival time for consecutive stops
     severity: INFO
+  - code: MISSING_SCHEDULED_STOP_ASSIGNMENT
+    name: Missing ScheduledStopAssignment for StopPointInJourneyPattern
+    severity: ERROR
+  - code: DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
+    name: Distance between stop point and start of linestring, exceeds max limit, in LinkSequenceProjection
+    severity: ERROR
+  - code: DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
+    name: Distance between stop point and end of linestring, exceeds max limit, in LinkSequenceProjection
+    severity: ERROR
+  - code: DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
+    name: Distance between stop point and start of linestring, exceeds warning limit, in LinkSequenceProjection
+    severity: WARNING
+  - code: DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
+    name: Distance between stop point and end of linestring, exceeds warning limit, in LinkSequenceProjection
+    severity: WARNING
