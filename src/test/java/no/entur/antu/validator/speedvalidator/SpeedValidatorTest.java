@@ -10,9 +10,9 @@ import java.util.List;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.netextestdata.NetexTestData;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.nonincreasingpassingtime.NetexTestDataSample;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -136,12 +136,28 @@ class SpeedValidatorTest {
 
   @Test
   void testSameDepartureArrivalTimeErrorThrown() {
-    ValidationReport validationReport = runTestWithStopPlaceCoordinates(
-      new NetexTestDataSample(new int[] { 0, 0 }), // Same departure time for both passingTimes.
-      List.of(
-        StopPlaceCoordinates.fromString("11.189184§60.41041"),
-        StopPlaceCoordinates.fromString("11.193265§60.446804")
+    NetexTestData testData = new NetexTestData();
+    JourneyPattern journeyPattern = testData
+      .journeyPattern()
+      .withNumberOfStopPointInJourneyPattern(2)
+      .create();
+
+    // Setting departureTimeOffset to 0 to will make the departure time same for both passingTimes.
+    ServiceJourney serviceJourney = testData
+      .serviceJourney(journeyPattern)
+      .withCreateTimetabledPassingTimes(
+        testData.timetabledPassingTimes().withDepartureTimeOffset(0)
       )
+      .create();
+
+    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+
+    ValidationReport validationReport = runTestWith(
+      List.of(
+        new StopPlaceCoordinates(6.622312, 60.481548),
+        new StopPlaceCoordinates(6.632312, 60.491548)
+      ),
+      testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -162,21 +178,23 @@ class SpeedValidatorTest {
   private static ValidationReport runTestWithStopPlaceCoordinates(
     List<StopPlaceCoordinates> stopPlaceCoordinates
   ) {
-    return runTestWithStopPlaceCoordinates(
-      new NetexTestDataSample(),
-      stopPlaceCoordinates
+    NetexTestData testData = new NetexTestData();
+    JourneyPattern journeyPattern = testData.journeyPattern().create();
+    ServiceJourney serviceJourney = testData
+      .serviceJourney(journeyPattern)
+      .create();
+    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+
+    return runTestWith(
+      stopPlaceCoordinates,
+      testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
     );
   }
 
-  private static ValidationReport runTestWithStopPlaceCoordinates(
-    NetexTestDataSample sample,
-    List<StopPlaceCoordinates> stopPlaceCoordinates
+  private static ValidationReport runTestWith(
+    List<StopPlaceCoordinates> stopPlaceCoordinates,
+    NetexEntitiesIndex netexEntitiesIndex
   ) {
-    ServiceJourney serviceJourney = sample.getServiceJourney();
-    JourneyPattern journeyPattern = sample.getJourneyPattern();
-
-    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
-
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
     );
@@ -201,35 +219,10 @@ class SpeedValidatorTest {
     }
 
     return setupAndRunValidation(
-      createNetexEntitiesIndex(journeyPattern, serviceJourney),
+      netexEntitiesIndex,
       commonDataRepository,
       stopPlaceRepository
     );
-  }
-
-  private static NetexEntitiesIndex createNetexEntitiesIndex(
-    JourneyPattern journeyPattern,
-    ServiceJourney serviceJourney
-  ) {
-    NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
-    netexEntitiesIndex
-      .getJourneyPatternIndex()
-      .put(journeyPattern.getId(), journeyPattern);
-
-    netexEntitiesIndex
-      .getTimetableFrames()
-      .add(
-        new TimetableFrame()
-          .withVehicleJourneys(
-            new JourneysInFrame_RelStructure()
-              .withId("JR:123")
-              .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-                serviceJourney
-              )
-          )
-      );
-
-    return netexEntitiesIndex;
   }
 
   private static ValidationReport setupAndRunValidation(

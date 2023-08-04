@@ -1,6 +1,7 @@
 package no.entur.antu.model;
 
 import no.entur.antu.exception.AntuException;
+import org.locationtech.jts.geom.Coordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.StopPlace;
 
@@ -14,6 +15,11 @@ public record StopPlaceCoordinates(double longitude, double latitude) {
       );
     }
     return null;
+  }
+
+  /** Return Antu domain coordinate as JTS GeoTools Library coordinate. */
+  public Coordinate asJtsCoordinate() {
+    return new Coordinate(longitude, latitude);
   }
 
   /*
