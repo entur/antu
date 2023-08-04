@@ -20,6 +20,8 @@ import no.entur.antu.stop.CurrentStopPlaceResource;
 import no.entur.antu.stop.StopPlaceRepositoryImpl;
 import no.entur.antu.stop.DefaultStopPlaceResource;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stop.fetcher.QuayFetcher;
+import no.entur.antu.stop.fetcher.StopPlaceFetcher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +56,7 @@ public class StopPlaceConfig {
     StopPlaceRepository currentStopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
                                                    Map<String, Set<String>> stopPlaceCache,
                                                    CurrentStopPlaceResource currentStopPlaceResource) {
-        return new StopPlaceRepositoryImpl(currentStopPlaceResource, stopPlaceCache);
+        return new StopPlaceRepositoryImpl(
+                currentStopPlaceResource, stopPlaceCache, new QuayFetcher(), new StopPlaceFetcher());
     }
 }

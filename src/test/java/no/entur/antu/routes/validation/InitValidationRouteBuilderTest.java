@@ -127,18 +127,18 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
             };
         }
 
-        @Bean
+        @Bean(name = "currentStopPlaceRepository")
         @Primary
         public StopPlaceRepository stopPlaceRepository() {
             return new StopPlaceRepository() {
                 @Override
-                public Set<String> getStopPlaceIds() {
-                    return Collections.emptySet();
+                public boolean hasStopPlaceId(String stopPlaceId) {
+                    return true;
                 }
 
                 @Override
-                public Set<String> getQuayIds() {
-                    return Collections.emptySet();
+                public boolean hasQuayId(String quayId) {
+                    return true;
                 }
 
                 @Override

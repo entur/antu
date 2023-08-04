@@ -19,13 +19,13 @@ class ReferenceToNsrValidatorTest {
     void setUpTest() {
         StopPlaceRepository stopPlaceRepository = new StopPlaceRepository() {
             @Override
-            public Set<String> getStopPlaceIds() {
-                return Set.of(STOP_PLACE_ID);
+            public boolean hasStopPlaceId(String stopPlaceId) {
+                return STOP_PLACE_ID.equals(stopPlaceId);
             }
 
             @Override
-            public Set<String> getQuayIds() {
-                return Set.of(QUAY_ID);
+            public boolean hasQuayId(String quayId) {
+                return QUAY_ID.equals(quayId);
             }
 
             @Override
