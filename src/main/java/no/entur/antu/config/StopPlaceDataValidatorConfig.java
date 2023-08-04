@@ -65,7 +65,7 @@ public class StopPlaceDataValidatorConfig {
                 versionOnLocalNetexIdValidator,
                 versionOnRefToLocalNetexIdValidator,
                 referenceToValidEntityTypeValidator,
-                /*netexReferenceValidator,*/
+                netexReferenceValidator,
                 netexIdUniquenessValidator
         );
         NetexXMLParser netexXMLParser = new NetexXMLParser();
