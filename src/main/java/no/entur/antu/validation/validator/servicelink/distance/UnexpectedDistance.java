@@ -1,4 +1,4 @@
-package no.entur.antu.validation.validator.servicelink;
+package no.entur.antu.validation.validator.servicelink.distance;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -23,16 +23,16 @@ import org.slf4j.LoggerFactory;
  * The distance is expected to be within a configured 'WARNING' and 'MAX' limits, and if it exceeds the limit,
  * a warning or an error is added to the validation report.
  */
-public class InvalidServiceLinks extends AntuNetexValidator {
+public class UnexpectedDistance extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    InvalidServiceLinks.class
+    UnexpectedDistance.class
   );
 
   private static final double DISTANCE_WARNING = 20;
   private static final double DISTANCE_MAX = 100;
 
-  public InvalidServiceLinks(
+  public UnexpectedDistance(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -46,7 +46,7 @@ public class InvalidServiceLinks extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return InvalidServiceLinkError.RuleCode.values();
+    return UnexpectedDistanceError.RuleCode.values();
   }
 
   @Override
@@ -61,17 +61,17 @@ public class InvalidServiceLinks extends AntuNetexValidator {
       validationContext
     );
 
-    InvalidServiceLinkContext.Builder contextBuilder =
-      new InvalidServiceLinkContext.Builder(antuNetexData);
+    UnexpectedDistanceContext.Builder contextBuilder =
+      new UnexpectedDistanceContext.Builder(antuNetexData);
 
     antuNetexData
       .serviceLinks()
       .map(contextBuilder::build)
       .filter(Objects::nonNull)
-      .forEach(invalidServiceLinkContext ->
+      .forEach(unexpectedDistanceContext ->
         validateServiceLink(
           antuNetexData,
-          invalidServiceLinkContext,
+          unexpectedDistanceContext,
           error ->
             addValidationReportEntry(validationReport, validationContext, error)
         )
@@ -85,10 +85,14 @@ public class InvalidServiceLinks extends AntuNetexValidator {
   ) {
     /*
     No validation needed for line file
-    We are getting the only in the common file, but it's not the rule.
+
+    We are validating service links only in the common file, but it's not the rule.
+    They can also appear in line file, but they need to refer to the StopPlaceAssignments.
+
     But, what if the StopPlaceAssignments appears in the LineFile:
       The common file does not refer to the line file, so the StopPlaceAssignments
-      will appear in the line file, when the Service links are in the common file.
+      will not appear in the line file, when the Service links are in the common file.
+
     We may need the implement the case where both the Service links and StopPlaceAssignments
     appear in the line file, OR the Service links in the line file and the StopPlaceAssignments
     in the common file.
@@ -102,7 +106,7 @@ public class InvalidServiceLinks extends AntuNetexValidator {
    */
   private void validateServiceLink(
     AntuNetexData antuNetexData,
-    InvalidServiceLinkContext context,
+    UnexpectedDistanceContext context,
     Consumer<ValidationError> reportError
   ) {
     Coordinate startCoordinate = context
@@ -148,15 +152,15 @@ public class InvalidServiceLinks extends AntuNetexValidator {
     AntuNetexData antuNetexData,
     double distance,
     boolean isStart,
-    InvalidServiceLinkContext context,
+    UnexpectedDistanceContext context,
     Consumer<ValidationError> reportError
   ) {
     if (distance > DISTANCE_MAX) {
       reportError.accept(
-        new InvalidServiceLinkError(
+        new UnexpectedDistanceError(
           isStart
-            ? InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
-            : InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
+            ? UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
+            : UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
           Comparison.of(DISTANCE_MAX, distance),
           isStart
             ? antuNetexData.getStopPointName(context.fromScheduledStopPointId())
@@ -168,10 +172,10 @@ public class InvalidServiceLinks extends AntuNetexValidator {
     }
     if (distance > DISTANCE_WARNING) {
       reportError.accept(
-        new InvalidServiceLinkError(
+        new UnexpectedDistanceError(
           isStart
-            ? InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
-            : InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
+            ? UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
+            : UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
           Comparison.of(DISTANCE_WARNING, distance),
           isStart
             ? antuNetexData.getStopPointName(context.fromScheduledStopPointId())

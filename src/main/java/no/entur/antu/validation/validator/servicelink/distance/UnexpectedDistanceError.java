@@ -1,9 +1,9 @@
-package no.entur.antu.validation.validator.servicelink;
+package no.entur.antu.validation.validator.servicelink.distance;
 
 import no.entur.antu.validation.ValidationError;
 import no.entur.antu.validation.utilities.Comparison;
 
-public record InvalidServiceLinkError(
+public record UnexpectedDistanceError(
   RuleCode ruleCode,
   Comparison<Double> distanceComparison,
   String scheduledStopPointName,
@@ -31,7 +31,7 @@ public record InvalidServiceLinkError(
     );
   }
 
-  enum RuleCode implements no.entur.antu.validation.RuleCode {
+  public enum RuleCode implements no.entur.antu.validation.RuleCode {
     DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT(
       "Distance between stop point and start of linestring, exceeds max limit."
     ),
