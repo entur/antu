@@ -1,4 +1,4 @@
-package no.entur.antu.codec;
+package no.entur.antu.cache.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
