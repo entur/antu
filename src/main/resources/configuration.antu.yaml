@@ -78,3 +78,6 @@ validationRuleConfigs:
   - code: INVALID_FLEXIBLE_AREA
     name: Invalid flexible area
     severity: ERROR
+  - code: SAME_STOP_POINT_IN_JOURNEY_PATTERNS
+    name: JourneyPatterns have same StopPoints
+    severity: ERROR
