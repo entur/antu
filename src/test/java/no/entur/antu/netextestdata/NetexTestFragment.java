@@ -5,6 +5,7 @@ import static no.entur.antu.netextestdata.MappingSupport.createWrappedRef;
 
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -12,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BinaryOperator;
-import java.util.stream.Collector;
 import java.util.stream.IntStream;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
@@ -23,7 +22,6 @@ import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
-import org.jetbrains.annotations.NotNull;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DayType;
@@ -31,11 +29,11 @@ import org.rutebanken.netex.model.DayTypeRefStructure;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import org.rutebanken.netex.model.DeadRun;
 import org.rutebanken.netex.model.DestinationDisplayRefStructure;
-import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
 import org.rutebanken.netex.model.FlexibleStopPlacesInFrame_RelStructure;
+import org.rutebanken.netex.model.JourneyInterchangesInFrame_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.Journey_VersionStructure;
@@ -60,6 +58,7 @@ import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceFrame;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.ServiceLinkRefStructure;
 import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
@@ -70,6 +69,7 @@ import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
 import org.rutebanken.netex.model.TimetableFrame;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 public class NetexTestFragment {
 
@@ -122,7 +122,7 @@ public class NetexTestFragment {
     int numberOfJourneyPatterns
   ) {
     return IntStream
-      .range(0, numberOfJourneyPatterns)
+      .rangeClosed(1, numberOfJourneyPatterns)
       .mapToObj(index -> new CreateJourneyPattern().withId(index).create())
       .toList();
   }
@@ -133,7 +133,7 @@ public class NetexTestFragment {
     int numberOfServiceJourneys
   ) {
     return IntStream
-      .range(0, numberOfServiceJourneys)
+      .rangeClosed(1, numberOfServiceJourneys)
       .mapToObj(index ->
         new CreateServiceJourney(line, journeyPattern).withId(index).create()
       )
@@ -149,6 +149,10 @@ public class NetexTestFragment {
       journeyPattern,
       numberOfServiceJourneys
     );
+  }
+
+  public CreateServiceJourneyInterchange serviceJourneyInterchange() {
+    return new CreateServiceJourneyInterchange();
   }
 
   public CreateServiceLink serviceLink(
@@ -753,6 +757,79 @@ public class NetexTestFragment {
     }
   }
 
+  public static class CreateServiceJourneyInterchange {
+
+    private int id = 1;
+    private boolean guaranteed = true;
+    private Duration maximumWaitTime;
+    private String fromPointRef;
+    private String toPointRef;
+    private String fromJourneyRef;
+    private String toJourneyRef;
+
+    public CreateServiceJourneyInterchange withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreateServiceJourneyInterchange withGuaranteed(boolean guaranteed) {
+      this.guaranteed = guaranteed;
+      return this;
+    }
+
+    public CreateServiceJourneyInterchange withMaximumWaitTime(
+      Duration maximumWaitTime
+    ) {
+      this.maximumWaitTime = maximumWaitTime;
+      return this;
+    }
+
+    public CreateServiceJourneyInterchange withFromPointRef(
+      String fromPointRef
+    ) {
+      this.fromPointRef = fromPointRef;
+      return this;
+    }
+
+    public CreateServiceJourneyInterchange withToPointRef(String toPointRef) {
+      this.toPointRef = toPointRef;
+      return this;
+    }
+
+    public CreateServiceJourneyInterchange withFromJourneyRef(
+      String fromJourneyRef
+    ) {
+      this.fromJourneyRef = fromJourneyRef;
+      return this;
+    }
+
+    public CreateServiceJourneyInterchange withToJourneyRef(
+      String toJourneyRef
+    ) {
+      this.toJourneyRef = toJourneyRef;
+      return this;
+    }
+
+    public ServiceJourneyInterchange create() {
+      return new ServiceJourneyInterchange()
+        .withId("TST:ServiceJourneyInterchange:" + id)
+        .withGuaranteed(guaranteed)
+        .withMaximumWaitTime(maximumWaitTime)
+        .withFromPointRef(
+          new ScheduledStopPointRefStructure().withRef(fromPointRef)
+        )
+        .withToPointRef(
+          new ScheduledStopPointRefStructure().withRef(toPointRef)
+        )
+        .withFromJourneyRef(
+          new VehicleJourneyRefStructure().withRef(fromJourneyRef)
+        )
+        .withToJourneyRef(
+          new VehicleJourneyRefStructure().withRef(toJourneyRef)
+        );
+    }
+  }
+
   public static class CreateTimetabledPassingTimes {
 
     private int departureTimeOffset = 5;
@@ -863,12 +940,14 @@ public class NetexTestFragment {
     }
   }
 
-  public class CreateNetexEntitiesIndex {
+  public static class CreateNetexEntitiesIndex {
 
     private Line line;
     private Route route;
     private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
     private final List<Journey_VersionStructure> journeys = new ArrayList<>();
+    private final List<ServiceJourneyInterchange> interchanges =
+      new ArrayList<>();
     private final List<ServiceLink> serviceLinks = new ArrayList<>();
     private final List<FlexibleStopPlace> flexibleStopPlaces =
       new ArrayList<>();
@@ -930,8 +1009,20 @@ public class NetexTestFragment {
       return this;
     }
 
+    public CreateNetexEntitiesIndex addInterchanges(
+      ServiceJourneyInterchange... interchanges
+    ) {
+      this.interchanges.addAll(Arrays.asList(interchanges));
+      return this;
+    }
+
     public NetexEntitiesIndex create() {
       NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
+
+      TimetableFrame timetableFrame = new TimetableFrame()
+        .withVehicleJourneys(
+          new JourneysInFrame_RelStructure().withId("TST:123")
+        );
 
       if (line != null) {
         netexEntitiesIndex.getLineIndex().put(line.getId(), line);
@@ -948,18 +1039,23 @@ public class NetexTestFragment {
       );
 
       journeys.forEach(journey ->
-        netexEntitiesIndex
-          .getTimetableFrames()
-          .add(
-            new TimetableFrame()
-              .withVehicleJourneys(
-                new JourneysInFrame_RelStructure()
-                  .withId("JR:123")
-                  .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-                    journey
-                  )
-              )
-          )
+        timetableFrame.withVehicleJourneys(
+          new JourneysInFrame_RelStructure()
+            .withId("JR:123")
+            .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
+              journey
+            )
+        )
+      );
+
+      interchanges.forEach(interchange ->
+        timetableFrame.withJourneyInterchanges(
+          new JourneyInterchangesInFrame_RelStructure()
+            .withId("TST:123")
+            .withServiceJourneyPatternInterchangeOrServiceJourneyInterchange(
+              interchange
+            )
+        )
       );
 
       serviceLinks.forEach(serviceLink ->
@@ -986,6 +1082,7 @@ public class NetexTestFragment {
           )
       );
 
+      netexEntitiesIndex.getTimetableFrames().add(timetableFrame);
       fillIndexes(netexEntitiesIndex);
       return netexEntitiesIndex;
     }
@@ -1014,6 +1111,22 @@ public class NetexTestFragment {
             passengerStopAssignment.getQuayRef().getValue().getRef()
           );
       });
+
+      interchanges.forEach(interchange -> {
+        netexEntitiesIndex
+          .getServiceJourneyInterchangeIndex()
+          .put(interchange.getId(), interchange);
+      });
+
+      journeys
+        .stream()
+        .filter(ServiceJourney.class::isInstance)
+        .map(ServiceJourney.class::cast)
+        .forEach(journey ->
+          netexEntitiesIndex
+            .getServiceJourneyIndex()
+            .put(journey.getId(), journey)
+        );
     }
   }
 
