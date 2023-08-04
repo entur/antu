@@ -9,13 +9,16 @@ import org.rutebanken.netex.model.*;
 
 public class StopPointInJourneyPatternContextBuilder {
 
+  private final String validationReportId;
   private final CommonDataRepository commonDataRepository;
   private final NetexEntitiesIndex netexEntitiesIndex;
 
   public StopPointInJourneyPatternContextBuilder(
+    String validationReportId,
     CommonDataRepository commonDataRepository,
     NetexEntitiesIndex netexEntitiesIndex
   ) {
+    this.validationReportId = validationReportId;
     this.commonDataRepository = commonDataRepository;
     this.netexEntitiesIndex = netexEntitiesIndex;
   }
@@ -27,8 +30,7 @@ public class StopPointInJourneyPatternContextBuilder {
   ) {}
 
   public List<StopPointInJourneyPatternContext> build(
-    JourneyPattern journeyPattern,
-    String validationReportId
+    JourneyPattern journeyPattern
   ) {
     Function<String, QuayId> quayIdForScheduleStopPoint =
       scheduledStopPointRef ->

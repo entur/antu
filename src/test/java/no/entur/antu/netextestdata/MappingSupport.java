@@ -1,4 +1,4 @@
-package no.entur.antu.validator.nonincreasingpassingtime;
+package no.entur.antu.netextestdata;
 
 import jakarta.xml.bind.JAXBElement;
 import javax.annotation.Nonnull;
@@ -10,7 +10,7 @@ import org.rutebanken.netex.model.VersionOfObjectRefStructure;
  */
 public class MappingSupport {
 
-  /** private constructor to prevent instansiation of utility class */
+  /** private constructor to prevent instantiation of utility class */
   private MappingSupport() {}
 
   /**
