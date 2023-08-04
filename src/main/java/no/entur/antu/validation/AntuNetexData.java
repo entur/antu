@@ -131,7 +131,10 @@ public record AntuNetexData(
       LOGGER.debug(
         "Stop place name cannot be found due to missing stop point assignment."
       );
-      return scheduledStopPointId.id();
+      return Optional
+        .ofNullable(scheduledStopPointId)
+        .map(ScheduledStopPointId::id)
+        .orElse(null);
     }
     return Optional
       .ofNullable(stopPlaceRepository.getStopPlaceNameForQuayId(quayId))
@@ -354,7 +357,6 @@ public record AntuNetexData(
   /**
    * Find the links in journey pattern for the given journey pattern, sorted by order.
    */
-
   public static Stream<LinkInJourneyPattern> linksInJourneyPattern(
     JourneyPattern journeyPattern
   ) {
