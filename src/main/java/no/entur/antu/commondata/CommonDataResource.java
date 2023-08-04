@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.model.QuayId;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.PassengerStopAssignment;
@@ -33,7 +32,7 @@ public class CommonDataResource {
     return netexEntitiesIndex;
   }
 
-  public Map<String, QuayId> getQuayIdsPerScheduledStopPoints() {
+  public Map<String, String> getQuayIdsPerScheduledStopPoints() {
     return getCommonDataIndex()
       .getServiceFrames()
       .stream()
@@ -51,9 +50,7 @@ public class CommonDataResource {
               .getValue()
               .getRef(),
           passengerStopAssignment ->
-            new QuayId(
-              passengerStopAssignment.getQuayRef().getValue().getRef()
-            ),
+            passengerStopAssignment.getQuayRef().getValue().getRef(),
           (v1, v2) -> v2
         )
       );
