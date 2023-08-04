@@ -52,3 +52,6 @@ validationRuleConfigs:
   - code: WARNING_SPEED_PROGRESSION
     name: Fast travel in ServiceJourney
     severity: WARNING
+  - code: MISSING_SCHEDULED_STOP_ASSIGNMENT
+    name: Missing ScheduledStopAssignment for StopPointInJourneyPattern
+    severity: ERROR
