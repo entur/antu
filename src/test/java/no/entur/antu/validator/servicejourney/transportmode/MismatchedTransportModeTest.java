@@ -61,54 +61,54 @@ class MismatchedTransportModeTest {
     public String getData() {
       String data =
         """
-                    <PublicationDelivery xmlns="http://www.netex.org.uk/netex"
-                                         version="1.04:NO-NeTEx-networktimetable:1.0">
-                      <dataObjects>
-                        <CompositeFrame id="TST:CompositeFrame:1" version="any" modification="new">
-                          <frames>
-                            <ServiceFrame id="TST:ServiceFrame:1" version="2023-01-26-065417">
-                              <routes>
-                                <Route id="TST:Route:1-227" version="2023-01-26-065417">
-                                  <${lineType}Ref ref="TST:${lineType}:1" version="any"/>
-                                </Route>
-                              </routes>
-                              <lines>
-                                <${lineType} id="TST:${lineType}:1" version="any">
-                                  ${transportModeInLine}
-                                  ${flexibleLineType}
-                                </${lineType}>
-                              </lines>
-                              <journeyPatterns>
-                                <JourneyPattern id="TST:JourneyPattern:1-227" version="2023-01-26-065417">
-                                  <RouteRef ref="TST:Route:1-227" version="2023-01-26-065417"/>
-                                  <pointsInSequence>
-                                    <StopPointInJourneyPattern id="TST:StopPointInJourneyPattern:1-227-1" version="2023-01-26-065417" order="1">
-                                      <ScheduledStopPointRef ref="TST:ScheduledStopPoint:default-11605"/>
-                                      <ForAlighting>false</ForAlighting>
-                                      <DestinationDisplayRef ref="TST:DestinationDisplay:8015"/>
-                                    </StopPointInJourneyPattern>
-                                    <StopPointInJourneyPattern id="TST:StopPointInJourneyPattern:1-227-20" version="2023-01-26-065417" order="20">
-                                      <ScheduledStopPointRef ref="TST:ScheduledStopPoint:default-11134"/>
-                                      <ForBoarding>false</ForBoarding>
-                                    </StopPointInJourneyPattern>
-                                  </pointsInSequence>
-                                </JourneyPattern>
-                              </journeyPatterns>
-                              ${stopAssignments}
-                            </ServiceFrame>
-                            <TimetableFrame id="TST:TimetableFrame:1" version="2023-01-26-065417">
-                              <vehicleJourneys>
-                                <ServiceJourney id="TST:ServiceJourney:1-173790-25022298" version="2023-01-26-065417">
-                                  <JourneyPatternRef ref="TST:JourneyPattern:1-227" version="2023-01-26-065417"/>
-                                  ${transportModeInServiceJourney}
-                                </ServiceJourney>
-                              </vehicleJourneys>
-                            </TimetableFrame>
-                          </frames>
-                        </CompositeFrame>
-                      </dataObjects>
-                    </PublicationDelivery>
-                    """;
+          <PublicationDelivery xmlns="http://www.netex.org.uk/netex"
+                               version="1.04:NO-NeTEx-networktimetable:1.0">
+            <dataObjects>
+              <CompositeFrame id="TST:CompositeFrame:1" version="any" modification="new">
+                <frames>
+                  <ServiceFrame id="TST:ServiceFrame:1" version="2023-01-26-065417">
+                    <routes>
+                      <Route id="TST:Route:1-227" version="2023-01-26-065417">
+                        <${lineType}Ref ref="TST:${lineType}:1" version="any"/>
+                      </Route>
+                    </routes>
+                    <lines>
+                      <${lineType} id="TST:${lineType}:1" version="any">
+                        ${transportModeInLine}
+                        ${flexibleLineType}
+                      </${lineType}>
+                    </lines>
+                    <journeyPatterns>
+                      <JourneyPattern id="TST:JourneyPattern:1-227" version="2023-01-26-065417">
+                        <RouteRef ref="TST:Route:1-227" version="2023-01-26-065417"/>
+                        <pointsInSequence>
+                          <StopPointInJourneyPattern id="TST:StopPointInJourneyPattern:1-227-1" version="2023-01-26-065417" order="1">
+                            <ScheduledStopPointRef ref="TST:ScheduledStopPoint:default-11605"/>
+                            <ForAlighting>false</ForAlighting>
+                            <DestinationDisplayRef ref="TST:DestinationDisplay:8015"/>
+                          </StopPointInJourneyPattern>
+                          <StopPointInJourneyPattern id="TST:StopPointInJourneyPattern:1-227-20" version="2023-01-26-065417" order="20">
+                            <ScheduledStopPointRef ref="TST:ScheduledStopPoint:default-11134"/>
+                            <ForBoarding>false</ForBoarding>
+                          </StopPointInJourneyPattern>
+                        </pointsInSequence>
+                      </JourneyPattern>
+                    </journeyPatterns>
+                    ${stopAssignments}
+                  </ServiceFrame>
+                  <TimetableFrame id="TST:TimetableFrame:1" version="2023-01-26-065417">
+                    <vehicleJourneys>
+                      <ServiceJourney id="TST:ServiceJourney:1-173790-25022298" version="2023-01-26-065417">
+                        <JourneyPatternRef ref="TST:JourneyPattern:1-227" version="2023-01-26-065417"/>
+                        ${transportModeInServiceJourney}
+                      </ServiceJourney>
+                    </vehicleJourneys>
+                  </TimetableFrame>
+                </frames>
+              </CompositeFrame>
+            </dataObjects>
+          </PublicationDelivery>
+        """;
       return data
         .replace(LINE_TYPE_TEMPLATE, lineType.name())
         .replace(TRANSPORT_MODE_IN_LINE_TEMPLATE, transportModeBlockInLine)
@@ -155,17 +155,17 @@ class MismatchedTransportModeTest {
       stopAssignments =
         String.format(
           """
-                            <stopAssignments>
-                              <PassengerStopAssignment id="TST:PassengerStopAssignment:14452714" order="1" version="366">
-                                <ScheduledStopPointRef ref="%s" version="366"/>
-                                <QuayRef ref="%s"/>
-                              </PassengerStopAssignment>
-                              <PassengerStopAssignment id="TST:PassengerStopAssignment:14452714-2" order="1" version="366">
-                                <ScheduledStopPointRef ref="%s" version="366"/>
-                                <QuayRef ref="%s"/>
-                              </PassengerStopAssignment>
-                            </stopAssignments>
-                            """,
+            <stopAssignments>
+              <PassengerStopAssignment id="TST:PassengerStopAssignment:14452714" order="1" version="366">
+                <ScheduledStopPointRef ref="%s" version="366"/>
+                <QuayRef ref="%s"/>
+              </PassengerStopAssignment>
+              <PassengerStopAssignment id="TST:PassengerStopAssignment:14452714-2" order="1" version="366">
+                <ScheduledStopPointRef ref="%s" version="366"/>
+                <QuayRef ref="%s"/>
+              </PassengerStopAssignment>
+            </stopAssignments>
+          """,
           SCHEDULED_STOP_POINT_REF,
           QUAY_ID.id(),
           SCHEDULED_STOP_POINT_REF_2,
@@ -184,11 +184,11 @@ class MismatchedTransportModeTest {
 
       return String.format(
         """
-                            <TransportMode>%s</TransportMode>
-                            <TransportSubmode>
-                              <%s>%s</%s>
-                            </TransportSubmode>
-                              """,
+          <TransportMode>%s</TransportMode>
+          <TransportSubmode>
+            <%s>%s</%s>
+          </TransportSubmode>
+        """,
         transportMode.value(),
         subModeTagName,
         transportSubMode.name(),
