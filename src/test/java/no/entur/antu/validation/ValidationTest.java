@@ -10,6 +10,8 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -87,6 +89,20 @@ public class ValidationTest {
     Mockito
       .when(stopPlaceRepositoryMock.getCoordinatesForQuayId(quayId))
       .thenReturn(quayCoordinates);
+  }
+
+  protected void mockGetScheduledStopPointIds(
+    ServiceLinkId serviceLinkId,
+    ScheduledStopPointIds scheduledStopPointIds
+  ) {
+    Mockito
+      .when(
+        commonDataRepositoryMock.findScheduledStopPointIdsForServiceLink(
+          eq(serviceLinkId),
+          anyString()
+        )
+      )
+      .thenReturn(scheduledStopPointIds);
   }
 
   protected <
