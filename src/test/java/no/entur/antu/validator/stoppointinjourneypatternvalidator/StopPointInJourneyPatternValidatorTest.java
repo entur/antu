@@ -247,7 +247,7 @@ class StopPointInJourneyPatternValidatorTest {
 
     when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
-    IntStream
+      IntStream
       .range(
         0,
         journeyPattern
