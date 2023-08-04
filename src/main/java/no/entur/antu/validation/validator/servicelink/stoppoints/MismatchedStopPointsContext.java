@@ -22,8 +22,6 @@ public record MismatchedStopPointsContext(
 ) {
   public static final class Builder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
-
     private final AntuNetexData antuNetexData;
 
     public Builder(AntuNetexData antuNetexData) {
@@ -62,9 +60,7 @@ public record MismatchedStopPointsContext(
           .map(serviceLinkId ->
             new AbstractMap.SimpleEntry<>(
               serviceLinkId,
-              antuNetexData.findScheduledStopPointsForServiceLinkId(
-                serviceLinkId
-              )
+              antuNetexData.scheduledStopPointsForServiceLinkId(serviceLinkId)
             )
           )
           .filter(entry -> entry.getValue() != null)

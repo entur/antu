@@ -5,6 +5,8 @@ import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceJourneyId;
+import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 
 /**
@@ -14,17 +16,22 @@ import no.entur.antu.model.ServiceLinkId;
 public interface CommonDataRepository {
   boolean hasQuayIds(String validationReportId);
 
-  QuayId findQuayIdForScheduledStopPoint(
+  QuayId quayIdForScheduledStopPoint(
     ScheduledStopPointId scheduledStopPointId,
     String validationReportId
   );
 
-  ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+  ScheduledStopPointIds scheduledStopPointIdsForServiceLink(
     ServiceLinkId serviceLinkId,
     String validationReportId
   );
 
-  List<LineInfo> getLineNames(String validationReportId);
+  List<LineInfo> lineNames(String validationReportId);
+
+  List<ServiceJourneyStop> serviceJourneyStops(
+    String validationReportId,
+    ServiceJourneyId serviceJourneyId
+  );
 
   void loadCommonDataCache(byte[] fileContent, String validationReportId);
 

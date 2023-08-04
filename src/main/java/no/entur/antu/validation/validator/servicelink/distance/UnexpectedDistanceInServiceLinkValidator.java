@@ -154,8 +154,8 @@ public class UnexpectedDistanceInServiceLinkValidator
             : UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
           Comparison.of(DISTANCE_MAX, distance),
           isStart
-            ? antuNetexData.getStopPointName(context.fromScheduledStopPointId())
-            : antuNetexData.getStopPointName(context.toScheduledStopPointId()),
+            ? antuNetexData.stopPointName(context.fromScheduledStopPointId())
+            : antuNetexData.stopPointName(context.toScheduledStopPointId()),
           context.serviceLinkId()
         )
       );
@@ -169,8 +169,8 @@ public class UnexpectedDistanceInServiceLinkValidator
             : UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
           Comparison.of(DISTANCE_WARNING, distance),
           isStart
-            ? antuNetexData.getStopPointName(context.fromScheduledStopPointId())
-            : antuNetexData.getStopPointName(context.toScheduledStopPointId()),
+            ? antuNetexData.stopPointName(context.fromScheduledStopPointId())
+            : antuNetexData.stopPointName(context.toScheduledStopPointId()),
           context.serviceLinkId()
         )
       );

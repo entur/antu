@@ -74,7 +74,7 @@ public class MissingPassengerStopAssignmentValidator
           validationContext,
           new MissingPassengerStopAssignmentError(
             context.stopPointInJourneyPatternRef(),
-            antuNetexData.getStopPointName(context.scheduledStopPointId()),
+            antuNetexData.stopPointName(context.scheduledStopPointId()),
             MissingPassengerStopAssignmentError.RuleCode.MISSING_SCHEDULED_STOP_ASSIGNMENT
           )
         )
