@@ -13,9 +13,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
+import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
+import net.opengis.gml._3.LinearRingType;
+import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.rutebanken.netex.model.*;
@@ -92,6 +95,14 @@ public class NetexTestFragment {
       .withToScheduledStopPointRef(toScheduledStopPointRef);
   }
 
+  public CreateFlexibleArea flexibleArea() {
+    return new CreateFlexibleArea();
+  }
+
+  public CreateFlexibleStopPlace flexibleStopPlace(FlexibleArea flexibleArea) {
+    return new CreateFlexibleStopPlace().withFlexibleArea(flexibleArea);
+  }
+
   public CreatePassengerStopAssignment passengerStopAssignment() {
     return new CreatePassengerStopAssignment();
   }
@@ -111,6 +122,78 @@ public class NetexTestFragment {
 
   public CreateNetexEntitiesIndex netexEntitiesIndex(ServiceLink serviceLink) {
     return new CreateNetexEntitiesIndex().addServiceLinks(serviceLink);
+  }
+
+  public CreateNetexEntitiesIndex netexEntitiesIndex(
+    FlexibleStopPlace flexibleStopPlace
+  ) {
+    return new CreateNetexEntitiesIndex()
+      .addFlexibleStopPlace(flexibleStopPlace);
+  }
+
+  public static class CreateFlexibleArea {
+
+    private int id = 1;
+
+    private List<Double> coordinates;
+
+    public CreateFlexibleArea withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreateFlexibleArea withCoordinates(List<Double> coordinates) {
+      this.coordinates = coordinates;
+      return this;
+    }
+
+    public FlexibleArea create() {
+      LinearRingType linearRing = new LinearRingType();
+      DirectPositionListType positionList = new DirectPositionListType()
+        .withValue(coordinates);
+      linearRing.withPosList(positionList);
+
+      return new FlexibleArea()
+        .withId("RUT:FlexibleArea:" + id)
+        .withName(new MultilingualString().withValue("FlexibleArea " + id))
+        .withPolygon(
+          new PolygonType()
+            .withExterior(
+              new AbstractRingPropertyType()
+                .withAbstractRing(
+                  new net.opengis.gml._3.ObjectFactory()
+                    .createLinearRing(linearRing)
+                )
+            )
+        );
+    }
+  }
+
+  public static class CreateFlexibleStopPlace {
+
+    private int id = 1;
+
+    private FlexibleArea flexibleArea;
+
+    public CreateFlexibleStopPlace withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreateFlexibleStopPlace withFlexibleArea(FlexibleArea flexibleArea) {
+      this.flexibleArea = flexibleArea;
+      return this;
+    }
+
+    public FlexibleStopPlace create() {
+      return new FlexibleStopPlace()
+        .withId("RUT:FlexibleStopPlace:" + id)
+        .withName(new MultilingualString().withValue("FlexibleStopPlace " + id))
+        .withAreas(
+          new FlexibleStopPlace_VersionStructure.Areas()
+            .withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(flexibleArea)
+        );
+    }
   }
 
   public static class CreatePassengerStopAssignment {
@@ -521,6 +604,16 @@ public class NetexTestFragment {
     private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
     private final List<Journey_VersionStructure> journeys = new ArrayList<>();
     private final List<ServiceLink> serviceLinks = new ArrayList<>();
+    private final List<FlexibleStopPlace> flexibleStopPlaces =
+      new ArrayList<>();
+
+    public CreateNetexEntitiesIndex addFlexibleStopPlace(
+      FlexibleStopPlace... flexibleStopPlace
+    ) {
+      this.flexibleStopPlaces.addAll(Arrays.asList(flexibleStopPlace));
+      return this;
+    }
+
     private final List<PassengerStopAssignment> passengerStopAssignments =
       new ArrayList<>();
 
@@ -592,6 +685,18 @@ public class NetexTestFragment {
               .withServiceLinks(
                 new ServiceLinksInFrame_RelStructure()
                   .withServiceLink(serviceLink)
+              )
+          )
+      );
+
+      flexibleStopPlaces.forEach(flexibleStopPlace ->
+        netexEntitiesIndex
+          .getSiteFrames()
+          .add(
+            new SiteFrame()
+              .withFlexibleStopPlaces(
+                new FlexibleStopPlacesInFrame_RelStructure()
+                  .withFlexibleStopPlace(flexibleStopPlace)
               )
           )
       );
