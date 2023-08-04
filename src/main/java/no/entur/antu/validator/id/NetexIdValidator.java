@@ -43,9 +43,11 @@ public class NetexIdValidator extends AbstractNetexValidator {
         this(validationReportEntryFactory, Set.of());
     }
 
-    public NetexIdValidator(ValidationReportEntryFactory validationReportEntryFactory, Set<String> entityTypesReportedAsWarningForUnapprovedCodespace) {
+    public NetexIdValidator(ValidationReportEntryFactory validationReportEntryFactory,
+                            Set<String> entityTypesReportedAsWarningForUnapprovedCodespace) {
         super(validationReportEntryFactory);
-        this.entityTypesReportedAsWarningForUnapprovedCodespace = Objects.requireNonNull(entityTypesReportedAsWarningForUnapprovedCodespace);
+        this.entityTypesReportedAsWarningForUnapprovedCodespace =
+                Objects.requireNonNull(entityTypesReportedAsWarningForUnapprovedCodespace);
     }
 
     @Override
