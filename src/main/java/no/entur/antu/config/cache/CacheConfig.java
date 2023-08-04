@@ -1,7 +1,8 @@
-package no.entur.antu.config;
+package no.entur.antu.config.cache;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +52,7 @@ public class CacheConfig {
     "scheduledStopPointAndQuayIdCache";
   public static final String SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE =
     "serviceLinksAndScheduledStopPointIdsCache";
+  public static final String LINE_INFO_CACHE = "linesInfoCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
   private static final Logger LOGGER = LoggerFactory.getLogger(
     CacheConfig.class
@@ -141,6 +143,17 @@ public class CacheConfig {
   ) {
     return redissonClient.getLocalCachedMap(
       SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec()),
+      LocalCachedMapOptions.defaults()
+    );
+  }
+
+  @Bean(name = LINE_INFO_CACHE)
+  public Map<String, List<String>> lineNamesCache(
+    RedissonClient redissonClient
+  ) {
+    return redissonClient.getLocalCachedMap(
+      LINE_INFO_CACHE,
       new CompositeCodec(new StringCodec(), new JsonJacksonCodec()),
       LocalCachedMapOptions.defaults()
     );

@@ -1,6 +1,6 @@
 package no.entur.antu.metrics;
 
-import static no.entur.antu.routes.validation.AggregateValidationReportsRouteBuilder.REPORT_CREATION_DATE;
+import static no.entur.antu.Constants.REPORT_CREATION_DATE;
 
 import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.MeterRegistry;

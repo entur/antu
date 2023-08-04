@@ -3,6 +3,7 @@ package no.entur.antu.validation.validator.servicejourney.passingtime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -48,9 +50,11 @@ class NonIncreasingPassingTimeValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(String testFile)
     throws IOException {
+    String validationReportId = "Test1122";
+
     ValidationReport testValidationReport = new ValidationReport(
       TEST_CODESPACE,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -65,26 +69,29 @@ class NonIncreasingPassingTimeValidatorIntegrationTest {
       ValidationContextWithNetexEntitiesIndex validationContext = mock(
         ValidationContextWithNetexEntitiesIndex.class
       );
-      when(validationContext.getNetexEntitiesIndex())
-        .thenReturn(netexEntitiesIndex);
 
       CommonDataRepository commonDataRepository = mock(
         CommonDataRepository.class
       );
       when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
-      StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(
+            validationReportId,
+            netexEntitiesIndex,
+            commonDataRepository,
+            mock(StopPlaceRepository.class)
+          )
+        );
 
       NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator =
-        new NonIncreasingPassingTimeValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          commonDataRepository,
-          stopPlaceRepository
+        new NonIncreasingPassingTimeValidator((code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       nonIncreasingPassingTimeValidator.validate(

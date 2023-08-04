@@ -43,28 +43,18 @@ public class MissingPassengerStopAssignmentValidator
   }
 
   public MissingPassengerStopAssignmentValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating Stop place in journey pattern");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     MissingPassengerStopAssignmentContext.Builder builder =
       new MissingPassengerStopAssignmentContext.Builder(antuNetexData);
@@ -97,7 +87,8 @@ public class MissingPassengerStopAssignmentValidator
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // StopPoints and JourneyPatterns only appear in the Line file.
   }
