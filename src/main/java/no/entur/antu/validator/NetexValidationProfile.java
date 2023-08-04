@@ -17,7 +17,9 @@ public class NetexValidationProfile {
     private final boolean skipSchemaValidation;
     private final boolean skipNetexValidators;
 
-    public NetexValidationProfile(Map<String, NetexValidatorsRunner> netexValidatorsRunners, boolean skipSchemaValidation, boolean skipNetexValidators) {
+    public NetexValidationProfile(Map<String, NetexValidatorsRunner> netexValidatorsRunners,
+                                  boolean skipSchemaValidation,
+                                  boolean skipNetexValidators) {
         this.netexValidatorsRunners = netexValidatorsRunners;
         this.skipSchemaValidation = skipSchemaValidation;
         this.skipNetexValidators = skipNetexValidators;
