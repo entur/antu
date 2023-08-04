@@ -6,6 +6,8 @@ import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.organisation.OrganisationRepository;
@@ -29,6 +31,14 @@ public class TestConfig {
       @Override
       public QuayId findQuayIdForScheduledStopPoint(
         ScheduledStopPointId scheduledStopPointId,
+        String validationReportId
+      ) {
+        return null;
+      }
+
+      @Override
+      public ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+        ServiceLinkId serviceLinkId,
         String validationReportId
       ) {
         return null;
