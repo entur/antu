@@ -18,7 +18,14 @@
 
 package no.entur.antu.routes.validation;
 
-import static no.entur.antu.Constants.*;
+import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
+import static no.entur.antu.Constants.FILENAME_DELIMITER;
+import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
+import static no.entur.antu.Constants.NETEX_COMMON_FILE_NAME;
+import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
+import static no.entur.antu.Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER;
 
 import java.util.HashSet;
 import java.util.Set;

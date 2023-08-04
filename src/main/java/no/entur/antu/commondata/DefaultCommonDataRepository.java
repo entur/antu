@@ -3,6 +3,7 @@ package no.entur.antu.commondata;
 import java.util.Map;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
+import no.entur.antu.model.ScheduledStopPointId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +18,11 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   );
 
   private final CommonDataResource commonDataResource;
-  private final Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache;
+  private final Map<String, Map<ScheduledStopPointId, QuayId>> scheduledStopPointAndQuayIdCache;
 
   public DefaultCommonDataRepository(
     CommonDataResource commonDataResource,
-    Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache
+    Map<String, Map<ScheduledStopPointId, QuayId>> scheduledStopPointAndQuayIdCache
   ) {
     this.commonDataResource = commonDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
@@ -29,27 +30,25 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
 
   @Override
   public boolean hasQuayIds(String validationReportId) {
-    Map<String, QuayId> idsForReport = scheduledStopPointAndQuayIdCache.get(
-      validationReportId
-    );
+    Map<ScheduledStopPointId, QuayId> idsForReport =
+      scheduledStopPointAndQuayIdCache.get(validationReportId);
     return idsForReport != null && !idsForReport.isEmpty();
   }
 
   @Override
   public QuayId findQuayIdForScheduledStopPoint(
-    String scheduledStopPoint,
+    ScheduledStopPointId scheduledStopPointId,
     String validationReportId
   ) {
-    Map<String, QuayId> idsForReport = scheduledStopPointAndQuayIdCache.get(
-      validationReportId
-    );
+    Map<ScheduledStopPointId, QuayId> idsForReport =
+      scheduledStopPointAndQuayIdCache.get(validationReportId);
     if (idsForReport == null) {
       throw new AntuException(
         "Quay ids cache not found for validation report with id: " +
         validationReportId
       );
     }
-    return idsForReport.get(scheduledStopPoint);
+    return idsForReport.get(scheduledStopPointId);
   }
 
   @Override
