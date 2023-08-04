@@ -1,9 +1,12 @@
 package no.entur.antu.commondata;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceLinkId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +22,17 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
 
   private final CommonDataResource commonDataResource;
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
+  private final Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache;
 
   public DefaultCommonDataRepository(
     CommonDataResource commonDataResource,
-    Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache
+    Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
+    Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache
   ) {
     this.commonDataResource = commonDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
+    this.serviceLinksAndScheduledStopPointIdsCache =
+      serviceLinksAndScheduledStopPointIdsCache;
   }
 
   @Override
@@ -54,6 +61,24 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   }
 
   @Override
+  public ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+    ServiceLinkId serviceLinkId,
+    String validationReportId
+  ) {
+    Map<String, String> idsForReport =
+      serviceLinksAndScheduledStopPointIdsCache.get(validationReportId);
+    if (idsForReport == null) {
+      throw new AntuException(
+        "Service links cache not found for validation report with id: " +
+        validationReportId
+      );
+    }
+    return ScheduledStopPointIds.fromString(
+      idsForReport.get(serviceLinkId.id())
+    );
+  }
+
+  @Override
   public void loadCommonDataCache(
     byte[] fileContent,
     String validationReportId
@@ -64,6 +89,22 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
     scheduledStopPointAndQuayIdCache.merge(
       validationReportId,
       commonDataResource.getQuayIdsPerScheduledStopPoints(),
+      (existingMap, newMap) -> {
+        existingMap.putAll(newMap);
+        return existingMap;
+      }
+    );
+
+    Map<String, String> scheduledStopPointIdsPerServiceLinkId =
+      commonDataResource
+        .getScheduledStopPointIdsPerServiceLinkId()
+        .entrySet()
+        .stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    serviceLinksAndScheduledStopPointIdsCache.merge(
+      validationReportId,
+      scheduledStopPointIdsPerServiceLinkId,
       (existingMap, newMap) -> {
         existingMap.putAll(newMap);
         return existingMap;

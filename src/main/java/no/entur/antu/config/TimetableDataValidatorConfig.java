@@ -23,13 +23,16 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.journeypattern.stoppoint.identicalstoppoints.IdenticalStopPoints;
+import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRef;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoints.SameStopPoints;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount.StopPointsCount;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignment;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTime;
 import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeed;
 import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportMode;
-import no.entur.antu.validation.validator.servicelink.InvalidServiceLinks;
+import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistance;
+import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPoints;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
@@ -131,14 +134,14 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public InvalidServiceLinks invalidServiceLinks(
+  public UnexpectedDistance unexpectedDistance(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new InvalidServiceLinks(
+    return new UnexpectedDistance(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -161,6 +164,21 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public IdenticalStopPoints identicalStopPoints(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new IdenticalStopPoints(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
+  }
+
+  @Bean
   public StopPointsCount stopPointsCount(
     @Qualifier(
       "validationReportEntryFactory"
@@ -169,6 +187,36 @@ public class TimetableDataValidatorConfig {
     StopPlaceRepository stopPlaceRepository
   ) {
     return new StopPointsCount(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
+  }
+
+  @Bean
+  public SameQuayRef sameQuayRef(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new SameQuayRef(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
+  }
+
+  @Bean
+  public MismatchedStopPoints unexpectedStopPointRef(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new MismatchedStopPoints(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -191,9 +239,12 @@ public class TimetableDataValidatorConfig {
     NonIncreasingPassingTime nonIncreasingPassingTime,
     UnexpectedSpeed unexpectedSpeed,
     MissingPassengerStopAssignment missingPassengerStopAssignment,
-    InvalidServiceLinks invalidServiceLinks,
+    UnexpectedDistance unexpectedDistance,
     SameStopPoints sameStopPoints,
-    StopPointsCount stopPointsCount
+    StopPointsCount stopPointsCount,
+    SameQuayRef sameQuayRef,
+    IdenticalStopPoints identicalStopPoints,
+    MismatchedStopPoints mismatchedStopPoints
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -207,9 +258,12 @@ public class TimetableDataValidatorConfig {
       nonIncreasingPassingTime,
       unexpectedSpeed,
       missingPassengerStopAssignment,
-      invalidServiceLinks,
+      unexpectedDistance,
       sameStopPoints,
-      stopPointsCount
+      stopPointsCount,
+      sameQuayRef,
+      identicalStopPoints,
+      mismatchedStopPoints
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(

@@ -7,9 +7,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
-import no.entur.antu.codec.QuayCoordinatesCodec;
-import no.entur.antu.codec.QuayIdCodec;
-import no.entur.antu.codec.TransportModesCodec;
+import no.entur.antu.cache.codec.QuayCoordinatesCodec;
+import no.entur.antu.cache.codec.QuayIdCodec;
+import no.entur.antu.cache.codec.TransportModesCodec;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
@@ -49,6 +49,8 @@ public class CacheConfig {
   public static final String COMMON_IDS_CACHE = "commonIdsCache";
   public static final String SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE =
     "scheduledStopPointAndQuayIdCache";
+  public static final String SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE =
+    "serviceLinksAndScheduledStopPointIdsCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
   private static final Logger LOGGER = LoggerFactory.getLogger(
     CacheConfig.class
@@ -129,6 +131,17 @@ public class CacheConfig {
     return redissonClient.getLocalCachedMap(
       STOP_PLACE_NAME_PER_QUAY_ID_CACHE,
       new CompositeCodec(new QuayIdCodec(), new StringCodec()),
+      LocalCachedMapOptions.defaults()
+    );
+  }
+
+  @Bean(name = SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE)
+  public Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache(
+    RedissonClient redissonClient
+  ) {
+    return redissonClient.getLocalCachedMap(
+      SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec()),
       LocalCachedMapOptions.defaults()
     );
   }
