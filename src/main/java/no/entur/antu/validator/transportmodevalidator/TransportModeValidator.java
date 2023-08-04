@@ -19,6 +19,10 @@ import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validates that the transport mode of a service journey is valid for the quays it visits.
+ * The transport mode of a service journey must be valid for the quays it visits.
+ */
 public class TransportModeValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
