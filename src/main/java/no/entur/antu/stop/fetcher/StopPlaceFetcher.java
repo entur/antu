@@ -1,6 +1,7 @@
 package no.entur.antu.stop.fetcher;
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.stop.model.StopPlaceId;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StopPlaceFetcher extends AntuNetexEntityFetcher<StopPlace, String> {
+public class StopPlaceFetcher extends AntuNetexEntityFetcher<StopPlace, StopPlaceId> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StopPlaceFetcher.class);
 
@@ -19,18 +20,18 @@ public class StopPlaceFetcher extends AntuNetexEntityFetcher<StopPlace, String> 
     }
 
     @Override
-    public StopPlace tryFetch(String stopPlaceId) {
+    public StopPlace tryFetch(StopPlaceId stopPlaceId) {
 
-        LOGGER.info("Trying to fetch the stop place with id {}, from read API", stopPlaceId);
+        LOGGER.info("Trying to fetch the stop place with id {}, from read API", stopPlaceId.id());
 
         try {
             return this.webClient.get()
-                    .uri("/quays/{quayId}/stop-place", stopPlaceId)
+                    .uri("stop-places/{stopPlaceId}", stopPlaceId.id())
                     .retrieve()
                     .bodyToMono(StopPlace.class)
                     .block();
         } catch (Exception e) {
-            throw new AntuException("Could not find StopPlace for quay id " + stopPlaceId + " due to " + e.getMessage());
+            throw new AntuException("Could not find StopPlace for id " + stopPlaceId.id() + " due to " + e.getMessage());
         }
     }
 }

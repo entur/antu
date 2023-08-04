@@ -87,7 +87,7 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public ReferenceToNsrValidator nsrRefValidator(@Qualifier("currentStopPlaceRepository")  StopPlaceRepository stopPlaceRepository) {
+    public ReferenceToNsrValidator nsrRefValidator(@Qualifier("stopPlaceRepository")  StopPlaceRepository stopPlaceRepository) {
         return new ReferenceToNsrValidator(stopPlaceRepository);
     }
 
@@ -125,6 +125,4 @@ public class ValidatorConfig {
                 VALIDATION_PROFILE_STOP, stopDataValidatorsRunner
         ), skipSchemaValidation, skipNetexValidators);
     }
-
-
 }

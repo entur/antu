@@ -30,3 +30,15 @@ validationRuleConfigs:
   - code: SITE_FRAME_IN_COMMON_FILE_1
     name: stopPlaces not allowed in flexible line files
     severity: ERROR
+  - code: NETEX_TRANSPORT_MODE_1
+    name: Invalid transport mode
+    severity: ERROR
+  - code: TIMETABLED_PASSING_TIME_INCOMPLETE_TIME
+    name: ServiceJourney has incomplete TimetabledPassingTime
+    severity: ERROR
+  - code: TIMETABLED_PASSING_TIME_INCONSISTENT_TIME
+    name: ServiceJourney has inconsistent TimetabledPassingTime
+    severity: ERROR
+  - code: TIMETABLED_PASSING_TIME_NON_INCREASING_TIME
+    name: ServiceJourney has non-increasing TimetabledPassingTime
+    severity: ERROR

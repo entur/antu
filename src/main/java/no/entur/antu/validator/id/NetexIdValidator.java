@@ -1,6 +1,6 @@
 package no.entur.antu.validator.id;
 
-import no.entur.antu.validator.codespace.NetexCodespace;
+import no.entur.antu.validator.NetexCodespace;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -43,9 +43,11 @@ public class NetexIdValidator extends AbstractNetexValidator {
         this(validationReportEntryFactory, Set.of());
     }
 
-    public NetexIdValidator(ValidationReportEntryFactory validationReportEntryFactory, Set<String> entityTypesReportedAsWarningForUnapprovedCodespace) {
+    public NetexIdValidator(ValidationReportEntryFactory validationReportEntryFactory,
+                            Set<String> entityTypesReportedAsWarningForUnapprovedCodespace) {
         super(validationReportEntryFactory);
-        this.entityTypesReportedAsWarningForUnapprovedCodespace = Objects.requireNonNull(entityTypesReportedAsWarningForUnapprovedCodespace);
+        this.entityTypesReportedAsWarningForUnapprovedCodespace =
+                Objects.requireNonNull(entityTypesReportedAsWarningForUnapprovedCodespace);
     }
 
     @Override

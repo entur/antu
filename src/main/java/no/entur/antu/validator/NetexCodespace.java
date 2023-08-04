@@ -1,4 +1,4 @@
-package no.entur.antu.validator.codespace;
+package no.entur.antu.validator;
 
 import java.util.Locale;
 import java.util.Set;

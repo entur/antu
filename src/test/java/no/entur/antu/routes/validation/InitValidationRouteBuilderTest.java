@@ -37,8 +37,6 @@ package no.entur.antu.routes.validation;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
-import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.util.TestValidationReportUtil;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
@@ -49,15 +47,10 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
 import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
@@ -101,52 +94,6 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
     @EndpointInject("mock:notifyStatus")
     protected MockEndpoint notifyStatus;
-
-    @TestConfiguration
-    static class TestContextConfiguration {
-        @Bean
-        @Primary
-        public OrganisationRepository organisationRepository() {
-            return new OrganisationRepository() {
-                @Override
-                public void refreshCache() {
-
-                }
-
-                @Override
-                public Set<String> getWhitelistedAuthorityIds(String codespace) {
-                    if ("avi".equals(codespace)) {
-                        return Set.of("AVI:Authority:Avinor");
-                    }
-                    if ("flb".equals(codespace)) {
-                        return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
-                    }
-                    return Collections.emptySet();
-
-                }
-            };
-        }
-
-        @Bean(name = "currentStopPlaceRepository")
-        @Primary
-        public StopPlaceRepository stopPlaceRepository() {
-            return new StopPlaceRepository() {
-                @Override
-                public boolean hasStopPlaceId(String stopPlaceId) {
-                    return false;
-                }
-
-                @Override
-                public boolean hasQuayId(String quayId) {
-                    return false;
-                }
-
-                @Override
-                public void refreshCache() {
-                }
-            };
-        }
-    }
 
     @Test
     void testValidateAuthority() throws Exception {

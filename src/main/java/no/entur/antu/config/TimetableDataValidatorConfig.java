@@ -16,7 +16,12 @@
 
 package no.entur.antu.config;
 
+import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
+import no.entur.antu.validator.TransportModeValidator;
+import no.entur.antu.validator.nonincreasingpassingtime.ServiceJourneyNonIncreasingPassingTime;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
@@ -53,6 +58,20 @@ public class TimetableDataValidatorConfig {
     }
 
     @Bean
+    public TransportModeValidator transportModeValidator(@Qualifier("validationReportEntryFactory")
+                                                         ValidationReportEntryFactory validationReportEntryFactory,
+                                                         CommonDataRepository commonDataRepository,
+                                                         StopPlaceRepository currentStopPlaceRepository) {
+        return new TransportModeValidator(validationReportEntryFactory, commonDataRepository, currentStopPlaceRepository);
+    }
+
+    @Bean
+    public ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime(@Qualifier("validationReportEntryFactory")
+                                                                                         ValidationReportEntryFactory validationReportEntryFactory) {
+        return new ServiceJourneyNonIncreasingPassingTime(validationReportEntryFactory);
+    }
+
+    @Bean
     public NetexValidatorsRunner timetableDataValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
                                                                @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
                                                                NetexIdValidator netexIdValidator,
@@ -60,7 +79,9 @@ public class TimetableDataValidatorConfig {
                                                                VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                NetexReferenceValidator netexReferenceValidator,
-                                                               @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator) {
+                                                               NetexIdUniquenessValidator netexIdUniquenessValidator,
+                                                               TransportModeValidator transportModeValidator,
+                                                               ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime) {
         List<NetexValidator> netexValidators = List.of(
                 xpathValidator,
                 netexIdValidator,
@@ -68,10 +89,12 @@ public class TimetableDataValidatorConfig {
                 versionOnRefToLocalNetexIdValidator,
                 referenceToValidEntityTypeValidator,
                 netexReferenceValidator,
-                netexIdUniquenessValidator
+                netexIdUniquenessValidator,
+                transportModeValidator,
+                serviceJourneyNonIncreasingPassingTime
         );
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
-        return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
+        return new NetexValidatorRunnerWithNetexEntitiesIndex(netexXMLParser, netexSchemaValidator, netexValidators);
     }
 
 }

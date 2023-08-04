@@ -42,6 +42,7 @@ public class EnturFlexTimetableDataValidationTreeFactory extends EnturTimetableD
         return validationTree;
     }
 
+    @Override
     protected ValidationTree getSiteFrameValidationTreeForCommonFile(String path) {
         ValidationTree siteFrameValidationTree = new ValidationTree("Site frame in common file", path);
 
