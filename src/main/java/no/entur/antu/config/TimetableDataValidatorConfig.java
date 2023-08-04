@@ -32,7 +32,8 @@ import no.entur.antu.validation.validator.passengerstopassignment.MissingPasseng
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTime;
 import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeed;
 import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportMode;
-import no.entur.antu.validation.validator.servicelink.InvalidServiceLinks;
+import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistance;
+import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPoints;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
@@ -134,14 +135,14 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public InvalidServiceLinks invalidServiceLinks(
+  public UnexpectedDistance unexpectedDistance(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new InvalidServiceLinks(
+    return new UnexpectedDistance(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -239,7 +240,7 @@ public class TimetableDataValidatorConfig {
     NonIncreasingPassingTime nonIncreasingPassingTime,
     UnexpectedSpeed unexpectedSpeed,
     MissingPassengerStopAssignment missingPassengerStopAssignment,
-    InvalidServiceLinks invalidServiceLinks,
+    UnexpectedDistance unexpectedDistance,
     SameStopPoints sameStopPoints,
     StopPointsCount stopPointsCount,
     UnexpectedDistanceValidator unexpectedDistanceValidator,
@@ -258,7 +259,7 @@ public class TimetableDataValidatorConfig {
       nonIncreasingPassingTime,
       unexpectedSpeed,
       missingPassengerStopAssignment,
-      invalidServiceLinks,
+      unexpectedDistance,
       sameStopPoints,
       stopPointsCount,
       unexpectedDistanceValidator,

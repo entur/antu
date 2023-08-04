@@ -2,6 +2,8 @@ package no.entur.antu.commondata;
 
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceLinkId;
 
 /**
  * Repository for common data from the Netex Common file.
@@ -12,6 +14,11 @@ public interface CommonDataRepository {
 
   QuayId findQuayIdForScheduledStopPoint(
     ScheduledStopPointId scheduledStopPointId,
+    String validationReportId
+  );
+
+  ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+    ServiceLinkId serviceLinkId,
     String validationReportId
   );
 

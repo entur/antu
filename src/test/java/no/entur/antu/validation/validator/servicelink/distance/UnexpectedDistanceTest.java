@@ -1,4 +1,4 @@
-package no.entur.antu.validation.validator.servicelink;
+package no.entur.antu.validation.validator.servicelink.distance;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -18,14 +18,14 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ServiceLink;
 
-class InvalidServiceLinkTest extends ValidationTest {
+class UnexpectedDistanceTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnCommonFile(
       netexEntitiesIndex,
-      InvalidServiceLinks.class
+      UnexpectedDistance.class
     );
   }
 
@@ -91,7 +91,7 @@ class InvalidServiceLinkTest extends ValidationTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+          UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
         )
       )
     );
@@ -119,7 +119,7 @@ class InvalidServiceLinkTest extends ValidationTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+          UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
         )
       )
     );
@@ -151,7 +151,7 @@ class InvalidServiceLinkTest extends ValidationTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+          UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
         )
       )
     );
@@ -179,7 +179,7 @@ class InvalidServiceLinkTest extends ValidationTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+          UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
         )
       )
     );
@@ -211,7 +211,7 @@ class InvalidServiceLinkTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+              UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
             )
         )
     );
@@ -223,7 +223,7 @@ class InvalidServiceLinkTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+              UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
             )
         )
     );
@@ -251,7 +251,7 @@ class InvalidServiceLinkTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+              UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
             )
         )
     );
@@ -263,7 +263,7 @@ class InvalidServiceLinkTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+              UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
             )
         )
     );
