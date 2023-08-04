@@ -1,4 +1,4 @@
-package no.entur.antu.validation.validator.servicelink;
+package no.entur.antu.validation.validator.servicelink.distance;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -14,7 +14,7 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 
-class InvalidServiceLinkIntegrationTest {
+class UnexpectedDistanceIntegrationTest {
 
   public static final String TEST_CODESPACE = "AVI";
   public static final String TEST_FILE_WITH_NO_SERVICE_LINKS =
@@ -52,7 +52,7 @@ class InvalidServiceLinkIntegrationTest {
         .thenReturn(netexEntitiesIndex);
       when(validationContext.isCommonFile()).thenReturn(true);
 
-      InvalidServiceLinks invalidServiceLinks = new InvalidServiceLinks(
+      UnexpectedDistance unexpectedDistance = new UnexpectedDistance(
         (code, message, dataLocation) ->
           new ValidationReportEntry(
             message,
@@ -63,7 +63,7 @@ class InvalidServiceLinkIntegrationTest {
         null
       );
 
-      invalidServiceLinks.validate(testValidationReport, validationContext);
+      unexpectedDistance.validate(testValidationReport, validationContext);
     }
 
     return testValidationReport;
