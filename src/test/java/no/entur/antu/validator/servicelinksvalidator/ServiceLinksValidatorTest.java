@@ -364,9 +364,9 @@ class ServiceLinksValidatorTest {
     NetexTestData testData = new NetexTestData();
 
     ValidationReport validationReport = setupAndRunValidation(
-      testData
-        .netexEntitiesIndex()
-        .create(), null, null
+      testData.netexEntitiesIndex().create(),
+      null,
+      null
     );
 
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
