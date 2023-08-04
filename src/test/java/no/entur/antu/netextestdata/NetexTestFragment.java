@@ -50,6 +50,7 @@ import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Projections_RelStructure;
 import org.rutebanken.netex.model.QuayRefStructure;
+import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
@@ -74,34 +75,39 @@ public class NetexTestFragment {
     .withId("EVERYDAY")
     .withName(new MultilingualString().withValue("everyday"));
 
-  private final Line line;
-
-  public NetexTestFragment() {
-    this.line = new CreateLine().create();
+  public CreateLine line() {
+    return new CreateLine();
   }
 
-  public NetexTestFragment(Line line) {
-    this.line = line;
-  }
-
-  public JAXBElement<LineRefStructure> getLineRef() {
-    return createWrappedRef(this.line.getId(), LineRefStructure.class);
+  public CreateRoute route() {
+    return new CreateRoute();
   }
 
   public CreateJourneyPattern journeyPattern() {
     return new CreateJourneyPattern();
   }
 
+  public CreateServiceJourney serviceJourney(
+    Line line,
+    JourneyPattern journeyPattern
+  ) {
+    return new CreateServiceJourney(line, journeyPattern);
+  }
+
   public CreateServiceJourney serviceJourney(JourneyPattern journeyPattern) {
-    return new CreateServiceJourney(journeyPattern);
+    return serviceJourney(new CreateLine().create(), journeyPattern);
   }
 
   public CreateTimetabledPassingTimes timetabledPassingTimes() {
     return new CreateTimetabledPassingTimes();
   }
 
+  public CreateDeadRun deadRun(Line line, JourneyPattern journeyPattern) {
+    return new CreateDeadRun(line, journeyPattern);
+  }
+
   public CreateDeadRun deadRun(JourneyPattern journeyPattern) {
-    return new CreateDeadRun(journeyPattern);
+    return deadRun(new CreateLine().create(), journeyPattern);
   }
 
   public CreateDatedServiceJourney datedServiceJourney() {
@@ -118,15 +124,27 @@ public class NetexTestFragment {
   }
 
   public List<ServiceJourney> createServiceJourneys(
+    Line line,
     JourneyPattern journeyPattern,
     int numberOfServiceJourneys
   ) {
     return IntStream
       .range(0, numberOfServiceJourneys)
       .mapToObj(index ->
-        new CreateServiceJourney(journeyPattern).withId(index).create()
+        new CreateServiceJourney(line, journeyPattern).withId(index).create()
       )
       .toList();
+  }
+
+  public List<ServiceJourney> createServiceJourneys(
+    JourneyPattern journeyPattern,
+    int numberOfServiceJourneys
+  ) {
+    return createServiceJourneys(
+      new CreateLine().create(),
+      journeyPattern,
+      numberOfServiceJourneys
+    );
   }
 
   public CreateServiceLink serviceLink(
@@ -332,8 +350,7 @@ public class NetexTestFragment {
   public static class CreateLine {
 
     private int id = 1;
-    private AllVehicleModesOfTransportEnumeration transportMode =
-      AllVehicleModesOfTransportEnumeration.BUS;
+    private AllVehicleModesOfTransportEnumeration transportMode;
 
     public CreateLine withId(int id) {
       this.id = id;
@@ -347,7 +364,7 @@ public class NetexTestFragment {
       return this;
     }
 
-    private Line create() {
+    public Line create() {
       return new Line()
         .withId("TST:Line:" + id)
         .withName(new MultilingualString().withValue("Line " + id))
@@ -355,9 +372,33 @@ public class NetexTestFragment {
     }
   }
 
+  public static class CreateRoute {
+
+    private int id = 1;
+    private Line line;
+
+    public CreateRoute withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreateRoute withLine(Line line) {
+      this.line = line;
+      return this;
+    }
+
+    public Route create() {
+      return new Route()
+        .withLineRef(
+          createJaxbElement(new LineRefStructure().withRef(line.getId()))
+        )
+        .withId("TST:Route:" + id);
+    }
+  }
+
   public static class CreateJourneyPattern {
 
-    private int routeId = 1;
+    private Route route;
     private int id = 1;
     private int numberOfStopPointInJourneyPattern = 4;
 
@@ -374,8 +415,8 @@ public class NetexTestFragment {
       return this;
     }
 
-    public CreateJourneyPattern withRouteId(int routeId) {
-      this.routeId = routeId;
+    public CreateJourneyPattern withRoute(Route route) {
+      this.route = route;
       return this;
     }
 
@@ -418,23 +459,31 @@ public class NetexTestFragment {
     }
 
     public JourneyPattern create() {
-      RouteRefStructure routeRef = new RouteRefStructure()
-        .withRef("TST:Route:" + routeId);
-
       JourneyPattern journeyPattern = new JourneyPattern()
-        .withId("TST:JourneyPattern:" + id)
-        .withRouteRef(routeRef)
-        .withPointsInSequence(
+        .withId("TST:JourneyPattern:" + id);
+
+      if (route != null) {
+        journeyPattern.withRouteRef(
+          new RouteRefStructure().withRef(route.getId())
+        );
+      }
+
+      if (
+        numberOfStopPointInJourneyPattern > 0 || !pointsInSequence.isEmpty()
+      ) {
+        journeyPattern.withPointsInSequence(
           new PointsInJourneyPattern_RelStructure()
             .withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
-              this.pointsInSequence.isEmpty() &&
-                numberOfStopPointInJourneyPattern > 0
+              this.pointsInSequence.isEmpty()
                 ? createPointsInLinkSequence(numberOfStopPointInJourneyPattern)
                 : this.pointsInSequence
             )
         );
+      }
 
-      if (numberOfServiceLinksInJourneyPattern > 0) {
+      if (
+        numberOfServiceLinksInJourneyPattern > 0 || !linkInSequence.isEmpty()
+      ) {
         journeyPattern.withLinksInSequence(
           new LinksInJourneyPattern_RelStructure()
             .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
@@ -446,6 +495,7 @@ public class NetexTestFragment {
             )
         );
       }
+
       return journeyPattern;
     }
 
@@ -459,7 +509,7 @@ public class NetexTestFragment {
             new CreateStopPointInJourneyPattern(id)
               .withId(index + 1)
               .withOrder(index + 1)
-              .withScheduledStopPointRef(index + 1);
+              .withScheduledStopPointId(index + 1);
 
           // Setting destination display id for first and last stop point
           if (index == 0 || index == numberOfStopPointInJourneyPattern - 1) {
@@ -496,8 +546,14 @@ public class NetexTestFragment {
     private final int journeyPatternId;
     private int id = 1;
     private int order = 1;
-    private int scheduledStopPointId;
+    private int scheduledStopPointId = 1;
     private int destinationDisplayId = -1;
+
+    public CreateStopPointInJourneyPattern(
+      CreateJourneyPattern journeyPattern
+    ) {
+      this.journeyPatternId = journeyPattern.id;
+    }
 
     public CreateStopPointInJourneyPattern(int journeyPatternId) {
       this.journeyPatternId = journeyPatternId;
@@ -513,7 +569,7 @@ public class NetexTestFragment {
       return this;
     }
 
-    public CreateStopPointInJourneyPattern withScheduledStopPointRef(
+    public CreateStopPointInJourneyPattern withScheduledStopPointId(
       int scheduledStopPointId
     ) {
       this.scheduledStopPointId = scheduledStopPointId;
@@ -588,15 +644,16 @@ public class NetexTestFragment {
     }
   }
 
-  public class CreateDeadRun {
+  public static class CreateDeadRun {
 
     private int id = 1;
-
+    private final Line line;
     private final JourneyPattern journeyPattern;
 
     private CreateTimetabledPassingTimes createTimetabledPassingTimes;
 
-    public CreateDeadRun(JourneyPattern journeyPattern) {
+    public CreateDeadRun(Line line, JourneyPattern journeyPattern) {
+      this.line = line;
       this.journeyPattern = journeyPattern;
       this.createTimetabledPassingTimes = new CreateTimetabledPassingTimes();
     }
@@ -616,7 +673,7 @@ public class NetexTestFragment {
     public DeadRun create() {
       return new DeadRun()
         .withId("TST:DeadRun:" + id)
-        .withLineRef(getLineRef())
+        .withLineRef(createLineRef(line.getId()))
         .withDayTypes(createEveryDayRefs())
         .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
         .withPassingTimes(
@@ -628,14 +685,15 @@ public class NetexTestFragment {
     }
   }
 
-  public class CreateServiceJourney {
+  public static class CreateServiceJourney {
 
     private int id = 1;
+    private final Line line;
     private final JourneyPattern journeyPattern;
-
     private CreateTimetabledPassingTimes createTimetabledPassingTimes;
 
-    public CreateServiceJourney(JourneyPattern journeyPattern) {
+    public CreateServiceJourney(Line line, JourneyPattern journeyPattern) {
+      this.line = line;
       this.journeyPattern = journeyPattern;
       this.createTimetabledPassingTimes = new CreateTimetabledPassingTimes();
     }
@@ -655,7 +713,7 @@ public class NetexTestFragment {
     public ServiceJourney create() {
       return new ServiceJourney()
         .withId("TST:ServiceJourney:" + id)
-        .withLineRef(getLineRef())
+        .withLineRef(createLineRef(line.getId()))
         .withDayTypes(createEveryDayRefs())
         .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
         .withPassingTimes(
@@ -777,13 +835,25 @@ public class NetexTestFragment {
     }
   }
 
-  public static class CreateNetexEntitiesIndex {
+  public class CreateNetexEntitiesIndex {
 
+    private Line line;
+    private Route route;
     private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
     private final List<Journey_VersionStructure> journeys = new ArrayList<>();
     private final List<ServiceLink> serviceLinks = new ArrayList<>();
     private final List<FlexibleStopPlace> flexibleStopPlaces =
       new ArrayList<>();
+
+    public CreateNetexEntitiesIndex addLine(Line line) {
+      this.line = line;
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addRoute(Route route) {
+      this.route = route;
+      return this;
+    }
 
     public CreateNetexEntitiesIndex addFlexibleStopPlace(
       FlexibleStopPlace... flexibleStopPlace
@@ -834,6 +904,15 @@ public class NetexTestFragment {
 
     public NetexEntitiesIndex create() {
       NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
+
+      if (line != null) {
+        netexEntitiesIndex.getLineIndex().put(line.getId(), line);
+      }
+
+      if (route != null) {
+        netexEntitiesIndex.getRouteIndex().put(route.getId(), route);
+      }
+
       journeyPatterns.forEach(journeyPattern ->
         netexEntitiesIndex
           .getJourneyPatternIndex()
@@ -938,6 +1017,10 @@ public class NetexTestFragment {
     String id
   ) {
     return createWrappedRef(id, JourneyPatternRefStructure.class);
+  }
+
+  private static JAXBElement<LineRefStructure> createLineRef(String id) {
+    return createWrappedRef(id, LineRefStructure.class);
   }
 
   private static JAXBElement<DestinationDisplayRefStructure> createDestinationDisplayRef(
