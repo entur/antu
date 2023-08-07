@@ -44,7 +44,7 @@ public class CurrentStopPlaceResource implements StopPlaceResource {
                 .collect(Collectors.toSet());
     }
 
-    private NetexEntitiesIndex getNetexEntitiesIndex() {
+    protected NetexEntitiesIndex getNetexEntitiesIndex() {
         if (netexEntitiesIndex == null) {
             throw new AntuException("Stop places dataset not loaded");
         }
