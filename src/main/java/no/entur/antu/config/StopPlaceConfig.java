@@ -21,6 +21,7 @@ import no.entur.antu.stop.StopPlaceRepositoryImpl;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.fetcher.QuayFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceFetcher;
+import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,11 +35,29 @@ public class StopPlaceConfig {
 
     @Bean
     @Profile("!test")
+    CurrentStopPlaceResource currentStopPlaceResource(StopPlacesDatasetLoader stopPlacesDatasetLoader) {
+        return new CurrentStopPlaceResource(stopPlacesDatasetLoader);
+    }
+
+    @Bean
+    @Profile("!test")
     StopPlaceRepository currentStopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
                                                    Map<String, Set<String>> stopPlaceCache,
-                                                   CurrentStopPlaceResource currentStopPlaceResource,
                                                    StopPlaceFetcher stopPlaceFetcher,
-                                                   QuayFetcher quayFetcher) {
-        return new StopPlaceRepositoryImpl(currentStopPlaceResource, stopPlaceCache, quayFetcher, stopPlaceFetcher);
+                                                   QuayFetcher quayFetcher,
+                                                   @Qualifier("transportModePerStopPlaceCache")
+                                                   Map<String, String> transportModePerStopPlaceCache,
+                                                   @Qualifier("transportSubModePerStopPlaceCache")
+                                                   Map<String, String> transportSubModePerStopPlaceCache,
+                                                   @Qualifier("currentStopPlaceResource")
+                                                   CurrentStopPlaceResource currentStopPlaceResource) {
+        return new StopPlaceRepositoryImpl(
+                currentStopPlaceResource,
+                stopPlaceCache,
+                transportModePerStopPlaceCache,
+                transportSubModePerStopPlaceCache,
+                quayFetcher,
+                stopPlaceFetcher
+        );
     }
 }

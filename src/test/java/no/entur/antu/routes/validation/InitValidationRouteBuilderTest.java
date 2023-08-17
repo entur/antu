@@ -142,6 +142,16 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
                 }
 
                 @Override
+                public String getTransportModeForStopPlaceId(String stopPlaceId) {
+                    return null;
+                }
+
+                @Override
+                public String getTransportSubModeForStopPlaceId(String stopPlaceId) {
+                    return null;
+                }
+
+                @Override
                 public void refreshCache() {
                 }
             };
