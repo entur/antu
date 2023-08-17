@@ -31,10 +31,10 @@ public class CacheConfig {
 
     public static final String ORGANISATION_CACHE = "organisationCache";
     public static final String STOP_PLACE_AND_QUAY_CACHE = "stopPlaceAndQuayCache";
+    public static final String TRANSPORT_MODE_PER_STOP_PLACE_CACHE = "transportModePerStopPlaceCache";
+    public static final String TRANSPORT_SUB_MODE_PER_STOP_PLACE_CACHE = "transportSubModePerStopPlaceCache";
     public static final String COMMON_IDS_CACHE = "commonIdsCache";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfig.class);
-
 
     @Bean
     public Config redissonConfig(RedisProperties redisProperties,
@@ -70,8 +70,6 @@ public class CacheConfig {
                     .setPassword(authenticationString);
             return redissonConfig;
         }
-
-
     }
 
     @Bean(destroyMethod = "shutdown")
@@ -80,6 +78,16 @@ public class CacheConfig {
         return Redisson.create(redissonConfig);
     }
 
+
+    @Bean
+    public Map<String, String> transportModePerStopPlaceCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(TRANSPORT_MODE_PER_STOP_PLACE_CACHE, LocalCachedMapOptions.defaults());
+    }
+
+    @Bean
+    public Map<String, String> transportSubModePerStopPlaceCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(TRANSPORT_SUB_MODE_PER_STOP_PLACE_CACHE, LocalCachedMapOptions.defaults());
+    }
 
     @Bean
     public Map<String, Set<String>> stopPlaceAndQuayCache(RedissonClient redissonClient) {
