@@ -33,6 +33,18 @@ public interface StopPlaceRepository {
     boolean hasQuayId(String quayId);
 
     /**
+     * Returns the transport mode for stop place present in the cache or try getting it from Read api.
+     * @return transport mode for given stop place id.
+     */
+    String getTransportModeForStopPlaceId(String stopPlaceId);
+
+    /**
+     * Returns the transport mode for stop place present in the cache or try getting it from Read api.
+     * @return transport mode for given stop place id.
+     */
+    String getTransportSubModeForStopPlaceId(String stopPlaceId);
+
+    /**
      * Refresh the cache with data retrieved from the Stop Place Register.
      */
     void refreshCache();
