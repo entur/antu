@@ -11,6 +11,7 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
 import org.redisson.codec.Kryo5Codec;
 import org.redisson.config.Config;
+import org.rutebanken.netex.model.VehicleModeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,13 +35,14 @@ public class CacheConfig {
     public static final String TRANSPORT_MODE_PER_STOP_PLACE_CACHE = "transportModePerStopPlaceCache";
     public static final String TRANSPORT_SUB_MODE_PER_STOP_PLACE_CACHE = "transportSubModePerStopPlaceCache";
     public static final String COMMON_IDS_CACHE = "commonIdsCache";
+    public static final String STOP_PLACE_IDS_PER_SCHEDULED_STOP_POINTS = "stopPlaceIdsPerScheduledStopPoints";
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfig.class);
 
     @Bean
     public Config redissonConfig(RedisProperties redisProperties,
                                  @Value("${antu.redis.server.trust.store.file:}") String trustStoreFile,
                                  @Value("${antu.redis.server.trust.store.password:}") String trustStorePassword,
-                                 @Value("${antu.redis.authentication.string:}") String authenticationString ) throws MalformedURLException {
+                                 @Value("${antu.redis.authentication.string:}") String authenticationString) throws MalformedURLException {
         Config redissonConfig = new Config();
 
         Codec codec = new Kryo5Codec(this.getClass().getClassLoader());
@@ -80,13 +82,18 @@ public class CacheConfig {
 
 
     @Bean
-    public Map<String, String> transportModePerStopPlaceCache(RedissonClient redissonClient) {
+    public Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache(RedissonClient redissonClient) {
         return redissonClient.getLocalCachedMap(TRANSPORT_MODE_PER_STOP_PLACE_CACHE, LocalCachedMapOptions.defaults());
     }
 
     @Bean
     public Map<String, String> transportSubModePerStopPlaceCache(RedissonClient redissonClient) {
         return redissonClient.getLocalCachedMap(TRANSPORT_SUB_MODE_PER_STOP_PLACE_CACHE, LocalCachedMapOptions.defaults());
+    }
+
+    @Bean
+    public RLocalCachedMap<String, String> stopPlaceIdPerScheduledStopPointsCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(STOP_PLACE_IDS_PER_SCHEDULED_STOP_POINTS, LocalCachedMapOptions.defaults());
     }
 
     @Bean
