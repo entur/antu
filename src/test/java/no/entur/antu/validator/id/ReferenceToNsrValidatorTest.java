@@ -5,6 +5,8 @@ import org.entur.netex.validation.validator.id.IdVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 import java.util.Set;
 
@@ -26,6 +28,16 @@ class ReferenceToNsrValidatorTest {
             @Override
             public boolean hasQuayId(String quayId) {
                 return QUAY_ID.equals(quayId);
+            }
+
+            @Override
+            public VehicleModeEnumeration getTransportModeForStopPlaceId(String stopPlaceId) {
+                return null;
+            }
+
+            @Override
+            public String getTransportSubModeForStopPlaceId(String stopPlaceId) {
+                return null;
             }
 
             @Override

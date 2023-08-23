@@ -33,7 +33,13 @@ public class NetexValidationProfile {
      * @param fileContent        the binary content of the NeTEx file.
      * @return a ValidationReport listing the findings for this NeTEx file.
      */
-    public ValidationReport validate(String validationProfile, String codespace, String validationReportId, String filename, byte[] fileContent, NetexValidationProgressCallBack netexValidationProgressCallBack) {
+    public ValidationReport validate(String validationProfile,
+                                     String codespace,
+                                     String validationReportId,
+                                     String filename,
+                                     byte[] fileContent,
+                                     NetexValidationProgressCallBack netexValidationProgressCallBack) {
+
         if (validationProfile == null) {
             throw new AntuException("Missing validation profile");
         }

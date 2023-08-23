@@ -48,6 +48,7 @@ import org.apache.camel.component.mock.MockEndpoint;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.rutebanken.netex.model.VehicleModeEnumeration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -142,7 +143,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
                 }
 
                 @Override
-                public String getTransportModeForStopPlaceId(String stopPlaceId) {
+                public VehicleModeEnumeration getTransportModeForStopPlaceId(String stopPlaceId) {
                     return null;
                 }
 
