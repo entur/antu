@@ -125,6 +125,4 @@ public class ValidatorConfig {
                 VALIDATION_PROFILE_STOP, stopDataValidatorsRunner
         ), skipSchemaValidation, skipNetexValidators);
     }
-
-
 }

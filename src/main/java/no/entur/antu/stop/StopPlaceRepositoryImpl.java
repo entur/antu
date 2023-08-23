@@ -19,6 +19,7 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.VehicleModeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,14 +37,14 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     private final StopPlaceResource stopPlaceResource;
     private final Map<String, Set<String>> stopPlaceCache;
-    private final Map<String, String> transportModePerStopPlaceCache;
+    private final Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache;
     private final Map<String, String> transportSubModePerStopPlaceCache;
     private final NetexEntityFetcher<Quay, String> quayFetcher;
     private final NetexEntityFetcher<StopPlace, String> stopPlaceFetcher;
 
     public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
                                    Map<String, Set<String>> stopPlaceCache,
-                                   Map<String, String> transportModePerStopPlaceCache,
+                                   Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache,
                                    Map<String, String> transportSubModePerStopPlaceCache) {
         this(stopPlaceResource,
                 stopPlaceCache,
@@ -59,7 +60,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
                                    Map<String, Set<String>> stopPlaceCache,
-                                   Map<String, String> transportModePerStopPlaceCache,
+                                   Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache,
                                    Map<String, String> transportSubModePerStopPlaceCache,
                                    NetexEntityFetcher<Quay, String> quayFetcher,
                                    NetexEntityFetcher<StopPlace, String> stopPlaceFetcher) {
@@ -92,10 +93,10 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
     }
 
     @Override
-    public String getTransportModeForStopPlaceId(String stopPlaceId) {
+    public VehicleModeEnumeration getTransportModeForStopPlaceId(String stopPlaceId) {
         return transportModePerStopPlaceCache.computeIfAbsent(
                 stopPlaceId,
-                id -> stopPlaceFetcher.tryFetch(id).getTransportMode().value());
+                id -> stopPlaceFetcher.tryFetch(id).getTransportMode());
     }
 
     @Override
@@ -111,9 +112,8 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         stopPlaceResource.loadStopPlacesDataset();
         stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceResource.getStopPlaceIds());
         stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
-        stopPlaceResource.getTransportModesPerStopPlace()
-                .forEach((sid, mode) -> transportModePerStopPlaceCache.put(sid, mode.value()));
-        transportModePerStopPlaceCache.putAll(stopPlaceResource.getTransportSubModesPerStopPlace());
+        transportModePerStopPlaceCache.putAll(stopPlaceResource.getTransportModesPerStopPlace());
+        transportSubModePerStopPlaceCache.putAll(stopPlaceResource.getTransportSubModesPerStopPlace());
 
         LOGGER.debug("Updated stop places and quays cache. Cache now has {} stop places and {} quays",
                 stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(),

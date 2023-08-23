@@ -22,6 +22,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.fetcher.QuayFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceFetcher;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
+import org.rutebanken.netex.model.VehicleModeEnumeration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +47,7 @@ public class StopPlaceConfig {
                                                    StopPlaceFetcher stopPlaceFetcher,
                                                    QuayFetcher quayFetcher,
                                                    @Qualifier("transportModePerStopPlaceCache")
-                                                   Map<String, String> transportModePerStopPlaceCache,
+                                                   Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache,
                                                    @Qualifier("transportSubModePerStopPlaceCache")
                                                    Map<String, String> transportSubModePerStopPlaceCache,
                                                    @Qualifier("currentStopPlaceResource")
