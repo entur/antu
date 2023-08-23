@@ -52,7 +52,7 @@ public class CurrentStopPlaceResource implements StopPlaceResource {
                 .toList();
 
         return list.stream()
-                .filter(stopPlace -> stopPlace.getTransportMode() != null)
+                .filter(stopPlace -> stopPlace.getTransportMode() != null) // TODO: Do we need to check the parent??
                 .collect(Collectors.toMap(
                         StopPlace::getId,
                         StopPlace_VersionStructure::getTransportMode

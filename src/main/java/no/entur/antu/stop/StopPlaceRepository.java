@@ -15,6 +15,9 @@
 
 package no.entur.antu.stop;
 
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.VehicleModeEnumeration;
+
 /**
  * A repository to store and cache the stop place and quay ids retrieved from the National Stop Register.
  */
@@ -36,7 +39,7 @@ public interface StopPlaceRepository {
      * Returns the transport mode for stop place present in the cache or try getting it from Read api.
      * @return transport mode for given stop place id.
      */
-    String getTransportModeForStopPlaceId(String stopPlaceId);
+    VehicleModeEnumeration getTransportModeForStopPlaceId(String stopPlaceId);
 
     /**
      * Returns the transport mode for stop place present in the cache or try getting it from Read api.
