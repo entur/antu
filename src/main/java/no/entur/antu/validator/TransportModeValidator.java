@@ -11,10 +11,12 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class TransportModeValidator extends AbstractNetexValidator {
 
@@ -58,7 +60,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
                 ).toList();
 
         serviceJourneys.stream()
-                .filter(Predicate.not(this::validateServiceJourney))
+                .filter(Predicate.not(serviceJourneyContext -> validateServiceJourney(serviceJourneyContext, validationContext)))
                 .forEach(serviceJourneyContext -> validationReport.addValidationReportEntry(
                         createValidationReportEntry(
                                 RULE_CODE_NETEX_TRANSPORT_MODE_1,
@@ -77,53 +79,73 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
     }
 
-    private boolean validateServiceJourney(ServiceJourneyContext serviceJourneyContext) {
+    private boolean validateServiceJourney(ServiceJourneyContext serviceJourneyContext,
+                                           ValidationContext validationContext) {
         return serviceJourneyContext.scheduledStopPoints.stream()
                 .map(commonDataRepository::findStopPlaceId)
-                .map(stopPlaceRepository::getTransportModeForStopPlaceId)
-                .allMatch(stopPlaceTransportMode -> isValidTransportMode(serviceJourneyContext.transportMode(), stopPlaceTransportMode));
+                .allMatch(stopPlaceId ->
+                        isValidTransportMode(
+                                serviceJourneyContext::transportMode,
+                                () -> getBusSubmodeForServiceJourney(serviceJourneyContext.serviceJourneyItem, validationContext),
+                                () -> stopPlaceRepository.getTransportModeForStopPlaceId(stopPlaceId),
+                                () -> stopPlaceRepository.getTransportSubModeForStopPlaceId(stopPlaceId)
+                        )
+                );
     }
 
-    private boolean isValidTransportMode(AllVehicleModesOfTransportEnumeration serviceJourneyTransportMode, VehicleModeEnumeration stopPlaceTransportMode) {
-        if (serviceJourneyTransportMode == null || stopPlaceTransportMode == null) {
+    private boolean isValidTransportMode(Supplier<AllVehicleModesOfTransportEnumeration> getTransportModeForServiceJourney,
+                                         Supplier<BusSubmodeEnumeration> getBusSubModeForServiceJourney,
+                                         Supplier<VehicleModeEnumeration> getTransportModeForStopPlace,
+                                         Supplier<String> getTransportSubModeForStopPlace) {
+
+        VehicleModeEnumeration transportModeForStopPlace = getTransportModeForStopPlace.get();
+        AllVehicleModesOfTransportEnumeration transportModeForServiceJourney = getTransportModeForServiceJourney.get();
+        if (transportModeForServiceJourney == null || transportModeForStopPlace == null) {
             return true;
-        } else if ((serviceJourneyTransportMode.equals(AllVehicleModesOfTransportEnumeration.COACH) && stopPlaceTransportMode.equals(VehicleModeEnumeration.BUS))
-                || (serviceJourneyTransportMode.equals(AllVehicleModesOfTransportEnumeration.BUS) && stopPlaceTransportMode.equals(VehicleModeEnumeration.COACH))) {
-            // Coach and bus are interchangeable
-            return true;
-        } else if (serviceJourneyTransportMode.equals(AllVehicleModesOfTransportEnumeration.TAXI)
-                && (stopPlaceTransportMode.equals(VehicleModeEnumeration.BUS) || stopPlaceTransportMode.equals(VehicleModeEnumeration.COACH))) {
-            // Taxi can stop on bus and coach stops
-            return true;
-        } else {
-            return serviceJourneyTransportMode.value().equals(stopPlaceTransportMode.value());
         }
-    }
 
-    /*
-    private boolean validCombination(TransportModeNameEnum vehicleJourneyTransportMode,
-                                     TransportSubModeNameEnum vehicleJourneyTransportSubMode,
-                                     TransportModeNameEnum stopMode,
-                                     TransportSubModeNameEnum stopSubMode) {
+        // Coach and bus are interchangeable
+        if ((transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.COACH) && transportModeForStopPlace.equals(VehicleModeEnumeration.BUS))
+                || (transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.BUS) && transportModeForStopPlace.equals(VehicleModeEnumeration.COACH))) {
+            return true;
+        }
 
-        if (vehicleJourneyTransportMode == null || stopMode == null) {
+        // Taxi can stop on bus and coach stops
+        if (transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.TAXI)
+                && (transportModeForStopPlace.equals(VehicleModeEnumeration.BUS) || transportModeForStopPlace.equals(VehicleModeEnumeration.COACH))) {
             return true;
-        } else if ((TransportModeNameEnum.Coach == vehicleJourneyTransportMode && TransportModeNameEnum.Bus == stopMode) ||
-                (TransportModeNameEnum.Bus == vehicleJourneyTransportMode && TransportModeNameEnum.Coach == stopMode)) {
-            // Coach and bus are interchangeable
-            return true;
-        } else if (TransportModeNameEnum.Taxi == vehicleJourneyTransportMode && (stopMode == TransportModeNameEnum.Bus || stopMode == TransportModeNameEnum.Coach)) {
-            return true;
-        } else if (vehicleJourneyTransportMode != stopMode) {
-            return false;
-        } else if (TransportSubModeNameEnum.RailReplacementBus == stopSubMode && vehicleJourneyTransportSubMode != null && TransportSubModeNameEnum.RailReplacementBus != vehicleJourneyTransportSubMode) {
+        }
+
+        if (transportModeForServiceJourney.value().equals(transportModeForStopPlace.value())) {
+            String stopPlaceTransportSubMode = getTransportSubModeForStopPlace.get();
+            BusSubmodeEnumeration busSubModeForServiceJourney = getBusSubModeForServiceJourney.get();
             // Only rail replacement bus service can visit rail replacement bus stops
-            return false;
+            return !BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value().equals(stopPlaceTransportSubMode)
+                    || busSubModeForServiceJourney == null
+                    || BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.equals(busSubModeForServiceJourney);
         } else {
-            return true;
+            return false;
         }
     }
-    */
+
+    private static BusSubmodeEnumeration getBusSubmodeForServiceJourney(XdmItem serviceJourneyItem,
+                                                                        ValidationContext validationContext) {
+        try {
+            XdmNode transportSubmodeNode = getChild(serviceJourneyItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportSubmode"));
+            transportSubmodeNode = transportSubmodeNode != null
+                    ? transportSubmodeNode
+                    : getTransportSubModeNodeFromLine(serviceJourneyItem, validationContext);
+
+            XdmNode busSubModeNode = transportSubmodeNode != null
+                    ? getChild(transportSubmodeNode, new QName("n", Constants.NETEX_NAMESPACE, "BusSubmode"))
+                    : null;
+
+            return busSubModeNode == null ? null : BusSubmodeEnumeration.fromValue(busSubModeNode.getStringValue());
+
+        } catch (Exception ex) {
+            throw new AntuException(ex);
+        }
+    }
 
     private List<String> getScheduledStopPointsForServiceJourney(XdmItem serviceJourneyItem,
                                                                  ValidationContext validationContext) {
@@ -155,21 +177,41 @@ public class TransportModeValidator extends AbstractNetexValidator {
                                                                                            ValidationContext validationContext) {
         try {
             XdmNode transportModeNode = getChild(serviceJourneyItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportMode"));
-            return transportModeNode == null
-                    ? getTransportModeFromLine(serviceJourneyItem, validationContext)
-                    : AllVehicleModesOfTransportEnumeration.fromValue(transportModeNode.getStringValue());
+            transportModeNode = transportModeNode != null
+                    ? transportModeNode
+                    : getTransportModeNodeFromLine(serviceJourneyItem, validationContext);
+
+            return transportModeNode != null
+                    ? AllVehicleModesOfTransportEnumeration.fromValue(transportModeNode.getStringValue())
+                    : AllVehicleModesOfTransportEnumeration.UNKNOWN;
         } catch (Exception ex) {
             throw new AntuException(ex);
         }
     }
 
-    private static AllVehicleModesOfTransportEnumeration getTransportModeFromLine(XdmItem serviceJourneyItem,
-                                                                                  ValidationContext validationContext) throws SaxonApiException {
+    private static XdmNode getTransportModeNodeFromLine(XdmItem serviceJourneyItem,
+                                                        ValidationContext validationContext) throws SaxonApiException {
+        XdmItem lineItem = findLineItemForServiceJourney(serviceJourneyItem, validationContext);
+        return getChild(lineItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportMode"));
+    }
+
+    private static XdmNode getTransportSubModeNodeFromLine(XdmItem serviceJourneyItem,
+                                                           ValidationContext validationContext) throws SaxonApiException {
+        XdmItem lineItem = findLineItemForServiceJourney(serviceJourneyItem, validationContext);
+        return getChild(lineItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportSubmode"));
+    }
+
+    private static XdmItem findLineItemForServiceJourney(XdmItem serviceJourneyItem,
+                                                         ValidationContext validationContext) throws SaxonApiException {
+
         String journeyPatternRef = getJourneyPatternRefFromServiceJourney(serviceJourneyItem);
         String routeRef = getRouteRefForJourneyPatternRef(journeyPatternRef, validationContext);
         String lineRef = getLineRefFromRouteRef(routeRef, validationContext);
-        String transportMode = getTransportModeForLineRef(lineRef, validationContext);
-        return transportMode == null ? AllVehicleModesOfTransportEnumeration.UNKNOWN : AllVehicleModesOfTransportEnumeration.fromValue(transportMode);
+        XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
+                .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/lines/Line[@id = '" + lineRef + "']")
+                .load();
+        selector.setContextItem(validationContext.getXmlNode());
+        return selector.evaluateSingle();
     }
 
     private static String getJourneyPatternRefFromServiceJourney(XdmItem serviceJourneyItem) {
@@ -199,17 +241,6 @@ public class TransportModeValidator extends AbstractNetexValidator {
         XdmItem routeItem = selector.evaluateSingle();
         XdmNode lineNode = getChild(routeItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "LineRef"));
         return lineNode == null ? null : lineNode.attribute("ref");
-    }
-
-    private static String getTransportModeForLineRef(String lineRef,
-                                                     ValidationContext validationContext) throws SaxonApiException {
-        XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
-                .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/lines/Line[@id = '" + lineRef + "']")
-                .load();
-        selector.setContextItem(validationContext.getXmlNode());
-        XdmItem lineItem = selector.evaluateSingle();
-        XdmNode transportModeNode = getChild(lineItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportMode"));
-        return transportModeNode == null ? null : transportModeNode.getStringValue();
     }
 
     private static XdmNode getChild(XdmNode parent, QName childName) {

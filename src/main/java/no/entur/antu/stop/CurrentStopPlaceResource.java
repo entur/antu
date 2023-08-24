@@ -3,10 +3,7 @@ package no.entur.antu.stop;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.StopPlace_VersionStructure;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
+import org.rutebanken.netex.model.*;
 
 import java.util.List;
 import java.util.Map;
