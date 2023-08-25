@@ -26,7 +26,7 @@
         <java.version>17</java.version>
         <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
         <camel.version>3.20.6</camel.version>
-        <entur.helpers.version>1.99</entur.helpers.version>
+        <entur.helpers.version>1.100</entur.helpers.version>
         <netex-validator-java.version>0.0.43</netex-validator-java.version>
         <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.16</zt-zip.version>
