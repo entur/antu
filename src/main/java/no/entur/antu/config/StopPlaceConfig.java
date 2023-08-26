@@ -18,38 +18,19 @@ package no.entur.antu.config;
 
 import no.entur.antu.stop.CurrentStopPlaceResource;
 import no.entur.antu.stop.StopPlaceRepositoryImpl;
-import no.entur.antu.stop.DefaultStopPlaceResource;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.fetcher.QuayFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceFetcher;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 import java.util.Set;
 
 @Configuration
 public class StopPlaceConfig {
-
-    @Bean
-    @Profile("!test")
-    DefaultStopPlaceResource defaultStopPlaceResource(@Value("${antu.stop.registry.id.url}")
-                                                      String stopIdsEndpoint,
-                                                      WebClient.Builder webClientBuilder) {
-        return new DefaultStopPlaceResource(stopIdsEndpoint, webClientBuilder);
-    }
-
-    @Bean
-    @Profile("!test")
-    StopPlaceRepository defaultStopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
-                                                   Map<String, Set<String>> stopPlaceCache,
-                                                   DefaultStopPlaceResource defaultStopPlaceResource) {
-        return new StopPlaceRepositoryImpl(defaultStopPlaceResource, stopPlaceCache);
-    }
 
     @Bean
     @Profile("!test")
