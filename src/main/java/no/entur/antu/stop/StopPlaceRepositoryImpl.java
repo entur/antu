@@ -41,17 +41,6 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
     private final NetexEntityFetcher<StopPlace, String> stopPlaceFetcher;
 
     public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
-                                   Map<String, Set<String>> stopPlaceCache) {
-        this(stopPlaceResource, stopPlaceCache,
-                quayId -> {
-                    throw new AntuException("Could not find Quay for id " + quayId);
-                },
-                stopPlaceId -> {
-                    throw new AntuException("Could not find StopPlace for quay id " + stopPlaceId);
-                });
-    }
-
-    public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
                                    Map<String, Set<String>> stopPlaceCache,
                                    NetexEntityFetcher<Quay, String> quayFetcher,
                                    NetexEntityFetcher<StopPlace, String> stopPlaceFetcher) {

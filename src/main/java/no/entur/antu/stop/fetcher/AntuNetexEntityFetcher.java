@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+import java.util.function.Predicate;
 
 public abstract class AntuNetexEntityFetcher<R, S> implements NetexEntityFetcher<R, S> {
 
@@ -15,11 +18,16 @@ public abstract class AntuNetexEntityFetcher<R, S> implements NetexEntityFetcher
     protected static final String ET_CLIENT_ID_HEADER = "ET-Client-ID";
     protected static final String ET_CLIENT_NAME_HEADER = "ET-Client-Name";
 
-    @Value("${http.client.name:damu}")
+    protected static final long MAX_RETRY_ATTEMPTS = 3;
+
+    @Value("${http.client.name:antu}")
     protected String clientName;
 
-    @Value("${http.client.id:damu}")
+    @Value("${http.client.id:antu}")
     protected String clientId;
+
+    protected static final Predicate<Throwable> is5xx =
+            throwable -> throwable instanceof WebClientResponseException webClientResponseException && webClientResponseException.getStatusCode().is5xxServerError();
 
     protected AntuNetexEntityFetcher() {
         this.webClient = WebClient.builder()
