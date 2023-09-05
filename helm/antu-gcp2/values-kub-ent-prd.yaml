@@ -33,3 +33,5 @@ ingress:
 
 horizontalPodAutoscaler:
   project: ent-antu-prd
+
+stopplaceRegistryUrl: https://api.entur.io/stop-places/v1/read
