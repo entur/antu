@@ -22,12 +22,10 @@ public class ReferenceToNsrValidator implements ExternalReferenceValidator {
     @Override
     public Set<IdVersion> validateReferenceIds(Set<IdVersion> externalIds) {
         Objects.requireNonNull(externalIds);
-        Set<String> stopPlaceIds = stopPlaceRepository.getStopPlaceIds();
-        Set<String> quayIds = stopPlaceRepository.getQuayIds();
         Set<IdVersion> validIds = new HashSet<>();
 
         for (IdVersion id : externalIds) {
-            if (isValidQuayReference(quayIds, id) || isValidStopPlaceReference(stopPlaceIds, id)) {
+            if (isValidQuayReference(id) || isValidStopPlaceReference(id)) {
                 validIds.add(id);
             }
         }
@@ -35,12 +33,12 @@ public class ReferenceToNsrValidator implements ExternalReferenceValidator {
         return validIds;
     }
 
-    private boolean isValidStopPlaceReference(Set<String> stopPlaceIds, IdVersion id) {
-        return id.getId().contains(":StopPlace:") && stopPlaceIds.contains(id.getId());
+    private boolean isValidStopPlaceReference(IdVersion id) {
+        return id.getId().contains(":StopPlace:") && stopPlaceRepository.hasStopPlaceId(id.getId());
     }
 
-    private boolean isValidQuayReference(Set<String> quayIds, IdVersion id) {
-        return id.getId().contains(":Quay:") && quayIds.contains(id.getId());
+    private boolean isValidQuayReference(IdVersion id) {
+        return id.getId().contains(":Quay:") && stopPlaceRepository.hasQuayId(id.getId());
     }
 
 }

@@ -27,7 +27,9 @@ data:
 
     # Stop place register
     antu.stop.registry.id.url={{ .Values.tiamatUrl }}/services/stop_places
-    antu.stop.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
+    # Refresh stop place cache at 01:00 and 14:00 every day
+    antu.stop.refresh.interval=?cron=0+0+01,14+?+*+*
+    stopplace.registry.url={{ .Values.stopplaceRegistryUrl }}
 
 
     # Validators
@@ -58,6 +60,7 @@ data:
     blobstore.gcs.project.id={{ .Values.gcp.blobstoreProjectId }}
     blobstore.gcs.marduk.container.name={{ .Values.gcp.marduk.bucketName }}
     blobstore.gcs.antu.container.name={{ .Values.gcp.antu.bucketName }}
+    antu.netex.stop.current.filename=tiamat/Current_latest.zip
 
     # Redis
     spring.redis.host=${REDIS_HOST}

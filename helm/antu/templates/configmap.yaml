@@ -29,7 +29,6 @@ data:
     antu.stop.registry.id.url={{ .Values.tiamatUrl }}/services/stop_places
     antu.stop.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
 
-
     # Validators
     antu.schema.validation.enabled=true
 
@@ -74,7 +73,6 @@ data:
     management.endpoint.prometheus.enabled=true
     management.endpoints.web.exposure.include=health,prometheus
     management.endpoints.jmx.exposure.exclude=*
-
 
     # Logging
     logging.config=classpath:logback.xml

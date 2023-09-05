@@ -16,16 +16,15 @@
 
 package no.entur.antu.config;
 
-import no.entur.antu.stop.DefaultStopPlaceRepository;
-import no.entur.antu.stop.DefaultStopPlaceResource;
+import no.entur.antu.stop.CurrentStopPlaceResource;
+import no.entur.antu.stop.StopPlaceRepositoryImpl;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.stop.StopPlaceResource;
+import no.entur.antu.stop.fetcher.QuayFetcher;
+import no.entur.antu.stop.fetcher.StopPlaceFetcher;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 import java.util.Set;
@@ -33,17 +32,13 @@ import java.util.Set;
 @Configuration
 public class StopPlaceConfig {
 
-
     @Bean
     @Profile("!test")
-    StopPlaceResource stopPlaceResource(@Value("${antu.stop.registry.id.url}") String stopIdsEndpoint, WebClient.Builder webClientBuilder) {
-        return new DefaultStopPlaceResource(stopIdsEndpoint, webClientBuilder);
+    StopPlaceRepository currentStopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
+                                                   Map<String, Set<String>> stopPlaceCache,
+                                                   CurrentStopPlaceResource currentStopPlaceResource,
+                                                   StopPlaceFetcher stopPlaceFetcher,
+                                                   QuayFetcher quayFetcher) {
+        return new StopPlaceRepositoryImpl(currentStopPlaceResource, stopPlaceCache, quayFetcher, stopPlaceFetcher);
     }
-
-    @Bean
-    @Profile("!test")
-    StopPlaceRepository stopPlaceRepository(StopPlaceResource stopPlaceResource, @Qualifier("stopPlaceAndQuayCache") Map<String, Set<String>> stopPlaceCache) {
-        return new DefaultStopPlaceRepository(stopPlaceResource, stopPlaceCache);
-    }
-
 }

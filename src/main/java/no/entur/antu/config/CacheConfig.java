@@ -99,7 +99,8 @@ public class CacheConfig {
     }
 
     @Bean
-    public NetexIdRepository netexIdRepository(RedissonClient redissonClient, @Qualifier("commonIdsCache") RLocalCachedMap<String, Set<String>> commonIdsCache) {
+    public NetexIdRepository netexIdRepository(RedissonClient redissonClient,
+                                               @Qualifier("commonIdsCache") RLocalCachedMap<String, Set<String>> commonIdsCache) {
         return new RedisNetexIdRepository(redissonClient, commonIdsCache);
     }
 
