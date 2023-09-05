@@ -20,7 +20,6 @@ import no.entur.antu.flex.validation.validator.EnturFlexTimetableDataValidationT
 import no.entur.antu.flex.validation.validator.EnturImportFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.flex.validation.validator.FileNameValidator;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validator.TransportModeValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
