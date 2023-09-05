@@ -15,7 +15,6 @@
 
 package no.entur.antu.stop;
 
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 /**
