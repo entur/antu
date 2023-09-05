@@ -36,8 +36,9 @@ public class StopPlaceConfig {
     @Profile("!test")
     StopPlaceRepository currentStopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
                                                    Map<String, Set<String>> stopPlaceCache,
-                                                   CurrentStopPlaceResource currentStopPlaceResource) {
-        return new StopPlaceRepositoryImpl(
-                currentStopPlaceResource, stopPlaceCache, new QuayFetcher(), new StopPlaceFetcher());
+                                                   CurrentStopPlaceResource currentStopPlaceResource,
+                                                   StopPlaceFetcher stopPlaceFetcher,
+                                                   QuayFetcher quayFetcher) {
+        return new StopPlaceRepositoryImpl(currentStopPlaceResource, stopPlaceCache, quayFetcher, stopPlaceFetcher);
     }
 }
