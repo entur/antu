@@ -1,14 +1,14 @@
 package no.entur.antu.commondata;
 
-import org.redisson.api.RLocalCachedMap;
+import java.util.Map;
 
 public class CommonDataRepository {
 
     private final CommonDataResource commonDataResource;
-    private final RLocalCachedMap<String, String> stopPlaceIdPerScheduledStopPointsCache;
+    private final Map<String, String> stopPlaceIdPerScheduledStopPointsCache;
 
     public CommonDataRepository(CommonDataResource commonDataResource,
-                                RLocalCachedMap<String, String> stopPlaceIdPerScheduledStopPointsCache) {
+                                Map<String, String> stopPlaceIdPerScheduledStopPointsCache) {
         this.commonDataResource = commonDataResource;
         this.stopPlaceIdPerScheduledStopPointsCache = stopPlaceIdPerScheduledStopPointsCache;
     }
