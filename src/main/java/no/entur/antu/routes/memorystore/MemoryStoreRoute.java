@@ -1,18 +1,17 @@
 /*
  *
- *  * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
- *  * the European Commission - subsequent versions of the EUPL (the "Licence");
- *  * You may not use this work except in compliance with the Licence.
- *  * You may obtain a copy of the Licence at:
- *  *
- *  *   https://joinup.ec.europa.eu/software/page/eupl
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the Licence is distributed on an "AS IS" basis,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the Licence for the specific language governing permissions and
- *  * limitations under the Licence.
- *  *
+ * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
+ * the European Commission - subsequent versions of the EUPL (the "Licence");
+ * You may not use this work except in compliance with the Licence.
+ * You may obtain a copy of the Licence at:
+ *
+ *   https://joinup.ec.europa.eu/software/page/eupl
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the Licence is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Licence for the specific language governing permissions and
+ * limitations under the Licence.
  *
  */
 
@@ -22,9 +21,7 @@ import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
-import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
-
+import static no.entur.antu.Constants.*;
 
 /**
  * Upload and download files to a memory store.
@@ -33,6 +30,8 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
  */
 @Component
 public class MemoryStoreRoute extends BaseRouteBuilder {
+
+    public static final String MEMORY_STORE_FILE_NAME = "MemoryStoreFileName";
 
     @Override
     public void configure() {
@@ -47,5 +46,13 @@ public class MemoryStoreRoute extends BaseRouteBuilder {
                 .setBody(constant(""))
                 .log(LoggingLevel.DEBUG, correlation() + "Stored file ${header." + TEMPORARY_FILE_NAME + "} in memory store.")
                 .routeId("memory-store-upload");
+
+        from("direct:downloadSingleNetexFileFromMemoryStore").streamCaching()
+                .log(LoggingLevel.DEBUG, correlation() + "Downloading single NeTEx file ${header." + FILE_HANDLE + "}")
+                .setHeader(TEMPORARY_FILE_NAME, header(MEMORY_STORE_FILE_NAME))
+                .to("direct:downloadBlobFromMemoryStore")
+                .log(LoggingLevel.DEBUG, correlation() + "Downloaded single NeTEx file ${header." + FILE_HANDLE + "}")
+                .unmarshal().zipFile()
+                .routeId("memory-store-download-single-netex-file");
     }
 }
