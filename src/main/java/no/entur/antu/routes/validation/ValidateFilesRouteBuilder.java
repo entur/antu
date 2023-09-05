@@ -44,6 +44,7 @@ import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
+import static no.entur.antu.routes.memorystore.MemoryStoreRoute.MEMORY_STORE_FILE_NAME;
 
 
 /**
@@ -67,7 +68,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .setProperty(PROP_STOP_WATCH, StopWatch::new)
                 .setProperty(PROP_ALL_NETEX_FILE_NAMES, body())
                 .doTry()
-                .to("direct:downloadSingleNetexFile")
+                .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_FILE_NAME))
+                .to("direct:downloadSingleNetexFileFromMemoryStore")
                 .setProperty(PROP_NETEX_FILE_CONTENT, body())
                 .to("direct:runNetexValidators")
                 // Duplicated PubSub messages are detected when trying to download the NeTEx file: it does not exist anymore after the report is generated and all temporary files are deleted
@@ -87,14 +89,6 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
                 .to("direct:notifyValidationReportAggregator")
                 .log(LoggingLevel.INFO, correlation() + "Validated NeTEx file ${header." + NETEX_FILE_NAME + "} in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
                 .routeId("validate-netex");
-
-        from("direct:downloadSingleNetexFile").streamCaching()
-                .log(LoggingLevel.DEBUG, correlation() + "Downloading single NeTEx file ${header." + FILE_HANDLE + "}")
-                .setHeader(TEMPORARY_FILE_NAME, header(NETEX_FILE_NAME))
-                .to("direct:downloadBlobFromMemoryStore")
-                .log(LoggingLevel.DEBUG, correlation() + "Downloaded single NeTEx file ${header." + FILE_HANDLE + "}")
-                .unmarshal().zipFile()
-                .routeId("download-single-netex-file");
 
         from("direct:runNetexValidators").streamCaching()
                 .log(LoggingLevel.DEBUG, correlation() + "Running NeTEx validators using validation profile ${header." + VALIDATION_PROFILE_HEADER + "}")
