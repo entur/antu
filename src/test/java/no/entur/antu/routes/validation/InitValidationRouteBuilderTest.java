@@ -37,6 +37,7 @@ package no.entur.antu.routes.validation;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
+import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.util.TestValidationReportUtil;
@@ -156,6 +157,12 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
                 public void refreshCache() {
                 }
             };
+        }
+
+        @Bean
+        @Primary
+        public CommonDataRepository commonDataRepository() {
+            return new CommonDataRepository(null,  Map.of());
         }
     }
 
