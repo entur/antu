@@ -48,6 +48,11 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
     @Override
     public void validate(ValidationReport validationReport, ValidationContext validationContext) {
+
+        if (validationContext.isCommonFile()) {
+            return;
+        }
+
         String fileName = validationContext.getFileName();
 
         List<ServiceJourneyContext> serviceJourneys = getServiceJourneys(validationContext).stream()
@@ -83,6 +88,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
                                            ValidationContext validationContext) {
         return serviceJourneyContext.scheduledStopPoints.stream()
                 .map(commonDataRepository::findStopPlaceId)
+                .filter(Objects::nonNull)
                 .allMatch(stopPlaceId ->
                         isValidTransportMode(
                                 serviceJourneyContext::transportMode,
