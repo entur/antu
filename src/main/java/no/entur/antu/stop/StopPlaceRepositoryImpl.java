@@ -94,17 +94,27 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     @Override
     public VehicleModeEnumeration getTransportModeForStopPlaceId(String stopPlaceId) {
-        return transportModePerStopPlaceCache.computeIfAbsent(
-                stopPlaceId,
-                id -> stopPlaceFetcher.tryFetch(id).getTransportMode());
+        try {
+            return transportModePerStopPlaceCache.computeIfAbsent(
+                    stopPlaceId,
+                    id -> stopPlaceFetcher.tryFetch(id).getTransportMode());
+        } catch (AntuException ex) {
+            LOGGER.debug(ex.getMessage());
+            return null;
+        }
     }
 
     @Override
     public String getTransportSubModeForStopPlaceId(String stopPlaceId) {
-        return transportSubModePerStopPlaceCache.computeIfAbsent(
-                stopPlaceId,
-                id -> String.valueOf(stopPlaceFetcher.tryFetch(id))
-        );
+        try {
+            return transportSubModePerStopPlaceCache.computeIfAbsent(
+                    stopPlaceId,
+                    id -> String.valueOf(stopPlaceFetcher.tryFetch(id))
+            );
+        } catch (AntuException ex) {
+            LOGGER.debug(ex.getMessage());
+            return null;
+        }
     }
 
     @Override

@@ -22,11 +22,6 @@ public class NetexValidatorRunnerWithNetexEntitiesIndex extends NetexValidatorsR
 
     private final NetexXMLParser netexXMLParser;
 
-    public NetexValidatorRunnerWithNetexEntitiesIndex(NetexXMLParser netexXMLParser, List<NetexValidator> netexValidators) {
-        super(netexXMLParser, netexValidators);
-        this.netexXMLParser = netexXMLParser;
-    }
-
     public NetexValidatorRunnerWithNetexEntitiesIndex(NetexXMLParser netexXMLParser, NetexSchemaValidator netexSchemaValidator, List<NetexValidator> netexValidators) {
         super(netexXMLParser, netexSchemaValidator, netexValidators);
         this.netexXMLParser = netexXMLParser;

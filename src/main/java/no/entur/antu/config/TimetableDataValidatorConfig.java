@@ -84,7 +84,7 @@ public class TimetableDataValidatorConfig {
                                                                ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime) {
         List<NetexValidator> netexValidators = List.of(
                 xpathValidator,
-//                netexIdValidator,
+                netexIdValidator,
                 versionOnLocalNetexIdValidator,
                 versionOnRefToLocalNetexIdValidator,
                 referenceToValidEntityTypeValidator,
