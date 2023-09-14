@@ -7,7 +7,7 @@ import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmSequenceIterator;
-import no.entur.antu.validator.codespace.NetexCodespace;
+import no.entur.antu.validator.NetexCodespace;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.exception.NetexValidationException;
 import org.entur.netex.validation.validator.DataLocation;
@@ -70,14 +70,5 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
     @Override
     public String getCode() {
         return RULE_CODE;
-    }
-
-    private static XdmNode getChild(XdmNode parent, QName childName) {
-        XdmSequenceIterator<XdmNode> iter = parent.axisIterator(Axis.CHILD, childName);
-        if (iter.hasNext()) {
-            return iter.next();
-        } else {
-            return null;
-        }
     }
 }

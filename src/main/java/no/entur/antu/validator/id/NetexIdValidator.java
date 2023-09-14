@@ -1,6 +1,6 @@
 package no.entur.antu.validator.id;
 
-import no.entur.antu.validator.codespace.NetexCodespace;
+import no.entur.antu.validator.NetexCodespace;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;

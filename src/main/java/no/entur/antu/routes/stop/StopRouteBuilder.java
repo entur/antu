@@ -51,7 +51,7 @@ public class StopRouteBuilder extends BaseRouteBuilder {
 
         from("direct:refresh-stop-cache")
                 .log(LoggingLevel.INFO, correlation() + "Refreshing stop place cache")
-                .bean("currentStopPlaceRepository", "refreshCache")
+                .bean("stopPlaceRepository", "refreshCache")
                 .log(LoggingLevel.INFO, correlation() + "Refreshed stop place cache")
                 .routeId("refresh-stop-cache");
     }

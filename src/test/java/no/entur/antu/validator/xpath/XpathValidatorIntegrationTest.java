@@ -38,7 +38,7 @@ class XpathValidatorIntegrationTest {
                 return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
             }
         };
-        ValidationTreeFactory validationTreeFactory = new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository);
+        ValidationTreeFactory validationTreeFactory = new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository, null, null);
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
         XPathValidator xPathValidator = new XPathValidator(validationTreeFactory, new DefaultValidationEntryFactory(new DefaultValidationConfigLoader(CONFIGURATION_ANTU_YAML)));
 
