@@ -10,13 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CurrentStopPlaceResource implements StopPlaceResource {
+public class StopPlaceResourceImpl implements StopPlaceResource {
 
     private final StopPlacesDatasetLoader stopPlacesDatasetLoader;
 
     private NetexEntitiesIndex netexEntitiesIndex;
 
-    public CurrentStopPlaceResource(StopPlacesDatasetLoader stopPlacesDatasetLoader) {
+    public StopPlaceResourceImpl(StopPlacesDatasetLoader stopPlacesDatasetLoader) {
         this.stopPlacesDatasetLoader = stopPlacesDatasetLoader;
     }
 

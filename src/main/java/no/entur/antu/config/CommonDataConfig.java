@@ -13,15 +13,15 @@ public class CommonDataConfig {
 
     @Bean
     @Profile("!test")
-    public CommonDataResource commonDataResource() {
+    CommonDataResource commonDataResource() {
         return new CommonDataResource();
     }
 
     @Bean
     @Profile("!test")
-    public CommonDataRepository commonDataRepository(CommonDataResource commonDataResource,
-                                                     @Qualifier("stopPlaceIdPerScheduledStopPointsCache")
-                                                     RLocalCachedMap<String, String> stopPlaceIdPerScheduledStopPointsCache) {
+    CommonDataRepository commonDataRepository(CommonDataResource commonDataResource,
+                                              @Qualifier("stopPlaceIdPerScheduledStopPointsCache")
+                                              RLocalCachedMap<String, String> stopPlaceIdPerScheduledStopPointsCache) {
         return new CommonDataRepository(commonDataResource, stopPlaceIdPerScheduledStopPointsCache);
     }
 }
