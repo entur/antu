@@ -1,15 +1,13 @@
-package no.entur.antu.validator;
+package no.entur.antu.validator.xpath.rules;
 
 import net.sf.saxon.s9api.*;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.validation.Constants;
-import org.entur.netex.validation.validator.AbstractNetexValidator;
-import org.entur.netex.validation.validator.DataLocation;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
@@ -18,13 +16,14 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class TransportModeValidator extends AbstractNetexValidator {
+public class ValidateTransportMode extends AbstractXPathValidationRule {
 
-    private record ServiceJourneyContext(
+    private record ValidationRuleContext(
             XdmItem serviceJourneyItem,
             String serviceJourneyId,
             AllVehicleModesOfTransportEnumeration transportMode,
             List<String> scheduledStopPoints) {
+
     }
 
     private static final String RULE_CODE_NETEX_TRANSPORT_MODE_1 = "NETEX_TRANSPORT_MODE_1";
@@ -33,66 +32,49 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
     private final StopPlaceRepository stopPlaceRepository;
 
-    public TransportModeValidator(ValidationReportEntryFactory validationReportEntryFactory,
-                                  CommonDataRepository commonDataRepository,
-                                  StopPlaceRepository stopPlaceRepository) {
-        super(validationReportEntryFactory);
+    public ValidateTransportMode(CommonDataRepository commonDataRepository,
+                                 StopPlaceRepository stopPlaceRepository) {
         this.commonDataRepository = commonDataRepository;
         this.stopPlaceRepository = stopPlaceRepository;
     }
 
     @Override
-    public Set<String> getRuleDescriptions() {
-        return Set.of(createRuleDescription(RULE_CODE_NETEX_TRANSPORT_MODE_1, "Invalid transport mode"));
-    }
+    public List<XPathValidationReportEntry> validate(XPathValidationContext xPathValidationContext) {
+        String fileName = xPathValidationContext.getFileName();
 
-    @Override
-    public void validate(ValidationReport validationReport, ValidationContext validationContext) {
-
-        if (validationContext.isCommonFile()) {
-            return;
-        }
-
-        String fileName = validationContext.getFileName();
-
-        List<ServiceJourneyContext> serviceJourneys = getServiceJourneys(validationContext).stream()
+        List<ValidationRuleContext> validationRuleContexts = getServiceJourneys(xPathValidationContext).stream()
                 .map(serviceJourneyItem ->
-                        new ServiceJourneyContext(
+                        new ValidationRuleContext(
                                 serviceJourneyItem,
                                 serviceJourneyItem.stream().asNode().attribute("id"),
-                                getTransportModeForServiceJourney(serviceJourneyItem, validationContext),
-                                getScheduledStopPointsForServiceJourney(serviceJourneyItem, validationContext))
+                                getTransportModeForServiceJourney(serviceJourneyItem, xPathValidationContext),
+                                getScheduledStopPointsForServiceJourney(serviceJourneyItem, xPathValidationContext))
                 ).toList();
 
-        serviceJourneys.stream()
-                .filter(Predicate.not(serviceJourneyContext -> validateServiceJourney(serviceJourneyContext, validationContext)))
-                .forEach(serviceJourneyContext -> validationReport.addValidationReportEntry(
-                        createValidationReportEntry(
-                                RULE_CODE_NETEX_TRANSPORT_MODE_1,
-                                validationContext.getLocalIds().stream()
-                                        .filter(localId -> localId.getId().equals(serviceJourneyContext.serviceJourneyId))
-                                        .findFirst()
-                                        .map(idVersion -> new DataLocation(idVersion.getId(), fileName, idVersion.getLineNumber(), idVersion.getColumnNumber()))
-                                        .orElse(new DataLocation(serviceJourneyContext.serviceJourneyId(), fileName, 0, 0)),
+        return validationRuleContexts.stream()
+                .filter(Predicate.not(validationRuleContext -> validateServiceJourney(validationRuleContext, xPathValidationContext)))
+                .map(validationRuleContext -> new XPathValidationReportEntry(
                                 String.format(
                                         "Invalid transport mode %s found in service journey with id %s",
-                                        serviceJourneyContext.transportMode(),
-                                        serviceJourneyContext.serviceJourneyId
-                                )
+                                        validationRuleContext.transportMode(),
+                                        validationRuleContext.serviceJourneyId
+                                ),
+                                RULE_CODE_NETEX_TRANSPORT_MODE_1,
+                                getXdmNodeLocation(fileName, validationRuleContext.serviceJourneyItem.stream().asNode())
                         )
-                ));
-
+                )
+                .toList();
     }
 
-    private boolean validateServiceJourney(ServiceJourneyContext serviceJourneyContext,
-                                           ValidationContext validationContext) {
-        return serviceJourneyContext.scheduledStopPoints.stream()
+    private boolean validateServiceJourney(ValidationRuleContext validationRuleContext,
+                                           XPathValidationContext xPathValidationContext) {
+        return validationRuleContext.scheduledStopPoints.stream()
                 .map(commonDataRepository::findStopPlaceId)
                 .filter(Objects::nonNull)
                 .allMatch(stopPlaceId ->
                         isValidTransportMode(
-                                serviceJourneyContext::transportMode,
-                                () -> getBusSubmodeForServiceJourney(serviceJourneyContext.serviceJourneyItem, validationContext),
+                                validationRuleContext::transportMode,
+                                () -> getBusSubmodeForServiceJourney(validationRuleContext.serviceJourneyItem, xPathValidationContext),
                                 () -> stopPlaceRepository.getTransportModeForStopPlaceId(stopPlaceId),
                                 () -> stopPlaceRepository.getTransportSubModeForStopPlaceId(stopPlaceId)
                         )
@@ -135,12 +117,12 @@ public class TransportModeValidator extends AbstractNetexValidator {
     }
 
     private static BusSubmodeEnumeration getBusSubmodeForServiceJourney(XdmItem serviceJourneyItem,
-                                                                        ValidationContext validationContext) {
+                                                                        XPathValidationContext xPathValidationContext) {
         try {
             XdmNode transportSubmodeNode = getChild(serviceJourneyItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportSubmode"));
             transportSubmodeNode = transportSubmodeNode != null
                     ? transportSubmodeNode
-                    : getTransportSubModeNodeFromLine(serviceJourneyItem, validationContext);
+                    : getTransportSubModeNodeFromLine(serviceJourneyItem, xPathValidationContext);
 
             XdmNode busSubModeNode = transportSubmodeNode != null
                     ? getChild(transportSubmodeNode, new QName("n", Constants.NETEX_NAMESPACE, "BusSubmode"))
@@ -154,25 +136,25 @@ public class TransportModeValidator extends AbstractNetexValidator {
     }
 
     private List<String> getScheduledStopPointsForServiceJourney(XdmItem serviceJourneyItem,
-                                                                 ValidationContext validationContext) {
+                                                                 XPathValidationContext xPathValidationContext) {
         try {
             String journeyPatternRef = getJourneyPatternRefFromServiceJourney(serviceJourneyItem);
-            XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
+            XPathSelector selector = xPathValidationContext.getNetexXMLParser().getXPathCompiler()
                     .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/journeyPatterns/JourneyPattern[@id = '" + journeyPatternRef + "']/pointsInSequence/StopPointInJourneyPattern/ScheduledStopPointRef")
                     .load();
-            selector.setContextItem(validationContext.getXmlNode());
+            selector.setContextItem(xPathValidationContext.getXmlNode());
             return selector.stream().asListOfNodes().stream().map(scheduledStopPointRef -> scheduledStopPointRef.attribute("ref")).toList();
         } catch (Exception ex) {
             throw new AntuException(ex);
         }
     }
 
-    private static List<XdmItem> getServiceJourneys(ValidationContext validationContext) {
+    private static List<XdmItem> getServiceJourneys(XPathValidationContext xPathValidationContext) {
         try {
-            XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
+            XPathSelector selector = xPathValidationContext.getNetexXMLParser().getXPathCompiler()
                     .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/vehicleJourneys/ServiceJourney")
                     .load();
-            selector.setContextItem(validationContext.getXmlNode());
+            selector.setContextItem(xPathValidationContext.getXmlNode());
             return selector.stream().toList();
         } catch (Exception ex) {
             throw new AntuException(ex);
@@ -180,12 +162,12 @@ public class TransportModeValidator extends AbstractNetexValidator {
     }
 
     private static AllVehicleModesOfTransportEnumeration getTransportModeForServiceJourney(XdmItem serviceJourneyItem,
-                                                                                           ValidationContext validationContext) {
+                                                                                           XPathValidationContext xPathValidationContext) {
         try {
             XdmNode transportModeNode = getChild(serviceJourneyItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportMode"));
             transportModeNode = transportModeNode != null
                     ? transportModeNode
-                    : getTransportModeNodeFromLine(serviceJourneyItem, validationContext);
+                    : getTransportModeNodeFromLine(serviceJourneyItem, xPathValidationContext);
 
             return transportModeNode != null
                     ? AllVehicleModesOfTransportEnumeration.fromValue(transportModeNode.getStringValue())
@@ -196,27 +178,27 @@ public class TransportModeValidator extends AbstractNetexValidator {
     }
 
     private static XdmNode getTransportModeNodeFromLine(XdmItem serviceJourneyItem,
-                                                        ValidationContext validationContext) throws SaxonApiException {
-        XdmItem lineItem = findLineItemForServiceJourney(serviceJourneyItem, validationContext);
+                                                        XPathValidationContext xPathValidationContext) throws SaxonApiException {
+        XdmItem lineItem = findLineItemForServiceJourney(serviceJourneyItem, xPathValidationContext);
         return getChild(lineItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportMode"));
     }
 
     private static XdmNode getTransportSubModeNodeFromLine(XdmItem serviceJourneyItem,
-                                                           ValidationContext validationContext) throws SaxonApiException {
-        XdmItem lineItem = findLineItemForServiceJourney(serviceJourneyItem, validationContext);
+                                                           XPathValidationContext xPathValidationContext) throws SaxonApiException {
+        XdmItem lineItem = findLineItemForServiceJourney(serviceJourneyItem, xPathValidationContext);
         return getChild(lineItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "TransportSubmode"));
     }
 
     private static XdmItem findLineItemForServiceJourney(XdmItem serviceJourneyItem,
-                                                         ValidationContext validationContext) throws SaxonApiException {
+                                                         XPathValidationContext xPathValidationContext) throws SaxonApiException {
 
         String journeyPatternRef = getJourneyPatternRefFromServiceJourney(serviceJourneyItem);
-        String routeRef = getRouteRefForJourneyPatternRef(journeyPatternRef, validationContext);
-        String lineRef = getLineRefFromRouteRef(routeRef, validationContext);
-        XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
+        String routeRef = getRouteRefForJourneyPatternRef(journeyPatternRef, xPathValidationContext);
+        String lineRef = getLineRefFromRouteRef(routeRef, xPathValidationContext);
+        XPathSelector selector = xPathValidationContext.getNetexXMLParser().getXPathCompiler()
                 .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/lines/Line[@id = '" + lineRef + "']")
                 .load();
-        selector.setContextItem(validationContext.getXmlNode());
+        selector.setContextItem(xPathValidationContext.getXmlNode());
         return selector.evaluateSingle();
     }
 
@@ -228,33 +210,34 @@ public class TransportModeValidator extends AbstractNetexValidator {
     }
 
     private static String getRouteRefForJourneyPatternRef(String journeyPatternRef,
-                                                          ValidationContext validationContext) throws SaxonApiException {
-        XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
+                                                          XPathValidationContext xPathValidationContext) throws SaxonApiException {
+        XPathSelector selector = xPathValidationContext.getNetexXMLParser().getXPathCompiler()
                 .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/journeyPatterns/JourneyPattern[@id = '" + journeyPatternRef + "']")
                 .load();
-        selector.setContextItem(validationContext.getXmlNode());
+        selector.setContextItem(xPathValidationContext.getXmlNode());
         XdmItem journeyPatternItem = selector.evaluateSingle();
         XdmNode routeNode = getChild(journeyPatternItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "RouteRef"));
         return routeNode == null ? null : routeNode.attribute("ref");
     }
 
     private static String getLineRefFromRouteRef(String routeRef,
-                                                 ValidationContext validationContext) throws SaxonApiException {
-        XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
+                                                 XPathValidationContext xPathValidationContext) throws SaxonApiException {
+        XPathSelector selector = xPathValidationContext.getNetexXMLParser().getXPathCompiler()
                 .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/routes/Route[@id = '" + routeRef + "']")
                 .load();
-        selector.setContextItem(validationContext.getXmlNode());
+        selector.setContextItem(xPathValidationContext.getXmlNode());
         XdmItem routeItem = selector.evaluateSingle();
         XdmNode lineNode = getChild(routeItem.stream().asNode(), new QName("n", Constants.NETEX_NAMESPACE, "LineRef"));
         return lineNode == null ? null : lineNode.attribute("ref");
     }
 
-    private static XdmNode getChild(XdmNode parent, QName childName) {
-        XdmSequenceIterator<XdmNode> iter = parent.axisIterator(Axis.CHILD, childName);
-        if (iter.hasNext()) {
-            return iter.next();
-        } else {
-            return null;
-        }
+    @Override
+    public String getCode() {
+        return RULE_CODE_NETEX_TRANSPORT_MODE_1;
+    }
+
+    @Override
+    public String getMessage() {
+        return "Invalid transport mode";
     }
 }

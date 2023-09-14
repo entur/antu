@@ -12,7 +12,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
-class CurrentStopPlaceResourceTest {
+class StopPlaceResourceImplTest {
 
     @Test
     void getQuayIds() {
@@ -28,14 +28,14 @@ class CurrentStopPlaceResourceTest {
                         new Quay().withId("NSR:Quay:4567").withVersion("1"))
         );
 
-        CurrentStopPlaceResource currentStopPlaceResource = mock(CurrentStopPlaceResource.class);
-        when(currentStopPlaceResource.getNetexEntitiesIndex()).thenReturn(netexEntitiesIndex);
-        when(currentStopPlaceResource.getQuayIds()).thenCallRealMethod();
+        StopPlaceResourceImpl stopPlaceResourceImpl = mock(StopPlaceResourceImpl.class);
+        when(stopPlaceResourceImpl.getNetexEntitiesIndex()).thenReturn(netexEntitiesIndex);
+        when(stopPlaceResourceImpl.getQuayIds()).thenCallRealMethod();
 
-        Set<String> quayIds = currentStopPlaceResource.getQuayIds();
+        Set<String> quayIds = stopPlaceResourceImpl.getQuayIds();
 
-        verify(currentStopPlaceResource).getQuayIds();
-        verify(currentStopPlaceResource).getNetexEntitiesIndex();
+        verify(stopPlaceResourceImpl).getQuayIds();
+        verify(stopPlaceResourceImpl).getNetexEntitiesIndex();
 
         assertThat(quayIds.size(), is(3));
     }
@@ -51,14 +51,14 @@ class CurrentStopPlaceResourceTest {
                 )
         ));
 
-        CurrentStopPlaceResource currentStopPlaceResource = mock(CurrentStopPlaceResource.class);
-        when(currentStopPlaceResource.getNetexEntitiesIndex()).thenReturn(netexEntitiesIndex);
-        when(currentStopPlaceResource.getStopPlaceIds()).thenCallRealMethod();
+        StopPlaceResourceImpl stopPlaceResourceImpl = mock(StopPlaceResourceImpl.class);
+        when(stopPlaceResourceImpl.getNetexEntitiesIndex()).thenReturn(netexEntitiesIndex);
+        when(stopPlaceResourceImpl.getStopPlaceIds()).thenCallRealMethod();
 
-        Set<String> stopPlaceIds = currentStopPlaceResource.getStopPlaceIds();
+        Set<String> stopPlaceIds = stopPlaceResourceImpl.getStopPlaceIds();
 
-        verify(currentStopPlaceResource).getStopPlaceIds();
-        verify(currentStopPlaceResource).getNetexEntitiesIndex();
+        verify(stopPlaceResourceImpl).getStopPlaceIds();
+        verify(stopPlaceResourceImpl).getNetexEntitiesIndex();
 
         assertThat(stopPlaceIds.size(), is(2));
     }

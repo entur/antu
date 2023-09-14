@@ -129,7 +129,7 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
             };
         }
 
-        @Bean(name = "currentStopPlaceRepository")
+        @Bean(name = "stopPlaceRepository")
         @Primary
         public StopPlaceRepository stopPlaceRepository() {
             return new StopPlaceRepository() {

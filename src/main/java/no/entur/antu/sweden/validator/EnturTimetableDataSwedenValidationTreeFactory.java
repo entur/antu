@@ -26,7 +26,7 @@ public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetabl
             public Set<String> getWhitelistedAuthorityIds(String codespace) {
                 return Set.of();
             }
-        });
+        }, null, null);
     }
 
     @Override

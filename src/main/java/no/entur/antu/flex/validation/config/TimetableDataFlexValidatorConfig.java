@@ -16,10 +16,12 @@
 
 package no.entur.antu.flex.validation.config;
 
+import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.flex.validation.validator.EnturFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.flex.validation.validator.EnturImportFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.flex.validation.validator.FileNameValidator;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.id.NetexIdValidator;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
@@ -47,13 +49,17 @@ import java.util.Set;
 public class TimetableDataFlexValidatorConfig {
 
     @Bean
-    public ValidationTreeFactory flexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
-        return new EnturFlexTimetableDataValidationTreeFactory(organisationRepository);
+    public ValidationTreeFactory flexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository,
+                                                                        CommonDataRepository commonDataRepository,
+                                                                        StopPlaceRepository stopPlaceRepository) {
+        return new EnturFlexTimetableDataValidationTreeFactory(organisationRepository, commonDataRepository, stopPlaceRepository);
     }
 
     @Bean
-    public ValidationTreeFactory importFlexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
-        return new EnturImportFlexTimetableDataValidationTreeFactory(organisationRepository);
+    public ValidationTreeFactory importFlexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository,
+                                                                              CommonDataRepository commonDataRepository,
+                                                                              StopPlaceRepository stopPlaceRepository) {
+        return new EnturImportFlexTimetableDataValidationTreeFactory(organisationRepository, commonDataRepository, stopPlaceRepository);
     }
 
     @Bean
