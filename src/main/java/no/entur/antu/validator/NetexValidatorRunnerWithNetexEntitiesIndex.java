@@ -1,4 +1,4 @@
-package no.entur.antu.validator.nonincreasingpassingtime;
+package no.entur.antu.validator;
 
 import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XdmNode;
@@ -39,7 +39,7 @@ public class NetexValidatorRunnerWithNetexEntitiesIndex extends NetexValidatorsR
             return netexParser.parse(new ByteArrayInputStream(fileContent));
         };
 
-        return new ValidationContextWithNetexEntitesIndex(
+        return new ValidationContextWithNetexEntitiesIndex(
                 document, netexXMLParser, getNetexEntitiesIndex, codespace, filename, localIds, localRefs
         );
     }

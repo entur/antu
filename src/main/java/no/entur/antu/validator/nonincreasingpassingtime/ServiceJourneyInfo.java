@@ -1,6 +1,6 @@
 package no.entur.antu.validator.nonincreasingpassingtime;
 
-import no.entur.antu.validator.nonincreasingpassingtime.stoptime.StopTimeAdaptor;
+import no.entur.antu.validator.nonincreasingpassingtime.stoptimeadapter.StopTimeAdaptor;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.*;
 

@@ -1,4 +1,4 @@
-package no.entur.antu.validator.nonincreasingpassingtime;
+package no.entur.antu.validator;
 
 import net.sf.saxon.s9api.XdmNode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class ValidationContextWithNetexEntitesIndex extends ValidationContext {
+public class ValidationContextWithNetexEntitiesIndex extends ValidationContext {
 
     private final Supplier<NetexEntitiesIndex> getNetexEntitiesIndex;
     private NetexEntitiesIndex netexEntitiesIndex;
 
-    public ValidationContextWithNetexEntitesIndex(XdmNode document,
-                                                  NetexXMLParser netexXMLParser,
-                                                  Supplier<NetexEntitiesIndex> getNetexEntitiesIndex,
-                                                  String codespace,
-                                                  String fileName,
-                                                  Set<IdVersion> localIds,
-                                                  List<IdVersion> localRefs) {
+    public ValidationContextWithNetexEntitiesIndex(XdmNode document,
+                                                   NetexXMLParser netexXMLParser,
+                                                   Supplier<NetexEntitiesIndex> getNetexEntitiesIndex,
+                                                   String codespace,
+                                                   String fileName,
+                                                   Set<IdVersion> localIds,
+                                                   List<IdVersion> localRefs) {
         super(document, netexXMLParser, codespace, fileName, localIds, localRefs);
         this.getNetexEntitiesIndex = getNetexEntitiesIndex;
     }

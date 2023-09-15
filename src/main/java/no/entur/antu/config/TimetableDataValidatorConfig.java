@@ -19,7 +19,7 @@ package no.entur.antu.config;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validator.nonincreasingpassingtime.NetexValidatorRunnerWithNetexEntitiesIndex;
+import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validator.nonincreasingpassingtime.ServiceJourneyNonIncreasingPassingTime;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
@@ -72,7 +72,7 @@ public class TimetableDataValidatorConfig {
                                                                VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                NetexReferenceValidator netexReferenceValidator,
-                                                               @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator,
+                                                               NetexIdUniquenessValidator netexIdUniquenessValidator,
                                                                ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime) {
         List<NetexValidator> netexValidators = List.of(
                 xpathValidator,

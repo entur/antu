@@ -1,4 +1,4 @@
-package no.entur.antu.validator.nonincreasingpassingtime.stoptime;
+package no.entur.antu.validator.nonincreasingpassingtime.stoptimeadapter;
 
 import org.rutebanken.netex.model.TimetabledPassingTime;
 

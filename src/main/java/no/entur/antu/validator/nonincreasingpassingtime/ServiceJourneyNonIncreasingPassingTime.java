@@ -1,7 +1,8 @@
 package no.entur.antu.validator.nonincreasingpassingtime;
 
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.validator.nonincreasingpassingtime.stoptime.StopTimeAdaptor;
+import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
+import no.entur.antu.validator.nonincreasingpassingtime.stoptimeadapter.StopTimeAdaptor;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -36,8 +37,8 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
             return;
         }
 
-        if (validationContext instanceof ValidationContextWithNetexEntitesIndex validationContextWithNetexEntitesIndex) {
-            NetexEntitiesIndex index = validationContextWithNetexEntitesIndex.getNetexEntitiesIndex();
+        if (validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex) {
+            NetexEntitiesIndex index = validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
             List<ServiceJourney> serviceJourneys =
                     index.getTimetableFrames().stream()
                             .flatMap(timetableFrame -> timetableFrame
