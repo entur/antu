@@ -39,11 +39,11 @@ public class StopRouteBuilder extends BaseRouteBuilder {
     public void configure() throws Exception {
         super.configure();
 
-        from("quartz://antu/refreshStopPlaceCacheAtStartup?" + "?trigger.repeatCount=0")
+        from("master:lockOnAntuRefreshStopCacheAtStartup:quartz://antu/refreshStopPlaceCacheAtStartup?" + "?trigger.repeatCount=0")
                 .to("direct:refresh-stop-cache")
                 .routeId("refresh-stop-cache-at-startup");
 
-        from("master:lockOnAntuRefreshStopCache:quartz://antu/refreshStopPlaceCachePeriodically?" + quartzTrigger)
+        from("master:lockOnAntuRefreshStopCachePeriodically:quartz://antu/refreshStopPlaceCachePeriodically?" + quartzTrigger)
                 .to("direct:refresh-stop-cache")
                 .routeId("refresh-stop-cache-periodically");
 
