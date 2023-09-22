@@ -2,6 +2,8 @@ package no.entur.antu.config;
 
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
+import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.stop.model.TransportSubMode;
 import no.entur.antu.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.Redisson;
@@ -32,10 +34,10 @@ public class CacheConfig {
 
     public static final String ORGANISATION_CACHE = "organisationCache";
     public static final String STOP_PLACE_AND_QUAY_CACHE = "stopPlaceAndQuayCache";
-    public static final String TRANSPORT_MODE_PER_STOP_PLACE_CACHE = "transportModePerStopPlaceCache";
-    public static final String TRANSPORT_SUB_MODE_PER_STOP_PLACE_CACHE = "transportSubModePerStopPlaceCache";
+    public static final String TRANSPORT_MODE_PER_QUAY_ID_CACHE = "transportModePerQuayIdCache";
+    public static final String TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE = "transportSubModePerQuayIdCache";
     public static final String COMMON_IDS_CACHE = "commonIdsCache";
-    public static final String STOP_PLACE_IDS_PER_SCHEDULED_STOP_POINTS = "stopPlaceIdsPerScheduledStopPoints";
+    public static final String QUAY_IDS_PER_SCHEDULED_STOP_POINTS_CACHE = "quayIdsPerScheduledStopPointsCache";
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfig.class);
 
     @Bean
@@ -81,19 +83,19 @@ public class CacheConfig {
     }
 
 
-    @Bean
-    public Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache(RedissonClient redissonClient) {
-        return redissonClient.getLocalCachedMap(TRANSPORT_MODE_PER_STOP_PLACE_CACHE, LocalCachedMapOptions.defaults());
+    @Bean(name = TRANSPORT_MODE_PER_QUAY_ID_CACHE)
+    public Map<QuayId, VehicleModeEnumeration> transportModePerQuayIdCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(TRANSPORT_MODE_PER_QUAY_ID_CACHE, LocalCachedMapOptions.defaults());
     }
 
-    @Bean
-    public Map<String, String> transportSubModePerStopPlaceCache(RedissonClient redissonClient) {
-        return redissonClient.getLocalCachedMap(TRANSPORT_SUB_MODE_PER_STOP_PLACE_CACHE, LocalCachedMapOptions.defaults());
+    @Bean(name = TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE)
+    public Map<QuayId, TransportSubMode> transportSubModePerQuayIdCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE, LocalCachedMapOptions.defaults());
     }
 
-    @Bean
-    public RLocalCachedMap<String, String> stopPlaceIdPerScheduledStopPointsCache(RedissonClient redissonClient) {
-        return redissonClient.getLocalCachedMap(STOP_PLACE_IDS_PER_SCHEDULED_STOP_POINTS, LocalCachedMapOptions.defaults());
+    @Bean(name = QUAY_IDS_PER_SCHEDULED_STOP_POINTS_CACHE)
+    public RLocalCachedMap<String, QuayId> quayIdsPerScheduledStopPointsCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(QUAY_IDS_PER_SCHEDULED_STOP_POINTS_CACHE, LocalCachedMapOptions.defaults());
     }
 
     @Bean

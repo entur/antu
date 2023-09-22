@@ -1,5 +1,7 @@
 package no.entur.antu.stop;
 
+import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.stop.model.TransportSubMode;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 import java.util.Map;
@@ -23,16 +25,16 @@ public interface StopPlaceResource {
     Set<String> getStopPlaceIds();
 
     /**
-     * Returns transport modes per stop place ids.
-     * @return map of stop place ids and transport mode.
+     * Returns transport modes per quay ids.
+     * @return map of quay ids and transport mode.
      */
-    Map<String, VehicleModeEnumeration> getTransportModesPerStopPlace();
+    Map<QuayId, VehicleModeEnumeration> getTransportModesPerQuayId();
 
     /**
-     * Returns transport sub modes per stop place ids.
-     * @return map of stop place ids and transport sub mode.
+     * Returns transport sub modes per quay ids.
+     * @return map of quay ids and transport sub mode.
      */
-    Map<String, String> getTransportSubModesPerStopPlace();
+    Map<QuayId, TransportSubMode> getTransportSubModesPerQuayId();
 
     void loadStopPlacesDataset();
 }

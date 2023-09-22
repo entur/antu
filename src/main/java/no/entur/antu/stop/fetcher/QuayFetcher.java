@@ -1,6 +1,7 @@
 package no.entur.antu.stop.fetcher;
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.stop.model.QuayId;
 import org.rutebanken.netex.model.Quay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,7 @@ import reactor.util.retry.Retry;
 import java.time.Duration;
 
 @Component
-public class QuayFetcher extends AntuNetexEntityFetcher<Quay, String> {
+public class QuayFetcher extends AntuNetexEntityFetcher<Quay, QuayId> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QuayFetcher.class);
 
@@ -22,19 +23,19 @@ public class QuayFetcher extends AntuNetexEntityFetcher<Quay, String> {
     }
 
     @Override
-    public Quay tryFetch(String quayId) {
+    public Quay tryFetch(QuayId quayId) {
 
-        LOGGER.info("Trying to fetch the Quay with id {}, from read API", quayId);
+        LOGGER.info("Trying to fetch the Quay with id {}, from read API", quayId.id());
 
         try {
             return this.webClient.get()
-                    .uri("/quays/{quayId}", quayId)
+                    .uri("/quays/{quayId}", quayId.id())
                     .retrieve()
                     .bodyToMono(Quay.class)
                     .retryWhen(Retry.backoff(MAX_RETRY_ATTEMPTS, Duration.ofSeconds(1)).filter(is5xx))
                     .block();
         } catch (Exception e) {
-            throw new AntuException("Could not find Quay for id " + quayId + " due to " + e.getMessage());
+            throw new AntuException("Could not find Quay for id " + quayId.id() + " due to " + e.getMessage());
         }
     }
 }

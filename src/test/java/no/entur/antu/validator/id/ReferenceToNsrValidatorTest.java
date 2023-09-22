@@ -1,6 +1,9 @@
 package no.entur.antu.validator.id;
 
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.stop.model.StopPlaceId;
+import no.entur.antu.stop.model.TransportSubMode;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,22 +24,22 @@ class ReferenceToNsrValidatorTest {
     void setUpTest() {
         StopPlaceRepository stopPlaceRepository = new StopPlaceRepository() {
             @Override
-            public boolean hasStopPlaceId(String stopPlaceId) {
-                return STOP_PLACE_ID.equals(stopPlaceId);
+            public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
+                return STOP_PLACE_ID.equals(stopPlaceId.id());
             }
 
             @Override
-            public boolean hasQuayId(String quayId) {
-                return QUAY_ID.equals(quayId);
+            public boolean hasQuayId(QuayId quayId) {
+                return QUAY_ID.equals(quayId.id());
             }
 
             @Override
-            public VehicleModeEnumeration getTransportModeForStopPlaceId(String stopPlaceId) {
+            public VehicleModeEnumeration getTransportModeForQuayId(QuayId quayId) {
                 return null;
             }
 
             @Override
-            public String getTransportSubModeForStopPlaceId(String stopPlaceId) {
+            public TransportSubMode getTransportSubModeForQuayId(QuayId quayId) {
                 return null;
             }
 
