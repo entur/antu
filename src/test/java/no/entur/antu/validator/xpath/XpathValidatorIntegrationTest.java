@@ -1,7 +1,9 @@
 package no.entur.antu.validator.xpath;
 
 import net.sf.saxon.s9api.XdmNode;
+import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.stop.model.QuayId;
 import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
 import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationReportEntry;
@@ -38,7 +40,21 @@ class XpathValidatorIntegrationTest {
                 return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
             }
         };
-        ValidationTreeFactory validationTreeFactory = new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository, null, null);
+        CommonDataRepository commonDataRepository = new CommonDataRepository() {
+            @Override
+            public QuayId findQuayId(String scheduledStopPoint) {
+                return null;
+            }
+
+            @Override
+            public void loadCommonDataCache(byte[] fileContent) {
+            }
+
+            @Override
+            public void cleanUp() {
+            }
+        };
+        ValidationTreeFactory validationTreeFactory = new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository, commonDataRepository, null);
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
         XPathValidator xPathValidator = new XPathValidator(validationTreeFactory, new DefaultValidationEntryFactory(new DefaultValidationConfigLoader(CONFIGURATION_ANTU_YAML)));
 
