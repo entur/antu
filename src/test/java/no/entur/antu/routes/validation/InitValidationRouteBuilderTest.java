@@ -165,7 +165,20 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         @Bean
         @Primary
         public CommonDataRepository commonDataRepository() {
-            return new CommonDataRepository(null,  Map.of());
+            return new CommonDataRepository() {
+                @Override
+                public QuayId findQuayId(String scheduledStopPoint) {
+                    return null;
+                }
+
+                @Override
+                public void loadCommonDataCache(byte[] fileContent) {
+                }
+
+                @Override
+                public void cleanUp() {
+                }
+            };
         }
     }
 
