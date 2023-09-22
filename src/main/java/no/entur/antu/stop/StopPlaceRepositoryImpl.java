@@ -17,6 +17,9 @@ package no.entur.antu.stop;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
+import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.stop.model.StopPlaceId;
+import no.entur.antu.stop.model.TransportSubMode;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.VehicleModeEnumeration;
@@ -37,73 +40,62 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     private final StopPlaceResource stopPlaceResource;
     private final Map<String, Set<String>> stopPlaceCache;
-    private final Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache;
-    private final Map<String, String> transportSubModePerStopPlaceCache;
-    private final NetexEntityFetcher<Quay, String> quayFetcher;
-    private final NetexEntityFetcher<StopPlace, String> stopPlaceFetcher;
+    private final Map<QuayId, VehicleModeEnumeration> transportModePerQuayIdCache;
+    private final Map<QuayId, TransportSubMode> transportSubModePerQuayIdCache;
+    private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
+    private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
+    private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
 
     public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
                                    Map<String, Set<String>> stopPlaceCache,
-                                   Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache,
-                                   Map<String, String> transportSubModePerStopPlaceCache) {
-        this(stopPlaceResource,
-                stopPlaceCache,
-                transportModePerStopPlaceCache,
-                transportSubModePerStopPlaceCache,
-                quayId -> {
-                    throw new AntuException("Could not find Quay for id " + quayId);
-                },
-                stopPlaceId -> {
-                    throw new AntuException("Could not find StopPlace for quay id " + stopPlaceId);
-                });
-    }
-
-    public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
-                                   Map<String, Set<String>> stopPlaceCache,
-                                   Map<String, VehicleModeEnumeration> transportModePerStopPlaceCache,
-                                   Map<String, String> transportSubModePerStopPlaceCache,
-                                   NetexEntityFetcher<Quay, String> quayFetcher,
-                                   NetexEntityFetcher<StopPlace, String> stopPlaceFetcher) {
+                                   Map<QuayId, VehicleModeEnumeration> transportModePerQuayIdCache,
+                                   Map<QuayId, TransportSubMode> transportSubModePerQuayIdCache,
+                                   NetexEntityFetcher<Quay, QuayId> quayFetcher,
+                                   NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
+                                   NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher) {
         this.stopPlaceResource = stopPlaceResource;
         this.stopPlaceCache = stopPlaceCache;
-        this.transportModePerStopPlaceCache = transportModePerStopPlaceCache;
-        this.transportSubModePerStopPlaceCache = transportSubModePerStopPlaceCache;
+        this.transportModePerQuayIdCache = transportModePerQuayIdCache;
+        this.transportSubModePerQuayIdCache = transportSubModePerQuayIdCache;
         this.quayFetcher = quayFetcher;
         this.stopPlaceFetcher = stopPlaceFetcher;
+        this.stopPlaceForQuayIdFetcher = stopPlaceForQuayIdFetcher;
     }
 
     @Override
-    public boolean hasStopPlaceId(String stopPlaceId) {
+    public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
         Set<String> stopPlaceIds = stopPlaceCache.get(STOP_PLACE_CACHE_KEY);
         if (stopPlaceIds == null) {
             throw new AntuException("Stop place ids cache not found");
         }
-        boolean idFoundInCache = stopPlaceIds.stream().anyMatch(id -> id.equals(stopPlaceId));
+        boolean idFoundInCache = stopPlaceIds.stream().anyMatch(id -> id.equals(stopPlaceId.id()));
         return idFoundInCache || stopPlaceFetcher.tryFetch(stopPlaceId) != null;
     }
 
     @Override
-    public boolean hasQuayId(String quayId) {
+    public boolean hasQuayId(QuayId quayId) {
         Set<String> quayIds = stopPlaceCache.get(QUAY_CACHE_KEY);
         if (quayIds == null) {
             throw new AntuException("Quay ids cache not found");
         }
-        boolean idFoundInCache = quayIds.stream().anyMatch(id -> id.equals(quayId));
+        boolean idFoundInCache = quayIds.stream().anyMatch(id -> id.equals(quayId.id()));
         return idFoundInCache || quayFetcher.tryFetch(quayId) != null;
     }
 
     @Override
-    public VehicleModeEnumeration getTransportModeForStopPlaceId(String stopPlaceId) {
-        return transportModePerStopPlaceCache.computeIfAbsent(
-                stopPlaceId,
-                id -> stopPlaceFetcher.tryFetch(id).getTransportMode());
+    public VehicleModeEnumeration getTransportModeForQuayId(QuayId quayId) {
+        return transportModePerQuayIdCache.computeIfAbsent(
+                quayId,
+                id -> stopPlaceForQuayIdFetcher.tryFetch(id).getTransportMode());
     }
 
     @Override
-    public String getTransportSubModeForStopPlaceId(String stopPlaceId) {
-        return transportSubModePerStopPlaceCache.computeIfAbsent(
-                stopPlaceId,
-                id -> String.valueOf(stopPlaceFetcher.tryFetch(id))
+    public TransportSubMode getTransportSubModeForQuayId(QuayId quayId) {
+        return transportSubModePerQuayIdCache.computeIfAbsent(
+                quayId,
+                id -> TransportSubMode
+                        .from(stopPlaceForQuayIdFetcher.tryFetch(id))
+                        .orElse(null)
         );
     }
 
@@ -112,10 +104,10 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         stopPlaceResource.loadStopPlacesDataset();
         stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceResource.getStopPlaceIds());
         stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
-        transportModePerStopPlaceCache.putAll(stopPlaceResource.getTransportModesPerStopPlace());
-        transportSubModePerStopPlaceCache.putAll(stopPlaceResource.getTransportSubModesPerStopPlace());
+        transportModePerQuayIdCache.putAll(stopPlaceResource.getTransportModesPerQuayId());
+        transportSubModePerQuayIdCache.putAll(stopPlaceResource.getTransportSubModesPerQuayId());
 
-        LOGGER.debug("Updated stop places and quays cache. Cache now has {} stop places and {} quays",
+        LOGGER.debug("Updated stop places ids, quays ids and transport mode cache. Cache now has {} stop places and {} quays",
                 stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(),
                 stopPlaceCache.get(QUAY_CACHE_KEY).size());
     }

@@ -4,6 +4,7 @@ import net.sf.saxon.s9api.*;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stop.model.TransportSubMode;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
@@ -18,7 +19,7 @@ import java.util.function.Supplier;
 
 public class ValidateTransportMode extends AbstractXPathValidationRule {
 
-    private record ValidationRuleContext(
+    private record ServiceJourneyContext(
             XdmItem serviceJourneyItem,
             String serviceJourneyId,
             AllVehicleModesOfTransportEnumeration transportMode,
@@ -42,73 +43,74 @@ public class ValidateTransportMode extends AbstractXPathValidationRule {
     public List<XPathValidationReportEntry> validate(XPathValidationContext xPathValidationContext) {
         String fileName = xPathValidationContext.getFileName();
 
-        List<ValidationRuleContext> validationRuleContexts = getServiceJourneys(xPathValidationContext).stream()
+        List<ServiceJourneyContext> serviceJourneyContexts = getServiceJourneys(xPathValidationContext).stream()
                 .map(serviceJourneyItem ->
-                        new ValidationRuleContext(
+                        new ServiceJourneyContext(
                                 serviceJourneyItem,
                                 serviceJourneyItem.stream().asNode().attribute("id"),
                                 getTransportModeForServiceJourney(serviceJourneyItem, xPathValidationContext),
                                 getScheduledStopPointsForServiceJourney(serviceJourneyItem, xPathValidationContext))
                 ).toList();
 
-        return validationRuleContexts.stream()
-                .filter(Predicate.not(validationRuleContext -> validateServiceJourney(validationRuleContext, xPathValidationContext)))
-                .map(validationRuleContext -> new XPathValidationReportEntry(
+        return serviceJourneyContexts.stream()
+                .filter(Predicate.not(serviceJourneyContext -> validateServiceJourney(serviceJourneyContext, xPathValidationContext)))
+                .map(serviceJourneyContext -> new XPathValidationReportEntry(
                                 String.format(
                                         "Invalid transport mode %s found in service journey with id %s",
-                                        validationRuleContext.transportMode(),
-                                        validationRuleContext.serviceJourneyId
+                                        serviceJourneyContext.transportMode(),
+                                        serviceJourneyContext.serviceJourneyId
                                 ),
                                 RULE_CODE_NETEX_TRANSPORT_MODE_1,
-                                getXdmNodeLocation(fileName, validationRuleContext.serviceJourneyItem.stream().asNode())
+                                getXdmNodeLocation(fileName, serviceJourneyContext.serviceJourneyItem.stream().asNode())
                         )
                 )
                 .toList();
     }
 
-    private boolean validateServiceJourney(ValidationRuleContext validationRuleContext,
+    private boolean validateServiceJourney(ServiceJourneyContext serviceJourneyContext,
                                            XPathValidationContext xPathValidationContext) {
-        return validationRuleContext.scheduledStopPoints.stream()
-                .map(commonDataRepository::findStopPlaceId)
+        return serviceJourneyContext.scheduledStopPoints.stream()
+                .map(commonDataRepository::findQuayId)
                 .filter(Objects::nonNull)
-                .allMatch(stopPlaceId ->
+                .allMatch(quayId ->
                         isValidTransportMode(
-                                validationRuleContext::transportMode,
-                                () -> getBusSubmodeForServiceJourney(validationRuleContext.serviceJourneyItem, xPathValidationContext),
-                                () -> stopPlaceRepository.getTransportModeForStopPlaceId(stopPlaceId),
-                                () -> stopPlaceRepository.getTransportSubModeForStopPlaceId(stopPlaceId)
+                                serviceJourneyContext::transportMode,
+                                () -> getBusSubmodeForServiceJourney(serviceJourneyContext.serviceJourneyItem, xPathValidationContext),
+                                () -> stopPlaceRepository.getTransportModeForQuayId(quayId),
+                                () -> stopPlaceRepository.getTransportSubModeForQuayId(quayId)
                         )
                 );
     }
 
     private boolean isValidTransportMode(Supplier<AllVehicleModesOfTransportEnumeration> getTransportModeForServiceJourney,
                                          Supplier<BusSubmodeEnumeration> getBusSubModeForServiceJourney,
-                                         Supplier<VehicleModeEnumeration> getTransportModeForStopPlace,
-                                         Supplier<String> getTransportSubModeForStopPlace) {
+                                         Supplier<VehicleModeEnumeration> getTransportModeForQuayId,
+                                         Supplier<TransportSubMode> getTransportSubModeForQuayId) {
 
-        VehicleModeEnumeration transportModeForStopPlace = getTransportModeForStopPlace.get();
+        VehicleModeEnumeration transportModeForQuayId = getTransportModeForQuayId.get();
         AllVehicleModesOfTransportEnumeration transportModeForServiceJourney = getTransportModeForServiceJourney.get();
-        if (transportModeForServiceJourney == null || transportModeForStopPlace == null) {
+        if (transportModeForServiceJourney == null || transportModeForQuayId == null) {
             return true;
         }
 
         // Coach and bus are interchangeable
-        if ((transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.COACH) && transportModeForStopPlace.equals(VehicleModeEnumeration.BUS))
-                || (transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.BUS) && transportModeForStopPlace.equals(VehicleModeEnumeration.COACH))) {
+        if ((transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.COACH) && transportModeForQuayId.equals(VehicleModeEnumeration.BUS))
+                || (transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.BUS) && transportModeForQuayId.equals(VehicleModeEnumeration.COACH))) {
             return true;
         }
 
         // Taxi can stop on bus and coach stops
         if (transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.TAXI)
-                && (transportModeForStopPlace.equals(VehicleModeEnumeration.BUS) || transportModeForStopPlace.equals(VehicleModeEnumeration.COACH))) {
+                && (transportModeForQuayId.equals(VehicleModeEnumeration.BUS) || transportModeForQuayId.equals(VehicleModeEnumeration.COACH))) {
             return true;
         }
 
-        if (transportModeForServiceJourney.value().equals(transportModeForStopPlace.value())) {
-            String stopPlaceTransportSubMode = getTransportSubModeForStopPlace.get();
+        if (transportModeForServiceJourney.value().equals(transportModeForQuayId.value())) {
+            TransportSubMode stopPlaceTransportSubMode = getTransportSubModeForQuayId.get();
             BusSubmodeEnumeration busSubModeForServiceJourney = getBusSubModeForServiceJourney.get();
             // Only rail replacement bus service can visit rail replacement bus stops
-            return !BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value().equals(stopPlaceTransportSubMode)
+            return (stopPlaceTransportSubMode != null
+                    && !BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value().equals(stopPlaceTransportSubMode.name()))
                     || busSubModeForServiceJourney == null
                     || BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.equals(busSubModeForServiceJourney);
         } else {
@@ -140,7 +142,8 @@ public class ValidateTransportMode extends AbstractXPathValidationRule {
         try {
             String journeyPatternRef = getJourneyPatternRefFromServiceJourney(serviceJourneyItem);
             XPathSelector selector = xPathValidationContext.getNetexXMLParser().getXPathCompiler()
-                    .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/journeyPatterns/JourneyPattern[@id = '" + journeyPatternRef + "']/pointsInSequence/StopPointInJourneyPattern/ScheduledStopPointRef")
+                    .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/journeyPatterns/JourneyPattern" +
+                            "[@id = '" + journeyPatternRef + "']/pointsInSequence/StopPointInJourneyPattern/ScheduledStopPointRef")
                     .load();
             selector.setContextItem(xPathValidationContext.getXmlNode());
             return selector.stream().asListOfNodes().stream().map(scheduledStopPointRef -> scheduledStopPointRef.attribute("ref")).toList();
