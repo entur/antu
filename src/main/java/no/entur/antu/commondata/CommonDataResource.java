@@ -1,6 +1,7 @@
 package no.entur.antu.commondata;
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.stop.model.QuayId;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.PassengerStopAssignment;
@@ -26,7 +27,7 @@ public class CommonDataResource {
         return netexEntitiesIndex;
     }
 
-    public Map<String, String> getStopPlaceIdsPerScheduledStopPoints() {
+    public Map<String, QuayId> getQuayIdsPerScheduledStopPoints() {
         return getCommonDataIndex().getServiceFrames().stream()
                 .flatMap(serviceFrame -> serviceFrame.getStopAssignments().getStopAssignment().stream())
                 .map(JAXBElement::getValue)
@@ -34,7 +35,7 @@ public class CommonDataResource {
                 .map(PassengerStopAssignment.class::cast)
                 .collect(Collectors.toMap(
                         passengerStopAssignment -> passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(),
-                        passengerStopAssignment -> passengerStopAssignment.getStopPlaceRef().getRef(),
+                        passengerStopAssignment -> new QuayId(passengerStopAssignment.getQuayRef().getRef()),
                         (v1, v2) -> v2
                 ));
     }

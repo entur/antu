@@ -40,6 +40,9 @@ import no.entur.antu.TestApp;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.stop.model.StopPlaceId;
+import no.entur.antu.stop.model.TransportSubMode;
 import no.entur.antu.util.TestValidationReportUtil;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
@@ -134,22 +137,22 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
         public StopPlaceRepository stopPlaceRepository() {
             return new StopPlaceRepository() {
                 @Override
-                public boolean hasStopPlaceId(String stopPlaceId) {
+                public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
                     return false;
                 }
 
                 @Override
-                public boolean hasQuayId(String quayId) {
+                public boolean hasQuayId(QuayId quayId) {
                     return false;
                 }
 
                 @Override
-                public VehicleModeEnumeration getTransportModeForStopPlaceId(String stopPlaceId) {
+                public VehicleModeEnumeration getTransportModeForQuayId(QuayId quayId) {
                     return null;
                 }
 
                 @Override
-                public String getTransportSubModeForStopPlaceId(String stopPlaceId) {
+                public TransportSubMode getTransportSubModeForQuayId(QuayId quayId) {
                     return null;
                 }
 

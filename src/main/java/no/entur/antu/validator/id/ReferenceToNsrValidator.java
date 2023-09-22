@@ -2,6 +2,8 @@ package no.entur.antu.validator.id;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.stop.model.StopPlaceId;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.slf4j.Logger;
@@ -40,7 +42,7 @@ public class ReferenceToNsrValidator implements ExternalReferenceValidator {
 
     private boolean isValidStopPlaceReference(IdVersion id) {
         try {
-            return id.getId().contains(":StopPlace:") && stopPlaceRepository.hasStopPlaceId(id.getId());
+            return StopPlaceId.isValid(id.getId()) && stopPlaceRepository.hasStopPlaceId(new StopPlaceId(id.getId()));
         } catch (AntuException ex) {
             LOGGER.warn(ex.getMessage());
             return false;
@@ -49,7 +51,7 @@ public class ReferenceToNsrValidator implements ExternalReferenceValidator {
 
     private boolean isValidQuayReference(IdVersion id) {
         try {
-            return id.getId().contains(":Quay:") && stopPlaceRepository.hasQuayId(id.getId());
+            return QuayId.isValid(id.getId()) && stopPlaceRepository.hasQuayId(new QuayId(id.getId()));
         } catch (AntuException ex) {
             LOGGER.warn(ex.getMessage());
             return false;

@@ -1,30 +1,32 @@
 package no.entur.antu.commondata;
 
+import no.entur.antu.stop.model.QuayId;
+
 import java.util.Map;
 
 public class CommonDataRepository {
 
     private final CommonDataResource commonDataResource;
-    private final Map<String, String> stopPlaceIdPerScheduledStopPointsCache;
+    private final Map<String, QuayId> quayIdsPerScheduledStopPointsCache;
 
     public CommonDataRepository(CommonDataResource commonDataResource,
-                                Map<String, String> stopPlaceIdPerScheduledStopPointsCache) {
+                                Map<String, QuayId> quayIdsPerScheduledStopPointsCache) {
         this.commonDataResource = commonDataResource;
-        this.stopPlaceIdPerScheduledStopPointsCache = stopPlaceIdPerScheduledStopPointsCache;
+        this.quayIdsPerScheduledStopPointsCache = quayIdsPerScheduledStopPointsCache;
     }
 
-    public String findStopPlaceId(String scheduledStopPoint) {
-        return stopPlaceIdPerScheduledStopPointsCache.get(scheduledStopPoint);
+    public QuayId findQuayId(String scheduledStopPoint) {
+        return quayIdsPerScheduledStopPointsCache.get(scheduledStopPoint);
     }
 
     public void loadCommonDataCache(byte[] fileContent) {
         commonDataResource.loadCommonData(fileContent);
-        stopPlaceIdPerScheduledStopPointsCache.putAll(
-                commonDataResource.getStopPlaceIdsPerScheduledStopPoints()
+        quayIdsPerScheduledStopPointsCache.putAll(
+                commonDataResource.getQuayIdsPerScheduledStopPoints()
         );
     }
 
     public void cleanUp() {
-        stopPlaceIdPerScheduledStopPointsCache.clear();
+        quayIdsPerScheduledStopPointsCache.clear();
     }
 }
