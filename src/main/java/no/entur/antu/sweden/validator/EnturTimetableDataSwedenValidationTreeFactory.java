@@ -1,6 +1,8 @@
 package no.entur.antu.sweden.validator;
 
+import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
@@ -15,7 +17,8 @@ import java.util.Set;
  * Validation rules are adapted to match swedish content.
  */
 public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetableDataValidationTreeFactory {
-    public EnturTimetableDataSwedenValidationTreeFactory() {
+    public EnturTimetableDataSwedenValidationTreeFactory(CommonDataRepository commonDataRepository,
+                                                         StopPlaceRepository stopPlaceRepository) {
         super(new OrganisationRepository() {
             @Override
             public void refreshCache() {
@@ -26,7 +29,7 @@ public class EnturTimetableDataSwedenValidationTreeFactory extends EnturTimetabl
             public Set<String> getWhitelistedAuthorityIds(String codespace) {
                 return Set.of();
             }
-        }, null, null);
+        }, commonDataRepository, stopPlaceRepository);
     }
 
     @Override
