@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import static no.entur.antu.config.CacheConfig.QUAY_IDS_PER_SCHEDULED_STOP_POINTS_CACHE;
+import java.util.Map;
+
+import static no.entur.antu.config.CacheConfig.QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE;
 
 @Configuration
 public class CommonDataConfig {
@@ -24,8 +26,8 @@ public class CommonDataConfig {
     @Bean
     @Profile("!test")
     CommonDataRepository commonDataRepository(CommonDataResource commonDataResource,
-                                              @Qualifier(QUAY_IDS_PER_SCHEDULED_STOP_POINTS_CACHE)
-                                              RLocalCachedMap<String, QuayId> quayIdsPerScheduledStopPointsCache) {
-        return new CommonDataRepositoryImpl(commonDataResource, quayIdsPerScheduledStopPointsCache);
+                                              @Qualifier(QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE)
+                                              RLocalCachedMap<String, Map<String, QuayId>> quayIdForScheduledStopPointCache) {
+        return new CommonDataRepositoryImpl(commonDataResource, quayIdForScheduledStopPointCache);
     }
 }

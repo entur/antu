@@ -37,7 +37,7 @@ public class CacheConfig {
     public static final String TRANSPORT_MODE_PER_QUAY_ID_CACHE = "transportModePerQuayIdCache";
     public static final String TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE = "transportSubModePerQuayIdCache";
     public static final String COMMON_IDS_CACHE = "commonIdsCache";
-    public static final String QUAY_IDS_PER_SCHEDULED_STOP_POINTS_CACHE = "quayIdsPerScheduledStopPointsCache";
+    public static final String QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE = "quayIdForScheduledStopPointCache";
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfig.class);
 
     @Bean
@@ -93,9 +93,9 @@ public class CacheConfig {
         return redissonClient.getLocalCachedMap(TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE, LocalCachedMapOptions.defaults());
     }
 
-    @Bean(name = QUAY_IDS_PER_SCHEDULED_STOP_POINTS_CACHE)
-    public RLocalCachedMap<String, QuayId> quayIdsPerScheduledStopPointsCache(RedissonClient redissonClient) {
-        return redissonClient.getLocalCachedMap(QUAY_IDS_PER_SCHEDULED_STOP_POINTS_CACHE, LocalCachedMapOptions.defaults());
+    @Bean(name = QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE)
+    public RLocalCachedMap<String, Map<String, QuayId>> quayIdForScheduledStopPointCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE, LocalCachedMapOptions.defaults());
     }
 
     @Bean
