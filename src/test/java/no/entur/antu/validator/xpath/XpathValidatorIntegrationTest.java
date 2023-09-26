@@ -40,21 +40,7 @@ class XpathValidatorIntegrationTest {
                 return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
             }
         };
-        CommonDataRepository commonDataRepository = new CommonDataRepository() {
-            @Override
-            public QuayId findQuayId(String scheduledStopPoint) {
-                return null;
-            }
-
-            @Override
-            public void loadCommonDataCache(byte[] fileContent) {
-            }
-
-            @Override
-            public void cleanUp() {
-            }
-        };
-        ValidationTreeFactory validationTreeFactory = new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository, commonDataRepository, null);
+        ValidationTreeFactory validationTreeFactory = new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository);
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
         XPathValidator xPathValidator = new XPathValidator(validationTreeFactory, new DefaultValidationEntryFactory(new DefaultValidationConfigLoader(CONFIGURATION_ANTU_YAML)));
 

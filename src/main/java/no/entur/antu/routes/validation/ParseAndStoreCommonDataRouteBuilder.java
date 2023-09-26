@@ -47,15 +47,22 @@ public class ParseAndStoreCommonDataRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Parsing NeTEx file ${header." + FILE_HANDLE + "}")
                 .setProperty(PROP_STOP_WATCH, StopWatch::new)
                 .doTry()
-                    .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_COMMON_FILE_NAME))
-                    .to("direct:downloadSingleNetexFileFromMemoryStore")
-                    .process(exchange -> commonDataRepository.loadCommonDataCache(exchange.getIn().getBody(byte[].class)))
+                .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_COMMON_FILE_NAME))
+                .to("direct:downloadSingleNetexFileFromMemoryStore")
+                .process(exchange -> commonDataRepository.loadCommonDataCache(
+                                exchange.getIn().getBody(byte[].class),
+                                exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class)
+                        ))
                 .doCatch(Exception.class)
-                    .log(LoggingLevel.ERROR, correlation() + "System error while parsing the NeTEx file ${header." + FILE_HANDLE + "}: ${exception.message} stacktrace: ${exception.stacktrace}")
+                .log(LoggingLevel.ERROR,
+                        correlation() + "System error while parsing the NeTEx file ${header." + FILE_HANDLE + "}: " +
+                                "${exception.message} stacktrace: ${exception.stacktrace}")
                 .stop()
                 // end catch
                 .end()
-                .log(LoggingLevel.INFO, correlation() + "Parsed NeTEx file ${header." + NETEX_FILE_NAME + "} in ${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
+                .log(LoggingLevel.INFO,
+                        correlation() + "Parsed NeTEx file ${header." + NETEX_FILE_NAME + "} in " +
+                                "${exchangeProperty." + PROP_STOP_WATCH + ".taken()} ms")
                 .routeId("store-common-data");
     }
 }

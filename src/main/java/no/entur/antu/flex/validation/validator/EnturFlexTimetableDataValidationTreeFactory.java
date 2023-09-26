@@ -1,8 +1,6 @@
 package no.entur.antu.flex.validation.validator;
 
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
@@ -14,10 +12,8 @@ import java.util.List;
  * XPath validation tree for flexible transport timetable data.
  */
 public class EnturFlexTimetableDataValidationTreeFactory extends EnturTimetableDataValidationTreeFactory {
-    public EnturFlexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository,
-                                                       CommonDataRepository commonDataRepository,
-                                                       StopPlaceRepository stopPlaceRepository) {
-        super(organisationRepository, commonDataRepository, stopPlaceRepository);
+    public EnturFlexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
+        super(organisationRepository);
     }
 
     @Override
