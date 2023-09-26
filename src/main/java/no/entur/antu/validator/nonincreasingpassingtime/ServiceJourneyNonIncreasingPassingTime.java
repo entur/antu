@@ -136,10 +136,8 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
 
     private String getValidationMessage(RuleCode ruleCode) {
         return switch (ruleCode) {
-            case TIMETABLED_PASSING_TIME_INCOMPLETE_TIME ->
-                    "ServiceJourney has incomplete TimetabledPassingTime";
-            case TIMETABLED_PASSING_TIME_INCONSISTENT_TIME ->
-                    "ServiceJourney has inconsistent TimetabledPassingTime";
+            case TIMETABLED_PASSING_TIME_INCOMPLETE_TIME -> "ServiceJourney has incomplete TimetabledPassingTime";
+            case TIMETABLED_PASSING_TIME_INCONSISTENT_TIME -> "ServiceJourney has inconsistent TimetabledPassingTime";
             case TIMETABLED_PASSING_TIME_NON_INCREASING_TIME ->
                     "ServiceJourney has non-increasing TimetabledPassingTime";
         };

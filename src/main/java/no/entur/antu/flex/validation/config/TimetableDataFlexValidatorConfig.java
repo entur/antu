@@ -49,17 +49,13 @@ import java.util.Set;
 public class TimetableDataFlexValidatorConfig {
 
     @Bean
-    public ValidationTreeFactory flexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository,
-                                                                        CommonDataRepository commonDataRepository,
-                                                                        StopPlaceRepository stopPlaceRepository) {
-        return new EnturFlexTimetableDataValidationTreeFactory(organisationRepository, commonDataRepository, stopPlaceRepository);
+    public ValidationTreeFactory flexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
+        return new EnturFlexTimetableDataValidationTreeFactory(organisationRepository);
     }
 
     @Bean
-    public ValidationTreeFactory importFlexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository,
-                                                                              CommonDataRepository commonDataRepository,
-                                                                              StopPlaceRepository stopPlaceRepository) {
-        return new EnturImportFlexTimetableDataValidationTreeFactory(organisationRepository, commonDataRepository, stopPlaceRepository);
+    public ValidationTreeFactory importFlexTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
+        return new EnturImportFlexTimetableDataValidationTreeFactory(organisationRepository);
     }
 
     @Bean
