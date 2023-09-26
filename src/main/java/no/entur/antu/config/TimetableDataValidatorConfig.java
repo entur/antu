@@ -19,6 +19,7 @@ package no.entur.antu.config;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validator.TransportModeValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
@@ -44,16 +45,22 @@ import java.util.Set;
 public class TimetableDataValidatorConfig {
 
     @Bean
-    public ValidationTreeFactory timetableDataValidationTreeFactory(OrganisationRepository organisationRepository,
-                                                                    CommonDataRepository commonDataRepository,
-                                                                    StopPlaceRepository stopPlaceRepository) {
-        return new EnturTimetableDataValidationTreeFactory(organisationRepository, commonDataRepository, stopPlaceRepository);
+    public ValidationTreeFactory timetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
+        return new EnturTimetableDataValidationTreeFactory(organisationRepository);
     }
 
     @Bean
     public XPathValidator timetableDataXPathValidator(@Qualifier("timetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory,
                                                       ValidationReportEntryFactory validationReportEntryFactory) {
         return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
+    }
+
+    @Bean
+    public TransportModeValidator transportModeValidator(@Qualifier("validationReportEntryFactory")
+                                                         ValidationReportEntryFactory validationReportEntryFactory,
+                                                         CommonDataRepository commonDataRepository,
+                                                         StopPlaceRepository currentStopPlaceRepository) {
+        return new TransportModeValidator(validationReportEntryFactory, commonDataRepository, currentStopPlaceRepository);
     }
 
     @Bean
@@ -64,7 +71,8 @@ public class TimetableDataValidatorConfig {
                                                                VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
                                                                ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                NetexReferenceValidator netexReferenceValidator,
-                                                               @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator) {
+                                                               @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator,
+                                                               TransportModeValidator transportModeValidator) {
         List<NetexValidator> netexValidators = List.of(
                 xpathValidator,
                 netexIdValidator,
@@ -72,7 +80,8 @@ public class TimetableDataValidatorConfig {
                 versionOnRefToLocalNetexIdValidator,
                 referenceToValidEntityTypeValidator,
                 netexReferenceValidator,
-                netexIdUniquenessValidator
+                netexIdUniquenessValidator,
+                transportModeValidator
         );
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
         return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);

@@ -22,16 +22,16 @@ public class TestConfig {
     public CommonDataRepository commonDataRepository() {
         return new CommonDataRepository() {
             @Override
-            public QuayId findQuayId(String scheduledStopPoint) {
+            public QuayId findQuayId(String scheduledStopPoint, String validationReportId) {
                 return null;
             }
 
             @Override
-            public void loadCommonDataCache(byte[] fileContent) {
+            public void loadCommonDataCache(byte[] fileContent, String validationReportId) {
             }
 
             @Override
-            public void cleanUp() {
+            public void cleanUp(String validationReportId) {
             }
         };
     }

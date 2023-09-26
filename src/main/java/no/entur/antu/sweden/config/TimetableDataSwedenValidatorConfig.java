@@ -74,9 +74,8 @@ public class TimetableDataSwedenValidatorConfig {
     }
 
     @Bean
-    public ValidationTreeFactory swedenTimetableDataValidationTreeFactory(CommonDataRepository commonDataRepository,
-                                                                          StopPlaceRepository stopPlaceRepository) {
-        return new EnturTimetableDataSwedenValidationTreeFactory(commonDataRepository, stopPlaceRepository);
+    public ValidationTreeFactory swedenTimetableDataValidationTreeFactory() {
+        return new EnturTimetableDataSwedenValidationTreeFactory();
     }
 
     @Bean
