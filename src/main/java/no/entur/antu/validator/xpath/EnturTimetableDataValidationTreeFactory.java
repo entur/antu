@@ -1,9 +1,6 @@
 package no.entur.antu.validator.xpath;
 
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validator.xpath.rules.ValidateTransportMode;
 import no.entur.antu.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validator.xpath.rules.ValidateAuthorityId;
 import no.entur.antu.validator.xpath.rules.ValidateNSRCodespace;
@@ -20,15 +17,9 @@ import java.util.Objects;
 public class EnturTimetableDataValidationTreeFactory extends DefaultValidationTreeFactory {
 
     private final OrganisationRepository organisationRepository;
-    private final CommonDataRepository commonDataRepository;
-    private final StopPlaceRepository stopPlaceRepository;
 
-    public EnturTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository,
-                                                   CommonDataRepository commonDataRepository,
-                                                   StopPlaceRepository stopPlaceRepository) {
+    public EnturTimetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
         this.organisationRepository = Objects.requireNonNull(organisationRepository);
-        this.commonDataRepository = commonDataRepository;
-        this.stopPlaceRepository = stopPlaceRepository;
     }
 
     @Override
@@ -56,7 +47,6 @@ public class EnturTimetableDataValidationTreeFactory extends DefaultValidationTr
     protected ValidationTree getLineFileValidationTree() {
         ValidationTree lineFileValidationTree = super.getLineFileValidationTree();
         lineFileValidationTree.addValidationRule(new ValidateAllowedCodespaces());
-        lineFileValidationTree.addValidationRule(new ValidateTransportMode(commonDataRepository, stopPlaceRepository));
         return lineFileValidationTree;
     }
 
