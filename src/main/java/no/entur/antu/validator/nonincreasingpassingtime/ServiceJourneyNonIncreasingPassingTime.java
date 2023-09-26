@@ -74,9 +74,11 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
         var previousPassingTime = orderedPassingTimes.get(0);
         if (!previousPassingTime.isComplete()) {
             validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME);
+            return;
         }
         if (!previousPassingTime.isConsistent()) {
             validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME);
+            return;
         }
 
         for (int i = 1; i < orderedPassingTimes.size(); i++) {
@@ -84,13 +86,16 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
 
             if (!currentPassingTime.isComplete()) {
                 validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME);
+                return;
             }
             if (!currentPassingTime.isConsistent()) {
                 validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME);
+                return;
             }
 
             if (!previousPassingTime.isStopTimesIncreasing(currentPassingTime)) {
                 validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME);
+                return;
             }
 
             previousPassingTime = currentPassingTime;
