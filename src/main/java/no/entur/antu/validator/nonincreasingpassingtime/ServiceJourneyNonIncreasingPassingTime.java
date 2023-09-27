@@ -18,7 +18,7 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceJourneyNonIncreasingPassingTime.class);
 
-    private enum RuleCode {
+    protected enum RuleCode {
         TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
         TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
         TIMETABLED_PASSING_TIME_NON_INCREASING_TIME
