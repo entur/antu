@@ -21,7 +21,7 @@ public class StopPlacesDatasetLoader {
     private final String currentStopPlacesFile;
     
     public StopPlacesDatasetLoader(MardukBlobStoreService mardukBlobStoreService,
-                                   @Value("${antu.netex.stop.current.filename:tiamat/Current_latest.zip}") String currentStopPlacesFile) {
+                                   @Value("${antu.netex.stop.current.filename:tiamat/CurrentAndFuture_latest.zip}") String currentStopPlacesFile) {
         this.mardukBlobStoreService = mardukBlobStoreService;
         this.currentStopPlacesFile = currentStopPlacesFile;
     }
