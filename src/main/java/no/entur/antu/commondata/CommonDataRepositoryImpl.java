@@ -27,7 +27,15 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
 
     public void loadCommonDataCache(byte[] fileContent, String validationReportId) {
         commonDataResource.loadCommonData(fileContent);
-        quayIdForScheduledStopPointCache.put(validationReportId, commonDataResource.getQuayIdsPerScheduledStopPoints());
+        // Merging with the existing map, for handing the case where there are
+        // multiple common files in the dataset.
+        quayIdForScheduledStopPointCache.merge(
+                validationReportId,
+                commonDataResource.getQuayIdsPerScheduledStopPoints(),
+                (existingMap, newMap) -> {
+                    existingMap.putAll(newMap);
+                    return existingMap;
+                });
     }
 
     public void cleanUp(String validationReportId) {
