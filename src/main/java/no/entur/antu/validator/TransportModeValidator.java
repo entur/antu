@@ -69,7 +69,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
                 .forEach(serviceJourneyContext -> validationReport.addValidationReportEntry(
                         createValidationReportEntry(
                                 RULE_CODE_NETEX_TRANSPORT_MODE_1,
-                                findDataLOcation(validationContext, serviceJourneyContext, validationContext.getFileName()),
+                                findDataLocation(validationContext, serviceJourneyContext, validationContext.getFileName()),
                                 String.format(
                                         "Invalid transport mode %s found in service journey with id %s",
                                         serviceJourneyContext.transportMode(),
@@ -80,7 +80,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
     }
 
-    private DataLocation findDataLOcation(ValidationContext validationContext,
+    private DataLocation findDataLocation(ValidationContext validationContext,
                                           ServiceJourneyContext serviceJourneyContext,
                                           String fileName) {
         return validationContext.getLocalIds().stream()
@@ -101,6 +101,9 @@ public class TransportModeValidator extends AbstractNetexValidator {
                                            String validationReportId) {
         return serviceJourneyContext.scheduledStopPoints.stream()
                 .map(scheduledStopPoint -> commonDataRepository.findQuayId(scheduledStopPoint, validationReportId))
+                // At this point, we have already validated that all the ids in line file exists either in the line file or in the common file.
+                // So we have probably already have the validation entry for the missing id reference in validation context. So we will simply ignore
+                // the null values instead of creating new validation entry.
                 .filter(Objects::nonNull)
                 .allMatch(quayId ->
                         isValidTransportMode(
@@ -120,6 +123,10 @@ public class TransportModeValidator extends AbstractNetexValidator {
         VehicleModeEnumeration transportModeForQuayId = getTransportModeForQuayId.get();
         AllVehicleModesOfTransportEnumeration transportModeForServiceJourney = getTransportModeForServiceJourney.get();
         if (transportModeForServiceJourney == null || transportModeForQuayId == null) {
+            // TransportMode on Line is mandatory. At this point, the validation entry for the Missing transport mode,
+            // will already be created. So we will simply ignore it, if there is no transportModeForServiceJourney exists.
+            // transportModeForQuayId should never be null at this point, as it is mandatory in stop places file in tiamat.
+            // In worst case we will return true to ignore the validation.
             return true;
         }
 
