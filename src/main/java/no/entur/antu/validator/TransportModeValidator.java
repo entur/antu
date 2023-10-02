@@ -148,11 +148,14 @@ public class TransportModeValidator extends AbstractNetexValidator {
         if (transportModeForServiceJourney.value().equals(transportModeForQuayId.value())) {
             TransportSubMode stopPlaceTransportSubMode = getTransportSubModeForQuayId.get();
             BusSubmodeEnumeration busSubModeForServiceJourney = getBusSubModeForServiceJourney.get();
+
             // Only rail replacement bus service can visit rail replacement bus stops
-            return (stopPlaceTransportSubMode != null
-                    && !BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value().equals(stopPlaceTransportSubMode.name()))
-                    || busSubModeForServiceJourney == null
-                    || BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.equals(busSubModeForServiceJourney);
+            if (stopPlaceTransportSubMode != null && stopPlaceTransportSubMode.name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())) {
+                // if the stopPlaceTransportSubMode is RAIL_REPLACEMENT_BUS, then busSubModeForServiceJourney should be RAIL_REPLACEMENT_BUS
+                return busSubModeForServiceJourney == BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS;
+            } else {
+                return true;
+            }
         } else {
             return false;
         }
@@ -163,7 +166,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
         try {
             XdmNode transportSubmodeNode = getChild(
                     serviceJourneyItem.stream().asNode(),
-                    new QName("n", Constants.NETEX_NAMESPACE, "TransportSubmode")
+                    new QName("n", Constants.NETEX_NAMESPACE, "TransportSubmode") // TODO: Is it correct
             );
             transportSubmodeNode = transportSubmodeNode != null
                     ? transportSubmodeNode
@@ -197,7 +200,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
         }
     }
 
-    private static List<XdmItem> getServiceJourneys(ValidationContext validationContext) {
+    protected List<XdmItem> getServiceJourneys(ValidationContext validationContext) {
         try {
             XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
                     .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/vehicleJourneys/ServiceJourney")
