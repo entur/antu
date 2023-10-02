@@ -25,7 +25,7 @@ public class StopPlaceFetcher extends AntuNetexEntityFetcher<StopPlace, String> 
 
         try {
             return this.webClient.get()
-                    .uri("/quays/{quayId}/stop-place", stopPlaceId)
+                    .uri("/stop-places/{stopPlaceId}", stopPlaceId)
                     .retrieve()
                     .bodyToMono(StopPlace.class)
                     .block();
