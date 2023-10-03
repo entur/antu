@@ -166,7 +166,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
         try {
             XdmNode transportSubmodeNode = getChild(
                     serviceJourneyItem.stream().asNode(),
-                    new QName("n", Constants.NETEX_NAMESPACE, "TransportSubmode") // TODO: Is it correct
+                    new QName("n", Constants.NETEX_NAMESPACE, "TransportSubmode")
             );
             transportSubmodeNode = transportSubmodeNode != null
                     ? transportSubmodeNode
