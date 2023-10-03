@@ -32,16 +32,17 @@ import java.util.Set;
 @Configuration
 public class OrganisationConfig {
 
-
     @Bean
     @Profile("!test")
-    OrganisationResource organisationResource(@Value("${antu.organisation.registry.url}") String organisationRegistryUrl, WebClient orgRegisterClient) {
+    OrganisationResource organisationResource(@Value("${antu.organisation.registry.url}") String organisationRegistryUrl,
+                                              WebClient orgRegisterClient) {
         return new OrganisationResource(organisationRegistryUrl, orgRegisterClient);
     }
 
     @Bean
     @Profile("!test")
-    OrganisationRepository organisationRepository(OrganisationResource organisationResource, @Qualifier("organisationCache") Map<String, Set<String>> organisationCache) {
+    OrganisationRepository organisationRepository(OrganisationResource organisationResource,
+                                                  @Qualifier("organisationCache") Map<String, Set<String>> organisationCache) {
         return new DefaultOrganisationRepository(organisationResource, organisationCache);
     }
 }

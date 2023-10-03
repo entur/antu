@@ -16,11 +16,16 @@
 
 package no.entur.antu.config;
 
-import no.entur.antu.stop.CurrentStopPlaceResource;
+import no.entur.antu.stop.StopPlaceResourceImpl;
 import no.entur.antu.stop.StopPlaceRepositoryImpl;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.fetcher.QuayFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceFetcher;
+import no.entur.antu.stop.fetcher.StopPlaceForQuayIdFetcher;
+import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
+import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.stop.model.TransportSubMode;
+import org.rutebanken.netex.model.VehicleModeEnumeration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,16 +34,39 @@ import org.springframework.context.annotation.Profile;
 import java.util.Map;
 import java.util.Set;
 
+import static no.entur.antu.config.CacheConfig.TRANSPORT_MODE_PER_QUAY_ID_CACHE;
+import static no.entur.antu.config.CacheConfig.TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE;
+
 @Configuration
 public class StopPlaceConfig {
 
     @Bean
     @Profile("!test")
-    StopPlaceRepository currentStopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
-                                                   Map<String, Set<String>> stopPlaceCache,
-                                                   CurrentStopPlaceResource currentStopPlaceResource,
-                                                   StopPlaceFetcher stopPlaceFetcher,
-                                                   QuayFetcher quayFetcher) {
-        return new StopPlaceRepositoryImpl(currentStopPlaceResource, stopPlaceCache, quayFetcher, stopPlaceFetcher);
+    StopPlaceResourceImpl stopPlaceResource(StopPlacesDatasetLoader stopPlacesDatasetLoader) {
+        return new StopPlaceResourceImpl(stopPlacesDatasetLoader);
+    }
+
+    @Bean
+    @Profile("!test")
+    StopPlaceRepository stopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
+                                            Map<String, Set<String>> stopPlaceCache,
+                                            StopPlaceFetcher stopPlaceFetcher,
+                                            QuayFetcher quayFetcher,
+                                            StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
+                                            @Qualifier(TRANSPORT_MODE_PER_QUAY_ID_CACHE)
+                                            Map<QuayId, VehicleModeEnumeration> transportModePerStopPlaceCache,
+                                            @Qualifier(TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE)
+                                            Map<QuayId, TransportSubMode> transportSubModePerStopPlaceCache,
+                                            @Qualifier("stopPlaceResource")
+                                            StopPlaceResourceImpl stopPlaceResourceImpl) {
+        return new StopPlaceRepositoryImpl(
+                stopPlaceResourceImpl,
+                stopPlaceCache,
+                transportModePerStopPlaceCache,
+                transportSubModePerStopPlaceCache,
+                quayFetcher,
+                stopPlaceFetcher,
+                stopPlaceForQuayIdFetcher
+        );
     }
 }

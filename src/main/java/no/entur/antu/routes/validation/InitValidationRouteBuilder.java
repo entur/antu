@@ -27,14 +27,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static no.entur.antu.Constants.DATASET_CODESPACE;
-import static no.entur.antu.Constants.DATASET_REFERENTIAL;
-import static no.entur.antu.Constants.JOB_TYPE;
-import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
-import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
-import static no.entur.antu.Constants.JOB_TYPE_SPLIT;
-import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
-import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
+import static no.entur.antu.Constants.*;
 
 
 /**
@@ -86,6 +79,8 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .choice()
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_SPLIT))
                 .to("direct:splitDataset")
+                .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_STORE_COMMON_DATA))
+                .to("direct:storeCommonData")
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE))
                 .to("direct:validateNetex")
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_COMMON_FILES))

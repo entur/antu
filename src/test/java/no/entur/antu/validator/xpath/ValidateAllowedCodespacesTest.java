@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Set;
 
-import static no.entur.antu.validator.codespace.NetexCodespace.NSR_NETEX_CODESPACE;
+import static no.entur.antu.validator.NetexCodespace.NSR_NETEX_CODESPACE;
 
 class ValidateAllowedCodespacesTest {
 
