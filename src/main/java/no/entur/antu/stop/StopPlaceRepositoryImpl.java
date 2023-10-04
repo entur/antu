@@ -107,8 +107,14 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         transportModePerQuayIdCache.putAll(stopPlaceResource.getTransportModesPerQuayId());
         transportSubModePerQuayIdCache.putAll(stopPlaceResource.getTransportSubModesPerQuayId());
 
-        LOGGER.debug("Updated stop places ids, quays ids and transport mode cache. Cache now has {} stop places and {} quays",
+        LOGGER.info("Updated cache with " +
+                     "{} stop places ids, " +
+                     "{} quays ids, " +
+                     "{} transport modes per quay id, " +
+                     "{} transport sub modes per quay id",
                 stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(),
-                stopPlaceCache.get(QUAY_CACHE_KEY).size());
+                stopPlaceCache.get(QUAY_CACHE_KEY).size(),
+                transportModePerQuayIdCache.size(),
+                transportSubModePerQuayIdCache.size());
     }
 }
