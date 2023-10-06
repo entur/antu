@@ -24,8 +24,8 @@ import no.entur.antu.stop.fetcher.StopPlaceFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceForQuayIdFetcher;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.TransportSubMode;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
+import no.entur.antu.stop.model.TransportModes;
+import org.redisson.api.RLocalCachedMap;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,8 +34,7 @@ import org.springframework.context.annotation.Profile;
 import java.util.Map;
 import java.util.Set;
 
-import static no.entur.antu.config.CacheConfig.TRANSPORT_MODE_PER_QUAY_ID_CACHE;
-import static no.entur.antu.config.CacheConfig.TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE;
+import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_PER_QUAY_ID_CACHE;
 
 @Configuration
 public class StopPlaceConfig {
@@ -53,17 +52,14 @@ public class StopPlaceConfig {
                                             StopPlaceFetcher stopPlaceFetcher,
                                             QuayFetcher quayFetcher,
                                             StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
-                                            @Qualifier(TRANSPORT_MODE_PER_QUAY_ID_CACHE)
-                                            Map<QuayId, VehicleModeEnumeration> transportModePerStopPlaceCache,
-                                            @Qualifier(TRANSPORT_SUB_MODE_PER_QUAY_ID_CACHE)
-                                            Map<QuayId, TransportSubMode> transportSubModePerStopPlaceCache,
+                                            @Qualifier(TRANSPORT_MODES_PER_QUAY_ID_CACHE)
+                                            RLocalCachedMap<QuayId, TransportModes> transportModesPerStopPlaceCache,
                                             @Qualifier("stopPlaceResource")
                                             StopPlaceResourceImpl stopPlaceResourceImpl) {
         return new StopPlaceRepositoryImpl(
                 stopPlaceResourceImpl,
                 stopPlaceCache,
-                transportModePerStopPlaceCache,
-                transportSubModePerStopPlaceCache,
+                transportModesPerStopPlaceCache,
                 quayFetcher,
                 stopPlaceFetcher,
                 stopPlaceForQuayIdFetcher
