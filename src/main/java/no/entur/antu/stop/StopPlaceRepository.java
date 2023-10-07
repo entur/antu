@@ -17,8 +17,7 @@ package no.entur.antu.stop;
 
 import no.entur.antu.stop.model.QuayId;
 import no.entur.antu.stop.model.StopPlaceId;
-import no.entur.antu.stop.model.TransportSubMode;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
+import no.entur.antu.stop.model.TransportModes;
 
 /**
  * A repository to store and cache the stop place and quay ids retrieved from the National Stop Register.
@@ -38,16 +37,10 @@ public interface StopPlaceRepository {
     boolean hasQuayId(QuayId quayId);
 
     /**
-     * Returns the transport mode for quay id present in the cache or try getting it from Read api.
-     * @return transport mode for given stop place id.
+     * Returns the transport modes for quay id present in the cache or try getting it from Read api.
+     * @return transport modes for given stop place id.
      */
-    VehicleModeEnumeration getTransportModeForQuayId(QuayId quayId);
-
-    /**
-     * Returns the transport mode for quay id present in the cache or try getting it from Read api.
-     * @return transport mode for given stop place id.
-     */
-    TransportSubMode getTransportSubModeForQuayId(QuayId quayId);
+    TransportModes getTransportModesForQuayId(QuayId quayId);
 
     /**
      * Refresh the cache with data retrieved from the Stop Place Register.

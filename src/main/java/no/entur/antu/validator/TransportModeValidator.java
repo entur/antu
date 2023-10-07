@@ -4,7 +4,7 @@ import net.sf.saxon.s9api.*;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.stop.model.TransportSubMode;
+import no.entur.antu.stop.model.TransportModes;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
 import org.entur.netex.validation.validator.DataLocation;
@@ -109,20 +109,20 @@ public class TransportModeValidator extends AbstractNetexValidator {
                         isValidTransportMode(
                                 serviceJourneyContext::transportMode,
                                 () -> getBusSubmodeForServiceJourney(serviceJourneyContext.serviceJourneyItem, validationContext),
-                                () -> stopPlaceRepository.getTransportModeForQuayId(quayId),
-                                () -> stopPlaceRepository.getTransportSubModeForQuayId(quayId)
+                                () -> stopPlaceRepository.getTransportModesForQuayId(quayId)
                         )
                 );
     }
 
     private boolean isValidTransportMode(Supplier<AllVehicleModesOfTransportEnumeration> getTransportModeForServiceJourney,
                                          Supplier<BusSubmodeEnumeration> getBusSubModeForServiceJourney,
-                                         Supplier<VehicleModeEnumeration> getTransportModeForQuayId,
-                                         Supplier<TransportSubMode> getTransportSubModeForQuayId) {
+                                         Supplier<TransportModes> getTransportModeForQuayId) {
 
-        VehicleModeEnumeration transportModeForQuayId = getTransportModeForQuayId.get();
+        TransportModes transportModeForQuayId = getTransportModeForQuayId.get();
         AllVehicleModesOfTransportEnumeration transportModeForServiceJourney = getTransportModeForServiceJourney.get();
-        if (transportModeForServiceJourney == null || transportModeForQuayId == null) {
+        if (transportModeForQuayId == null
+            || transportModeForQuayId.mode() == null
+            || transportModeForServiceJourney == null) {
             // TransportMode on Line is mandatory. At this point, the validation entry for the Missing transport mode,
             // will already be created. So we will simply ignore it, if there is no transportModeForServiceJourney exists.
             // transportModeForQuayId should never be null at this point, as it is mandatory in stop places file in tiamat.
@@ -132,26 +132,27 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
         // Coach and bus are interchangeable
         if ((transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.COACH)
-                && transportModeForQuayId.equals(VehicleModeEnumeration.BUS))
+                && transportModeForQuayId.mode().equals(VehicleModeEnumeration.BUS))
                 || (transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.BUS)
-                && transportModeForQuayId.equals(VehicleModeEnumeration.COACH))) {
+                && transportModeForQuayId.mode().equals(VehicleModeEnumeration.COACH))) {
             return true;
         }
 
         // Taxi can stop on bus and coach stops
         if (transportModeForServiceJourney.equals(AllVehicleModesOfTransportEnumeration.TAXI)
-                && (transportModeForQuayId.equals(VehicleModeEnumeration.BUS)
-                || transportModeForQuayId.equals(VehicleModeEnumeration.COACH))) {
+                && (transportModeForQuayId.mode().equals(VehicleModeEnumeration.BUS)
+                || transportModeForQuayId.mode().equals(VehicleModeEnumeration.COACH))) {
             return true;
         }
 
-        if (transportModeForServiceJourney.value().equals(transportModeForQuayId.value())) {
-            TransportSubMode stopPlaceTransportSubMode = getTransportSubModeForQuayId.get();
+        if (transportModeForServiceJourney.value().equals(transportModeForQuayId.mode().value())) {
             BusSubmodeEnumeration busSubModeForServiceJourney = getBusSubModeForServiceJourney.get();
 
             // Only rail replacement bus service can visit rail replacement bus stops
-            if (stopPlaceTransportSubMode != null && stopPlaceTransportSubMode.name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())) {
-                // if the stopPlaceTransportSubMode is RAIL_REPLACEMENT_BUS, then busSubModeForServiceJourney should be RAIL_REPLACEMENT_BUS
+            if (transportModeForQuayId.subMode() != null
+                && transportModeForQuayId.subMode().name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())) {
+                // if the stopPlaceTransportSubMode is RAIL_REPLACEMENT_BUS,
+                // then busSubModeForServiceJourney should be RAIL_REPLACEMENT_BUS
                 return busSubModeForServiceJourney == BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS;
             } else {
                 return true;

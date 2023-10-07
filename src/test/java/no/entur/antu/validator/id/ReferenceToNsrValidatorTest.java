@@ -3,14 +3,11 @@ package no.entur.antu.validator.id;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.model.QuayId;
 import no.entur.antu.stop.model.StopPlaceId;
-import no.entur.antu.stop.model.TransportSubMode;
+import no.entur.antu.stop.model.TransportModes;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
-
 import java.util.Set;
 
 class ReferenceToNsrValidatorTest {
@@ -34,12 +31,7 @@ class ReferenceToNsrValidatorTest {
             }
 
             @Override
-            public VehicleModeEnumeration getTransportModeForQuayId(QuayId quayId) {
-                return null;
-            }
-
-            @Override
-            public TransportSubMode getTransportSubModeForQuayId(QuayId quayId) {
+            public TransportModes getTransportModesForQuayId(QuayId quayId) {
                 return null;
             }
 

@@ -5,8 +5,7 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.model.QuayId;
 import no.entur.antu.stop.model.StopPlaceId;
-import no.entur.antu.stop.model.TransportSubMode;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
+import no.entur.antu.stop.model.TransportModes;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -74,12 +73,7 @@ public class TestConfig {
             }
 
             @Override
-            public VehicleModeEnumeration getTransportModeForQuayId(QuayId quayId) {
-                return null;
-            }
-
-            @Override
-            public TransportSubMode getTransportSubModeForQuayId(QuayId quayId) {
+            public TransportModes getTransportModesForQuayId(QuayId quayId) {
                 return null;
             }
 
