@@ -82,13 +82,14 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     @Override
     public TransportModes getTransportModesForQuayId(QuayId quayId) {
-        TransportModes transportModes = transportModesPerQuayIdCache.computeIfAbsent(
+        return transportModesPerQuayIdCache.computeIfAbsent(
                 quayId,
-                id -> new TransportModes(stopPlaceForQuayIdFetcher.tryFetch(id).getTransportMode(), TransportSubMode
-                        .from(stopPlaceForQuayIdFetcher.tryFetch(id))
-                        .orElse(null)));
-
-        return transportModes;
+                id -> {
+                    StopPlace stopPlace = stopPlaceForQuayIdFetcher.tryFetch(id);
+                    return new TransportModes(
+                            stopPlace.getTransportMode(),
+                            TransportSubMode.from(stopPlace).orElse(null));
+                });
     }
 
     @Override
