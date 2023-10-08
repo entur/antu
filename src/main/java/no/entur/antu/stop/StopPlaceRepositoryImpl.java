@@ -82,14 +82,19 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     @Override
     public TransportModes getTransportModesForQuayId(QuayId quayId) {
-        return transportModesPerQuayIdCache.computeIfAbsent(
-                quayId,
-                id -> {
-                    StopPlace stopPlace = stopPlaceForQuayIdFetcher.tryFetch(id);
-                    return new TransportModes(
-                            stopPlace.getTransportMode(),
-                            TransportSubMode.from(stopPlace).orElse(null));
-                });
+        // Intentionally not using the "Map.computeIfAbsent()", because we need
+        // to call the readApi from computeIfAbsent, which is somewhat long-running
+        // operation, which holds the RedissonLock.lock, causing java.lang.InterruptedException.
+        TransportModes transportModes = transportModesPerQuayIdCache.get(quayId);
+        if (transportModes == null) {
+            StopPlace stopPlace = stopPlaceForQuayIdFetcher.tryFetch(quayId);
+            TransportModes transportModesFromReadApi = new TransportModes(
+                    stopPlace.getTransportMode(),
+                    TransportSubMode.from(stopPlace).orElse(null));
+            transportModesPerQuayIdCache.put(quayId, transportModesFromReadApi);
+            return transportModesFromReadApi;
+        }
+        return transportModes;
     }
 
     @Override
