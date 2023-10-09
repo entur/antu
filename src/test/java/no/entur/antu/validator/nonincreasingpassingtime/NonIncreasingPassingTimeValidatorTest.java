@@ -11,14 +11,14 @@ import org.rutebanken.netex.model.*;
 
 import java.time.LocalTime;
 
-import static no.entur.antu.validator.nonincreasingpassingtime.ServiceJourneyNonIncreasingPassingTime.RuleCode;
+import static no.entur.antu.validator.nonincreasingpassingtime.NonIncreasingPassingTimeValidator.RuleCode;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class ServiceJourneyNonIncreasingPassingTimeTest {
+class NonIncreasingPassingTimeValidatorTest {
 
     @Test
     void testValidateServiceJourneyWithRegularStop() {
@@ -365,8 +365,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     }
 
     private static ValidationReport setupAndRunValidation(NetexEntitiesIndex netexEntitiesIndex) {
-        ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
-                new ServiceJourneyNonIncreasingPassingTime(
+        NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator =
+                new NonIncreasingPassingTimeValidator(
                         (code, message, dataLocation) ->
                                 new ValidationReportEntry(message, code, ValidationReportEntrySeverity.ERROR)
                 );
@@ -376,7 +376,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
         ValidationContextWithNetexEntitiesIndex validationContext = mock(ValidationContextWithNetexEntitiesIndex.class);
         when(validationContext.getNetexEntitiesIndex()).thenReturn(netexEntitiesIndex);
 
-        serviceJourneyNonIncreasingPassingTime.validate(testValidationReport, validationContext);
+        nonIncreasingPassingTimeValidator.validate(testValidationReport, validationContext);
 
         return testValidationReport;
     }
