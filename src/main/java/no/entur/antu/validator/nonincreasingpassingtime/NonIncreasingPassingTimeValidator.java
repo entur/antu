@@ -2,7 +2,8 @@ package no.entur.antu.validator.nonincreasingpassingtime;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.nonincreasingpassingtime.stoptimeadapter.StopTimeAdaptor;
+import no.entur.antu.validator.nonincreasingpassingtime.stoptime.SortedStopTimes;
+import no.entur.antu.validator.nonincreasingpassingtime.stoptime.StopTime;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -14,9 +15,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidator {
+public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceJourneyNonIncreasingPassingTime.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NonIncreasingPassingTimeValidator.class);
 
     protected enum RuleCode {
         TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
@@ -24,7 +25,7 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
         TIMETABLED_PASSING_TIME_NON_INCREASING_TIME
     }
 
-    public ServiceJourneyNonIncreasingPassingTime(ValidationReportEntryFactory validationReportEntryFactory) {
+    public NonIncreasingPassingTimeValidator(ValidationReportEntryFactory validationReportEntryFactory) {
         super(validationReportEntryFactory);
     }
 
@@ -51,27 +52,26 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
             serviceJourneys.forEach(serviceJourney -> validateServiceJourney(
                     serviceJourney,
                     index,
-                    ((stopTimeAdaptor, validationCode) ->
+                    ((stopTime, validationCode) ->
                             addValidationReportEntry(
-                                    validationReport, validationContext, serviceJourney, stopTimeAdaptor, validationCode
+                                    validationReport, validationContext, serviceJourney, stopTime, validationCode
                             )
                     )
             ));
 
         } else {
             throw new AntuException("Received invalid validation context in " +
-                    "Validating ServiceJourney non-increasing passing time");
+                                    "Validating ServiceJourney non-increasing passing time");
         }
     }
 
     public void validateServiceJourney(ServiceJourney serviceJourney,
                                        NetexEntitiesIndex netexEntitiesIndex,
-                                       BiConsumer<StopTimeAdaptor, RuleCode> validationError) {
+                                       BiConsumer<StopTime, RuleCode> validationError) {
 
-        ServiceJourneyInfo serviceJourneyInfo = new ServiceJourneyInfo(serviceJourney, netexEntitiesIndex);
-        List<StopTimeAdaptor> orderedPassingTimes = serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
+        List<StopTime> sortedTimetabledPassingTime = SortedStopTimes.from(serviceJourney, netexEntitiesIndex);
 
-        var previousPassingTime = orderedPassingTimes.get(0);
+        var previousPassingTime = sortedTimetabledPassingTime.get(0);
         if (!previousPassingTime.isComplete()) {
             validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME);
             return;
@@ -81,8 +81,8 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
             return;
         }
 
-        for (int i = 1; i < orderedPassingTimes.size(); i++) {
-            var currentPassingTime = orderedPassingTimes.get(i);
+        for (int i = 1; i < sortedTimetabledPassingTime.size(); i++) {
+            var currentPassingTime = sortedTimetabledPassingTime.get(i);
 
             if (!currentPassingTime.isComplete()) {
                 validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME);
@@ -105,17 +105,13 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
     private void addValidationReportEntry(ValidationReport validationReport,
                                           ValidationContext validationContext,
                                           ServiceJourney serviceJourney,
-                                          StopTimeAdaptor stopTime,
+                                          StopTime stopTime,
                                           RuleCode ruleCode) {
 
         String fileName = validationContext.getFileName();
         ValidationReportEntry validationReportEntry = createValidationReportEntry(
                 ruleCode.toString(),
-                validationContext.getLocalIds().stream()
-                        .filter(localId -> localId.getId().equals(serviceJourney.getId()))
-                        .findFirst()
-                        .map(idVersion -> new DataLocation(idVersion.getId(), fileName, idVersion.getLineNumber(), idVersion.getColumnNumber()))
-                        .orElse(new DataLocation(serviceJourney.getId(), fileName, 0, 0)),
+                findDataLocation(validationContext, serviceJourney, fileName),
                 String.format(
                         "%s. ServiceJourney = %s, TimetabledPassingTime = %s",
                         getValidationMessage(ruleCode),
@@ -125,6 +121,22 @@ public class ServiceJourneyNonIncreasingPassingTime extends AbstractNetexValidat
         );
 
         validationReport.addValidationReportEntry(validationReportEntry);
+    }
+
+    private static DataLocation findDataLocation(ValidationContext validationContext,
+                                                 ServiceJourney serviceJourney,
+                                                 String fileName) {
+        return validationContext.getLocalIds().stream()
+                .filter(localId -> localId.getId().equals(serviceJourney.getId()))
+                .findFirst()
+                .map(idVersion ->
+                        new DataLocation(
+                                idVersion.getId(),
+                                fileName,
+                                idVersion.getLineNumber(),
+                                idVersion.getColumnNumber()
+                        ))
+                .orElse(new DataLocation(serviceJourney.getId(), fileName, 0, 0));
     }
 
     @Override

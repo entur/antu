@@ -1,15 +1,19 @@
-package no.entur.antu.validator.nonincreasingpassingtime.stoptimeadapter;
+package no.entur.antu.validator.nonincreasingpassingtime.stoptime;
 
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
-public sealed interface StopTimeAdaptor permits AbstractStopTimeAdaptor {
-    static StopTimeAdaptor of(
-            TimetabledPassingTime timetabledPassingTime,
-            boolean stopIsFlexibleArea
-    ) {
+import java.math.BigInteger;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.Objects;
+
+public sealed interface StopTime permits AbstractStopTime {
+    static StopTime of(TimetabledPassingTime timetabledPassingTime,
+                       boolean stopIsFlexibleArea) {
+
         return stopIsFlexibleArea
-                ? new AreaStopTimeAdaptor(timetabledPassingTime)
-                : new RegularStopTimeAdaptor(timetabledPassingTime);
+                ? new FlexibleStopTime(timetabledPassingTime)
+                : new RegularStopTime(timetabledPassingTime);
     }
 
     /**
@@ -55,5 +59,19 @@ public sealed interface StopTimeAdaptor permits AbstractStopTimeAdaptor {
     /**
      * Return {@code true} if this stop-time is before the given {@code next} stop time.
      */
-    boolean isStopTimesIncreasing(StopTimeAdaptor next);
+    boolean isStopTimesIncreasing(StopTime next);
+
+    /**
+     * Return the elapsed time in second since midnight for a given local time, taking into account
+     * the day offset.
+     */
+    default int elapsedTimeSinceMidnight(LocalTime time, BigInteger dayOffset) {
+        Objects.requireNonNull(time);
+
+        int intOffsetValue = dayOffset != null ? dayOffset.intValueExact() : 0;
+        return (int) Duration
+                .between(LocalTime.MIDNIGHT, time)
+                .plus(Duration.ofDays(intOffsetValue))
+                .toSeconds();
+    }
 }
