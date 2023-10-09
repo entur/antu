@@ -1,17 +1,15 @@
-package no.entur.antu.validator.nonincreasingpassingtime.stoptimeadapter;
+package no.entur.antu.validator.nonincreasingpassingtime.stoptime;
 
 import org.rutebanken.netex.model.TimetabledPassingTime;
-
-import static no.entur.antu.validator.nonincreasingpassingtime.ServiceJourneyHelper.elapsedTimeSinceMidnight;
 
 /**
  * Wrapper around {@link TimetabledPassingTime} that provides a simpler interface
  * for passing times comparison.
  * Passing times are exposed as seconds since midnight, taking into account the day offset.
  */
-final class RegularStopTimeAdaptor extends AbstractStopTimeAdaptor {
+final class RegularStopTime extends AbstractStopTime {
 
-    RegularStopTimeAdaptor(TimetabledPassingTime timetabledPassingTime) {
+    RegularStopTime(TimetabledPassingTime timetabledPassingTime) {
         super(timetabledPassingTime);
     }
 
