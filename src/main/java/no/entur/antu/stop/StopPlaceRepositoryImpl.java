@@ -88,11 +88,16 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         TransportModes transportModes = transportModesPerQuayIdCache.get(quayId);
         if (transportModes == null) {
             StopPlace stopPlace = stopPlaceForQuayIdFetcher.tryFetch(quayId);
-            TransportModes transportModesFromReadApi = new TransportModes(
-                    stopPlace.getTransportMode(),
-                    TransportSubMode.from(stopPlace).orElse(null));
-            transportModesPerQuayIdCache.put(quayId, transportModesFromReadApi);
-            return transportModesFromReadApi;
+            if (stopPlace != null) {
+                TransportModes transportModesFromReadApi = new TransportModes(
+                        stopPlace.getTransportMode(),
+                        TransportSubMode.from(stopPlace).orElse(null)
+                );
+                transportModesPerQuayIdCache.put(quayId, transportModesFromReadApi);
+                return transportModesFromReadApi;
+            } else {
+                return null;
+            }
         }
         return transportModes;
     }

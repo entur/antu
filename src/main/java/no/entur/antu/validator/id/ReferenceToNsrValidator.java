@@ -44,7 +44,7 @@ public class ReferenceToNsrValidator implements ExternalReferenceValidator {
         try {
             return StopPlaceId.isValid(id.getId()) && stopPlaceRepository.hasStopPlaceId(new StopPlaceId(id.getId()));
         } catch (AntuException ex) {
-            LOGGER.warn(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return false;
         }
     }
@@ -53,7 +53,7 @@ public class ReferenceToNsrValidator implements ExternalReferenceValidator {
         try {
             return QuayId.isValid(id.getId()) && stopPlaceRepository.hasQuayId(new QuayId(id.getId()));
         } catch (AntuException ex) {
-            LOGGER.warn(ex.getMessage());
+            LOGGER.error(ex.getMessage());
             return false;
         }
     }

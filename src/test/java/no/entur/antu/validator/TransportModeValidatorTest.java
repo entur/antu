@@ -349,6 +349,31 @@ class TransportModeValidatorTest {
     }
 
     @Test
+    void validateOkWhenTransportModeNotFound() {
+
+        CommonDataRepository commonDataRepository = Mockito.mock(CommonDataRepository.class);
+        StopPlaceRepository stopPlaceRepository = Mockito.mock(StopPlaceRepository.class);
+
+        // Creating test data
+        TestData testData = new TestData()
+                .withTransportModeAtLine(
+                        AllVehicleModesOfTransportEnumeration.TAXI,
+                        new TransportSubMode("communalTaxi"));
+
+        // Mock findQuayId
+        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+                .thenReturn(TestData.QUAY_ID);
+
+        // Mock getTransportModeForQuayId
+        Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
+                .thenReturn(null);
+
+        ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
+
+        assertThat(validationReport.getValidationReportEntries().size(), is(0));
+    }
+
+    @Test
     void transportModeMissMatchShouldGenerateValidationEntry() {
 
         CommonDataRepository commonDataRepository = Mockito.mock(CommonDataRepository.class);
