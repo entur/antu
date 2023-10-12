@@ -19,7 +19,7 @@ package no.entur.antu.config;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validator.TransportModeValidator;
+import no.entur.antu.validator.transportmodevalidator.TransportModeValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;

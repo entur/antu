@@ -1,7 +1,7 @@
 package no.entur.antu.stop;
 
 import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.TransportModes;
+import no.entur.antu.stop.model.StopPlaceTransportModes;
 
 import java.util.Map;
 import java.util.Set;
@@ -25,9 +25,10 @@ public interface StopPlaceResource {
 
     /**
      * Returns transport modes per quay ids.
+     *
      * @return map of quay ids and transport mode.
      */
-    Map<QuayId, TransportModes> getTransportModesPerQuayId();
+    Map<QuayId, StopPlaceTransportModes> getTransportModesPerQuayId();
 
     void loadStopPlacesDataset();
 }
