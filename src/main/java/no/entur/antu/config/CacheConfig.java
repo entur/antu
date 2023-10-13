@@ -3,7 +3,7 @@ package no.entur.antu.config;
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.TransportModes;
+import no.entur.antu.stop.model.StopPlaceTransportModes;
 import no.entur.antu.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.Redisson;
@@ -82,7 +82,7 @@ public class CacheConfig {
 
 
     @Bean(name = TRANSPORT_MODES_PER_QUAY_ID_CACHE)
-    public RLocalCachedMap<QuayId, TransportModes> transportModesPerQuayIdCache(RedissonClient redissonClient) {
+    public RLocalCachedMap<QuayId, StopPlaceTransportModes> transportModesPerQuayIdCache(RedissonClient redissonClient) {
         return redissonClient.getLocalCachedMap(TRANSPORT_MODES_PER_QUAY_ID_CACHE, LocalCachedMapOptions.defaults());
     }
 

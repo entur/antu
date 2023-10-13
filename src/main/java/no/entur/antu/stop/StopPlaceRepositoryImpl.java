@@ -19,7 +19,7 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
 import no.entur.antu.stop.model.QuayId;
 import no.entur.antu.stop.model.StopPlaceId;
-import no.entur.antu.stop.model.TransportModes;
+import no.entur.antu.stop.model.StopPlaceTransportModes;
 import no.entur.antu.stop.model.TransportSubMode;
 import org.redisson.api.RLocalCachedMap;
 import org.rutebanken.netex.model.Quay;
@@ -41,14 +41,14 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     private final StopPlaceResource stopPlaceResource;
     private final Map<String, Set<String>> stopPlaceCache;
-    private final RLocalCachedMap<QuayId, TransportModes> transportModesPerQuayIdCache;
+    private final RLocalCachedMap<QuayId, StopPlaceTransportModes> transportModesPerQuayIdCache;
     private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
     private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
     private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
 
     public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
                                    Map<String, Set<String>> stopPlaceCache,
-                                   RLocalCachedMap<QuayId, TransportModes> transportModesPerQuayIdCache,
+                                   RLocalCachedMap<QuayId, StopPlaceTransportModes> transportModesPerQuayIdCache,
                                    NetexEntityFetcher<Quay, QuayId> quayFetcher,
                                    NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
                                    NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher) {
@@ -81,25 +81,25 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
     }
 
     @Override
-    public TransportModes getTransportModesForQuayId(QuayId quayId) {
+    public StopPlaceTransportModes getTransportModesForQuayId(QuayId quayId) {
         // Intentionally not using the "Map.computeIfAbsent()", because we need
         // to call the readApi from computeIfAbsent, which is somewhat long-running
         // operation, which holds the RedissonLock.lock, causing java.lang.InterruptedException.
-        TransportModes transportModes = transportModesPerQuayIdCache.get(quayId);
-        if (transportModes == null) {
+        StopPlaceTransportModes stopPlaceTransportModes = transportModesPerQuayIdCache.get(quayId);
+        if (stopPlaceTransportModes == null) {
             StopPlace stopPlace = stopPlaceForQuayIdFetcher.tryFetch(quayId);
             if (stopPlace != null) {
-                TransportModes transportModesFromReadApi = new TransportModes(
+                StopPlaceTransportModes stopPlaceTransportModesFromReadApi = new StopPlaceTransportModes(
                         stopPlace.getTransportMode(),
                         TransportSubMode.from(stopPlace).orElse(null)
                 );
-                transportModesPerQuayIdCache.put(quayId, transportModesFromReadApi);
-                return transportModesFromReadApi;
+                transportModesPerQuayIdCache.put(quayId, stopPlaceTransportModesFromReadApi);
+                return stopPlaceTransportModesFromReadApi;
             } else {
                 return null;
             }
         }
-        return transportModes;
+        return stopPlaceTransportModes;
     }
 
     @Override

@@ -24,7 +24,7 @@ import no.entur.antu.stop.fetcher.StopPlaceFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceForQuayIdFetcher;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.TransportModes;
+import no.entur.antu.stop.model.StopPlaceTransportModes;
 import org.redisson.api.RLocalCachedMap;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +53,7 @@ public class StopPlaceConfig {
                                             QuayFetcher quayFetcher,
                                             StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
                                             @Qualifier(TRANSPORT_MODES_PER_QUAY_ID_CACHE)
-                                            RLocalCachedMap<QuayId, TransportModes> transportModesPerStopPlaceCache,
+                                            RLocalCachedMap<QuayId, StopPlaceTransportModes> transportModesPerStopPlaceCache,
                                             @Qualifier("stopPlaceResource")
                                             StopPlaceResourceImpl stopPlaceResourceImpl) {
         return new StopPlaceRepositoryImpl(
