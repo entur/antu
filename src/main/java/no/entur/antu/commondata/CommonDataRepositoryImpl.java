@@ -2,10 +2,14 @@ package no.entur.antu.commondata;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.model.QuayId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class CommonDataRepositoryImpl implements CommonDataRepository {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonDataRepositoryImpl.class);
 
     private final CommonDataResource commonDataResource;
     private final Map<String, Map<String, QuayId>> quayIdForScheduledStopPointCache;
@@ -36,6 +40,9 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
                     existingMap.putAll(newMap);
                     return existingMap;
                 });
+
+        LOGGER.info("{} Quay ids for ScheduledStopPoint cached fir validation report with id: {}",
+                quayIdForScheduledStopPointCache.get(validationReportId).size(), validationReportId);
     }
 
     public void cleanUp(String validationReportId) {
