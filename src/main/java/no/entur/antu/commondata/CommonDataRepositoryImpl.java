@@ -41,7 +41,7 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
                     return existingMap;
                 });
 
-        LOGGER.info("{} Quay ids for ScheduledStopPoint cached fir validation report with id: {}",
+        LOGGER.info("{} Quay ids for ScheduledStopPoints cached for validation report with id: {}",
                 quayIdForScheduledStopPointCache.get(validationReportId).size(), validationReportId);
     }
 

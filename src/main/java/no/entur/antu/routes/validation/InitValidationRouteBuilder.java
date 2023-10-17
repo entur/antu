@@ -79,8 +79,6 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .choice()
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_SPLIT))
                 .to("direct:splitDataset")
-                .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_STORE_COMMON_DATA))
-                .to("direct:storeCommonData")
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE))
                 .to("direct:validateNetex")
                 .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_COMMON_FILES))

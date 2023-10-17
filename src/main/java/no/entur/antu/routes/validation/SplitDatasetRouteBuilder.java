@@ -107,12 +107,11 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.DEBUG, correlation() + "Start parsing common files")
                 .split(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
                     .filter(body().startsWith("_"))
-                    .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_STORE_COMMON_DATA))
                     .setHeader(Constants.DATASET_NB_NETEX_FILES, exchangeProperty(Exchange.SPLIT_SIZE))
                     .setHeader(NETEX_COMMON_FILE_NAME, body())
                     .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
                     .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
-                    .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
+                    .to("direct:storeCommonData")
                 //end split
                 .end()
                 .routeId("create-parse-and-store-common-data-jobs");

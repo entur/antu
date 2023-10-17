@@ -41,7 +41,6 @@ public final class Constants {
     public static final String JOB_TYPE = "JOB_TYPE";
     public static final String JOB_TYPE_SPLIT = "SPLIT";
     public static final String JOB_TYPE_VALIDATE = "VALIDATE";
-    public static final String JOB_TYPE_STORE_COMMON_DATA = "STORE_COMMON_DATA";
     public static final String JOB_TYPE_AGGREGATE_REPORTS = "AGGREGATE_REPORTS";
     public static final String JOB_TYPE_AGGREGATE_COMMON_FILES = "AGGREGATE_COMMON_FILES";
 
