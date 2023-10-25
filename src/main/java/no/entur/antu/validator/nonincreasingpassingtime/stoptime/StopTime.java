@@ -62,6 +62,11 @@ public sealed interface StopTime permits AbstractStopTime {
     boolean isStopTimesIncreasing(StopTime next);
 
     /**
+     * Return time between this and given time values with offset handling.
+     */
+    int getStopTimeDiff(StopTime given);
+
+    /**
      * Return the elapsed time in second since midnight for a given local time, taking into account
      * the day offset.
      */

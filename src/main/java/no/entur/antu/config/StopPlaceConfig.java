@@ -25,6 +25,7 @@ import no.entur.antu.stop.fetcher.StopPlaceForQuayIdFetcher;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
+import no.entur.antu.stop.model.StopPlaceCoordinates;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,7 @@ import java.util.Set;
 
 import static no.entur.antu.config.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
 import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE;
+import static no.entur.antu.config.CacheConfig.COORDINATES_PER_QUAY_ID_CACHE;
 
 @Configuration
 public class StopPlaceConfig {
@@ -64,13 +66,16 @@ public class StopPlaceConfig {
                                             Map<QuayId, TransportModes> transportModesForQuayIdCache,
                                             @Qualifier(QUAY_ID_NOT_FOUND_CACHE)
                                             Set<QuayId> quayIdNotFoundCache,
+                                            @Qualifier(COORDINATES_PER_QUAY_ID_CACHE)
+                                            Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
                                             @Qualifier("stopPlaceResource")
                                             StopPlaceResourceImpl stopPlaceResourceImpl) {
         return new StopPlaceRepositoryImpl(
                 stopPlaceResourceImpl,
                 stopPlaceCache,
-                quayIdNotFoundCache,
                 transportModesForQuayIdCache,
+                quayIdNotFoundCache,
+                coordinatesPerQuayIdCache,
                 quayFetcher,
                 stopPlaceFetcher,
                 stopPlaceForQuayIdFetcher

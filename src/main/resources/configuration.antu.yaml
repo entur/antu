@@ -42,3 +42,9 @@ validationRuleConfigs:
   - code: TIMETABLED_PASSING_TIME_NON_INCREASING_TIME
     name: ServiceJourney has non-increasing TimetabledPassingTime
     severity: ERROR
+  - code: LOW_SPEED_PROGRESSION
+    name: Vehicle is moving too slow
+    severity: ERROR
+  - code: HIGH_SPEED_PROGRESSION
+    name: Vehicle is moving too fast
+    severity: ERROR

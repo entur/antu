@@ -1,4 +1,4 @@
-package no.entur.antu.validator.nonincreasingpassingtime;
+package no.entur.antu.validator.speedprogressionvalidator;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
@@ -15,17 +15,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
+public class SpeedProgressionValidator extends AbstractNetexValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NonIncreasingPassingTimeValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpeedProgressionValidator.class);
 
     enum RuleCode {
-        TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
-        TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
-        TIMETABLED_PASSING_TIME_NON_INCREASING_TIME
+        LOW_SPEED_PROGRESSION,
+        HIGH_SPEED_PROGRESSION
     }
 
-    public NonIncreasingPassingTimeValidator(ValidationReportEntryFactory validationReportEntryFactory) {
+    public SpeedProgressionValidator(ValidationReportEntryFactory validationReportEntryFactory) {
         super(validationReportEntryFactory);
     }
 
@@ -45,7 +44,6 @@ public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
                             .flatMap(timetableFrame -> timetableFrame
                                     .getVehicleJourneys()
                                     .getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney().stream())
-                            .filter(ServiceJourney.class::isInstance)
                             .map(ServiceJourney.class::cast)
                             .toList();
 
@@ -61,8 +59,7 @@ public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
             ));
 
         } else {
-            throw new AntuException("Received invalid validation context in " +
-                                    "Validating ServiceJourney non-increasing passing time");
+            throw new AntuException("Received invalid validation context in Speed Progression validator");
         }
     }
 
@@ -73,36 +70,83 @@ public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
         List<StopTime> sortedTimetabledPassingTime = SortedStopTimes.from(serviceJourney, netexEntitiesIndex);
 
         var previousPassingTime = sortedTimetabledPassingTime.get(0);
-        if (!previousPassingTime.isComplete()) {
-            validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME);
-            return;
-        }
-        if (!previousPassingTime.isConsistent()) {
-            validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME);
+        if (!previousPassingTime.isComplete() || !previousPassingTime.isConsistent()) {
             return;
         }
 
         for (int i = 1; i < sortedTimetabledPassingTime.size(); i++) {
             var currentPassingTime = sortedTimetabledPassingTime.get(i);
 
-            if (!currentPassingTime.isComplete()) {
-                validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME);
-                return;
-            }
-            if (!currentPassingTime.isConsistent()) {
-                validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME);
-                return;
-            }
+            if (currentPassingTime.isComplete() || currentPassingTime.isConsistent() || previousPassingTime.isStopTimesIncreasing(currentPassingTime)) {
+                // validate speed progression
+                int diff = previousPassingTime.getStopTimeDiff(currentPassingTime);
+                if (diff >= 0) {
+//                    double distance = getDistance(stopArea0, stopArea1);
 
-            if (!previousPassingTime.isStopTimesIncreasing(currentPassingTime)) {
-                validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME);
-                return;
+                }
+
             }
 
             previousPassingTime = currentPassingTime;
         }
     }
+/*
+    private double getDistance(StopArea stop1, StopArea stop2) {
+        if (stop1 == null || stop2 == null) {
+            return 0;  // Cannot compute distance when either stop is missing
+        }
 
+        String key = stop1.getObjectId() + "#" + stop2.getObjectId();
+
+        if (distances.containsKey(key)) {
+            return distances.get(key).doubleValue();
+        }
+
+        key = stop2.getObjectId() + "#" + stop1.getObjectId();
+
+        if (distances.containsKey(key)) {
+            return distances.get(key).doubleValue();
+        }
+
+        double distance = distance(stop1, stop2);
+
+        distances.put(key, distance);
+
+        return distance;
+    }
+
+    protected static double distance(NeptuneLocalizedObject obj1, NeptuneLocalizedObject obj2) {
+        if (obj1.hasCoordinates() && obj2.hasCoordinates()) {
+            return computeHaversineFormula(obj1, obj2);
+        } else
+            return 0;
+    }
+
+ */
+
+    /**
+     * @see http://mathforum.org/library/drmath/view/51879.html
+     */
+/*    private static double computeHaversineFormula(NeptuneLocalizedObject obj1, NeptuneLocalizedObject obj2) {
+
+        double R = 6371008.8; // Earth radius
+        double toRad = 0.017453292519943; // degree/rad ratio
+
+        double lon1 = obj1.getLongitude().doubleValue() * toRad;
+        double lat1 = obj1.getLatitude().doubleValue() * toRad;
+        double lon2 = obj2.getLongitude().doubleValue() * toRad;
+        double lat2 = obj2.getLatitude().doubleValue() * toRad;
+
+
+        double dlon = Math.sin((lon2 - lon1) / 2);
+        double dlat = Math.sin((lat2 - lat1) / 2);
+        double a = (dlat * dlat) + Math.cos(lat1) * Math.cos(lat2)
+                                   * (dlon * dlon);
+        double c = 2. * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double d = R * c;
+        return d;
+    }
+*/
     private void addValidationReportEntry(ValidationReport validationReport,
                                           ValidationContext validationContext,
                                           ServiceJourney serviceJourney,
@@ -143,21 +187,17 @@ public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
     @Override
     public Set<String> getRuleDescriptions() {
         return Set.of(
-                createRuleDescription(RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME.toString(),
-                        getValidationMessage(RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME)),
-                createRuleDescription(RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME.toString(),
-                        getValidationMessage(RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME)),
-                createRuleDescription(RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME.toString(),
-                        getValidationMessage(RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME))
+                createRuleDescription(RuleCode.LOW_SPEED_PROGRESSION.toString(),
+                        getValidationMessage(RuleCode.LOW_SPEED_PROGRESSION)),
+                createRuleDescription(RuleCode.HIGH_SPEED_PROGRESSION.toString(),
+                        getValidationMessage(RuleCode.HIGH_SPEED_PROGRESSION))
         );
     }
 
     private String getValidationMessage(RuleCode ruleCode) {
         return switch (ruleCode) {
-            case TIMETABLED_PASSING_TIME_INCOMPLETE_TIME -> "ServiceJourney has incomplete TimetabledPassingTime";
-            case TIMETABLED_PASSING_TIME_INCONSISTENT_TIME -> "ServiceJourney has inconsistent TimetabledPassingTime";
-            case TIMETABLED_PASSING_TIME_NON_INCREASING_TIME ->
-                    "ServiceJourney has non-increasing TimetabledPassingTime";
+            case LOW_SPEED_PROGRESSION -> "ServiceJourney has low speed progression";
+            case HIGH_SPEED_PROGRESSION -> "ServiceJourney has high speed progression";
         };
     }
 }

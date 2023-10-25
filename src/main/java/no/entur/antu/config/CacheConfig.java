@@ -6,6 +6,7 @@ import no.entur.antu.codec.QuayIdCodec;
 import no.entur.antu.codec.TransportModesCodec;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
+import no.entur.antu.stop.model.StopPlaceCoordinates;
 import no.entur.antu.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.Redisson;
@@ -37,6 +38,7 @@ public class CacheConfig {
     public static final String ORGANISATION_CACHE = "organisationCache";
     public static final String STOP_PLACE_AND_QUAY_CACHE = "stopPlaceAndQuayCache";
     public static final String TRANSPORT_MODES_FOR_QUAY_ID_CACHE = "transportModesForQuayIdCache";
+    public static final String COORDINATES_PER_QUAY_ID_CACHE = "coordinatesPerQuayIdCache";
     public static final String COMMON_IDS_CACHE = "commonIdsCache";
     public static final String SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE = "scheduledStopPointAndQuayIdCache";
     public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
@@ -101,6 +103,11 @@ public class CacheConfig {
                 SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE,
                 LocalCachedMapOptions.defaults()
         );
+    }
+
+    @Bean(name = COORDINATES_PER_QUAY_ID_CACHE)
+    public RLocalCachedMap<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache(RedissonClient redissonClient) {
+        return redissonClient.getLocalCachedMap(COORDINATES_PER_QUAY_ID_CACHE, LocalCachedMapOptions.defaults());
     }
 
     @Bean
