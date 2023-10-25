@@ -21,7 +21,28 @@ final class FlexibleStopTime extends AbstractStopTime {
 
     @Override
     public boolean isConsistent() {
-        return normalizedLatestArrivalTime() >= normalizedEarliestDepartureTime();
+        return !isComplete() || normalizedLatestArrivalTime() >= normalizedEarliestDepartureTime();
+    }
+
+    @Override
+    public boolean isStopTimesIncreasing(StopTime next) {
+        if (next instanceof RegularStopTime regularStopTime) {
+            return isAreaStopFollowedByRegularStopValid(regularStopTime);
+        }
+        return isAreaStopFollowedByAreaStopValid((FlexibleStopTime) next);
+    }
+
+    @Override
+    public int getStopTimeDiff(StopTime given) {
+        // TODO: This should be fixed. We need to take into account the type of given.
+        //  Is it the same type as this, or not. See how we have done in
+        //  isRegularStopFollowedByRegularStopValid, isAreaStopFollowedByAreaStopValid,
+        //  isRegularStopFollowedByAreaStopValid, isAreaStopFollowedByRegularStopValid
+
+        if (given instanceof FlexibleStopTime) {
+            return isComplete() ? normalizedEarliestDepartureTime() - normalizedLatestArrivalTime() : 0;
+        }
+        return given.normalizedEarliestDepartureTime() - normalizedArrivalTimeOrElseDepartureTime();
     }
 
     @Override
@@ -50,5 +71,14 @@ final class FlexibleStopTime extends AbstractStopTime {
 
     private boolean hasEarliestDepartureTime() {
         return earliestDepartureTime() != null;
+    }
+
+    private boolean isAreaStopFollowedByAreaStopValid(FlexibleStopTime next) {
+        int earliestDepartureTime = normalizedEarliestDepartureTime();
+        int nextEarliestDepartureTime = next.normalizedEarliestDepartureTime();
+        int latestArrivalTime = normalizedLatestArrivalTime();
+        int nextLatestArrivalTime = next.normalizedLatestArrivalTime();
+
+        return earliestDepartureTime <= nextEarliestDepartureTime && latestArrivalTime <= nextLatestArrivalTime;
     }
 }
