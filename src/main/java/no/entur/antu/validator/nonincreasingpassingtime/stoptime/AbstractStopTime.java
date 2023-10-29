@@ -24,7 +24,7 @@ abstract sealed class AbstractStopTime
     }
 
     @Override
-    public final Object timetabledPassingTimeId() {
+    public final String timetabledPassingTimeId() {
         return timetabledPassingTime.getId();
     }
 

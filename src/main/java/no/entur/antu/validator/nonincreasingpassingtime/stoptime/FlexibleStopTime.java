@@ -81,4 +81,14 @@ final class FlexibleStopTime extends AbstractStopTime {
 
         return earliestDepartureTime <= nextEarliestDepartureTime && latestArrivalTime <= nextLatestArrivalTime;
     }
+
+    @Override
+    public boolean isArrivalInMinutesResolution() {
+        return latestArrivalTime().getSecond() == 0;
+    }
+
+    @Override
+    public boolean isDepartureInMinutesResolution() {
+        return earliestDepartureTime().getSecond() == 0;
+    }
 }

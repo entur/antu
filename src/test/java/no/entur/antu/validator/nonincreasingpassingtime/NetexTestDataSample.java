@@ -42,6 +42,7 @@ public class NetexTestDataSample {
                 .withId("RUT:Line:1")
                 .withName(new MultilingualString().withValue("Line 1"))
                 .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+
         JAXBElement<LineRefStructure> lineRef = createWrappedRef(line.getId(), LineRefStructure.class);
 
         // Add Netex Route (not the same as an OTP Route)
@@ -79,7 +80,7 @@ public class NetexTestDataSample {
             StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
                     .withId(stopPointId)
                     .withOrder(BigInteger.valueOf(i + 1))
-                    .withScheduledStopPointRef(createScheduledStopPointRef(stopPointId));
+                    .withScheduledStopPointRef(createScheduledStopPointRef("RUT:ScheduledStopPoint:" + (i + 1)));
 
             if (i == 0) stopPoint.setDestinationDisplayRef(
                     createDestinationDisplayRef(destinationBergen.getId()).getValue()

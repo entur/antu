@@ -62,8 +62,8 @@ public class TimetableDataValidatorConfig {
     public TransportModeValidator transportModeValidator(@Qualifier("validationReportEntryFactory")
                                                          ValidationReportEntryFactory validationReportEntryFactory,
                                                          CommonDataRepository commonDataRepository,
-                                                         StopPlaceRepository currentStopPlaceRepository) {
-        return new TransportModeValidator(validationReportEntryFactory, commonDataRepository, currentStopPlaceRepository);
+                                                         StopPlaceRepository stopPlaceRepository) {
+        return new TransportModeValidator(validationReportEntryFactory, commonDataRepository, stopPlaceRepository);
     }
 
     @Bean
@@ -74,8 +74,10 @@ public class TimetableDataValidatorConfig {
 
     @Bean
     public SpeedProgressionValidator speedProgressionValidator(@Qualifier("validationReportEntryFactory")
-                                                               ValidationReportEntryFactory validationReportEntryFactory) {
-        return new SpeedProgressionValidator(validationReportEntryFactory);
+                                                               ValidationReportEntryFactory validationReportEntryFactory,
+                                                               CommonDataRepository commonDataRepository,
+                                                               StopPlaceRepository stopPlaceRepository) {
+        return new SpeedProgressionValidator(validationReportEntryFactory, commonDataRepository, stopPlaceRepository);
     }
 
     @Bean
