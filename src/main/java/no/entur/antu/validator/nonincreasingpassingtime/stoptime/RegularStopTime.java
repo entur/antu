@@ -93,4 +93,14 @@ final class RegularStopTime extends AbstractStopTime {
     private boolean isRegularStopFollowedByRegularStopValid(RegularStopTime next) {
         return normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime();
     }
+
+    @Override
+    public boolean isArrivalInMinutesResolution() {
+        return hasArrivalTime() && arrivalTime().getSecond() == 0;
+    }
+
+    @Override
+    public boolean isDepartureInMinutesResolution() {
+        return departureTime().getSecond() == 0;
+    }
 }

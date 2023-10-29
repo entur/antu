@@ -93,7 +93,5 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .log(LoggingLevel.INFO, correlation() + "Notifying status ${body}")
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue")
                 .routeId("notify-status");
-
-
     }
 }

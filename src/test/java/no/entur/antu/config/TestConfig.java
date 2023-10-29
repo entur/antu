@@ -6,6 +6,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
+import no.entur.antu.stop.model.StopPlaceCoordinates;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -79,6 +80,11 @@ public class TestConfig {
 
             @Override
             public TransportModes getTransportModesForQuayId(QuayId quayId) {
+                return null;
+            }
+
+            @Override
+            public StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId) {
                 return null;
             }
 

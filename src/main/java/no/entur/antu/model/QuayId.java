@@ -7,7 +7,7 @@ public record QuayId(String id) {
     public QuayId {
         Objects.requireNonNull(id, "Quay id should not be null");
         if (!isValid(id)) {
-            throw new AntuException("Invalid quay id: " + id);
+                throw new AntuException("Invalid quay id: " + id);
         }
     }
 
