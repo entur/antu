@@ -56,7 +56,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
                 .setBody(constant(STATUS_VALIDATION_STARTED))
                 .to("direct:notifyStatus")
                 .log(LoggingLevel.INFO, correlation() + "Starting validation")
-                .to("direct:scaleUpKubernetesDeployment")
+//                .to("direct:scaleUpKubernetesDeployment")
                 .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_SPLIT))
                 .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
                 .routeId("init-dataset-validation");
