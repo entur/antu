@@ -6,7 +6,7 @@ data:
     spring.main.sources=no.entur.antu
     spring.profiles.active=gcs-blobstore
     server.port={{ .Values.service.http.internalPort }}
-    spring.quartz.auto-startup: false
+    spring.quartz.auto-startup=false
 
     # Camel
     camel.springboot.name=antu
