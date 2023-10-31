@@ -42,6 +42,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
     private final StopPlaceResource stopPlaceResource;
     private final Map<String, Set<String>> stopPlaceCache;
     private final RLocalCachedMap<QuayId, StopPlaceTransportModes> transportModesPerQuayIdCache;
+    private final Set<QuayId> quayIdNotFoundCache;
     private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
     private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
     private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
@@ -49,12 +50,14 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
     public StopPlaceRepositoryImpl(StopPlaceResource stopPlaceResource,
                                    Map<String, Set<String>> stopPlaceCache,
                                    RLocalCachedMap<QuayId, StopPlaceTransportModes> transportModesPerQuayIdCache,
+                                   Set<QuayId> quayIdNotFoundCache,
                                    NetexEntityFetcher<Quay, QuayId> quayFetcher,
                                    NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
                                    NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher) {
         this.stopPlaceResource = stopPlaceResource;
         this.stopPlaceCache = stopPlaceCache;
         this.transportModesPerQuayIdCache = transportModesPerQuayIdCache;
+        this.quayIdNotFoundCache = quayIdNotFoundCache;
         this.quayFetcher = quayFetcher;
         this.stopPlaceFetcher = stopPlaceFetcher;
         this.stopPlaceForQuayIdFetcher = stopPlaceForQuayIdFetcher;
@@ -77,7 +80,19 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
             throw new AntuException("Quay ids cache not found");
         }
         boolean idFoundInCache = quayIds.stream().anyMatch(id -> id.equals(quayId.id()));
-        return idFoundInCache || quayFetcher.tryFetch(quayId) != null;
+        return idFoundInCache || tryFetchWithNotFoundCheck(quayId, quayFetcher) != null;
+    }
+
+    private <R> R tryFetchWithNotFoundCheck(QuayId quayId,
+                           NetexEntityFetcher<R, QuayId> fetcherFunction) {
+        if (!quayIdNotFoundCache.contains(quayId)) {
+            R result = fetcherFunction.tryFetch(quayId);
+            if (result == null) {
+                quayIdNotFoundCache.add(quayId);
+            }
+            return result;
+        }
+        return null;
     }
 
     @Override
@@ -87,7 +102,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         // operation, which holds the RedissonLock.lock, causing java.lang.InterruptedException.
         StopPlaceTransportModes stopPlaceTransportModes = transportModesPerQuayIdCache.get(quayId);
         if (stopPlaceTransportModes == null) {
-            StopPlace stopPlace = stopPlaceForQuayIdFetcher.tryFetch(quayId);
+            StopPlace stopPlace = tryFetchWithNotFoundCheck(quayId, stopPlaceForQuayIdFetcher);
             if (stopPlace != null) {
                 StopPlaceTransportModes stopPlaceTransportModesFromReadApi = new StopPlaceTransportModes(
                         stopPlace.getTransportMode(),
@@ -95,8 +110,6 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
                 );
                 transportModesPerQuayIdCache.put(quayId, stopPlaceTransportModesFromReadApi);
                 return stopPlaceTransportModesFromReadApi;
-            } else {
-                return null;
             }
         }
         return stopPlaceTransportModes;
@@ -108,6 +121,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceResource.getStopPlaceIds());
         stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
         transportModesPerQuayIdCache.putAll(stopPlaceResource.getTransportModesPerQuayId());
+        quayIdNotFoundCache.clear();
 
         LOGGER.info("Updated cache with " +
                     "{} stop places ids, " +
