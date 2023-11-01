@@ -156,7 +156,7 @@ class TransportModeValidatorTest {
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.BUS, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.BUS, null));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
 
@@ -177,7 +177,7 @@ class TransportModeValidatorTest {
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.METRO, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.METRO, null));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
 
@@ -198,7 +198,7 @@ class TransportModeValidatorTest {
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
                 .thenReturn(new StopPlaceTransportModes(
-                        VehicleModeEnumeration.BUS,
+                        AllVehicleModesOfTransportEnumeration.BUS,
                         new TransportSubMode(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
@@ -223,7 +223,7 @@ class TransportModeValidatorTest {
         // Mock getTransportModeForQuayId
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
                 .thenReturn(new StopPlaceTransportModes(
-                        VehicleModeEnumeration.BUS,
+                        AllVehicleModesOfTransportEnumeration.BUS,
                         new TransportSubMode(BusSubmodeEnumeration.EXPRESS_BUS.value())
                 ));
 
@@ -250,7 +250,7 @@ class TransportModeValidatorTest {
 
         // Mock getTransportModeForQuayId
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.COACH, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.COACH, null));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
 
@@ -275,7 +275,7 @@ class TransportModeValidatorTest {
 
         // Mock getTransportModeForQuayId
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.BUS, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.BUS, null));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
 
@@ -300,7 +300,7 @@ class TransportModeValidatorTest {
 
         // Mock getTransportModeForQuayId
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.BUS, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.BUS, null));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
 
@@ -325,7 +325,7 @@ class TransportModeValidatorTest {
 
         // Mock getTransportModeForQuayId
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.COACH, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.COACH, null));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
 
@@ -350,7 +350,7 @@ class TransportModeValidatorTest {
 
         // Mock getTransportModeForQuayId
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.METRO, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.METRO, null));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
 
@@ -409,7 +409,7 @@ class TransportModeValidatorTest {
         // Mock getTransportModeForQuayId
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
                 .thenReturn(new StopPlaceTransportModes(
-                        VehicleModeEnumeration.RAIL,
+                        AllVehicleModesOfTransportEnumeration.RAIL,
                         new TransportSubMode(RailSubmodeEnumeration.LONG_DISTANCE.value())));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
@@ -440,7 +440,7 @@ class TransportModeValidatorTest {
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.BUS, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.BUS, null));
 
         ValidationReport validationReport = runValidation(testData, commonDataRepository, stopPlaceRepository);
 
@@ -462,12 +462,10 @@ class TransportModeValidatorTest {
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.BUS, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.BUS, null));
 
 
-        Exception exception = assertThrows(AntuException.class, () -> {
-            runValidation(testData, commonDataRepository, stopPlaceRepository);
-        });
+        Exception exception = assertThrows(AntuException.class, () -> runValidation(testData, commonDataRepository, stopPlaceRepository));
 
         assertThat(exception.getMessage(), is("Unsupported FlexibleLineType in TransportModeValidator: other"));
     }
@@ -486,12 +484,10 @@ class TransportModeValidatorTest {
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
-                .thenReturn(new StopPlaceTransportModes(VehicleModeEnumeration.BUS, null));
+                .thenReturn(new StopPlaceTransportModes(AllVehicleModesOfTransportEnumeration.BUS, null));
 
 
-        Exception exception = assertThrows(AntuException.class, () -> {
-            runValidation(testData, commonDataRepository, stopPlaceRepository);
-        });
+        Exception exception = assertThrows(AntuException.class, () -> runValidation(testData, commonDataRepository, stopPlaceRepository));
 
         assertThat(exception.getMessage(), is("Missing FlexibleLineType for FlexibleLine"));
     }
