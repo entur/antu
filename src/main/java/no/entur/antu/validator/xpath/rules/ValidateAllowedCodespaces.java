@@ -1,12 +1,10 @@
 package no.entur.antu.validator.xpath.rules;
 
-import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
-import net.sf.saxon.s9api.XdmSequenceIterator;
 import no.entur.antu.validator.NetexCodespace;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.exception.NetexValidationException;

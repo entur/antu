@@ -27,14 +27,14 @@
         <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
         <camel.version>3.20.7</camel.version>
         <entur.helpers.version>1.100</entur.helpers.version>
-        <netex-validator-java.version>1.0.7</netex-validator-java.version>
+        <netex-validator-java.version>1.1.0</netex-validator-java.version>
         <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.16</zt-zip.version>
         <redisson.version>3.24.3</redisson.version>
         <kryo.version>5.5.0</kryo.version>
         <embedded-redis.version>0.8.3</embedded-redis.version>
-        <netex-parser-java.version>2.2.0</netex-parser-java.version>
-        <netex-java-model.version>1.0.14</netex-java-model.version>
+        <netex-parser-java.version>2.3.0</netex-parser-java.version>
+        <netex-java-model.version>1.0.15</netex-java-model.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>

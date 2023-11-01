@@ -16,12 +16,10 @@
 
 package no.entur.antu.flex.validation.config;
 
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.flex.validation.validator.EnturFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.flex.validation.validator.EnturImportFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.flex.validation.validator.FileNameValidator;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.id.NetexIdValidator;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
