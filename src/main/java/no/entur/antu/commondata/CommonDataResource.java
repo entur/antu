@@ -35,7 +35,7 @@ public class CommonDataResource {
                 .map(PassengerStopAssignment.class::cast)
                 .collect(Collectors.toMap(
                         passengerStopAssignment -> passengerStopAssignment.getScheduledStopPointRef().getValue().getRef(),
-                        passengerStopAssignment -> new QuayId(passengerStopAssignment.getQuayRef().getRef()),
+                        passengerStopAssignment -> new QuayId(passengerStopAssignment.getQuayRef().getValue().getRef()),
                         (v1, v2) -> v2
                 ));
     }

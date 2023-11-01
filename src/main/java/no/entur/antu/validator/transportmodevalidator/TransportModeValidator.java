@@ -12,7 +12,6 @@ import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -114,16 +113,16 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
         // Coach and bus are interchangeable
         if ((datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH)
-             && stopPlaceTransportModes.mode().equals(VehicleModeEnumeration.BUS))
+             && stopPlaceTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS))
             || (datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
-                && stopPlaceTransportModes.mode().equals(VehicleModeEnumeration.COACH))) {
+                && stopPlaceTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH))) {
             return true;
         }
 
         // Taxi can stop on bus and coach stops
         if (datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.TAXI)
-            && (stopPlaceTransportModes.mode().equals(VehicleModeEnumeration.BUS)
-                || stopPlaceTransportModes.mode().equals(VehicleModeEnumeration.COACH))) {
+            && (stopPlaceTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
+                || stopPlaceTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH))) {
             return true;
         }
 
