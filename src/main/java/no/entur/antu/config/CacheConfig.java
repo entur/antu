@@ -36,6 +36,7 @@ public class CacheConfig {
     public static final String TRANSPORT_MODES_PER_QUAY_ID_CACHE = "transportModesPerQuayIdCache";
     public static final String COMMON_IDS_CACHE = "commonIdsCache";
     public static final String QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE = "quayIdForScheduledStopPointCache";
+    public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfig.class);
 
     @Bean
@@ -99,6 +100,11 @@ public class CacheConfig {
     @Bean
     public Map<String, Set<String>> organisationCache(RedissonClient redissonClient) {
         return redissonClient.getLocalCachedMap(ORGANISATION_CACHE, LocalCachedMapOptions.defaults());
+    }
+
+    @Bean(name = QUAY_ID_NOT_FOUND_CACHE)
+    public Set<QuayId> quayIdNotFoundCache(RedissonClient redissonClient) {
+        return redissonClient.getSet(QUAY_ID_NOT_FOUND_CACHE);
     }
 
     @Bean
