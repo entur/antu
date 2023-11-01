@@ -5,6 +5,8 @@ import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.*;
 
+import javax.xml.bind.JAXBElement;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -13,6 +15,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
 class StopPlaceResourceImplTest {
+
+    private static final ObjectFactory netexFactory = new ObjectFactory();
 
     @Test
     void getQuayIds() {
@@ -43,12 +47,12 @@ class StopPlaceResourceImplTest {
     @Test
     void getStopPlaceIds() {
         NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
-
+        Collection<JAXBElement<? extends Site_VersionStructure>> stopPlaces = List.of(
+                netexFactory.createStopPlace_(new StopPlace().withId("NSR:StopPlace:123").withVersion("1")),
+                netexFactory.createStopPlace_(new StopPlace().withId("NSR:StopPlace:456").withVersion("1"))
+        );
         netexEntitiesIndex.getSiteFrames().add(new SiteFrame().withStopPlaces(
-                new StopPlacesInFrame_RelStructure().withStopPlace(
-                        List.of(new StopPlace().withId("NSR:StopPlace:123").withVersion("1"),
-                                new StopPlace().withId("NSR:StopPlace:456").withVersion("1"))
-                )
+                new StopPlacesInFrame_RelStructure().withStopPlace_(stopPlaces)
         ));
 
         StopPlaceResourceImpl stopPlaceResourceImpl = mock(StopPlaceResourceImpl.class);
