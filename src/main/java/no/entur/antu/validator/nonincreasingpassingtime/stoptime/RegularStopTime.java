@@ -96,7 +96,7 @@ final class RegularStopTime extends AbstractStopTime {
 
     @Override
     public boolean isArrivalInMinutesResolution() {
-        return hasArrivalTime() && arrivalTime().getSecond() == 0;
+        return hasArrivalTime() ? arrivalTime().getSecond() == 0 : departureTime().getSecond() == 0;
     }
 
     @Override
