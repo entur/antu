@@ -1,7 +1,6 @@
-package no.entur.antu.stop.model;
+package no.entur.antu.model;
 
 import no.entur.antu.exception.AntuException;
-
 import java.util.Objects;
 
 public record QuayId(String id) {
@@ -14,5 +13,10 @@ public record QuayId(String id) {
 
     public static boolean isValid(String quayId) {
         return quayId.contains(":Quay:");
+    }
+
+    @Override
+    public String toString() {
+        return id();
     }
 }

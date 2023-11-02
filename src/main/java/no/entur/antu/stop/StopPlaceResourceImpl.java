@@ -2,9 +2,9 @@ package no.entur.antu.stop;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
-import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.StopPlaceTransportModes;
-import no.entur.antu.stop.model.TransportSubMode;
+import no.entur.antu.model.QuayId;
+import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportSubMode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.*;
 
@@ -50,7 +50,7 @@ public class StopPlaceResourceImpl implements StopPlaceResource {
     }
 
     @Override
-    public Map<QuayId, StopPlaceTransportModes> getTransportModesPerQuayId() {
+    public Map<QuayId, TransportModes> getTransportModesPerQuayId() {
         return getNetexEntitiesIndex().getSiteFrames().stream()
                 .flatMap(siteFrame -> siteFrame.getStopPlaces().getStopPlace_().stream())
                 .map(JAXBElement::getValue)
@@ -66,7 +66,7 @@ public class StopPlaceResourceImpl implements StopPlaceResource {
                 ));
     }
 
-    public List<Map.Entry<QuayId, StopPlaceTransportModes>> getQuayTransportModesEntries(StopPlace stopPlace) {
+    public List<Map.Entry<QuayId, TransportModes>> getQuayTransportModesEntries(StopPlace stopPlace) {
         return stopPlace.getQuays().getQuayRefOrQuay().stream()
                 .map(JAXBElement::getValue)
                 .filter(Quay.class::isInstance)
@@ -75,7 +75,7 @@ public class StopPlaceResourceImpl implements StopPlaceResource {
                 .map(QuayId::new)
                 .map(quayId -> Map.entry(
                         quayId,
-                        new StopPlaceTransportModes(
+                        new TransportModes(
                                 stopPlace.getTransportMode(),
                                 TransportSubMode.from(stopPlace).orElse(null)
                         )))

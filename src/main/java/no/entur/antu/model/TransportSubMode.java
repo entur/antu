@@ -1,4 +1,4 @@
-package no.entur.antu.stop.model;
+package no.entur.antu.model;
 
 import no.entur.antu.exception.AntuException;
 import org.rutebanken.netex.model.StopPlace;

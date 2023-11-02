@@ -15,9 +15,9 @@
 
 package no.entur.antu.stop;
 
-import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.StopPlaceId;
-import no.entur.antu.stop.model.StopPlaceTransportModes;
+import no.entur.antu.model.QuayId;
+import no.entur.antu.model.StopPlaceId;
+import no.entur.antu.model.TransportModes;
 
 /**
  * A repository to store and cache the stop place and quay ids retrieved from the National Stop Register.
@@ -40,7 +40,7 @@ public interface StopPlaceRepository {
      * Returns the transport modes for quay id present in the cache or try getting it from Read api.
      * @return transport modes for given stop place id.
      */
-    StopPlaceTransportModes getTransportModesForQuayId(QuayId quayId);
+    TransportModes getTransportModesForQuayId(QuayId quayId);
 
     /**
      * Refresh the cache with data retrieved from the Stop Place Register.

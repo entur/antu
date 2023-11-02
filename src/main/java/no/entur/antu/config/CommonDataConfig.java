@@ -3,8 +3,7 @@ package no.entur.antu.config;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.commondata.CommonDataRepositoryImpl;
 import no.entur.antu.commondata.CommonDataResource;
-import no.entur.antu.stop.model.QuayId;
-import org.redisson.api.RLocalCachedMap;
+import no.entur.antu.model.QuayId;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +26,7 @@ public class CommonDataConfig {
     @Profile("!test")
     CommonDataRepository commonDataRepository(CommonDataResource commonDataResource,
                                               @Qualifier(QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE)
-                                              RLocalCachedMap<String, Map<String, QuayId>> quayIdForScheduledStopPointCache) {
+                                              Map<String, Map<String, QuayId>> quayIdForScheduledStopPointCache) {
         return new CommonDataRepositoryImpl(commonDataResource, quayIdForScheduledStopPointCache);
     }
 }

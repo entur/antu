@@ -1,7 +1,7 @@
 package no.entur.antu.commondata;
 
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.model.QuayId;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.PassengerStopAssignment;

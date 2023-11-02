@@ -1,9 +1,9 @@
 package no.entur.antu.validator.id;
 
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.StopPlaceId;
-import no.entur.antu.stop.model.StopPlaceTransportModes;
+import no.entur.antu.model.QuayId;
+import no.entur.antu.model.StopPlaceId;
+import no.entur.antu.model.TransportModes;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ class ReferenceToNsrValidatorTest {
             }
 
             @Override
-            public StopPlaceTransportModes getTransportModesForQuayId(QuayId quayId) {
+            public TransportModes getTransportModesForQuayId(QuayId quayId) {
                 return null;
             }
 
