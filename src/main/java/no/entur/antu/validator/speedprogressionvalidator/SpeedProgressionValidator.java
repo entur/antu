@@ -36,7 +36,7 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
     }
 
     record ErrorContext(
-            RuleCode ruleCode,
+            SpeedProgressionRuleCode speedProgressionRuleCode,
             String exceptedSpeed,
             String calculatedSpeed,
             ServiceJourney serviceJourney,
@@ -44,7 +44,7 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
             StopTime to) {
     }
 
-    enum RuleCode {
+    enum SpeedProgressionRuleCode {
         LOW_SPEED_PROGRESSION,
         HIGH_SPEED_PROGRESSION,
         WARNING_SPEED_PROGRESSION
@@ -123,8 +123,8 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
                 || previousPassingTime.isStopTimesIncreasing(currentPassingTime)) {
 
                 // validate speed progression
-                int stopTimeDiff = previousPassingTime.getStopTimeDiff(currentPassingTime);
-                if (stopTimeDiff >= 0) {
+                int stopTimeDiffInSeconds = previousPassingTime.getStopTimeDiff(currentPassingTime);
+                if (stopTimeDiffInSeconds >= 0) {
                     StopPlaceCoordinates previousStopPlaceCoordinates =
                             context.stopPlaceCoordinatesPerTimetabledPassingTimeId()
                                     .get(previousPassingTime.timetabledPassingTimeId());
@@ -152,13 +152,13 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
                     }
                     validateDistance(
                             distance,
-                            stopTimeDiff,
+                            stopTimeDiffInSeconds,
                             previousPassingTime.isDepartureInMinutesResolution()
                             && currentPassingTime.isArrivalInMinutesResolution(),
                             TransportModeParameters.of(context.transportMode()),
-                            (ruleCode, expectedSpeed, calculatedSpeed) -> validationError.accept(
+                            (speedProgressionRuleCode, expectedSpeed, calculatedSpeed) -> validationError.accept(
                                     new ErrorContext(
-                                            ruleCode,
+                                            speedProgressionRuleCode,
                                             expectedSpeed,
                                             calculatedSpeed,
                                             context.serviceJourney(),
@@ -173,16 +173,16 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
     }
 
     private void validateDistance(double distance,
-                                  int stopTimeDiff,
+                                  int stopTimeDiffInSeconds,
                                   boolean hasMinutesResolution,
                                   TransportModeParameters transportModeParameters,
-                                  TriConsumer<RuleCode, String, String> speedError) {
+                                  TriConsumer<SpeedProgressionRuleCode, String, String> speedError) {
 
         // Times are often with minute resolution.
         // Assume max error (120 sec) when comparing with min and max allowed speed.
 
-        double minPossibleDiffTime = hasMinutesResolution ? Math.max(stopTimeDiff - 120, 1) : stopTimeDiff;
-        double maxPossibleDiffTime = hasMinutesResolution ? stopTimeDiff + 120 : stopTimeDiff;
+        double minPossibleDiffTime = hasMinutesResolution ? Math.max(stopTimeDiffInSeconds - 120, 1) : stopTimeDiffInSeconds;
+        double maxPossibleDiffTime = hasMinutesResolution ? stopTimeDiffInSeconds + 120 : stopTimeDiffInSeconds;
         double optimisticSpeed = distance / minPossibleDiffTime * 36 / 10; // (km/h)
         double pessimisticSpeed = distance / maxPossibleDiffTime * 36 / 10; // (km/h)
 
@@ -190,7 +190,7 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
             // too slow
             String calculatedSpeed = Integer.toString((int) optimisticSpeed);
             speedError.accept(
-                    RuleCode.LOW_SPEED_PROGRESSION,
+                    SpeedProgressionRuleCode.LOW_SPEED_PROGRESSION,
                     Integer.toString((int) transportModeParameters.minSpeed()),
                     calculatedSpeed);
         } else if (pessimisticSpeed > transportModeParameters.warningSpeed()) {
@@ -198,12 +198,12 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
             String calculatedSpeed = Integer.toString((int) pessimisticSpeed);
             if (pessimisticSpeed > transportModeParameters.maxSpeed()) {
                 speedError.accept(
-                        RuleCode.HIGH_SPEED_PROGRESSION,
+                        SpeedProgressionRuleCode.HIGH_SPEED_PROGRESSION,
                         Integer.toString((int) transportModeParameters.maxSpeed()),
                         calculatedSpeed);
             } else {
                 speedError.accept(
-                        RuleCode.WARNING_SPEED_PROGRESSION,
+                        SpeedProgressionRuleCode.WARNING_SPEED_PROGRESSION,
                         Integer.toString((int) transportModeParameters.warningSpeed()),
                         calculatedSpeed);
             }
@@ -216,14 +216,14 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
 
         String fileName = validationContext.getFileName();
         ValidationReportEntry validationReportEntry = createValidationReportEntry(
-                errorContext.ruleCode().toString(),
+                errorContext.speedProgressionRuleCode().toString(),
                 findDataLocation(validationContext, errorContext.serviceJourney(), fileName),
                 // TODO: update description to include the expected and calculated speed
                 String.format(
                         "%s. ServiceJourney = %s, " +
                         "from TimetabledPassingTime = %s, " +
                         "to TimetabledPassingTime = %s",
-                        getValidationMessage(errorContext.ruleCode()),
+                        getValidationMessage(errorContext.speedProgressionRuleCode()),
                         errorContext.serviceJourney().getId(),
                         errorContext.from().timetabledPassingTimeId(),
                         errorContext.to().timetabledPassingTimeId()
@@ -314,17 +314,17 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
     @Override
     public Set<String> getRuleDescriptions() {
         return Set.of(
-                createRuleDescription(RuleCode.LOW_SPEED_PROGRESSION.toString(),
-                        getValidationMessage(RuleCode.LOW_SPEED_PROGRESSION)),
-                createRuleDescription(RuleCode.HIGH_SPEED_PROGRESSION.toString(),
-                        getValidationMessage(RuleCode.HIGH_SPEED_PROGRESSION)),
-                createRuleDescription(RuleCode.WARNING_SPEED_PROGRESSION.toString(),
-                        getValidationMessage(RuleCode.WARNING_SPEED_PROGRESSION))
+                createRuleDescription(SpeedProgressionRuleCode.LOW_SPEED_PROGRESSION.toString(),
+                        getValidationMessage(SpeedProgressionRuleCode.LOW_SPEED_PROGRESSION)),
+                createRuleDescription(SpeedProgressionRuleCode.HIGH_SPEED_PROGRESSION.toString(),
+                        getValidationMessage(SpeedProgressionRuleCode.HIGH_SPEED_PROGRESSION)),
+                createRuleDescription(SpeedProgressionRuleCode.WARNING_SPEED_PROGRESSION.toString(),
+                        getValidationMessage(SpeedProgressionRuleCode.WARNING_SPEED_PROGRESSION))
         );
     }
 
-    private String getValidationMessage(RuleCode ruleCode) {
-        return switch (ruleCode) {
+    private String getValidationMessage(SpeedProgressionRuleCode speedProgressionRuleCode) {
+        return switch (speedProgressionRuleCode) {
             case LOW_SPEED_PROGRESSION -> "ServiceJourney has low speed progression";
             case HIGH_SPEED_PROGRESSION -> "ServiceJourney has high speed progression";
             case WARNING_SPEED_PROGRESSION -> "ServiceJourney has unexpected speed progression";
