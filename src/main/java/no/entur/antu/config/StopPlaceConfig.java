@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static no.entur.antu.config.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
-import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_PER_QUAY_ID_CACHE;
+import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE;
 
 @Configuration
 public class StopPlaceConfig {
@@ -52,8 +52,8 @@ public class StopPlaceConfig {
                                             StopPlaceFetcher stopPlaceFetcher,
                                             QuayFetcher quayFetcher,
                                             StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
-                                            @Qualifier(TRANSPORT_MODES_PER_QUAY_ID_CACHE)
-                                            Map<QuayId, TransportModes> transportModesPerStopPlaceCache,
+                                            @Qualifier(TRANSPORT_MODES_FOR_QUAY_ID_CACHE)
+                                            Map<QuayId, TransportModes> transportModesForQuayIdCache,
                                             @Qualifier(QUAY_ID_NOT_FOUND_CACHE)
                                             Set<QuayId> quayIdNotFoundCache,
                                             @Qualifier("stopPlaceResource")
@@ -62,7 +62,7 @@ public class StopPlaceConfig {
                 stopPlaceResourceImpl,
                 stopPlaceCache,
                 quayIdNotFoundCache,
-                transportModesPerStopPlaceCache,
+                transportModesForQuayIdCache,
                 quayFetcher,
                 stopPlaceFetcher,
                 stopPlaceForQuayIdFetcher

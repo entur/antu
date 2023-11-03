@@ -37,9 +37,9 @@ public class CacheConfig {
 
     public static final String ORGANISATION_CACHE = "organisationCache";
     public static final String STOP_PLACE_AND_QUAY_CACHE = "stopPlaceAndQuayCache";
-    public static final String TRANSPORT_MODES_PER_QUAY_ID_CACHE = "transportModesPerQuayIdCache";
+    public static final String TRANSPORT_MODES_FOR_QUAY_ID_CACHE = "transportModesForQuayIdCache";
     public static final String COMMON_IDS_CACHE = "commonIdsCache";
-    public static final String QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE = "quayIdForScheduledStopPointCache";
+    public static final String SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE = "scheduledStopPointAndQuayIdCache";
     public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfig.class);
 
@@ -85,22 +85,22 @@ public class CacheConfig {
         return Redisson.create(redissonConfig);
     }
 
-    @Bean(name = TRANSPORT_MODES_PER_QUAY_ID_CACHE)
-    public Map<QuayId, TransportModes> transportModesPerQuayIdCache(RedissonClient redissonClient,
+    @Bean(name = TRANSPORT_MODES_FOR_QUAY_ID_CACHE)
+    public Map<QuayId, TransportModes> transportModesForQuayIdCache(RedissonClient redissonClient,
                                                                     QuayIdCodec quayIdCodec,
                                                                     TransportModesCodec transportModesCodec) {
-        return redissonClient.getMap(
-                TRANSPORT_MODES_PER_QUAY_ID_CACHE,
+        return redissonClient.getLocalCachedMap(
+                TRANSPORT_MODES_FOR_QUAY_ID_CACHE,
                 new CompositeCodec(quayIdCodec, transportModesCodec),
                 LocalCachedMapOptions.defaults()
         );
     }
 
-    @Bean(name = QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE)
-    public Map<String, Map<String, QuayId>> quayIdForScheduledStopPointCache(RedissonClient redissonClient,
+    @Bean(name = SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE)
+    public Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache(RedissonClient redissonClient,
                                                                              QuayIdCodec quayIdCodec) {
-        return redissonClient.getMap(
-                QUAY_ID_FOR_SCHEDULED_STOP_POINT_CACHE,
+        return redissonClient.getLocalCachedMap(
+                SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE,
                 new CompositeCodec(
                         new StringCodec(),
                         new CompositeCodec(new StringCodec(), quayIdCodec)),
