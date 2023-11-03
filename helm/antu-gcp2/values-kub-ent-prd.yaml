@@ -10,6 +10,7 @@ gcp:
 
   antu:
     bucketName: ror-antu-gcp2-production
+    exchangeBucketName: ror-antu-exchange-gcp2-production
 
 tiamatUrl: http://tiamat.prd.entur.internal
 

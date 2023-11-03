@@ -53,7 +53,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
-import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
+import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
@@ -97,8 +97,8 @@ class SwedenDatasetValidationTest extends AntuRouteBuilderIntegrationTestBase {
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME;
-        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+        String datasetBlobName = BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME;
+        antuExchangeInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
         context.start();

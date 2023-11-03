@@ -79,7 +79,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
 
         from("direct:downloadNetexDataset")
                 .log(LoggingLevel.INFO, correlation() + "Downloading NeTEx dataset ${header." + FILE_HANDLE + "}")
-                .to("direct:getMardukBlob")
+                .to("direct:getAntuExchangeBlob")
                 .filter(body().isNull())
                 .log(LoggingLevel.ERROR, correlation() + "NeTEx file not found: ${header." + FILE_HANDLE + "}")
                 .stop()
