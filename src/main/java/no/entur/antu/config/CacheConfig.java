@@ -13,7 +13,6 @@ import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.Codec;
-import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.CompositeCodec;
 import org.redisson.codec.Kryo5Codec;
 import org.redisson.config.Config;
@@ -97,13 +96,9 @@ public class CacheConfig {
     }
 
     @Bean(name = SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE)
-    public Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache(RedissonClient redissonClient,
-                                                                             QuayIdCodec quayIdCodec) {
+    public Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache(RedissonClient redissonClient) {
         return redissonClient.getLocalCachedMap(
                 SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE,
-                new CompositeCodec(
-                        new StringCodec(),
-                        new CompositeCodec(new StringCodec(), quayIdCodec)),
                 LocalCachedMapOptions.defaults()
         );
     }
