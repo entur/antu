@@ -2,8 +2,8 @@ package no.entur.antu.validator.id;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.StopPlaceId;
+import no.entur.antu.model.QuayId;
+import no.entur.antu.model.StopPlaceId;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.slf4j.Logger;

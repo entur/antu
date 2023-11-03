@@ -1,9 +1,7 @@
 package no.entur.antu.validator.xpath;
 
 import net.sf.saxon.s9api.XdmNode;
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.stop.model.QuayId;
 import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
 import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationReportEntry;

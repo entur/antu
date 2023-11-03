@@ -1,6 +1,6 @@
 package no.entur.antu.commondata;
 
-import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.model.QuayId;
 
 public interface CommonDataRepository {
 

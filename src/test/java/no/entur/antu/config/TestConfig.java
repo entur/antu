@@ -3,9 +3,9 @@ package no.entur.antu.config;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.StopPlaceId;
-import no.entur.antu.stop.model.StopPlaceTransportModes;
+import no.entur.antu.model.QuayId;
+import no.entur.antu.model.StopPlaceId;
+import no.entur.antu.model.TransportModes;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -73,7 +73,7 @@ public class TestConfig {
             }
 
             @Override
-            public StopPlaceTransportModes getTransportModesForQuayId(QuayId quayId) {
+            public TransportModes getTransportModesForQuayId(QuayId quayId) {
                 return null;
             }
 

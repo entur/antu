@@ -1,7 +1,7 @@
 package no.entur.antu.commondata;
 
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.stop.model.QuayId;
+import no.entur.antu.model.QuayId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,17 +12,17 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonDataRepositoryImpl.class);
 
     private final CommonDataResource commonDataResource;
-    private final Map<String, Map<String, QuayId>> quayIdForScheduledStopPointCache;
+    private final Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache;
 
     public CommonDataRepositoryImpl(CommonDataResource commonDataResource,
-                                    Map<String, Map<String, QuayId>> quayIdForScheduledStopPointCache) {
+                                    Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache) {
         this.commonDataResource = commonDataResource;
-        this.quayIdForScheduledStopPointCache = quayIdForScheduledStopPointCache;
+        this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     }
 
     public QuayId findQuayId(String scheduledStopPoint, String validationReportId) {
 
-        Map<String, QuayId> idsForReport = quayIdForScheduledStopPointCache.get(validationReportId);
+        Map<String, QuayId> idsForReport = scheduledStopPointAndQuayIdCache.get(validationReportId);
         if (idsForReport == null) {
             throw new AntuException("Quay ids cache not found for validation report with id: " + validationReportId);
         }
@@ -33,7 +33,7 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
         commonDataResource.loadCommonData(fileContent);
         // Merging with the existing map, for handing the case where there are
         // multiple common files in the dataset.
-        quayIdForScheduledStopPointCache.merge(
+        scheduledStopPointAndQuayIdCache.merge(
                 validationReportId,
                 commonDataResource.getQuayIdsPerScheduledStopPoints(),
                 (existingMap, newMap) -> {
@@ -42,10 +42,10 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
                 });
 
         LOGGER.info("{} Quay ids for ScheduledStopPoints cached for validation report with id: {}",
-                quayIdForScheduledStopPointCache.get(validationReportId).size(), validationReportId);
+                scheduledStopPointAndQuayIdCache.get(validationReportId).size(), validationReportId);
     }
 
     public void cleanUp(String validationReportId) {
-        quayIdForScheduledStopPointCache.remove(validationReportId);
+        scheduledStopPointAndQuayIdCache.remove(validationReportId);
     }
 }

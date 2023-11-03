@@ -4,7 +4,7 @@ import net.sf.saxon.s9api.*;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.stop.model.StopPlaceTransportModes;
+import no.entur.antu.model.TransportModes;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -12,7 +12,6 @@ import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -99,11 +98,11 @@ public class TransportModeValidator extends AbstractNetexValidator {
                 );
     }
 
-    private boolean isValidTransportMode(DatasetTransportModes datasetTransportModes,
-                                         StopPlaceTransportModes stopPlaceTransportModes) {
+    private boolean isValidTransportMode(TransportModes datasetTransportModes,
+                                         TransportModes transportModes) {
 
-        if (stopPlaceTransportModes == null
-            || stopPlaceTransportModes.mode() == null
+        if (transportModes == null
+            || transportModes.mode() == null
             || datasetTransportModes.mode() == null) {
             // TransportMode on Line is mandatory. At this point, the validation entry for the Missing transport mode,
             // will already be created. So we will simply ignore it, if there is no transportModeForServiceJourney exists.
@@ -114,26 +113,26 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
         // Coach and bus are interchangeable
         if ((datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH)
-             && stopPlaceTransportModes.mode().equals(VehicleModeEnumeration.BUS))
+             && transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS))
             || (datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
-                && stopPlaceTransportModes.mode().equals(VehicleModeEnumeration.COACH))) {
+                && transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH))) {
             return true;
         }
 
         // Taxi can stop on bus and coach stops
         if (datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.TAXI)
-            && (stopPlaceTransportModes.mode().equals(VehicleModeEnumeration.BUS)
-                || stopPlaceTransportModes.mode().equals(VehicleModeEnumeration.COACH))) {
+            && (transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
+                || transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH))) {
             return true;
         }
 
-        if (datasetTransportModes.mode().value().equals(stopPlaceTransportModes.mode().value())) {
+        if (datasetTransportModes.mode().value().equals(transportModes.mode().value())) {
             // Only rail replacement bus service can visit rail replacement bus stops
-            if (stopPlaceTransportModes.subMode() != null
-                && stopPlaceTransportModes.subMode().name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())) {
+            if (transportModes.subMode() != null
+                && transportModes.subMode().name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())) {
                 // if the stopPlaceTransportSubMode is RAIL_REPLACEMENT_BUS,
                 // then busSubModeForServiceJourney should be RAIL_REPLACEMENT_BUS
-                return datasetTransportModes.busSubMode() == BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS;
+                return datasetTransportModes.subMode().name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value());
             } else {
                 return true;
             }

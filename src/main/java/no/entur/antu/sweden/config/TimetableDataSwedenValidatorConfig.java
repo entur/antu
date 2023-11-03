@@ -16,8 +16,6 @@
 
 package no.entur.antu.sweden.config;
 
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.sweden.stop.RedisSwedenStopPlaceNetexIdRepository;
 import no.entur.antu.sweden.stop.SwedenStopPlaceNetexIdRepository;
 import no.entur.antu.sweden.stop.SwedenStopPlaceValidator;

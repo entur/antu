@@ -2,12 +2,13 @@ package no.entur.antu.stop;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
-import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.StopPlaceTransportModes;
-import no.entur.antu.stop.model.TransportSubMode;
+import no.entur.antu.model.QuayId;
+import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportSubMode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.*;
 
+import javax.xml.bind.JAXBElement;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,7 +39,9 @@ public class StopPlaceResourceImpl implements StopPlaceResource {
     @Override
     public Set<String> getStopPlaceIds() {
         List<StopPlace> list = getNetexEntitiesIndex().getSiteFrames().stream()
-                .flatMap(siteFrame -> siteFrame.getStopPlaces().getStopPlace().stream())
+                .flatMap(siteFrame -> siteFrame.getStopPlaces().getStopPlace_().stream())
+                .map(JAXBElement::getValue)
+                .map(StopPlace.class::cast)
                 .toList();
 
         return list.stream()
@@ -47,9 +50,11 @@ public class StopPlaceResourceImpl implements StopPlaceResource {
     }
 
     @Override
-    public Map<QuayId, StopPlaceTransportModes> getTransportModesPerQuayId() {
+    public Map<QuayId, TransportModes> getTransportModesPerQuayId() {
         return getNetexEntitiesIndex().getSiteFrames().stream()
-                .flatMap(siteFrame -> siteFrame.getStopPlaces().getStopPlace().stream())
+                .flatMap(siteFrame -> siteFrame.getStopPlaces().getStopPlace_().stream())
+                .map(JAXBElement::getValue)
+                .map(StopPlace.class::cast)
                 .filter(stopPlace -> Objects.nonNull(stopPlace.getTransportMode()))
                 .filter(stopPlace -> Objects.nonNull(stopPlace.getQuays()))
                 .map(this::getQuayTransportModesEntries)
@@ -61,15 +66,16 @@ public class StopPlaceResourceImpl implements StopPlaceResource {
                 ));
     }
 
-    public List<Map.Entry<QuayId, StopPlaceTransportModes>> getQuayTransportModesEntries(StopPlace stopPlace) {
+    public List<Map.Entry<QuayId, TransportModes>> getQuayTransportModesEntries(StopPlace stopPlace) {
         return stopPlace.getQuays().getQuayRefOrQuay().stream()
+                .map(JAXBElement::getValue)
                 .filter(Quay.class::isInstance)
                 .map(Quay.class::cast)
                 .map(Quay::getId)
                 .map(QuayId::new)
                 .map(quayId -> Map.entry(
                         quayId,
-                        new StopPlaceTransportModes(
+                        new TransportModes(
                                 stopPlace.getTransportMode(),
                                 TransportSubMode.from(stopPlace).orElse(null)
                         )))

@@ -2,10 +2,11 @@ package no.entur.antu.validator.transportmodevalidator;
 
 import net.sf.saxon.s9api.*;
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportSubMode;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 
 import java.util.List;
@@ -16,12 +17,12 @@ public final class ServiceJourneyContextBuilder {
     record ServiceJourneyContext(
             XdmItem serviceJourneyItem,
             String serviceJourneyId,
-            DatasetTransportModes transportModes,
+            TransportModes transportModes,
             List<String> scheduledStopPoints) {
     }
 
     private final ValidationContext validationContext;
-    private final DatasetTransportModes transportModesForLine;
+    private final TransportModes transportModesForLine;
 
     public ServiceJourneyContextBuilder(ValidationContext validationContext) {
         this.validationContext = validationContext;
@@ -42,15 +43,15 @@ public final class ServiceJourneyContextBuilder {
                 getScheduledStopPointsForServiceJourney(serviceJourneyItem));
     }
 
-    private DatasetTransportModes findTransportModesForServiceJourney(XdmItem serviceJourneyItem) {
-        DatasetTransportModes transportModes = findTransportModes(serviceJourneyItem);
+    private TransportModes findTransportModesForServiceJourney(XdmItem serviceJourneyItem) {
+        TransportModes transportModes = findTransportModes(serviceJourneyItem);
         if (transportModes == null) {
             return transportModesForLine;
         }
         return transportModes;
     }
 
-    private DatasetTransportModes findTransportModes(XdmItem item) {
+    private TransportModes findTransportModes(XdmItem item) {
         XdmNode transportModeNode = getChild(
                 item.stream().asNode(),
                 new QName("n", Constants.NETEX_NAMESPACE, "TransportMode"));
@@ -62,7 +63,7 @@ public final class ServiceJourneyContextBuilder {
         AllVehicleModesOfTransportEnumeration transportMode =
                 AllVehicleModesOfTransportEnumeration.fromValue(transportModeNode.getStringValue());
 
-        return new DatasetTransportModes(
+        return new TransportModes(
                 transportMode,
                 transportMode == AllVehicleModesOfTransportEnumeration.BUS
                         ? findBusSubModeForServiceJourney(item)
@@ -93,7 +94,7 @@ public final class ServiceJourneyContextBuilder {
         return journeyPatternRefNode == null ? null : journeyPatternRefNode.attribute("ref");
     }
 
-    private static BusSubmodeEnumeration findBusSubModeForServiceJourney(XdmItem item) {
+    private static TransportSubMode findBusSubModeForServiceJourney(XdmItem item) {
         try {
             XdmNode transportSubModeNode = getChild(
                     item.stream().asNode(),
@@ -104,7 +105,7 @@ public final class ServiceJourneyContextBuilder {
                     ? getChild(transportSubModeNode, new QName("n", Constants.NETEX_NAMESPACE, "BusSubmode"))
                     : null;
 
-            return busSubModeNode == null ? null : BusSubmodeEnumeration.fromValue(busSubModeNode.getStringValue());
+            return busSubModeNode == null ? null : new TransportSubMode(busSubModeNode.getStringValue());
 
         } catch (Exception ex) {
             throw new AntuException(ex);
