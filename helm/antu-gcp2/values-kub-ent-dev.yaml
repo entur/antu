@@ -10,6 +10,7 @@ gcp:
 
   antu:
     bucketName: ror-antu-gcp2-dev
+    exchangeBucketName: ror-antu-exchange-gcp2-dev
 
 tiamatUrl: http://tiamat.dev.entur.internal
 

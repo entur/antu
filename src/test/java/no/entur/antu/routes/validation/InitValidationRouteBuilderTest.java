@@ -53,7 +53,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
-import static no.entur.antu.Constants.BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED;
+import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
@@ -108,8 +108,8 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME;
-        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+        String datasetBlobName = BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME;
+        antuExchangeInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
         context.start();
@@ -143,8 +143,8 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_STOP_PLACE_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_STOP_PLACE_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_STOP_PLACE_FILE_NAME;
-        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+        String datasetBlobName = BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_STOP_PLACE_FILE_NAME;
+        antuExchangeInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
         context.start();
@@ -187,8 +187,8 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
-        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+        String datasetBlobName = BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_FLB + '/' + TEST_DATASET_SCHEMA_VALIDATION_FILE_NAME;
+        antuExchangeInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
         context.start();
@@ -222,8 +222,8 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_NO_DUPLICATED_ID);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_NO_DUPLICATED_ID);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_AVI + '/' + TEST_DATASET_NO_DUPLICATED_ID;
-        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+        String datasetBlobName = BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_AVI + '/' + TEST_DATASET_NO_DUPLICATED_ID;
+        antuExchangeInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
         context.start();
@@ -262,8 +262,8 @@ class InitValidationRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase
 
         InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_DUPLICATED_ID);
         Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_DUPLICATED_ID);
-        String datasetBlobName = BLOBSTORE_PATH_MARDUK_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_AVI + '/' + TEST_DATASET_DUPLICATED_ID;
-        mardukInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+        String datasetBlobName = BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED + TEST_DATASET_CODESPACE_AVI + '/' + TEST_DATASET_DUPLICATED_ID;
+        antuExchangeInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
 
 
         context.start();

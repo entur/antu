@@ -60,6 +60,7 @@ data:
     # Blobstore
     blobstore.gcs.project.id={{ .Values.gcp.blobstoreProjectId }}
     blobstore.gcs.marduk.container.name={{ .Values.gcp.marduk.bucketName }}
+    blobstore.gcs.antu.exchange.container.name={{ .Values.gcp.antu.exchangeBucketName }}
     blobstore.gcs.antu.container.name={{ .Values.gcp.antu.bucketName }}
     antu.netex.stop.current.filename=tiamat/CurrentAndFuture_latest.zip
 
