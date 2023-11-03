@@ -34,7 +34,7 @@
         <kryo.version>5.5.0</kryo.version>
         <embedded-redis.version>0.8.3</embedded-redis.version>
         <netex-parser-java.version>2.3.0</netex-parser-java.version>
-        <netex-java-model.version>1.0.15</netex-java-model.version>
+        <netex-java-model.version>2.0.15</netex-java-model.version>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
