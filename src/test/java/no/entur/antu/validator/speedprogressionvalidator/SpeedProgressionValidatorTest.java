@@ -2,8 +2,8 @@ package no.entur.antu.validator.speedprogressionvalidator;
 
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.stop.model.QuayId;
-import no.entur.antu.stop.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayId;
+import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
 import no.entur.antu.validator.nonincreasingpassingtime.NetexTestDataSample;
 import org.entur.netex.index.api.NetexEntitiesIndex;

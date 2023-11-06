@@ -16,11 +16,11 @@
 package no.entur.antu.stop;
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
-import no.entur.antu.stop.model.*;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
     private final Map<String, Set<String>> stopPlaceCache;
     private final Set<QuayId> quayIdNotFoundCache;
     private final Map<QuayId, TransportModes> transportModesForQuayIdCache;
-    private final RLocalCachedMap<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache;
+    private final Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache;
     private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
     private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
     private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
@@ -52,7 +52,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
                                    Map<String, Set<String>> stopPlaceCache,
                                    Set<QuayId> quayIdNotFoundCache,
                                    Map<QuayId, TransportModes> transportModesForQuayIdCache,
-                                   RLocalCachedMap<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
+                                   Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
                                    NetexEntityFetcher<Quay, QuayId> quayFetcher,
                                    NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
                                    NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher) {
@@ -100,7 +100,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     @Override
     public TransportModes getTransportModesForQuayId(QuayId quayId) {
-        return getDataForQuayId(quayId, transportModesForQuayIdCache, StopPlaceTransportModes::of);
+        return getDataForQuayId(quayId, transportModesForQuayIdCache, TransportModes::of);
     }
 
     @Override

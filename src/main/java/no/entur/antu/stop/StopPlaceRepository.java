@@ -18,7 +18,7 @@ package no.entur.antu.stop;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
-import no.entur.antu.stop.model.StopPlaceCoordinates;
+import no.entur.antu.model.StopPlaceCoordinates;
 
 /**
  * A repository to store and cache the stop place and quay ids retrieved from the National Stop Register.

@@ -1,4 +1,4 @@
-package no.entur.antu.stop.model;
+package no.entur.antu.model;
 
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.StopPlace;
