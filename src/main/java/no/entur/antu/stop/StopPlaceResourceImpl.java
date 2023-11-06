@@ -2,7 +2,7 @@ package no.entur.antu.stop;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
-import no.entur.antu.stop.model.StopPlaceCoordinates;
+import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.model.TransportSubMode;
@@ -10,7 +10,6 @@ import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBElement;
 import java.util.List;
 import java.util.Map;

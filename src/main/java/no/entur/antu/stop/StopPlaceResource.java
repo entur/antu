@@ -2,7 +2,7 @@ package no.entur.antu.stop;
 
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
-import no.entur.antu.stop.model.StopPlaceCoordinates;
+import no.entur.antu.model.StopPlaceCoordinates;
 
 import java.util.Map;
 import java.util.Set;

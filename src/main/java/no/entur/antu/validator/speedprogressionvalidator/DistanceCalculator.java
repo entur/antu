@@ -1,13 +1,13 @@
 package no.entur.antu.validator.speedprogressionvalidator;
 
-import no.entur.antu.stop.model.StopPlaceCoordinates;
+import no.entur.antu.model.StopPlaceCoordinates;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class DistanceCalculator {
 
-    private Map<String, Double> distances = new HashMap<>();
+    private final Map<String, Double> distances = new HashMap<>();
 
     public double calculateDistance(String previousTimetabledPassingTimeId,
                                     StopPlaceCoordinates previousStopPlaceCoordinates,

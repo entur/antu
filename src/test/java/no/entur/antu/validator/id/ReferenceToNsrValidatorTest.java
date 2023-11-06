@@ -4,7 +4,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
-import no.entur.antu.stop.model.StopPlaceCoordinates;
+import no.entur.antu.model.StopPlaceCoordinates;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
