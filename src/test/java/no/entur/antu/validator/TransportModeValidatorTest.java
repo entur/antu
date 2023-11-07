@@ -152,7 +152,7 @@ class TransportModeValidatorTest {
         TestData testData = new TestData()
                 .withTransportModeAtLine(AllVehicleModesOfTransportEnumeration.BUS, new TransportSubMode("localBus"));
 
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
@@ -173,7 +173,7 @@ class TransportModeValidatorTest {
                 .withTransportModeAtLine(AllVehicleModesOfTransportEnumeration.BUS, new TransportSubMode("localBus"))
                 .withTransportModeAtServiceJourney(AllVehicleModesOfTransportEnumeration.METRO, new TransportSubMode("metro"));
 
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
@@ -193,7 +193,7 @@ class TransportModeValidatorTest {
         TestData testData = new TestData()
                 .withTransportModeAtLine(AllVehicleModesOfTransportEnumeration.BUS, new TransportSubMode("railReplacementBus"));
 
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
@@ -217,7 +217,7 @@ class TransportModeValidatorTest {
                 .withTransportModeAtLine(AllVehicleModesOfTransportEnumeration.BUS, new TransportSubMode("railReplacementBus"));
 
         // Mock findQuayId
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         // Mock getTransportModeForQuayId
@@ -245,7 +245,7 @@ class TransportModeValidatorTest {
                         new TransportSubMode("localBus"));
 
         // Mock findQuayId
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         // Mock getTransportModeForQuayId
@@ -270,7 +270,7 @@ class TransportModeValidatorTest {
                         new TransportSubMode("localBus"));
 
         // Mock findQuayId
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         // Mock getTransportModeForQuayId
@@ -295,7 +295,7 @@ class TransportModeValidatorTest {
                         new TransportSubMode("communalTaxi"));
 
         // Mock findQuayId
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         // Mock getTransportModeForQuayId
@@ -320,7 +320,7 @@ class TransportModeValidatorTest {
                         new TransportSubMode("communalTaxi"));
 
         // Mock findQuayId
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         // Mock getTransportModeForQuayId
@@ -345,7 +345,7 @@ class TransportModeValidatorTest {
                         new TransportSubMode("communalTaxi"));
 
         // Mock findQuayId
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         // Mock getTransportModeForQuayId
@@ -378,7 +378,7 @@ class TransportModeValidatorTest {
                         new TransportSubMode("communalTaxi"));
 
         // Mock findQuayId
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         // Mock getTransportModeForQuayId
@@ -403,7 +403,7 @@ class TransportModeValidatorTest {
                         new TransportSubMode("communalTaxi"));
 
         // Mock findQuayId
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         // Mock getTransportModeForQuayId
@@ -436,7 +436,7 @@ class TransportModeValidatorTest {
                 .withFlexibleLineType(FlexibleLineTypeEnumeration.FIXED)
                 .withTransportModeAtLine(AllVehicleModesOfTransportEnumeration.BUS, new TransportSubMode("localBus"));
 
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
@@ -458,7 +458,7 @@ class TransportModeValidatorTest {
                 .withFlexibleLineType(FlexibleLineTypeEnumeration.OTHER)
                 .withTransportModeAtLine(AllVehicleModesOfTransportEnumeration.BUS, new TransportSubMode("localBus"));
 
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
@@ -480,7 +480,7 @@ class TransportModeValidatorTest {
                 .withLineType(TestData.LineType.FlexibleLine)
                 .withTransportModeAtLine(AllVehicleModesOfTransportEnumeration.BUS, new TransportSubMode("localBus"));
 
-        Mockito.when(commonDataRepository.findQuayId(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
+        Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(TestData.SCHEDULED_STOP_POINT_REF, TestData.VALIDATION_REPORT_ID))
                 .thenReturn(TestData.QUAY_ID);
 
         Mockito.when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))

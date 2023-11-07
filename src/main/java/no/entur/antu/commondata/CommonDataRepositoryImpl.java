@@ -20,7 +20,14 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
         this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     }
 
-    public QuayId findQuayId(String scheduledStopPoint, String validationReportId) {
+    @Override
+    public boolean hasQuayIds(String validationReportId) {
+        return scheduledStopPointAndQuayIdCache.get(validationReportId) != null;
+    }
+
+    @Override
+    public QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint,
+                                                  String validationReportId) {
 
         Map<String, QuayId> idsForReport = scheduledStopPointAndQuayIdCache.get(validationReportId);
         if (idsForReport == null) {
@@ -29,7 +36,10 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
         return idsForReport.get(scheduledStopPoint);
     }
 
-    public void loadCommonDataCache(byte[] fileContent, String validationReportId) {
+    @Override
+    public void loadCommonDataCache(byte[] fileContent,
+                                    String validationReportId) {
+
         commonDataResource.loadCommonData(fileContent);
         // Merging with the existing map, for handing the case where there are
         // multiple common files in the dataset.
@@ -45,6 +55,7 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
                 scheduledStopPointAndQuayIdCache.get(validationReportId).size(), validationReportId);
     }
 
+    @Override
     public void cleanUp(String validationReportId) {
         scheduledStopPointAndQuayIdCache.remove(validationReportId);
     }

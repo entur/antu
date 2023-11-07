@@ -83,7 +83,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
     }
 
     private <R> R tryFetchWithNotFoundCheck(QuayId quayId,
-                           NetexEntityFetcher<R, QuayId> fetcherFunction) {
+                                            NetexEntityFetcher<R, QuayId> fetcherFunction) {
         if (!quayIdNotFoundCache.contains(quayId)) {
             R result = fetcherFunction.tryFetch(quayId);
             if (result == null) {
@@ -123,9 +123,9 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         quayIdNotFoundCache.clear();
 
         LOGGER.info("Updated cache with " +
-                    "{} stop places ids, " +
-                    "{} quays ids, " +
-                    "{} transport modes per quay id",
+                        "{} stop places ids, " +
+                        "{} quays ids, " +
+                        "{} transport modes per quay id",
                 stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(),
                 stopPlaceCache.get(QUAY_CACHE_KEY).size(),
                 transportModesForQuayIdCache.size());

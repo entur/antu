@@ -21,7 +21,12 @@ public class TestConfig {
     public CommonDataRepository commonDataRepository() {
         return new CommonDataRepository() {
             @Override
-            public QuayId findQuayId(String scheduledStopPoint, String validationReportId) {
+            public boolean hasQuayIds(String validationReportId) {
+                return false;
+            }
+
+            @Override
+            public QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint, String validationReportId) {
                 return null;
             }
 
