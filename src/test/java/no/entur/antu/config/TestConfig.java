@@ -22,7 +22,7 @@ public class TestConfig {
         return new CommonDataRepository() {
             @Override
             public boolean hasQuayIds(String validationReportId) {
-                return false;
+                return true;
             }
 
             @Override
