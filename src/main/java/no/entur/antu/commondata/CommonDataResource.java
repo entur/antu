@@ -5,10 +5,12 @@ import no.entur.antu.model.QuayId;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.PassengerStopAssignment;
+import org.rutebanken.netex.model.ServiceFrame;
 
 import javax.xml.bind.JAXBElement;
 import java.io.ByteArrayInputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CommonDataResource {
@@ -29,7 +31,9 @@ public class CommonDataResource {
 
     public Map<String, QuayId> getQuayIdsPerScheduledStopPoints() {
         return getCommonDataIndex().getServiceFrames().stream()
-                .flatMap(serviceFrame -> serviceFrame.getStopAssignments().getStopAssignment().stream())
+                .map(ServiceFrame::getStopAssignments)
+                .filter(Objects::nonNull)
+                .flatMap(stopAssignments -> stopAssignments.getStopAssignment().stream())
                 .map(JAXBElement::getValue)
                 .filter(PassengerStopAssignment.class::isInstance)
                 .map(PassengerStopAssignment.class::cast)
