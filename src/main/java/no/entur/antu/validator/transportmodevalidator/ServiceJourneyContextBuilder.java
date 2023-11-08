@@ -31,9 +31,13 @@ public final class ServiceJourneyContextBuilder {
                 selector.setContextItem(validationContext.getXmlNode());
                 XdmNode scheduledStopPointRef = selector.evaluateSingle().stream().asNode();
                 XdmNode passengerStopAssignment = getParent(scheduledStopPointRef, new QName("n", Constants.NETEX_NAMESPACE, "PassengerStopAssignment"));
-                XdmNode quayRef = getChild(passengerStopAssignment, new QName("n", Constants.NETEX_NAMESPACE, "QuayRef"));
-
-                return new QuayId(quayRef.attribute("ref"));
+                if (passengerStopAssignment != null) {
+                    XdmNode quayRef = getChild(passengerStopAssignment, new QName("n", Constants.NETEX_NAMESPACE, "QuayRef"));
+                    if (quayRef != null) {
+                        return new QuayId(quayRef.attribute("ref"));
+                    }
+                }
+                return null;
             } catch (Exception ex) {
                 throw new AntuException(ex);
             }
