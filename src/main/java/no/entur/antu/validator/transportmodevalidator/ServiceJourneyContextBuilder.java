@@ -2,6 +2,7 @@ package no.entur.antu.validator.transportmodevalidator;
 
 import net.sf.saxon.s9api.*;
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.model.TransportSubMode;
 import org.entur.netex.validation.Constants;
@@ -15,10 +16,35 @@ import java.util.Objects;
 public final class ServiceJourneyContextBuilder {
 
     record ServiceJourneyContext(
+            ValidationContext validationContext,
             XdmItem serviceJourneyItem,
             String serviceJourneyId,
             TransportModes transportModes,
             List<String> scheduledStopPoints) {
+
+        public QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint) {
+            try {
+                XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
+                        .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/stopAssignments/PassengerStopAssignment" +
+                                "/ScheduledStopPointRef[@ref = '" + scheduledStopPoint + "']")
+                        .load();
+                selector.setContextItem(validationContext.getXmlNode());
+                XdmNode scheduledStopPointRef = selector.evaluateSingle().stream().asNode();
+                XdmNode passengerStopAssignment = getParent(
+                        scheduledStopPointRef,
+                        new QName("n", Constants.NETEX_NAMESPACE, "PassengerStopAssignment")
+                );
+                if (passengerStopAssignment != null) {
+                    XdmNode quayRef = getChild(passengerStopAssignment, new QName("n", Constants.NETEX_NAMESPACE, "QuayRef"));
+                    if (quayRef != null) {
+                        return new QuayId(quayRef.attribute("ref"));
+                    }
+                }
+                return null;
+            } catch (Exception ex) {
+                throw new AntuException(ex);
+            }
+        }
     }
 
     private final ValidationContext validationContext;
@@ -37,6 +63,7 @@ public final class ServiceJourneyContextBuilder {
 
     public ServiceJourneyContext build(XdmItem serviceJourneyItem) {
         return new ServiceJourneyContext(
+                validationContext,
                 serviceJourneyItem,
                 serviceJourneyItem.stream().asNode().attribute("id"),
                 findTransportModesForServiceJourney(serviceJourneyItem),
@@ -71,29 +98,6 @@ public final class ServiceJourneyContextBuilder {
         );
     }
 
-    private List<String> getScheduledStopPointsForServiceJourney(XdmItem serviceJourneyItem) {
-        try {
-            String journeyPatternRef = getJourneyPatternRefFromServiceJourney(serviceJourneyItem);
-            XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
-                    .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/journeyPatterns/JourneyPattern" +
-                             "[@id = '" + journeyPatternRef + "']/pointsInSequence/StopPointInJourneyPattern/ScheduledStopPointRef")
-                    .load();
-            selector.setContextItem(validationContext.getXmlNode());
-            return selector.stream().asListOfNodes().stream()
-                    .map(scheduledStopPointRef -> scheduledStopPointRef.attribute("ref"))
-                    .toList();
-        } catch (Exception ex) {
-            throw new AntuException(ex);
-        }
-    }
-
-    private static String getJourneyPatternRefFromServiceJourney(XdmItem serviceJourneyItem) {
-        XdmNode journeyPatternRefNode = getChild(
-                serviceJourneyItem.stream().asNode(),
-                new QName("n", Constants.NETEX_NAMESPACE, "JourneyPatternRef"));
-        return journeyPatternRefNode == null ? null : journeyPatternRefNode.attribute("ref");
-    }
-
     private static TransportSubMode findBusSubModeForServiceJourney(XdmItem item) {
         try {
             XdmNode transportSubModeNode = getChild(
@@ -110,6 +114,29 @@ public final class ServiceJourneyContextBuilder {
         } catch (Exception ex) {
             throw new AntuException(ex);
         }
+    }
+
+    private List<String> getScheduledStopPointsForServiceJourney(XdmItem serviceJourneyItem) {
+        try {
+            String journeyPatternRef = getJourneyPatternRefFromServiceJourney(serviceJourneyItem);
+            XPathSelector selector = validationContext.getNetexXMLParser().getXPathCompiler()
+                    .compile("PublicationDelivery/dataObjects/CompositeFrame/frames/*/journeyPatterns/JourneyPattern" +
+                            "[@id = '" + journeyPatternRef + "']/pointsInSequence/StopPointInJourneyPattern/ScheduledStopPointRef")
+                    .load();
+            selector.setContextItem(validationContext.getXmlNode());
+            return selector.stream().asListOfNodes().stream()
+                    .map(scheduledStopPointRef -> scheduledStopPointRef.attribute("ref"))
+                    .toList();
+        } catch (Exception ex) {
+            throw new AntuException(ex);
+        }
+    }
+
+    private static String getJourneyPatternRefFromServiceJourney(XdmItem serviceJourneyItem) {
+        XdmNode journeyPatternRefNode = getChild(
+                serviceJourneyItem.stream().asNode(),
+                new QName("n", Constants.NETEX_NAMESPACE, "JourneyPatternRef"));
+        return journeyPatternRefNode == null ? null : journeyPatternRefNode.attribute("ref");
     }
 
     private XdmItem getRegularLine() {
@@ -157,6 +184,15 @@ public final class ServiceJourneyContextBuilder {
 
     private static XdmNode getChild(XdmNode parent, QName childName) {
         XdmSequenceIterator<XdmNode> iter = parent.axisIterator(Axis.CHILD, childName);
+        if (iter.hasNext()) {
+            return iter.next();
+        } else {
+            return null;
+        }
+    }
+
+    private static XdmNode getParent(XdmNode parent, QName parentName) {
+        XdmSequenceIterator<XdmNode> iter = parent.axisIterator(Axis.PARENT, parentName);
         if (iter.hasNext()) {
             return iter.next();
         } else {

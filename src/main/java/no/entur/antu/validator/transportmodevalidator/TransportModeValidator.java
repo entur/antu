@@ -3,6 +3,7 @@ package no.entur.antu.validator.transportmodevalidator;
 import net.sf.saxon.s9api.*;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.model.QuayId;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.model.TransportModes;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
@@ -14,6 +15,7 @@ import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static no.entur.antu.validator.transportmodevalidator.ServiceJourneyContextBuilder.*;
@@ -84,8 +86,12 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
     private boolean validateServiceJourney(ServiceJourneyContext serviceJourneyContext,
                                            String validationReportId) {
+        Function<String, QuayId> findQuayIdForScheduledStopPoint = commonDataRepository.hasQuayIds(validationReportId)
+                ? scheduledStopPoint -> commonDataRepository.findQuayIdForScheduledStopPoint(scheduledStopPoint, validationReportId)
+                : serviceJourneyContext::findQuayIdForScheduledStopPoint;
+
         return serviceJourneyContext.scheduledStopPoints().stream()
-                .map(scheduledStopPoint -> commonDataRepository.findQuayId(scheduledStopPoint, validationReportId))
+                .map(findQuayIdForScheduledStopPoint)
                 // At this point, we have already validated that all the ids in line file exists either in the line file or in the common file.
                 // So we have probably already have the validation entry for the missing id reference in validation context. So we will simply ignore
                 // the null values instead of creating new validation entry.
@@ -99,11 +105,11 @@ public class TransportModeValidator extends AbstractNetexValidator {
     }
 
     private boolean isValidTransportMode(TransportModes datasetTransportModes,
-                                         TransportModes transportModes) {
+                                                TransportModes transportModes) {
 
         if (transportModes == null
-            || transportModes.mode() == null
-            || datasetTransportModes.mode() == null) {
+                || transportModes.mode() == null
+                || datasetTransportModes.mode() == null) {
             // TransportMode on Line is mandatory. At this point, the validation entry for the Missing transport mode,
             // will already be created. So we will simply ignore it, if there is no transportModeForServiceJourney exists.
             // stopPlaceTransportModes should never be null at this point, as it is mandatory in stop places file in tiamat.
@@ -113,15 +119,15 @@ public class TransportModeValidator extends AbstractNetexValidator {
 
         // Coach and bus are interchangeable
         if ((datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH)
-             && transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS))
-            || (datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
+                && transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS))
+                || (datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
                 && transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH))) {
             return true;
         }
 
         // Taxi can stop on bus and coach stops
         if (datasetTransportModes.mode().equals(AllVehicleModesOfTransportEnumeration.TAXI)
-            && (transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
+                && (transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
                 || transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.COACH))) {
             return true;
         }
@@ -129,7 +135,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
         if (datasetTransportModes.mode().value().equals(transportModes.mode().value())) {
             // Only rail replacement bus service can visit rail replacement bus stops
             if (transportModes.subMode() != null
-                && transportModes.subMode().name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())) {
+                    && transportModes.subMode().name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())) {
                 // if the stopPlaceTransportSubMode is RAIL_REPLACEMENT_BUS,
                 // then busSubModeForServiceJourney should be RAIL_REPLACEMENT_BUS
                 return datasetTransportModes.subMode().name().equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value());

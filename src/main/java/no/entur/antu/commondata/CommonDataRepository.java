@@ -4,7 +4,11 @@ import no.entur.antu.model.QuayId;
 
 public interface CommonDataRepository {
 
-    QuayId findQuayId(String scheduledStopPoint, String validationReportId);
+    boolean hasQuayIds(String validationReportId);
+
+    QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint, String validationReportId);
+
     void loadCommonDataCache(byte[] fileContent, String validationReportId);
+
     void cleanUp(String validationReportId);
 }
