@@ -17,6 +17,29 @@ terraform {
 # Create bucket
 resource "google_storage_bucket" "storage_bucket" {
   name               = "${var.bucket_instance_prefix}-${var.bucket_instance_suffix}"
+  description        = "Storage for validation reports"
+  location           = var.bucket_location
+  project            = var.gcp_resources_project
+  storage_class      = var.bucket_storage_class
+  labels             = merge(var.labels, {offsite_enabled = "false"})
+  uniform_bucket_level_access = true
+
+
+  lifecycle_rule {
+
+    condition {
+      age = var.bucket_retention_period
+      with_state = "ANY"
+    }
+    action {
+      type = "Delete"
+    }
+  }
+}
+
+resource "google_storage_bucket" "storage_bucket" {
+  name               = "ror-antu-exchange-gcp2-${var.bucket_instance_suffix}"
+  description        = "Temporary storage for files to be validated"
   location           = var.bucket_location
   project            = var.gcp_resources_project
   storage_class      = var.bucket_storage_class

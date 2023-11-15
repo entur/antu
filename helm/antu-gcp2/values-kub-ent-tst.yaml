@@ -10,6 +10,7 @@ gcp:
 
   antu:
     bucketName: ror-antu-gcp2-test
+    exchangeBucketName: ror-antu-exchange-gcp2-test
 
 tiamatUrl: http://tiamat.tst.entur.internal
 

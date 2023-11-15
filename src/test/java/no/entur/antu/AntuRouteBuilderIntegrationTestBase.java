@@ -54,8 +54,8 @@ import javax.annotation.PostConstruct;
 public abstract class AntuRouteBuilderIntegrationTestBase {
 
 
-    @Value("${blobstore.gcs.marduk.container.name}")
-    private String mardukContainerName;
+    @Value("${blobstore.gcs.antu.exchange.container.name}")
+    private String antuExchangeContainerName;
 
     @Value("${blobstore.gcs.antu.container.name}")
     private String antuContainerName;
@@ -68,7 +68,7 @@ public abstract class AntuRouteBuilderIntegrationTestBase {
     protected PubSubTemplate pubSubTemplate;
 
     @Autowired
-    protected InMemoryBlobStoreRepository mardukInMemoryBlobStoreRepository;
+    protected InMemoryBlobStoreRepository antuExchangeInMemoryBlobStoreRepository;
 
     @Autowired
     protected InMemoryBlobStoreRepository antuInMemoryBlobStoreRepository;
@@ -79,7 +79,7 @@ public abstract class AntuRouteBuilderIntegrationTestBase {
 
     @PostConstruct
     void initInMemoryBlobStoreRepositories() {
-        mardukInMemoryBlobStoreRepository.setContainerName(mardukContainerName);
+        antuExchangeInMemoryBlobStoreRepository.setContainerName(antuExchangeContainerName);
         antuInMemoryBlobStoreRepository.setContainerName(antuContainerName);
     }
 
