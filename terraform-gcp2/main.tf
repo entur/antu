@@ -17,7 +17,6 @@ terraform {
 # Create bucket
 resource "google_storage_bucket" "storage_bucket" {
   name               = "${var.bucket_instance_prefix}-${var.bucket_instance_suffix}"
-  description        = "Storage for validation reports"
   location           = var.bucket_location
   project            = var.gcp_resources_project
   storage_class      = var.bucket_storage_class
@@ -37,9 +36,8 @@ resource "google_storage_bucket" "storage_bucket" {
   }
 }
 
-resource "google_storage_bucket" "storage_bucket" {
+resource "google_storage_bucket" "storage_bucket_exchange" {
   name               = "ror-antu-exchange-gcp2-${var.bucket_instance_suffix}"
-  description        = "Temporary storage for files to be validated"
   location           = var.bucket_location
   project            = var.gcp_resources_project
   storage_class      = var.bucket_storage_class
