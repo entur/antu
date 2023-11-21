@@ -1,12 +1,12 @@
 package no.entur.antu.stop;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.xml.bind.JAXBElement;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
