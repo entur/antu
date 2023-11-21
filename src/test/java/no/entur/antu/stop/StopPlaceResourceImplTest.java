@@ -4,10 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import javax.xml.bind.JAXBElement;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.junit.jupiter.api.Test;

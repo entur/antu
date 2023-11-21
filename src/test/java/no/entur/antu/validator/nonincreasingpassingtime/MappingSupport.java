@@ -1,7 +1,7 @@
 package no.entur.antu.validator.nonincreasingpassingtime;
 
+import jakarta.xml.bind.JAXBElement;
 import javax.annotation.Nonnull;
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 

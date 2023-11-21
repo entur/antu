@@ -7,10 +7,12 @@ import org.entur.oauth2.RorAuthenticationConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,7 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  */
 @Profile("!test")
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 @Configuration
 public class AntuWebSecurityConfiguration {
 
@@ -54,26 +56,44 @@ public class AntuWebSecurityConfiguration {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
       .cors(withDefaults())
-      .csrf()
-      .disable()
+      .csrf(AbstractHttpConfigurer::disable)
       .authorizeHttpRequests(authz ->
         authz
-          .antMatchers("/services/validation-report/swagger.json")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher(
+              "/services/validation-report/swagger.json"
+            )
+          )
           .permitAll()
-          .antMatchers("/services/swagger.json")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher("/services/swagger.json")
+          )
           .permitAll()
-          .antMatchers("/actuator/prometheus")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher("/actuator/prometheus")
+          )
           .permitAll()
-          .antMatchers("/actuator/health/liveness")
+          .requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/health"))
           .permitAll()
-          .antMatchers("/actuator/health/readiness")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher("/actuator/health/liveness")
+          )
+          .permitAll()
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher("/actuator/health/readiness")
+          )
           .permitAll()
           .anyRequest()
           .authenticated()
       )
-      .oauth2ResourceServer()
-      .jwt()
-      .jwtAuthenticationConverter(new RorAuthenticationConverter());
+      .oauth2ResourceServer(configurer ->
+        configurer.jwt(jwtConfigurer ->
+          jwtConfigurer.jwtAuthenticationConverter(
+            new RorAuthenticationConverter()
+          )
+        )
+      )
+      .oauth2Client(withDefaults());
     return http.build();
   }
 }

@@ -4,6 +4,7 @@ import static no.entur.antu.validator.nonincreasingpassingtime.MappingSupport.cr
 import static no.entur.antu.validator.nonincreasingpassingtime.MappingSupport.createWrappedRef;
 
 import com.google.common.collect.ArrayListMultimap;
+import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import org.rutebanken.netex.model.*;
 
 public class NetexTestDataSample {
