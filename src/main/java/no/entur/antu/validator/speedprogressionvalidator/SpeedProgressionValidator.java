@@ -289,7 +289,7 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
                 getStopPointInJourneyPattern(stopPointInJourneyPatternRef, journeyPatternRef, index);
         if (stopPointInJourneyPattern != null) {
             String scheduledStopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
-            QuayId quayId = commonDataRepository.findQuayId(scheduledStopPointRef, validationReportId);
+            QuayId quayId = commonDataRepository.findQuayIdForScheduledStopPoint(scheduledStopPointRef, validationReportId);
             StopPlaceCoordinates coordinatesForQuayId = stopPlaceRepository.getCoordinatesForQuayId(quayId);
             return Map.entry(timetabledPassingTime.getId(), coordinatesForQuayId);
         }
