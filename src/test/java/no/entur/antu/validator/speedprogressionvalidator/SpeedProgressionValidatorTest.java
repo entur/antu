@@ -46,7 +46,7 @@ class SpeedProgressionValidatorTest {
         for (int i = 0; i < 4; i++) {
             QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
 
-            Mockito.when(commonDataRepository.findQuayId(eq("RUT:ScheduledStopPoint:" + (i + 1)), anyString()))
+            Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(eq("RUT:ScheduledStopPoint:" + (i + 1)), anyString()))
                     .thenReturn(testQuayId);
             Mockito.when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
                     .thenReturn(stopPlaceCoordinates.get(i));
@@ -82,7 +82,7 @@ class SpeedProgressionValidatorTest {
         for (int i = 0; i < 4; i++) {
             QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
 
-            Mockito.when(commonDataRepository.findQuayId(eq("RUT:ScheduledStopPoint:" + (i + 1)), anyString()))
+            Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(eq("RUT:ScheduledStopPoint:" + (i + 1)), anyString()))
                     .thenReturn(testQuayId);
             Mockito.when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
                     .thenReturn(stopPlaceCoordinates.get(i));
