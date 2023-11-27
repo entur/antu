@@ -31,9 +31,15 @@ spec:
           type: Utilization
           averageUtilization: {{ .Values.horizontalPodAutoscaler.targetCPUUtilizationPercentage | default "80" }}
   behavior:
+    scaleUp:
+      policies:
+        - type: Pods
+          value: 10
+          periodSeconds: 15
+      stabilizationWindowSeconds: 0
     scaleDown:
       policies:
         - type: Pods
-          value: 1
-          periodSeconds: 120
+          value: 10
+          periodSeconds: 15
       stabilizationWindowSeconds : 300
