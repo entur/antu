@@ -27,35 +27,14 @@ class SpeedProgressionValidatorTest {
 
     @Test
     void normalSpeedProgressionShouldNotReturnAnyValidationEntry() {
-        NetexTestDataSample sample = new NetexTestDataSample();
-        ServiceJourney serviceJourney = sample.getServiceJourney();
-        JourneyPattern journeyPattern = sample.getJourneyPattern();
 
-        serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
-
-        CommonDataRepository commonDataRepository = Mockito.mock(CommonDataRepository.class);
-        StopPlaceRepository stopPlaceRepository = Mockito.mock(StopPlaceRepository.class);
-
-        List<StopPlaceCoordinates> stopPlaceCoordinates = List.of(
-                new StopPlaceCoordinates(6.621791, 60.424023),
-                new StopPlaceCoordinates(6.612112, 60.471748),
-                new StopPlaceCoordinates(6.622312, 60.481548),
-                new StopPlaceCoordinates(6.632312, 60.491548)
-        );
-
-        for (int i = 0; i < 4; i++) {
-            QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
-
-            Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(eq("RUT:ScheduledStopPoint:" + (i + 1)), anyString()))
-                    .thenReturn(testQuayId);
-            Mockito.when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
-                    .thenReturn(stopPlaceCoordinates.get(i));
-        }
-
-        NetexEntitiesIndex netexEntitiesIndex = createNetexEntitiesIndex(journeyPattern, serviceJourney);
-
-        ValidationReport validationReport = setupAndRunValidation(
-                netexEntitiesIndex, commonDataRepository, stopPlaceRepository
+        ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+                List.of(
+                        new StopPlaceCoordinates(6.621791, 60.424023),
+                        new StopPlaceCoordinates(6.612112, 60.471748),
+                        new StopPlaceCoordinates(6.622312, 60.481548),
+                        new StopPlaceCoordinates(6.632312, 60.491548)
+                )
         );
 
         assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -63,6 +42,84 @@ class SpeedProgressionValidatorTest {
 
     @Test
     void lowSpeedProgressionShouldReturnValidationEntryForLowSpeed() {
+
+        ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+                List.of(
+                        new StopPlaceCoordinates(6.621791, 60.424023),
+                        new StopPlaceCoordinates(6.612112, 60.471748),
+                        new StopPlaceCoordinates(6.612312, 60.471548),
+                        new StopPlaceCoordinates(6.632312, 60.491548)
+                )
+        );
+
+        assertThat(validationReport.getValidationReportEntries().size(), is(1));
+        assertThat(
+                validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).findFirst().orElse(null),
+                is(SpeedProgressionError.RuleCode.LOW_SPEED_PROGRESSION.name())
+        );
+    }
+
+    @Test
+    void highSpeedProgressionShouldReturnValidationEntryForHighSpeed() {
+
+        ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+                List.of(
+                        new StopPlaceCoordinates(6.621791, 60.424023),
+                        new StopPlaceCoordinates(6.612112, 60.471748),
+                        new StopPlaceCoordinates(6.602312, 60.471548),
+                        new StopPlaceCoordinates(6.592312, 61.491548)
+                )
+        );
+
+        assertThat(validationReport.getValidationReportEntries().size(), is(1));
+        assertThat(
+                validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).findFirst().orElse(null),
+                is(SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION.name())
+        );
+    }
+
+    @Test
+    void warningSpeedProgressionShouldReturnValidationEntryForHighSpeed() {
+
+        ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+                List.of(
+                        new StopPlaceCoordinates(6.621791, 60.424023),
+                        new StopPlaceCoordinates(6.612112, 60.471748),
+                        new StopPlaceCoordinates(6.602312, 60.471548),
+                        new StopPlaceCoordinates(6.592312, 60.551548)
+                )
+        );
+
+        assertThat(validationReport.getValidationReportEntries().size(), is(1));
+        assertThat(
+                validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).findFirst().orElse(null),
+                is(SpeedProgressionError.RuleCode.WARNING_SPEED_PROGRESSION.name())
+        );
+    }
+
+    @Test
+    void multipleSpeedViolationShouldBeDetected() {
+
+        ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+                List.of(
+                        new StopPlaceCoordinates(6.621791, 60.424023),
+                        new StopPlaceCoordinates(6.612112, 60.471748),
+                        new StopPlaceCoordinates(6.612312, 60.471548),
+                        new StopPlaceCoordinates(6.592312, 61.491548)
+                )
+        );
+
+        assertThat(validationReport.getValidationReportEntries().size(), is(2));
+        assertThat(
+                validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).toList(),
+                is(List.of(
+                        SpeedProgressionError.RuleCode.LOW_SPEED_PROGRESSION.name(),
+                        SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION.name())
+                )
+        );
+    }
+
+    private static ValidationReport runTestWithStopPlaceCoordinates(List<StopPlaceCoordinates> stopPlaceCoordinates) {
         NetexTestDataSample sample = new NetexTestDataSample();
         ServiceJourney serviceJourney = sample.getServiceJourney();
         JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -72,14 +129,7 @@ class SpeedProgressionValidatorTest {
         CommonDataRepository commonDataRepository = Mockito.mock(CommonDataRepository.class);
         StopPlaceRepository stopPlaceRepository = Mockito.mock(StopPlaceRepository.class);
 
-        List<StopPlaceCoordinates> stopPlaceCoordinates = List.of(
-                new StopPlaceCoordinates(6.621791, 60.424023),
-                new StopPlaceCoordinates(6.612112, 60.471748),
-                new StopPlaceCoordinates(6.612312, 60.471548),
-                new StopPlaceCoordinates(6.632312, 60.491548)
-        );
-
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < stopPlaceCoordinates.size(); i++) {
             QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
 
             Mockito.when(commonDataRepository.findQuayIdForScheduledStopPoint(eq("RUT:ScheduledStopPoint:" + (i + 1)), anyString()))
@@ -88,17 +138,10 @@ class SpeedProgressionValidatorTest {
                     .thenReturn(stopPlaceCoordinates.get(i));
         }
 
-        NetexEntitiesIndex netexEntitiesIndex = createNetexEntitiesIndex(journeyPattern, serviceJourney);
-
-        ValidationReport validationReport = setupAndRunValidation(
-                netexEntitiesIndex, commonDataRepository, stopPlaceRepository
-        );
-
-        assertThat(validationReport.getValidationReportEntries().size(), is(1));
-        assertThat(
-                validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).findFirst(),
-                is(SpeedProgressionValidator.SpeedProgressionRuleCode.LOW_SPEED_PROGRESSION.name())
-        );
+        return setupAndRunValidation(
+                createNetexEntitiesIndex(journeyPattern, serviceJourney),
+                commonDataRepository,
+                stopPlaceRepository);
     }
 
     private static NetexEntitiesIndex createNetexEntitiesIndex(JourneyPattern journeyPattern,
