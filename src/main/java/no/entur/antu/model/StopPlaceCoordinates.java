@@ -3,6 +3,7 @@ package no.entur.antu.model;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.StopPlace;
 
+// TODO: implement the redis codec for this
 public record StopPlaceCoordinates(
         double longitude,
         double latitude) {

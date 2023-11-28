@@ -2,8 +2,8 @@ package no.entur.antu.validator.nonincreasingpassingtime;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.nonincreasingpassingtime.stoptime.SortedStopTimes;
-import no.entur.antu.validator.nonincreasingpassingtime.stoptime.StopTime;
+import no.entur.antu.stoptime.SortedStopTimes;
+import no.entur.antu.stoptime.StopTime;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.xpath.ValidationContext;

@@ -3,12 +3,9 @@ package no.entur.antu.validator.speedprogressionvalidator;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.nonincreasingpassingtime.stoptime.SortedStopTimes;
-import no.entur.antu.validator.nonincreasingpassingtime.stoptime.StopTime;
-import org.apache.logging.log4j.util.TriConsumer;
+import no.entur.antu.stoptime.SortedStopTimes;
+import no.entur.antu.stoptime.StopTime;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -17,38 +14,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.function.DoubleSupplier;
+import java.util.stream.IntStream;
+
+import static no.entur.antu.validator.speedprogressionvalidator.ServiceJourneyContextBuilder.*;
 
 public class SpeedProgressionValidator extends AbstractNetexValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpeedProgressionValidator.class);
     private final CommonDataRepository commonDataRepository;
     private final StopPlaceRepository stopPlaceRepository;
-
-    record Context(
-            ServiceJourney serviceJourney,
-            AllVehicleModesOfTransportEnumeration transportMode,
-            Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId) {
-    }
-
-    record ErrorContext(
-            SpeedProgressionRuleCode speedProgressionRuleCode,
-            String exceptedSpeed,
-            String calculatedSpeed,
-            ServiceJourney serviceJourney,
-            StopTime from,
-            StopTime to) {
-    }
-
-    enum SpeedProgressionRuleCode {
-        LOW_SPEED_PROGRESSION,
-        HIGH_SPEED_PROGRESSION,
-        WARNING_SPEED_PROGRESSION
-    }
 
     public SpeedProgressionValidator(ValidationReportEntryFactory validationReportEntryFactory,
                                      CommonDataRepository commonDataRepository,
@@ -69,17 +47,19 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
 
         if (validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex) {
             NetexEntitiesIndex index = validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
+            ServiceJourneyContextBuilder contextBuilder = new ServiceJourneyContextBuilder(commonDataRepository, stopPlaceRepository);
             List<ServiceJourney> serviceJourneys =
                     index.getTimetableFrames().stream()
                             .flatMap(timetableFrame -> timetableFrame
                                     .getVehicleJourneys()
                                     .getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney().stream())
+                            .filter(ServiceJourney.class::isInstance)
                             .map(ServiceJourney.class::cast)
                             .toList();
 
             serviceJourneys.stream()
                     .map(serviceJourney ->
-                            createContext(
+                            contextBuilder.build(
                                     index,
                                     serviceJourney,
                                     validationReport.getValidationReportId()
@@ -87,11 +67,12 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
                     .forEach(context -> validateServiceJourney(
                                     context,
                                     index,
-                                    errorContext ->
+                                    error ->
                                             addValidationReportEntry(
                                                     validationReport,
                                                     validationContext,
-                                                    errorContext
+                                                    context.serviceJourney(),
+                                                    error
                                             )
                             )
                     );
@@ -103,139 +84,112 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
         }
     }
 
-    public void validateServiceJourney(Context context,
-                                       NetexEntitiesIndex netexEntitiesIndex,
-                                       Consumer<ErrorContext> validationError) {
+
+    private void validateServiceJourney(ServiceJourneyContext context,
+                                        NetexEntitiesIndex netexEntitiesIndex,
+                                        Consumer<SpeedProgressionError> reportError) {
 
         List<StopTime> sortedTimetabledPassingTime =
                 SortedStopTimes.from(context.serviceJourney(), netexEntitiesIndex);
 
-        DistanceCalculator distanceCalculator = new DistanceCalculator();
-        for (int i = 1; i < sortedTimetabledPassingTime.size(); i++) {
-            var previousPassingTime = sortedTimetabledPassingTime.get(i - 1);
-            if (!previousPassingTime.isComplete() || !previousPassingTime.isConsistent()) {
-                return;
-            }
-            var currentPassingTime = sortedTimetabledPassingTime.get(i);
-
-            if (currentPassingTime.isComplete()
-                || currentPassingTime.isConsistent()
-                || previousPassingTime.isStopTimesIncreasing(currentPassingTime)) {
-
-                // validate speed progression
-                int stopTimeDiffInSeconds = previousPassingTime.getStopTimeDiff(currentPassingTime);
-                if (stopTimeDiffInSeconds >= 0) {
-                    StopPlaceCoordinates previousStopPlaceCoordinates =
-                            context.stopPlaceCoordinatesPerTimetabledPassingTimeId()
-                                    .get(previousPassingTime.timetabledPassingTimeId());
-
-                    StopPlaceCoordinates currentStopPlaceCoordinates =
-                            context.stopPlaceCoordinatesPerTimetabledPassingTimeId()
-                                    .get(currentPassingTime.timetabledPassingTimeId());
-
-                    if (previousStopPlaceCoordinates == null || currentStopPlaceCoordinates == null) {
-                        // TODO: What if current is null, next iteration the current will be previous,
-                        //  then it will be null again, should handle it intelligently.
-                        continue;
-                    }
-
-                    double distance = distanceCalculator.calculateDistance(
-                            previousPassingTime.timetabledPassingTimeId(),
-                            previousStopPlaceCoordinates,
-                            currentPassingTime.timetabledPassingTimeId(),
-                            currentStopPlaceCoordinates
-                    );
-
-                    if (distance < 1) {
-                        // superimposed stops, speed not calculable
-                        continue;
-                    }
-                    validateDistance(
-                            distance,
-                            stopTimeDiffInSeconds,
-                            previousPassingTime.isDepartureInMinutesResolution()
-                            && currentPassingTime.isArrivalInMinutesResolution(),
-                            TransportModeParameters.of(context.transportMode()),
-                            (speedProgressionRuleCode, expectedSpeed, calculatedSpeed) -> validationError.accept(
-                                    new ErrorContext(
-                                            speedProgressionRuleCode,
-                                            expectedSpeed,
-                                            calculatedSpeed,
-                                            context.serviceJourney(),
-                                            previousPassingTime,
-                                            currentPassingTime
-                                    )
-                            )
-                    );
-                }
-            }
-        }
+        IntStream.range(1, sortedTimetabledPassingTime.size())
+                .mapToObj(i -> new PassingTimes(
+                        sortedTimetabledPassingTime.get(i - 1),
+                        sortedTimetabledPassingTime.get(i)))
+                .takeWhile(PassingTimes::isValid)
+                .filter(PassingTimes::hasValidTimeDifference)
+                .filter(context::hasValidCoordinates)
+                .map(passingTimes -> validateSpeedProgression(context, passingTimes))
+                .filter(Objects::nonNull)
+                .forEach(reportError);
     }
 
-    private void validateDistance(double distance,
-                                  int stopTimeDiffInSeconds,
-                                  boolean hasMinutesResolution,
-                                  TransportModeParameters transportModeParameters,
-                                  TriConsumer<SpeedProgressionRuleCode, String, String> speedError) {
+    private SpeedProgressionError validateSpeedProgression(ServiceJourneyContext context, PassingTimes passingTimes) {
 
-        // Times are often with minute resolution.
-        // Assume max error (120 sec) when comparing with min and max allowed speed.
+        double distance = context.calculateDistance(passingTimes);
 
-        double minPossibleDiffTime = hasMinutesResolution ? Math.max(stopTimeDiffInSeconds - 120, 1) : stopTimeDiffInSeconds;
-        double maxPossibleDiffTime = hasMinutesResolution ? stopTimeDiffInSeconds + 120 : stopTimeDiffInSeconds;
-        double optimisticSpeed = distance / minPossibleDiffTime * 36 / 10; // (km/h)
-        double pessimisticSpeed = distance / maxPossibleDiffTime * 36 / 10; // (km/h)
+        if (distance < 1) {
+            // superimposed stops, speed not calculable
+            return null;
+        }
 
-        if (optimisticSpeed < transportModeParameters.minSpeed()) {
+        return validateSpeed(distance, ExpectedSpeed.of(context.transportMode()), passingTimes);
+    }
+
+    /**
+     * Why multiply by 3.6?
+     * <p>
+     * To convert m/s to km/h, we have to convert two units i.e. distance and time
+     * First km to meters, 1 km = 1000 meters
+     * And hour to seconds, 1 hour = 1×60×60 = 3600,
+     * <p>
+     * So 1 m/s = 1000/3600 = 10/36 = 0.277
+     * So to convert km/h to m/s, we have to multiply by 0.277 approx.
+     * <p>
+     * Similarly, to convert m/s to km/h,
+     * To convert meters to kilometers divide by 1000
+     * To Convert seconds to hours divide by 3600 i.e. for 1 second 1/3600,
+     * <p>
+     * So 1 km/h = (1/1000) ÷ (1÷3600) = (1×3600)/1000 = 3.6
+     * So to convert m/s to km/h, we have to multiply by 3.6
+     */
+    private double calculateSpeedInKilometerPerHour(double distanceInMeters, DoubleSupplier timeInSeconds) {
+        return distanceInMeters / timeInSeconds.getAsDouble() * 3.6;
+    }
+
+    private SpeedProgressionError validateSpeed(double distance, ExpectedSpeed expectedSpeed, PassingTimes passingTimes) {
+
+        // Assume max error (120 sec) when comparing with min and max expected speed.
+        double optimisticSpeed = calculateSpeedInKilometerPerHour(
+                distance,
+                () -> passingTimes.minimumPossibleTimeDifference(120));
+
+        double pessimisticSpeed = calculateSpeedInKilometerPerHour(
+                distance,
+                () -> passingTimes.maximumPossibleTimeDifference(120));
+
+        if (optimisticSpeed < expectedSpeed.minSpeed()) {
             // too slow
-            String calculatedSpeed = Integer.toString((int) optimisticSpeed);
-            speedError.accept(
-                    SpeedProgressionRuleCode.LOW_SPEED_PROGRESSION,
-                    Integer.toString((int) transportModeParameters.minSpeed()),
-                    calculatedSpeed);
-        } else if (pessimisticSpeed > transportModeParameters.warningSpeed()) {
+            return new SpeedProgressionError(
+                    passingTimes,
+                    SpeedProgressionError.RuleCode.LOW_SPEED_PROGRESSION,
+                    Long.toString(expectedSpeed.minSpeed()),
+                    Double.toString(optimisticSpeed));
+        } else if (pessimisticSpeed > expectedSpeed.warningSpeed()) {
             // too fast
-            String calculatedSpeed = Integer.toString((int) pessimisticSpeed);
-            if (pessimisticSpeed > transportModeParameters.maxSpeed()) {
-                speedError.accept(
-                        SpeedProgressionRuleCode.HIGH_SPEED_PROGRESSION,
-                        Integer.toString((int) transportModeParameters.maxSpeed()),
-                        calculatedSpeed);
+            if (pessimisticSpeed > expectedSpeed.maxSpeed()) {
+                return new SpeedProgressionError(
+                        passingTimes,
+                        SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION,
+                        Long.toString(expectedSpeed.maxSpeed()),
+                        Double.toString(pessimisticSpeed));
             } else {
-                speedError.accept(
-                        SpeedProgressionRuleCode.WARNING_SPEED_PROGRESSION,
-                        Integer.toString((int) transportModeParameters.warningSpeed()),
-                        calculatedSpeed);
+                return new SpeedProgressionError(
+                        passingTimes,
+                        SpeedProgressionError.RuleCode.WARNING_SPEED_PROGRESSION,
+                        Long.toString(expectedSpeed.warningSpeed()),
+                        Double.toString(pessimisticSpeed));
             }
         }
+        return null;
     }
 
     private void addValidationReportEntry(ValidationReport validationReport,
                                           ValidationContext validationContext,
-                                          ErrorContext errorContext) {
+                                          ServiceJourney serviceJourney,
+                                          SpeedProgressionError speedProgressionError) {
 
-        String fileName = validationContext.getFileName();
         ValidationReportEntry validationReportEntry = createValidationReportEntry(
-                errorContext.speedProgressionRuleCode().toString(),
-                findDataLocation(validationContext, errorContext.serviceJourney(), fileName),
-                // TODO: update description to include the expected and calculated speed
-                String.format(
-                        "%s. ServiceJourney = %s, " +
-                        "from TimetabledPassingTime = %s, " +
-                        "to TimetabledPassingTime = %s",
-                        getValidationMessage(errorContext.speedProgressionRuleCode()),
-                        errorContext.serviceJourney().getId(),
-                        errorContext.from().timetabledPassingTimeId(),
-                        errorContext.to().timetabledPassingTimeId()
-                )
+                speedProgressionError.ruleCode().toString(),
+                findDataLocation(validationContext, serviceJourney),
+                speedProgressionError.validationReportEntryMessage(serviceJourney.getId())
         );
 
         validationReport.addValidationReportEntry(validationReportEntry);
     }
 
-    private static DataLocation findDataLocation(ValidationContext validationContext,
-                                                 ServiceJourney serviceJourney,
-                                                 String fileName) {
+    private static DataLocation findDataLocation(ValidationContext validationContext, ServiceJourney serviceJourney) {
+        String fileName = validationContext.getFileName();
         return validationContext.getLocalIds().stream()
                 .filter(localId -> localId.getId().equals(serviceJourney.getId()))
                 .findFirst()
@@ -249,86 +203,15 @@ public class SpeedProgressionValidator extends AbstractNetexValidator {
                 .orElse(new DataLocation(serviceJourney.getId(), fileName, 0, 0));
     }
 
-    private Context createContext(NetexEntitiesIndex index, ServiceJourney serviceJourney, String validationReportId) {
-        String journeyPatternRef = serviceJourney.getJourneyPatternRef().getValue().getRef();
-        Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId =
-                serviceJourney.getPassingTimes().getTimetabledPassingTime().stream()
-                        .map(timetabledPassingTime ->
-                                findStopPlaceCoordinates(index, timetabledPassingTime, journeyPatternRef, validationReportId))
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue,
-                                (previous, latest) -> latest
-                        ));
-        return new Context(
-                serviceJourney,
-                findTransportMode(index, serviceJourney),
-                stopPlaceCoordinatesPerTimetabledPassingTimeId
-        );
-    }
-
-    private AllVehicleModesOfTransportEnumeration findTransportMode(NetexEntitiesIndex index, ServiceJourney serviceJourney) {
-        AllVehicleModesOfTransportEnumeration transportMode = serviceJourney.getTransportMode();
-        if (transportMode == null) {
-            JourneyPattern journeyPattern = index.getJourneyPatternIndex().get(
-                    serviceJourney.getJourneyPatternRef().getValue().getRef());
-            Route route = index.getRouteIndex().get(journeyPattern.getRouteRef().getRef());
-            Line line = index.getLineIndex().get(route.getLineRef().getValue().getRef());
-            return line.getTransportMode();
-        }
-        return transportMode;
-    }
-
-    private Map.Entry<String, StopPlaceCoordinates> findStopPlaceCoordinates(NetexEntitiesIndex index,
-                                                                             TimetabledPassingTime timetabledPassingTime,
-                                                                             String journeyPatternRef,
-                                                                             String validationReportId) {
-        String stopPointInJourneyPatternRef = timetabledPassingTime.getPointInJourneyPatternRef().getValue().getRef();
-        StopPointInJourneyPattern stopPointInJourneyPattern =
-                getStopPointInJourneyPattern(stopPointInJourneyPatternRef, journeyPatternRef, index);
-        if (stopPointInJourneyPattern != null) {
-            String scheduledStopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
-            QuayId quayId = commonDataRepository.findQuayIdForScheduledStopPoint(scheduledStopPointRef, validationReportId);
-            StopPlaceCoordinates coordinatesForQuayId = stopPlaceRepository.getCoordinatesForQuayId(quayId);
-            return Map.entry(timetabledPassingTime.getId(), coordinatesForQuayId);
-        }
-        return null;
-    }
-
-    private StopPointInJourneyPattern getStopPointInJourneyPattern(String stopPointInJourneyPatternRef,
-                                                                   String journeyPatternRef,
-                                                                   NetexEntitiesIndex index) {
-        return index.getJourneyPatternIndex()
-                .get(journeyPatternRef)
-                .getPointsInSequence()
-                .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-                .stream()
-                .filter(StopPointInJourneyPattern.class::isInstance)
-                .map(StopPointInJourneyPattern.class::cast)
-                .filter(stopPointInJourneyPattern -> stopPointInJourneyPattern.getId().equals(stopPointInJourneyPatternRef))
-                .findFirst()
-                .orElse(null);
-    }
-
     @Override
     public Set<String> getRuleDescriptions() {
         return Set.of(
-                createRuleDescription(SpeedProgressionRuleCode.LOW_SPEED_PROGRESSION.toString(),
-                        getValidationMessage(SpeedProgressionRuleCode.LOW_SPEED_PROGRESSION)),
-                createRuleDescription(SpeedProgressionRuleCode.HIGH_SPEED_PROGRESSION.toString(),
-                        getValidationMessage(SpeedProgressionRuleCode.HIGH_SPEED_PROGRESSION)),
-                createRuleDescription(SpeedProgressionRuleCode.WARNING_SPEED_PROGRESSION.toString(),
-                        getValidationMessage(SpeedProgressionRuleCode.WARNING_SPEED_PROGRESSION))
+                createRuleDescription(SpeedProgressionError.RuleCode.LOW_SPEED_PROGRESSION.toString(),
+                        SpeedProgressionError.RuleCode.LOW_SPEED_PROGRESSION.getErrorMessage()),
+                createRuleDescription(SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION.toString(),
+                        SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION.getErrorMessage()),
+                createRuleDescription(SpeedProgressionError.RuleCode.WARNING_SPEED_PROGRESSION.toString(),
+                        SpeedProgressionError.RuleCode.WARNING_SPEED_PROGRESSION.getErrorMessage())
         );
-    }
-
-    private String getValidationMessage(SpeedProgressionRuleCode speedProgressionRuleCode) {
-        return switch (speedProgressionRuleCode) {
-            case LOW_SPEED_PROGRESSION -> "ServiceJourney has low speed progression";
-            case HIGH_SPEED_PROGRESSION -> "ServiceJourney has high speed progression";
-            case WARNING_SPEED_PROGRESSION -> "ServiceJourney has unexpected speed progression";
-            // TODO: unexpected or warning??
-        };
     }
 }
