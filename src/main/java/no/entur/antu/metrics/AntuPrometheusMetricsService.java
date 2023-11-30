@@ -7,6 +7,8 @@ import org.apache.camel.Handler;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class AntuPrometheusMetricsService {
 
     private static final String METRICS_PREFIX = "app.antu.";
     private static final String VALIDATION_ENTRIES_COUNTER_NAME = METRICS_PREFIX + "data.validation.entries";
+    private static final String VALIDATION_TIME_TAKEN_COUNTER_NAME = METRICS_PREFIX + "data.validation.time.taken";
 
     private final MeterRegistry meterRegistry;
 
@@ -23,7 +26,12 @@ public class AntuPrometheusMetricsService {
     }
 
     @Handler
-    public void countValidationEntries(ValidationReport validationReport) {
+    public void validationReportMetrics(ValidationReport validationReport) {
+        countValidationEntries(validationReport);
+        timeTakenToValidateDataSet(validationReport);
+    }
+
+    private void countValidationEntries(ValidationReport validationReport) {
         validationReport.getNumberOfValidationEntriesPerRule()
                 .forEach((key, value) -> {
                     List<Tag> counterTags = new ArrayList<>();
@@ -32,5 +40,13 @@ public class AntuPrometheusMetricsService {
                     meterRegistry.counter(VALIDATION_ENTRIES_COUNTER_NAME, counterTags).increment(value);
 
                 });
+
+    }
+
+    private void timeTakenToValidateDataSet(ValidationReport validationReport) {
+        long seconds = Duration.between(validationReport.getCreationDate(), LocalDateTime.now()).toSeconds();
+        List<Tag> counterTags = new ArrayList<>();
+        counterTags.add(new ImmutableTag("Codespace", validationReport.getCodespace()));
+        meterRegistry.counter(VALIDATION_TIME_TAKEN_COUNTER_NAME, counterTags).increment(seconds);
     }
 }
