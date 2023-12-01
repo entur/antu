@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,6 +64,7 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 @Component
 public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
+    public static final String REPORT_CREATION_DATE = "reportCreationDate";
     private static final String PROP_DATASET_NETEX_FILE_NAMES = "EnturDatasetNetexFileNames";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AggregateValidationReportsRouteBuilder.class);
@@ -219,6 +221,11 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
                             oldExchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class),
                             validationReportEntries,
                             numberOfValidationEntriesPerRule));
+
+            LocalDateTime reportCreationDate = oldExchange.getIn().getHeader(REPORT_CREATION_DATE, LocalDateTime.class);
+            if (reportCreationDate == null || reportCreationDate.isAfter(oldValidationReport.getCreationDate())) {
+                oldExchange.getIn().setHeader(REPORT_CREATION_DATE, oldValidationReport.getCreationDate());
+            }
 
             return oldExchange;
         }

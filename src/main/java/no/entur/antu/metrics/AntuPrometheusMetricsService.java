@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.ImmutableTag;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import org.apache.camel.Handler;
+import org.apache.camel.Header;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static no.entur.antu.routes.validation.AggregateValidationReportsRouteBuilder.REPORT_CREATION_DATE;
 
 @Component
 public class AntuPrometheusMetricsService {
@@ -26,9 +29,10 @@ public class AntuPrometheusMetricsService {
     }
 
     @Handler
-    public void validationReportMetrics(ValidationReport validationReport) {
+    public void validationReportMetrics(ValidationReport validationReport,
+                                        @Header(REPORT_CREATION_DATE) LocalDateTime reportCreationDate) {
         countValidationEntries(validationReport);
-        timeTakenToValidateDataSet(validationReport);
+        timeTakenToValidateDataSet(validationReport, reportCreationDate);
     }
 
     private void countValidationEntries(ValidationReport validationReport) {
@@ -43,8 +47,8 @@ public class AntuPrometheusMetricsService {
 
     }
 
-    private void timeTakenToValidateDataSet(ValidationReport validationReport) {
-        long seconds = Duration.between(validationReport.getCreationDate(), LocalDateTime.now()).toSeconds();
+    private void timeTakenToValidateDataSet(ValidationReport validationReport, LocalDateTime reportCreationDate) {
+        long seconds = Duration.between(reportCreationDate, LocalDateTime.now()).toSeconds();
         List<Tag> counterTags = new ArrayList<>();
         counterTags.add(new ImmutableTag("Codespace", validationReport.getCodespace()));
         meterRegistry.counter(VALIDATION_TIME_TAKEN_COUNTER_NAME, counterTags).increment(seconds);
