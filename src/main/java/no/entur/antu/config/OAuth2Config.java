@@ -26,6 +26,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2Res
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -56,13 +57,23 @@ public class OAuth2Config {
     }
 
 
-    @Bean
+    @Bean("orgRegisterWebClient")
     @Profile("!test")
-    WebClient webClient(WebClient.Builder webClientBuilder, OAuth2ClientProperties properties, @Value("${orgregister.oauth2.client.audience}") String audience) {
+    WebClient orgRegisterWebClient(WebClient.Builder webClientBuilder,
+                                   OAuth2ClientProperties properties,
+                                   @Value("${orgregister.oauth2.client.audience}")
+                                   String audience,
+                                   ClientHttpConnector clientHttpConnector,
+                                   @Value("${antu.organisation.registry.url}") String organisationRegistryUrl) {
         return new AuthorizedWebClientBuilder(webClientBuilder)
                 .withOAuth2ClientProperties(properties)
                 .withAudience(audience)
                 .withClientRegistrationId("orgregister")
+                .build()
+                .mutate()
+                .clientConnector(clientHttpConnector)
+                .defaultHeader("Et-Client-Name", "entur-antu")
+                .baseUrl(organisationRegistryUrl)
                 .build();
     }
 

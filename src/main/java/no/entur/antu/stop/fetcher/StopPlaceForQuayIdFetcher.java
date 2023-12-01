@@ -5,9 +5,10 @@ import no.entur.antu.model.QuayId;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.util.retry.Retry;
 
@@ -18,10 +19,8 @@ public class StopPlaceForQuayIdFetcher extends AntuNetexEntityFetcher<StopPlace,
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StopPlaceForQuayIdFetcher.class);
 
-    protected StopPlaceForQuayIdFetcher(@Value("${stopplace.registry.url:https://api.dev.entur.io/stop-places/v1/read}") String stopPlaceRegistryUrl,
-                                        @Value("${http.client.name:antu}") String clientName,
-                                        @Value("${http.client.id:antu}") String clientId) {
-        super(stopPlaceRegistryUrl, clientId, clientName);
+    protected StopPlaceForQuayIdFetcher(@Qualifier("stopPlaceWebClient") WebClient stopPlaceWebClient) {
+        super(stopPlaceWebClient);
     }
 
     @Override
