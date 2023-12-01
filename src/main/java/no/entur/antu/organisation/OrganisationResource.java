@@ -16,19 +16,13 @@
 package no.entur.antu.organisation;
 
 
-import io.netty.channel.ChannelOption;
-import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.handler.timeout.WriteTimeoutHandler;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.netty.http.client.HttpClient;
-import reactor.netty.resources.ConnectionProvider;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 /**
@@ -37,31 +31,11 @@ import java.util.function.Predicate;
 public class OrganisationResource {
 
     private static final long MAX_RETRY_ATTEMPTS = 3;
-    private static final int HTTP_TIMEOUT = 10000;
-    public static final int MAX_IDLE_TIME = 20;
-    public static final int MAX_LIFE_TIME = 60;
-    public static final int PENDING_ACQUIRE_TIMEOUT = 60;
-    public static final int EVICT_IN_BACKGROUND = 120;
-
 
     private final WebClient webClient;
 
-    public OrganisationResource(String organisationRegistryUrl, WebClient orgRegisterClient) {
-
-        ConnectionProvider provider = ConnectionProvider.builder("provider")
-                .maxIdleTime(Duration.ofSeconds(MAX_IDLE_TIME))
-                .maxLifeTime(Duration.ofSeconds(MAX_LIFE_TIME))
-                .pendingAcquireTimeout(Duration.ofSeconds(PENDING_ACQUIRE_TIMEOUT))
-                .evictInBackground(Duration.ofSeconds(EVICT_IN_BACKGROUND)).build();
-
-        ReactorClientHttpConnector connector = new ReactorClientHttpConnector(HttpClient.create(provider).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, HTTP_TIMEOUT).doOnConnected(connection -> {
-            connection.addHandlerLast(new ReadTimeoutHandler(HTTP_TIMEOUT, TimeUnit.MILLISECONDS));
-            connection.addHandlerLast(new WriteTimeoutHandler(HTTP_TIMEOUT, TimeUnit.MILLISECONDS));
-        }));
-        this.webClient = orgRegisterClient.mutate()
-                .defaultHeader("Et-Client-Name", "entur-antu")
-                .clientConnector(connector)
-                .baseUrl(organisationRegistryUrl)
+    public OrganisationResource(@Qualifier("orgRegisterWebClient") WebClient orgRegisterWebClient) {
+        this.webClient = orgRegisterWebClient.mutate()
                 .build();
     }
 

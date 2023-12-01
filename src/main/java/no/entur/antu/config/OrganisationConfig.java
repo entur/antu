@@ -20,7 +20,6 @@ import no.entur.antu.organisation.DefaultOrganisationRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.organisation.OrganisationResource;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -34,9 +33,8 @@ public class OrganisationConfig {
 
     @Bean
     @Profile("!test")
-    OrganisationResource organisationResource(@Value("${antu.organisation.registry.url}") String organisationRegistryUrl,
-                                              WebClient orgRegisterClient) {
-        return new OrganisationResource(organisationRegistryUrl, orgRegisterClient);
+    OrganisationResource organisationResource(@Qualifier("orgRegisterWebClient") WebClient orgRegisterClient) {
+        return new OrganisationResource(orgRegisterClient);
     }
 
     @Bean
