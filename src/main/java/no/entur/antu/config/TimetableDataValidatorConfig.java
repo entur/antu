@@ -19,8 +19,10 @@ package no.entur.antu.config;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validator.transportmodevalidator.TransportModeValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
+import no.entur.antu.validator.nonincreasingpassingtime.NonIncreasingPassingTimeValidator;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
@@ -64,6 +66,12 @@ public class TimetableDataValidatorConfig {
     }
 
     @Bean
+    public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator(@Qualifier("validationReportEntryFactory")
+                                                                               ValidationReportEntryFactory validationReportEntryFactory) {
+        return new NonIncreasingPassingTimeValidator(validationReportEntryFactory);
+    }
+
+    @Bean
     public NetexValidatorsRunner timetableDataValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
                                                                @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
                                                                NetexIdValidator netexIdValidator,
@@ -72,7 +80,8 @@ public class TimetableDataValidatorConfig {
                                                                ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
                                                                NetexReferenceValidator netexReferenceValidator,
                                                                @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator,
-                                                               TransportModeValidator transportModeValidator) {
+                                                               TransportModeValidator transportModeValidator,
+                                                               NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator) {
         List<NetexValidator> netexValidators = List.of(
                 xpathValidator,
                 netexIdValidator,
@@ -81,10 +90,11 @@ public class TimetableDataValidatorConfig {
                 referenceToValidEntityTypeValidator,
                 netexReferenceValidator,
                 netexIdUniquenessValidator,
-                transportModeValidator
+                transportModeValidator,
+                nonIncreasingPassingTimeValidator
         );
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
-        return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
+        return new NetexValidatorRunnerWithNetexEntitiesIndex(netexXMLParser, netexSchemaValidator, netexValidators);
     }
 
 }
