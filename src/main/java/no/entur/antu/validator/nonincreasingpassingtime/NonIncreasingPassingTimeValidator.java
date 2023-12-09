@@ -45,6 +45,7 @@ public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
                             .flatMap(timetableFrame -> timetableFrame
                                     .getVehicleJourneys()
                                     .getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney().stream())
+                            .filter(ServiceJourney.class::isInstance)
                             .map(ServiceJourney.class::cast)
                             .toList();
 
