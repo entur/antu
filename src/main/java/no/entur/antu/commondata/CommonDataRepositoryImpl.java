@@ -37,8 +37,12 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
     }
 
     @Override
-    public void loadCommonDataCache(byte[] fileContent,
-                                    String validationReportId) {
+    public Map<String, QuayId> isScheduledStopPointAssigned(String scheduledStopPoint, String validationReportId) {
+        return scheduledStopPointAndQuayIdCache.
+    }
+
+    @Override
+    public void loadCommonDataCache(byte[] fileContent, String validationReportId) {
 
         commonDataResource.loadCommonData(fileContent);
         // Merging with the existing map, for handing the case where there are
