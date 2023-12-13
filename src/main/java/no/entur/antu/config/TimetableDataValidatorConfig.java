@@ -20,6 +20,7 @@ import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
+import no.entur.antu.validator.stoppointinjourneypatternvalidator.StopPointInJourneyPatternValidator;
 import no.entur.antu.validator.speedprogressionvalidator.SpeedProgressionValidator;
 import no.entur.antu.validator.transportmodevalidator.TransportModeValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
@@ -78,6 +79,14 @@ public class TimetableDataValidatorConfig {
                                                                CommonDataRepository commonDataRepository,
                                                                StopPlaceRepository stopPlaceRepository) {
         return new SpeedProgressionValidator(validationReportEntryFactory, commonDataRepository, stopPlaceRepository);
+    }
+
+    @Bean
+    public StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator(@Qualifier("validationReportEntryFactory")
+                                                                             ValidationReportEntryFactory validationReportEntryFactory,
+                                                                               CommonDataRepository commonDataRepository,
+                                                                               StopPlaceRepository stopPlaceRepository) {
+        return new StopPointInJourneyPatternValidator(validationReportEntryFactory, commonDataRepository, stopPlaceRepository);
     }
 
     @Bean
