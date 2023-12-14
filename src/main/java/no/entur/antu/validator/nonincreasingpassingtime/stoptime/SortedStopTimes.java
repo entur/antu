@@ -30,6 +30,7 @@ public interface SortedStopTimes {
                 .getPassingTimes()
                 .getTimetabledPassingTime()
                 .stream()
+                .filter(timetabledPassingTime -> timetabledPassingTime.getPointInJourneyPatternRef().getValue() instanceof StopPointInJourneyPatternRefStructure)
                 .sorted(comparing(timetabledPassingTime ->
                         stopPointIdToOrder.get(getStopPointId(timetabledPassingTime))))
                 .map(timetabledPassingTime ->
@@ -42,6 +43,8 @@ public interface SortedStopTimes {
                 .getPointsInSequence()
                 .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
                 .stream()
+                .filter(StopPointInJourneyPattern.class::isInstance)
+                .map(StopPointInJourneyPattern.class::cast)
                 .collect(Collectors.toMap(
                         EntityStructure::getId,
                         point -> point.getOrder().intValueExact()
@@ -65,6 +68,7 @@ public interface SortedStopTimes {
                 .getPassingTimes()
                 .getTimetabledPassingTime()
                 .stream()
+                .filter(timetabledPassingTime -> timetabledPassingTime.getPointInJourneyPatternRef().getValue() instanceof StopPointInJourneyPatternRefStructure)
                 .collect(Collectors.toMap(Function.identity(), hasFlexibleStopPoint::test));
     }
 
