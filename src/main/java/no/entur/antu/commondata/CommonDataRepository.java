@@ -6,8 +6,6 @@ import java.util.Map;
 
 public interface CommonDataRepository {
 
-    Map<String, QuayId> isScheduledStopPointAssigned(String scheduledStopPoint, String validationReportId);
-
     boolean hasQuayIds(String validationReportId);
 
     QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint, String validationReportId);

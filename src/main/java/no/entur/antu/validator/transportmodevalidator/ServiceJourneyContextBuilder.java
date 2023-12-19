@@ -15,7 +15,7 @@ import java.util.Objects;
 
 public final class ServiceJourneyContextBuilder {
 
-    record ServiceJourneyContext(
+    public record ServiceJourneyContext(
             ValidationContext validationContext,
             XdmItem serviceJourneyItem,
             String serviceJourneyId,
