@@ -26,19 +26,13 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
     }
 
     @Override
-    public QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint,
-                                                  String validationReportId) {
+    public QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint, String validationReportId) {
 
         Map<String, QuayId> idsForReport = scheduledStopPointAndQuayIdCache.get(validationReportId);
         if (idsForReport == null) {
             throw new AntuException("Quay ids cache not found for validation report with id: " + validationReportId);
         }
         return idsForReport.get(scheduledStopPoint);
-    }
-
-    @Override
-    public Map<String, QuayId> isScheduledStopPointAssigned(String scheduledStopPoint, String validationReportId) {
-        return scheduledStopPointAndQuayIdCache.
     }
 
     @Override

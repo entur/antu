@@ -45,9 +45,6 @@ validationRuleConfigs:
   - code: LOW_SPEED_PROGRESSION
     name: Vehicle is moving too slow
     severity: ERROR
-  - code: ASSIGNED_TO_DEAD_RUN
-    name: ScheduledStopAssignment to DeadRun
-    severity: ERROR
-  - code: ASSIGNED_TO_NO_VEHICLE_JOURNEY
-    name: ScheduledStopAssignment to no vehicle journey
+  - code: MISSING_SCHEDULED_STOP_ASSIGNMENT
+    name: Missing ScheduledStopAssignment for StopPointInJourneyPattern
     severity: ERROR
