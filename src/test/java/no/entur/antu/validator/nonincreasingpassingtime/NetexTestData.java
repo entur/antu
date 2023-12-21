@@ -16,10 +16,10 @@ import static no.entur.antu.validator.nonincreasingpassingtime.MappingSupport.cr
 
 public class NetexTestData {
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DayType EVERYDAY = new DayType()
             .withId("EVERYDAY")
             .withName(new MultilingualString().withValue("everyday"));
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final Line line;
 
@@ -47,17 +47,8 @@ public class NetexTestData {
         return new CreateDeadRun(journeyPattern);
     }
 
-    // TODO: where should ths go??
-    public DatedServiceJourney createDatedServiceJourney(LocalDate operatingDayDate) {
-
-        OperatingDay operatingDay = new OperatingDay()
-                .withId(operatingDayDate.format(DATE_FORMATTER))
-                .withCalendarDate(operatingDayDate.atStartOfDay());
-
-        return new DatedServiceJourney()
-                .withId("RUT:DatedServiceJourney:1") //should refactor if we need multiple DatedServiceJourney
-                .withServiceAlteration(ServiceAlterationEnumeration.PLANNED)
-                .withOperatingDayRef(new OperatingDayRefStructure().withRef(operatingDay.getId()));
+    public CreateDatedServiceJourney datedServiceJourney() {
+        return new CreateDatedServiceJourney();
     }
 
     public List<JourneyPattern> createJourneyPatterns(int numberOfJourneyPatterns) {
@@ -72,33 +63,31 @@ public class NetexTestData {
                 .toList();
     }
 
-    public class CreateDeadRun {
+    public static class CreateDatedServiceJourney {
+
         private int id = 1;
+        private LocalDate operatingDayDate;
 
-        private final JourneyPattern journeyPattern;
-
-        public CreateDeadRun(JourneyPattern journeyPattern) {
-            this.journeyPattern = journeyPattern;
-        }
-
-        public CreateDeadRun withId(int id) {
+        public CreateDatedServiceJourney withId(int id) {
             this.id = id;
             return this;
         }
 
-        public DeadRun create() {
-            return new DeadRun()
-                    .withId("RUT:DeadRun:" + id)
-                    .withLineRef(getLineRef())
-                    .withDayTypes(createEveryDayRefs())
-                    .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
-                    .withPassingTimes(
-                            new TimetabledPassingTimes_RelStructure()
-                                    .withTimetabledPassingTime(createTimetabledPassingTimes(
-                                            journeyPattern.getPointsInSequence()
-                                                    .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-                                    ))
-                    );
+        public CreateDatedServiceJourney withOperatingDayDate(LocalDate operatingDayDate) {
+            this.operatingDayDate = operatingDayDate;
+            return this;
+        }
+
+        public DatedServiceJourney create() {
+
+            OperatingDay operatingDay = new OperatingDay()
+                    .withId(operatingDayDate.format(DATE_FORMATTER))
+                    .withCalendarDate(operatingDayDate.atStartOfDay());
+
+            return new DatedServiceJourney()
+                    .withId("RUT:DatedServiceJourney:" + id)
+                    .withServiceAlteration(ServiceAlterationEnumeration.PLANNED)
+                    .withOperatingDayRef(new OperatingDayRefStructure().withRef(operatingDay.getId()));
         }
     }
 
@@ -122,37 +111,6 @@ public class NetexTestData {
                     .withId("RUT:Line:" + id)
                     .withName(new MultilingualString().withValue("Line " + id))
                     .withTransportMode(transportMode);
-        }
-    }
-
-    public class CreateServiceJourney {
-
-        private int id = 1;
-        private final JourneyPattern journeyPattern;
-
-        public CreateServiceJourney(JourneyPattern journeyPattern) {
-            this.journeyPattern = journeyPattern;
-        }
-
-        public CreateServiceJourney withId(int id) {
-            this.id = id;
-            return this;
-        }
-
-        public ServiceJourney create() {
-
-            return new ServiceJourney()
-                    .withId("RUT:ServiceJourney:" + id)
-                    .withLineRef(getLineRef())
-                    .withDayTypes(createEveryDayRefs())
-                    .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
-                    .withPassingTimes(
-                            new TimetabledPassingTimes_RelStructure()
-                                    .withTimetabledPassingTime(createTimetabledPassingTimes(
-                                            journeyPattern.getPointsInSequence()
-                                                    .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-                                    ))
-                    );
         }
     }
 
@@ -242,6 +200,67 @@ public class NetexTestData {
         }
     }
 
+    public class CreateDeadRun {
+        private int id = 1;
+
+        private final JourneyPattern journeyPattern;
+
+        public CreateDeadRun(JourneyPattern journeyPattern) {
+            this.journeyPattern = journeyPattern;
+        }
+
+        public CreateDeadRun withId(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public DeadRun create() {
+            return new DeadRun()
+                    .withId("RUT:DeadRun:" + id)
+                    .withLineRef(getLineRef())
+                    .withDayTypes(createEveryDayRefs())
+                    .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
+                    .withPassingTimes(
+                            new TimetabledPassingTimes_RelStructure()
+                                    .withTimetabledPassingTime(createTimetabledPassingTimes(
+                                            journeyPattern.getPointsInSequence()
+                                                    .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+                                    ))
+                    );
+        }
+    }
+
+    public class CreateServiceJourney {
+
+        private int id = 1;
+        private final JourneyPattern journeyPattern;
+
+        public CreateServiceJourney(JourneyPattern journeyPattern) {
+            this.journeyPattern = journeyPattern;
+        }
+
+        public CreateServiceJourney withId(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public ServiceJourney create() {
+
+            return new ServiceJourney()
+                    .withId("RUT:ServiceJourney:" + id)
+                    .withLineRef(getLineRef())
+                    .withDayTypes(createEveryDayRefs())
+                    .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
+                    .withPassingTimes(
+                            new TimetabledPassingTimes_RelStructure()
+                                    .withTimetabledPassingTime(createTimetabledPassingTimes(
+                                            journeyPattern.getPointsInSequence()
+                                                    .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+                                    ))
+                    );
+        }
+    }
+
     private List<TimetabledPassingTime> createTimetabledPassingTimes(List<PointInLinkSequence_VersionedChildStructure> pointsInLink) {
         // Create timetable with 4 stops using the stopTimes above
         return IntStream.range(0, pointsInLink.size())
@@ -254,15 +273,13 @@ public class NetexTestData {
                 .toList();
     }
 
-    static DayTypeRefs_RelStructure createEveryDayRefs() {
+    private static DayTypeRefs_RelStructure createEveryDayRefs() {
         return new DayTypeRefs_RelStructure()
                 .withDayTypeRef(Collections.singleton(createEveryDayRef()));
     }
 
     /* private static utility methods */
-    private static JAXBElement<ScheduledStopPointRefStructure> createScheduledStopPointRef(
-            String id
-    ) {
+    private static JAXBElement<ScheduledStopPointRefStructure> createScheduledStopPointRef(String id) {
         return createWrappedRef(id, ScheduledStopPointRefStructure.class);
     }
 
