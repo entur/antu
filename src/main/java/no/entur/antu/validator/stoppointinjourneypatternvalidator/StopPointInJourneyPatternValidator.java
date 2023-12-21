@@ -63,7 +63,7 @@ public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
                 .toList();
 
         /*
-        Missing SPA -> No DeadRun -> Error
+        Missing SPA -> No DeadRun -> No SJ -> Error
         Missing SPA -> No DeadRun -> Yes SJ -> Error
         Missing SPA -> Yes DeadRun -> Yes SJ -> Error
         Missing SPA -> Yes DeadRun -> No SJ -> OK

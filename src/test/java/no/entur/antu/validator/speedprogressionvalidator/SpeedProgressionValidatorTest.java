@@ -5,7 +5,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.nonincreasingpassingtime.NetexTestDataSample;
+import no.entur.antu.validator.nonincreasingpassingtime.NetexTestData;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -120,9 +120,9 @@ class SpeedProgressionValidatorTest {
     }
 
     private static ValidationReport runTestWithStopPlaceCoordinates(List<StopPlaceCoordinates> stopPlaceCoordinates) {
-        NetexTestDataSample sample = new NetexTestDataSample();
-        ServiceJourney serviceJourney = sample.getServiceJourney();
-        JourneyPattern journeyPattern = sample.getJourneyPattern();
+        NetexTestData testData = new NetexTestData();
+        JourneyPattern journeyPattern = testData.journeyPattern().create();
+        ServiceJourney serviceJourney = testData.serviceJourney(journeyPattern).create();
 
         serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
