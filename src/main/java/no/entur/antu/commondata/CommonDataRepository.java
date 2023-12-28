@@ -2,8 +2,6 @@ package no.entur.antu.commondata;
 
 import no.entur.antu.model.QuayId;
 
-import java.util.Map;
-
 public interface CommonDataRepository {
 
     boolean hasQuayIds(String validationReportId);

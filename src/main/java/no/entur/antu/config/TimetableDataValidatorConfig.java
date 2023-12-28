@@ -109,9 +109,9 @@ public class TimetableDataValidatorConfig {
                 referenceToValidEntityTypeValidator,
                 netexReferenceValidator,
                 netexIdUniquenessValidator,
-//                transportModeValidator,
-//                nonIncreasingPassingTimeValidator,
-//                speedProgressionValidator
+                transportModeValidator,
+                nonIncreasingPassingTimeValidator,
+                speedProgressionValidator,
                 stopPointInJourneyPatternValidator
         );
         NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
