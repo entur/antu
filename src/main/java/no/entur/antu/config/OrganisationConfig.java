@@ -16,6 +16,8 @@
 
 package no.entur.antu.config;
 
+import java.util.Map;
+import java.util.Set;
 import no.entur.antu.organisation.DefaultOrganisationRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.organisation.OrganisationResource;
@@ -25,22 +27,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Map;
-import java.util.Set;
-
 @Configuration
 public class OrganisationConfig {
 
-    @Bean
-    @Profile("!test")
-    OrganisationResource organisationResource(@Qualifier("orgRegisterWebClient") WebClient orgRegisterClient) {
-        return new OrganisationResource(orgRegisterClient);
-    }
+  @Bean
+  @Profile("!test")
+  OrganisationResource organisationResource(
+    @Qualifier("orgRegisterWebClient") WebClient orgRegisterClient
+  ) {
+    return new OrganisationResource(orgRegisterClient);
+  }
 
-    @Bean
-    @Profile("!test")
-    OrganisationRepository organisationRepository(OrganisationResource organisationResource,
-                                                  @Qualifier("organisationCache") Map<String, Set<String>> organisationCache) {
-        return new DefaultOrganisationRepository(organisationResource, organisationCache);
-    }
+  @Bean
+  @Profile("!test")
+  OrganisationRepository organisationRepository(
+    OrganisationResource organisationResource,
+    @Qualifier("organisationCache") Map<String, Set<String>> organisationCache
+  ) {
+    return new DefaultOrganisationRepository(
+      organisationResource,
+      organisationCache
+    );
+  }
 }

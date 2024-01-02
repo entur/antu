@@ -21,43 +21,49 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import no.entur.antu.memorystore.RedisTemporaryFileRepository;
 import no.entur.antu.memorystore.TemporaryFileRepository;
 import org.redisson.api.RedissonClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 @Configuration
 public class CamelConfig {
 
-    /**
-     * Register Java Time Module for JSON serialization/deserialization of Java Time objects.
-     *
-     * @return
-     */
-    @Bean("jacksonJavaTimeModule")
-    JavaTimeModule jacksonJavaTimeModule() {
-        JavaTimeModule javaTimeModule = new JavaTimeModule();
-        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ISO_DATE_TIME));
-        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME));
-        return javaTimeModule;
-    }
+  /**
+   * Register Java Time Module for JSON serialization/deserialization of Java Time objects.
+   *
+   * @return
+   */
+  @Bean("jacksonJavaTimeModule")
+  JavaTimeModule jacksonJavaTimeModule() {
+    JavaTimeModule javaTimeModule = new JavaTimeModule();
+    javaTimeModule.addDeserializer(
+      LocalDateTime.class,
+      new LocalDateTimeDeserializer(DateTimeFormatter.ISO_DATE_TIME)
+    );
+    javaTimeModule.addSerializer(
+      LocalDateTime.class,
+      new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME)
+    );
+    return javaTimeModule;
+  }
 
-    @Bean
-    TemporaryFileRepository temporaryFileRepository(RedissonClient redissonClient) {
-        return new RedisTemporaryFileRepository(redissonClient);
+  @Bean
+  TemporaryFileRepository temporaryFileRepository(
+    RedissonClient redissonClient
+  ) {
+    return new RedisTemporaryFileRepository(redissonClient);
+  }
 
-    }
-
-    /**
-     * Default Kubernetes client to be used by Camel Kubernetes component
-     * @return a default Kubernetes client to be used by Camel Kubernetes component
-     */
-    @Bean
-    KubernetesClient kubernetesClient() {
-        return new DefaultKubernetesClient();
-    }
+  /**
+   * Default Kubernetes client to be used by Camel Kubernetes component
+   * @return a default Kubernetes client to be used by Camel Kubernetes component
+   */
+  @Bean
+  KubernetesClient kubernetesClient() {
+    return new DefaultKubernetesClient();
+  }
 }

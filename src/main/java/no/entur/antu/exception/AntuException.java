@@ -23,15 +23,15 @@ package no.entur.antu.exception;
  */
 public class AntuException extends RuntimeException {
 
-    public AntuException(Throwable cause) {
-        super(cause);
-    }
+  public AntuException(Throwable cause) {
+    super(cause);
+  }
 
-    public AntuException(String message) {
-        super(message);
-    }
+  public AntuException(String message) {
+    super(message);
+  }
 
-    public AntuException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public AntuException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

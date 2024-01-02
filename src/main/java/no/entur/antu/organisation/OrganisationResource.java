@@ -15,42 +15,42 @@
 
 package no.entur.antu.organisation;
 
-
+import java.time.Duration;
+import java.util.Collection;
+import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.util.retry.Retry;
-
-import java.time.Duration;
-import java.util.Collection;
-import java.util.function.Predicate;
 
 /**
  * REST-client to access the Organisation Register REST-service.
  */
 public class OrganisationResource {
 
-    private static final long MAX_RETRY_ATTEMPTS = 3;
+  private static final long MAX_RETRY_ATTEMPTS = 3;
 
-    private final WebClient webClient;
+  private final WebClient webClient;
 
-    public OrganisationResource(@Qualifier("orgRegisterWebClient") WebClient orgRegisterWebClient) {
-        this.webClient = orgRegisterWebClient.mutate()
-                .build();
-    }
+  public OrganisationResource(
+    @Qualifier("orgRegisterWebClient") WebClient orgRegisterWebClient
+  ) {
+    this.webClient = orgRegisterWebClient.mutate().build();
+  }
 
-    public Collection<Organisation> getOrganisations() {
+  public Collection<Organisation> getOrganisations() {
+    return webClient
+      .get()
+      .retrieve()
+      .bodyToFlux(Organisation.class)
+      .retryWhen(
+        Retry.backoff(MAX_RETRY_ATTEMPTS, Duration.ofSeconds(1)).filter(is5xx)
+      )
+      .collectList()
+      .block();
+  }
 
-        return webClient.get()
-                .retrieve()
-                .bodyToFlux(Organisation.class)
-                .retryWhen(Retry.backoff(MAX_RETRY_ATTEMPTS, Duration.ofSeconds(1)).filter(is5xx))
-                .collectList().block();
-
-    }
-
-    protected static final Predicate<Throwable> is5xx =
-            throwable -> throwable instanceof WebClientResponseException webClientResponseException && webClientResponseException.getStatusCode().is5xxServerError();
-
-
+  protected static final Predicate<Throwable> is5xx = throwable ->
+    throwable instanceof WebClientResponseException webClientResponseException &&
+    webClientResponseException.getStatusCode().is5xxServerError();
 }

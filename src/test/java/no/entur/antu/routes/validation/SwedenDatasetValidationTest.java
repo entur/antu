@@ -34,6 +34,23 @@
 
 package no.entur.antu.routes.validation;
 
+import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED;
+import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
+import static no.entur.antu.Constants.DATASET_REFERENTIAL;
+import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
+import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
+import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
+import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
+import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
+import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
+import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
+import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
@@ -48,84 +65,169 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
-import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED;
-import static no.entur.antu.Constants.DATASET_REFERENTIAL;
-import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
-import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
-import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
-import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
-import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
-import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
-import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
-import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
-
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class, properties = {
-        "antu.netex.validation.entries.max=1",
-        "antu.netex.job.consumers=2"})
+@SpringBootTest(
+  webEnvironment = SpringBootTest.WebEnvironment.NONE,
+  classes = TestApp.class,
+  properties = {
+    "antu.netex.validation.entries.max=1", "antu.netex.job.consumers=2",
+  }
+)
 class SwedenDatasetValidationTest extends AntuRouteBuilderIntegrationTestBase {
 
-    private static final String TEST_DATASET_CODESPACE = "SAM";
-    private static final String TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME = "varmland.zip";
+  private static final String TEST_DATASET_CODESPACE = "SAM";
+  private static final String TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME =
+    "varmland.zip";
 
-    private static final String VALIDATION_STAGE_PREVALIDATION = "EnturValidationStagePreValidation";
+  private static final String VALIDATION_STAGE_PREVALIDATION =
+    "EnturValidationStagePreValidation";
 
+  @Produce("direct:initDatasetValidation")
+  protected ProducerTemplate initDatasetValidation;
 
-    @Produce("direct:initDatasetValidation")
-    protected ProducerTemplate initDatasetValidation;
+  @EndpointInject("mock:notifyStatus")
+  protected MockEndpoint notifyStatus;
 
-    @EndpointInject("mock:notifyStatus")
-    protected MockEndpoint notifyStatus;
+  @Test
+  void testValidateDataset() throws Exception {
+    AdviceWith.adviceWith(
+      context,
+      "init-dataset-validation",
+      a ->
+        a
+          .interceptSendToEndpoint("direct:notifyStatus")
+          .skipSendToOriginalEndpoint()
+          .to("mock:notifyStatus")
+    );
+    AdviceWith.adviceWith(
+      context,
+      "aggregate-reports",
+      a ->
+        a
+          .interceptSendToEndpoint("direct:notifyStatus")
+          .skipSendToOriginalEndpoint()
+          .to("mock:notifyStatus")
+    );
 
-    @Test
-    void testValidateDataset() throws Exception {
+    notifyStatus.expectedMessageCount(2);
+    notifyStatus.setResultWaitTime(150000);
 
-        AdviceWith.adviceWith(context, "init-dataset-validation", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
-                .to("mock:notifyStatus"));
-        AdviceWith.adviceWith(context, "aggregate-reports", a -> a.interceptSendToEndpoint("direct:notifyStatus").skipSendToOriginalEndpoint()
-                .to("mock:notifyStatus"));
+    InputStream testDatasetAsStream = getClass()
+      .getResourceAsStream('/' + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME);
+    Assertions.assertNotNull(
+      testDatasetAsStream,
+      "Test dataset file not found: " + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME
+    );
+    String datasetBlobName =
+      BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED +
+      TEST_DATASET_CODESPACE +
+      '/' +
+      TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME;
+    antuExchangeInMemoryBlobStoreRepository.uploadBlob(
+      datasetBlobName,
+      testDatasetAsStream
+    );
 
-        notifyStatus.expectedMessageCount(2);
-        notifyStatus.setResultWaitTime(150000);
+    context.start();
+    Map<String, Object> headers = new HashMap<>();
+    headers.put(
+      Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER,
+      datasetBlobName
+    );
+    headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_CODESPACE);
+    headers.put(
+      Constants.VALIDATION_STAGE_HEADER,
+      VALIDATION_STAGE_PREVALIDATION
+    );
+    headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
+    headers.put(
+      Constants.VALIDATION_PROFILE_HEADER,
+      VALIDATION_PROFILE_TIMETABLE_SWEDEN
+    );
+    initDatasetValidation.sendBodyAndHeaders(" ", headers);
+    notifyStatus.assertIsSatisfied();
+    Assertions.assertTrue(
+      notifyStatus
+        .getExchanges()
+        .stream()
+        .anyMatch(exchange ->
+          STATUS_VALIDATION_STARTED.equals(
+            exchange.getIn().getBody(String.class)
+          )
+        )
+    );
+    Assertions.assertTrue(
+      notifyStatus
+        .getExchanges()
+        .stream()
+        .anyMatch(exchange ->
+          STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))
+        )
+    );
+    Assertions.assertTrue(
+      notifyStatus
+        .getExchanges()
+        .stream()
+        .allMatch(exchange ->
+          exchange.getIn().getHeader(DATASET_REFERENTIAL) != null
+        )
+    );
+    Assertions.assertTrue(
+      notifyStatus
+        .getExchanges()
+        .stream()
+        .allMatch(exchange ->
+          exchange.getIn().getHeader(VALIDATION_CORRELATION_ID_HEADER) != null
+        )
+    );
+    Assertions.assertTrue(
+      notifyStatus
+        .getExchanges()
+        .stream()
+        .allMatch(exchange ->
+          exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER) != null
+        )
+    );
+    Assertions.assertTrue(
+      notifyStatus
+        .getExchanges()
+        .stream()
+        .allMatch(exchange ->
+          VALIDATION_STAGE_PREVALIDATION.equals(
+            exchange.getIn().getHeader(VALIDATION_STAGE_HEADER)
+          )
+        )
+    );
+    Assertions.assertTrue(
+      notifyStatus
+        .getExchanges()
+        .stream()
+        .allMatch(exchange ->
+          VALIDATION_CLIENT_MARDUK.equals(
+            exchange.getIn().getHeader(VALIDATION_CLIENT_HEADER)
+          )
+        )
+    );
 
-        InputStream testDatasetAsStream = getClass().getResourceAsStream('/' + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME);
-        Assertions.assertNotNull(testDatasetAsStream, "Test dataset file not found: " + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME);
-        String datasetBlobName = BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED + TEST_DATASET_CODESPACE + '/' + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME;
-        antuExchangeInMemoryBlobStoreRepository.uploadBlob(datasetBlobName, testDatasetAsStream);
+    String validationReportId = notifyStatus
+      .getExchanges()
+      .stream()
+      .findFirst()
+      .orElseThrow()
+      .getIn()
+      .getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
 
-
-        context.start();
-        Map<String, Object> headers = new HashMap<>();
-        headers.put(Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER, datasetBlobName);
-        headers.put(Constants.DATASET_REFERENTIAL, TEST_DATASET_CODESPACE);
-        headers.put(Constants.VALIDATION_STAGE_HEADER, VALIDATION_STAGE_PREVALIDATION);
-        headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
-        headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_TIMETABLE_SWEDEN);
-        initDatasetValidation.sendBodyAndHeaders(" ", headers);
-        notifyStatus.assertIsSatisfied();
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_STARTED.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().anyMatch(exchange -> STATUS_VALIDATION_OK.equals(exchange.getIn().getBody(String.class))));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(DATASET_REFERENTIAL) != null));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_CORRELATION_ID_HEADER) != null));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER) != null));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_STAGE_PREVALIDATION.equals(exchange.getIn().getHeader(VALIDATION_STAGE_HEADER))));
-        Assertions.assertTrue(notifyStatus.getExchanges().stream().allMatch(exchange -> VALIDATION_CLIENT_MARDUK.equals(exchange.getIn().getHeader(VALIDATION_CLIENT_HEADER))));
-
-        String validationReportId = notifyStatus.getExchanges().stream().findFirst().orElseThrow().getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
-
-        String reportBlobName = BLOBSTORE_PATH_ANTU_REPORTS + TEST_DATASET_CODESPACE + VALIDATION_REPORT_PREFIX + validationReportId + VALIDATION_REPORT_SUFFIX;
-        InputStream reportInputStream = antuInMemoryBlobStoreRepository.getBlob(reportBlobName);
-        assert reportInputStream != null;
-        ValidationReport validationReport = TestValidationReportUtil.getValidationReport(reportInputStream);
-        Assertions.assertFalse(validationReport.hasError());
-    }
-
-
+    String reportBlobName =
+      BLOBSTORE_PATH_ANTU_REPORTS +
+      TEST_DATASET_CODESPACE +
+      VALIDATION_REPORT_PREFIX +
+      validationReportId +
+      VALIDATION_REPORT_SUFFIX;
+    InputStream reportInputStream = antuInMemoryBlobStoreRepository.getBlob(
+      reportBlobName
+    );
+    assert reportInputStream != null;
+    ValidationReport validationReport =
+      TestValidationReportUtil.getValidationReport(reportInputStream);
+    Assertions.assertFalse(validationReport.hasError());
+  }
 }
