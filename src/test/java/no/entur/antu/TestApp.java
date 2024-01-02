@@ -24,14 +24,15 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
-@ComponentScan(excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = App.class),
-})
+@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
+@ComponentScan(
+  excludeFilters = {
+    @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = App.class),
+  }
+)
 public class TestApp extends App {
 
-    public static void main(String[] args) {
-        SpringApplication.run(TestApp.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(TestApp.class, args);
+  }
 }

@@ -16,7 +16,6 @@
 
 package no.entur.antu.routes.organisation;
 
-
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,27 +27,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrganisationRouteBuilder extends BaseRouteBuilder {
 
-    private final String quartzTrigger;
+  private final String quartzTrigger;
 
-    public OrganisationRouteBuilder(@Value("${antu.organisation.refresh.interval:trigger.repeatInterval=600000&trigger.repeatCount=-1&stateful=true}") String quartzTrigger) {
-        super();
-        this.quartzTrigger = quartzTrigger;
-    }
+  public OrganisationRouteBuilder(
+    @Value(
+      "${antu.organisation.refresh.interval:trigger.repeatInterval=600000&trigger.repeatCount=-1&stateful=true}"
+    ) String quartzTrigger
+  ) {
+    super();
+    this.quartzTrigger = quartzTrigger;
+  }
 
-    @Override
-    public void configure() throws Exception {
-        super.configure();
-        from("master:lockOnAntuRefreshOrganisationCache:quartz://antu/refreshOrganisationCache?" + quartzTrigger)
-                .to("direct:refresh-organisation-cache")
-                .routeId("refresh-organisation-cache-quartz");
+  @Override
+  public void configure() throws Exception {
+    super.configure();
+    from(
+      "master:lockOnAntuRefreshOrganisationCache:quartz://antu/refreshOrganisationCache?" +
+      quartzTrigger
+    )
+      .to("direct:refresh-organisation-cache")
+      .routeId("refresh-organisation-cache-quartz");
 
-        from("direct:refresh-organisation-cache")
-                .log(LoggingLevel.INFO, correlation() + "Refreshing organisation cache")
-                .bean("organisationRepository", "refreshCache")
-                .log(LoggingLevel.INFO, correlation() + "Refreshed organisation cache")
-                .routeId("refresh-organisation-cache");
-
-
-    }
+    from("direct:refresh-organisation-cache")
+      .log(LoggingLevel.INFO, correlation() + "Refreshing organisation cache")
+      .bean("organisationRepository", "refreshCache")
+      .log(LoggingLevel.INFO, correlation() + "Refreshed organisation cache")
+      .routeId("refresh-organisation-cache");
+  }
 }
-

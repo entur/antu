@@ -19,6 +19,8 @@ package no.entur.antu.config;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ClientHttpConnector;
@@ -26,33 +28,40 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Common network timeout configuration for web clients.
  */
 @Configuration
 public class WebClientConfig {
 
-    private static final int HTTP_TIMEOUT = 10000;
-    public static final int MAX_IDLE_TIME = 20;
-    public static final int MAX_LIFE_TIME = 60;
-    public static final int PENDING_ACQUIRE_TIMEOUT = 60;
-    public static final int EVICT_IN_BACKGROUND = 120;
+  private static final int HTTP_TIMEOUT = 10000;
+  public static final int MAX_IDLE_TIME = 20;
+  public static final int MAX_LIFE_TIME = 60;
+  public static final int PENDING_ACQUIRE_TIMEOUT = 60;
+  public static final int EVICT_IN_BACKGROUND = 120;
 
+  @Bean
+  ClientHttpConnector webClientHttpConnector() {
+    ConnectionProvider provider = ConnectionProvider
+      .builder("provider")
+      .maxIdleTime(Duration.ofSeconds(MAX_IDLE_TIME))
+      .maxLifeTime(Duration.ofSeconds(MAX_LIFE_TIME))
+      .pendingAcquireTimeout(Duration.ofSeconds(PENDING_ACQUIRE_TIMEOUT))
+      .evictInBackground(Duration.ofSeconds(EVICT_IN_BACKGROUND))
+      .build();
 
-    @Bean
-    ClientHttpConnector webClientHttpConnector() {
-        ConnectionProvider provider = ConnectionProvider.builder("provider")
-                .maxIdleTime(Duration.ofSeconds(MAX_IDLE_TIME))
-                .maxLifeTime(Duration.ofSeconds(MAX_LIFE_TIME))
-                .pendingAcquireTimeout(Duration.ofSeconds(PENDING_ACQUIRE_TIMEOUT))
-                .evictInBackground(Duration.ofSeconds(EVICT_IN_BACKGROUND)).build();
-
-        return new ReactorClientHttpConnector(HttpClient.create(provider).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, HTTP_TIMEOUT).doOnConnected(connection -> {
-            connection.addHandlerLast(new ReadTimeoutHandler(HTTP_TIMEOUT, TimeUnit.MILLISECONDS));
-            connection.addHandlerLast(new WriteTimeoutHandler(HTTP_TIMEOUT, TimeUnit.MILLISECONDS));
-        }));
-    }
+    return new ReactorClientHttpConnector(
+      HttpClient
+        .create(provider)
+        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, HTTP_TIMEOUT)
+        .doOnConnected(connection -> {
+          connection.addHandlerLast(
+            new ReadTimeoutHandler(HTTP_TIMEOUT, TimeUnit.MILLISECONDS)
+          );
+          connection.addHandlerLast(
+            new WriteTimeoutHandler(HTTP_TIMEOUT, TimeUnit.MILLISECONDS)
+          );
+        })
+    );
+  }
 }

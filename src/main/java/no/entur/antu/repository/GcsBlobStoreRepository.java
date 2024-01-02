@@ -19,12 +19,11 @@
 package no.entur.antu.repository;
 
 import com.google.cloud.storage.Storage;
+import java.io.InputStream;
 import org.rutebanken.helper.gcp.BlobStoreHelper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
-
-import java.io.InputStream;
 
 /**
  * Blob store no.entur.antu.repository targeting Google Cloud Storage.
@@ -34,31 +33,30 @@ import java.io.InputStream;
 @Scope("prototype")
 public class GcsBlobStoreRepository implements BlobStoreRepository {
 
-    private final Storage storage;
+  private final Storage storage;
 
-    private String containerName;
+  private String containerName;
 
-    public GcsBlobStoreRepository(Storage storage) {
-        this.storage = storage;
-    }
+  public GcsBlobStoreRepository(Storage storage) {
+    this.storage = storage;
+  }
 
-    public void setContainerName(String containerName) {
-        this.containerName = containerName;
-    }
+  public void setContainerName(String containerName) {
+    this.containerName = containerName;
+  }
 
-    @Override
-    public boolean existBlob(String objectName) {
-        return BlobStoreHelper.existBlob(storage, containerName, objectName);
-    }
+  @Override
+  public boolean existBlob(String objectName) {
+    return BlobStoreHelper.existBlob(storage, containerName, objectName);
+  }
 
-    @Override
-    public InputStream getBlob(String name) {
-        return BlobStoreHelper.getBlob(storage, containerName, name);
-    }
+  @Override
+  public InputStream getBlob(String name) {
+    return BlobStoreHelper.getBlob(storage, containerName, name);
+  }
 
-    @Override
-    public void uploadBlob(String name, InputStream inputStream) {
-        BlobStoreHelper.createNew(storage, containerName, name, inputStream, false);
-    }
-
+  @Override
+  public void uploadBlob(String name, InputStream inputStream) {
+    BlobStoreHelper.createNew(storage, containerName, name, inputStream, false);
+  }
 }
