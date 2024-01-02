@@ -18,6 +18,12 @@
 
 package no.entur.antu.repository;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
@@ -25,13 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Simple memory-based blob store no.entur.antu.repository for testing purpose.
@@ -41,62 +40,72 @@ import java.util.Map;
 @Scope("prototype")
 public class InMemoryBlobStoreRepository implements BlobStoreRepository {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InMemoryBlobStoreRepository.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    InMemoryBlobStoreRepository.class
+  );
 
-    private final Map<String, Map<String, byte[]>> blobsInContainers;
+  private final Map<String, Map<String, byte[]>> blobsInContainers;
 
-    private String containerName;
+  private String containerName;
 
-    public InMemoryBlobStoreRepository(Map<String, Map<String, byte[]>> blobsInContainers) {
-        this.blobsInContainers = blobsInContainers;
+  public InMemoryBlobStoreRepository(
+    Map<String, Map<String, byte[]>> blobsInContainers
+  ) {
+    this.blobsInContainers = blobsInContainers;
+  }
+
+  private Map<String, byte[]> getBlobsForCurrentContainer() {
+    return getBlobsForContainer(containerName);
+  }
+
+  private Map<String, byte[]> getBlobsForContainer(String aContainer) {
+    return blobsInContainers.computeIfAbsent(
+      aContainer,
+      k -> Collections.synchronizedMap(new HashMap<>())
+    );
+  }
+
+  @Override
+  public boolean existBlob(String objectName) {
+    LOGGER.debug("existBlob called in in-memory blob store");
+    byte[] data = getBlobsForCurrentContainer().get(objectName);
+    return data != null;
+  }
+
+  @Override
+  public InputStream getBlob(String objectName) {
+    LOGGER.debug("get blob called in in-memory blob store");
+    byte[] data = getBlobsForCurrentContainer().get(objectName);
+    if (data != null) {
+      return new ByteArrayInputStream(data);
+    } else {
+      LOGGER.info(
+        "File '{}' in bucket '{}' does not exist",
+        objectName,
+        containerName
+      );
+      return null;
     }
+  }
 
-    private Map<String, byte[]> getBlobsForCurrentContainer() {
-        return getBlobsForContainer(containerName);
+  @Override
+  public void uploadBlob(String objectName, InputStream inputStream) {
+    try {
+      LOGGER.debug("upload blob called in in-memory blob store");
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      IOUtils.copy(inputStream, byteArrayOutputStream);
+      byte[] data = byteArrayOutputStream.toByteArray();
+      if (data.length == 0) {
+        LOGGER.warn("The uploaded file {} is empty", objectName);
+      }
+      getBlobsForCurrentContainer().put(objectName, data);
+    } catch (IOException e) {
+      throw new no.entur.antu.exception.AntuException(e);
     }
+  }
 
-    private Map<String, byte[]> getBlobsForContainer(String aContainer) {
-        return blobsInContainers.computeIfAbsent(aContainer, k -> Collections.synchronizedMap(new HashMap<>()));
-    }
-
-    @Override
-    public boolean existBlob(String objectName) {
-        LOGGER.debug("existBlob called in in-memory blob store");
-        byte[] data = getBlobsForCurrentContainer().get(objectName);
-        return data != null;
-    }
-
-    @Override
-    public InputStream getBlob(String objectName) {
-        LOGGER.debug("get blob called in in-memory blob store");
-        byte[] data = getBlobsForCurrentContainer().get(objectName);
-        if (data != null) {
-            return new ByteArrayInputStream(data);
-        } else {
-            LOGGER.info("File '{}' in bucket '{}' does not exist", objectName, containerName);
-            return null;
-        }
-    }
-
-    @Override
-    public void uploadBlob(String objectName, InputStream inputStream) {
-        try {
-            LOGGER.debug("upload blob called in in-memory blob store");
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            IOUtils.copy(inputStream, byteArrayOutputStream);
-            byte[] data = byteArrayOutputStream.toByteArray();
-            if (data.length == 0) {
-                LOGGER.warn("The uploaded file {} is empty", objectName);
-            }
-            getBlobsForCurrentContainer().put(objectName, data);
-        } catch (IOException e) {
-            throw new no.entur.antu.exception.AntuException(e);
-        }
-    }
-
-    @Override
-    public void setContainerName(String containerName) {
-        this.containerName = containerName;
-    }
-
+  @Override
+  public void setContainerName(String containerName) {
+    this.containerName = containerName;
+  }
 }

@@ -18,13 +18,12 @@
 
 package no.entur.antu.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Common in-memory map of blobs that simulate different buckets in GCS.
@@ -33,9 +32,8 @@ import java.util.Map;
 @Profile("in-memory-blobstore")
 public class InMemoryBlobStoreRepositoryConfig {
 
-    @Bean
-    public Map<String, Map<String, byte[]>> blobsInContainers() {
-        return Collections.synchronizedMap(new HashMap<>());
-    }
-
+  @Bean
+  public Map<String, Map<String, byte[]>> blobsInContainers() {
+    return Collections.synchronizedMap(new HashMap<>());
+  }
 }
