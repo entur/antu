@@ -1,9 +1,8 @@
 package no.entur.antu.validator.nonincreasingpassingtime.stoptime;
 
-import org.rutebanken.netex.model.TimetabledPassingTime;
-
 import java.math.BigInteger;
 import java.time.LocalTime;
+import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
  * Wrapper around {@link TimetabledPassingTime} that provides a simpler interface for passing times
@@ -14,95 +13,102 @@ import java.time.LocalTime;
  * should be fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
  */
 abstract sealed class AbstractStopTime
-        implements StopTime
-        permits FlexibleStopTime, RegularStopTime {
+  implements StopTime
+  permits FlexibleStopTime, RegularStopTime {
 
-    private final TimetabledPassingTime timetabledPassingTime;
+  private final TimetabledPassingTime timetabledPassingTime;
 
-    protected AbstractStopTime(TimetabledPassingTime timetabledPassingTime) {
-        this.timetabledPassingTime = timetabledPassingTime;
+  protected AbstractStopTime(TimetabledPassingTime timetabledPassingTime) {
+    this.timetabledPassingTime = timetabledPassingTime;
+  }
+
+  @Override
+  public final Object timetabledPassingTimeId() {
+    return timetabledPassingTime.getId();
+  }
+
+  @Override
+  public final boolean isStopTimesIncreasing(StopTime next) {
+    // This can be replaced with pattern-matching or polymorphic inheritance, BUT as long as we
+    // only have 4 cases the "if" keep the rules together and make it easier to read/get the hole
+    // picture - so keep it together until more cases are added.
+    if (this instanceof RegularStopTime) {
+      if (next instanceof RegularStopTime) {
+        return isRegularStopFollowedByRegularStopValid(next);
+      } else {
+        return isRegularStopFollowedByAreaStopValid(next);
+      }
+    } else {
+      if (next instanceof RegularStopTime) {
+        return isAreaStopFollowedByRegularStopValid(next);
+      } else {
+        return isAreaStopFollowedByAreaStopValid(next);
+      }
     }
+  }
 
-    @Override
-    public final Object timetabledPassingTimeId() {
-        return timetabledPassingTime.getId();
-    }
+  protected LocalTime arrivalTime() {
+    return timetabledPassingTime.getArrivalTime();
+  }
 
-    @Override
-    public final boolean isStopTimesIncreasing(StopTime next) {
-        // This can be replaced with pattern-matching or polymorphic inheritance, BUT as long as we
-        // only have 4 cases the "if" keep the rules together and make it easier to read/get the hole
-        // picture - so keep it together until more cases are added.
-        if (this instanceof RegularStopTime) {
-            if (next instanceof RegularStopTime) {
-                return isRegularStopFollowedByRegularStopValid(next);
-            } else {
-                return isRegularStopFollowedByAreaStopValid(next);
-            }
-        } else {
-            if (next instanceof RegularStopTime) {
-                return isAreaStopFollowedByRegularStopValid(next);
-            } else {
-                return isAreaStopFollowedByAreaStopValid(next);
-            }
-        }
-    }
+  protected BigInteger arrivalDayOffset() {
+    return timetabledPassingTime.getArrivalDayOffset();
+  }
 
-    protected LocalTime arrivalTime() {
-        return timetabledPassingTime.getArrivalTime();
-    }
+  protected LocalTime latestArrivalTime() {
+    return timetabledPassingTime.getLatestArrivalTime();
+  }
 
-    protected BigInteger arrivalDayOffset() {
-        return timetabledPassingTime.getArrivalDayOffset();
-    }
+  protected BigInteger latestArrivalDayOffset() {
+    return timetabledPassingTime.getLatestArrivalDayOffset();
+  }
 
-    protected LocalTime latestArrivalTime() {
-        return timetabledPassingTime.getLatestArrivalTime();
-    }
+  protected LocalTime departureTime() {
+    return timetabledPassingTime.getDepartureTime();
+  }
 
-    protected BigInteger latestArrivalDayOffset() {
-        return timetabledPassingTime.getLatestArrivalDayOffset();
-    }
+  protected BigInteger departureDayOffset() {
+    return timetabledPassingTime.getDepartureDayOffset();
+  }
 
-    protected LocalTime departureTime() {
-        return timetabledPassingTime.getDepartureTime();
-    }
+  protected LocalTime earliestDepartureTime() {
+    return timetabledPassingTime.getEarliestDepartureTime();
+  }
 
-    protected BigInteger departureDayOffset() {
-        return timetabledPassingTime.getDepartureDayOffset();
-    }
+  protected BigInteger earliestDepartureDayOffset() {
+    return timetabledPassingTime.getEarliestDepartureDayOffset();
+  }
 
-    protected LocalTime earliestDepartureTime() {
-        return timetabledPassingTime.getEarliestDepartureTime();
-    }
+  private boolean isRegularStopFollowedByRegularStopValid(StopTime next) {
+    return (
+      normalizedDepartureTimeOrElseArrivalTime() <=
+      next.normalizedArrivalTimeOrElseDepartureTime()
+    );
+  }
 
-    protected BigInteger earliestDepartureDayOffset() {
-        return timetabledPassingTime.getEarliestDepartureDayOffset();
-    }
+  private boolean isAreaStopFollowedByAreaStopValid(StopTime next) {
+    int earliestDepartureTime = normalizedEarliestDepartureTime();
+    int nextEarliestDepartureTime = next.normalizedEarliestDepartureTime();
+    int latestArrivalTime = normalizedLatestArrivalTime();
+    int nextLatestArrivalTime = next.normalizedLatestArrivalTime();
 
-    private boolean isRegularStopFollowedByRegularStopValid(StopTime next) {
-        return (
-                normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime()
-        );
-    }
+    return (
+      earliestDepartureTime <= nextEarliestDepartureTime &&
+      latestArrivalTime <= nextLatestArrivalTime
+    );
+  }
 
-    private boolean isAreaStopFollowedByAreaStopValid(StopTime next) {
-        int earliestDepartureTime = normalizedEarliestDepartureTime();
-        int nextEarliestDepartureTime = next.normalizedEarliestDepartureTime();
-        int latestArrivalTime = normalizedLatestArrivalTime();
-        int nextLatestArrivalTime = next.normalizedLatestArrivalTime();
+  private boolean isRegularStopFollowedByAreaStopValid(StopTime next) {
+    return (
+      normalizedDepartureTimeOrElseArrivalTime() <=
+      next.normalizedEarliestDepartureTime()
+    );
+  }
 
-        return (
-                earliestDepartureTime <= nextEarliestDepartureTime &&
-                        latestArrivalTime <= nextLatestArrivalTime
-        );
-    }
-
-    private boolean isRegularStopFollowedByAreaStopValid(StopTime next) {
-        return normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedEarliestDepartureTime();
-    }
-
-    private boolean isAreaStopFollowedByRegularStopValid(StopTime next) {
-        return normalizedLatestArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime();
-    }
+  private boolean isAreaStopFollowedByRegularStopValid(StopTime next) {
+    return (
+      normalizedLatestArrivalTime() <=
+      next.normalizedArrivalTimeOrElseDepartureTime()
+    );
+  }
 }

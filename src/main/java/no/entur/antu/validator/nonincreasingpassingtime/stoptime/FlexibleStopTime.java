@@ -2,7 +2,6 @@ package no.entur.antu.validator.nonincreasingpassingtime.stoptime;
 
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
-
 /**
  * Wrapper around {@link TimetabledPassingTime} that provides a simpler interface
  * for passing times comparison.
@@ -10,45 +9,51 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  */
 final class FlexibleStopTime extends AbstractStopTime {
 
-    FlexibleStopTime(TimetabledPassingTime timetabledPassingTime) {
-        super(timetabledPassingTime);
-    }
+  FlexibleStopTime(TimetabledPassingTime timetabledPassingTime) {
+    super(timetabledPassingTime);
+  }
 
-    @Override
-    public boolean isComplete() {
-        return hasLatestArrivalTime() && hasEarliestDepartureTime();
-    }
+  @Override
+  public boolean isComplete() {
+    return hasLatestArrivalTime() && hasEarliestDepartureTime();
+  }
 
-    @Override
-    public boolean isConsistent() {
-        return normalizedLatestArrivalTime() >= normalizedEarliestDepartureTime();
-    }
+  @Override
+  public boolean isConsistent() {
+    return normalizedLatestArrivalTime() >= normalizedEarliestDepartureTime();
+  }
 
-    @Override
-    public int normalizedEarliestDepartureTime() {
-        return elapsedTimeSinceMidnight(earliestDepartureTime(), earliestDepartureDayOffset());
-    }
+  @Override
+  public int normalizedEarliestDepartureTime() {
+    return elapsedTimeSinceMidnight(
+      earliestDepartureTime(),
+      earliestDepartureDayOffset()
+    );
+  }
 
-    @Override
-    public int normalizedLatestArrivalTime() {
-        return elapsedTimeSinceMidnight(latestArrivalTime(), latestArrivalDayOffset());
-    }
+  @Override
+  public int normalizedLatestArrivalTime() {
+    return elapsedTimeSinceMidnight(
+      latestArrivalTime(),
+      latestArrivalDayOffset()
+    );
+  }
 
-    @Override
-    public int normalizedDepartureTimeOrElseArrivalTime() {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public int normalizedDepartureTimeOrElseArrivalTime() {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public int normalizedArrivalTimeOrElseDepartureTime() {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public int normalizedArrivalTimeOrElseDepartureTime() {
+    throw new UnsupportedOperationException();
+  }
 
-    private boolean hasLatestArrivalTime() {
-        return latestArrivalTime() != null;
-    }
+  private boolean hasLatestArrivalTime() {
+    return latestArrivalTime() != null;
+  }
 
-    private boolean hasEarliestDepartureTime() {
-        return earliestDepartureTime() != null;
-    }
+  private boolean hasEarliestDepartureTime() {
+    return earliestDepartureTime() != null;
+  }
 }

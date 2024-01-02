@@ -23,28 +23,26 @@ import no.entur.antu.model.TransportModes;
  * A repository to store and cache the stop place and quay ids retrieved from the National Stop Register.
  */
 public interface StopPlaceRepository {
+  /**
+   * Checks if stop place id present in the cache or try getting it from Read api.
+   * @return stop place id.
+   */
+  boolean hasStopPlaceId(StopPlaceId stopPlaceId);
 
-    /**
-     * Checks if stop place id present in the cache or try getting it from Read api.
-     * @return stop place id.
-     */
-    boolean hasStopPlaceId(StopPlaceId stopPlaceId);
+  /**
+   * Checks if quay id present in the cache or try getting it from Read api.
+   * @return stop place id.
+   */
+  boolean hasQuayId(QuayId quayId);
 
-    /**
-     * Checks if quay id present in the cache or try getting it from Read api.
-     * @return stop place id.
-     */
-    boolean hasQuayId(QuayId quayId);
+  /**
+   * Returns the transport modes for quay id present in the cache or try getting it from Read api.
+   * @return transport modes for given stop place id.
+   */
+  TransportModes getTransportModesForQuayId(QuayId quayId);
 
-    /**
-     * Returns the transport modes for quay id present in the cache or try getting it from Read api.
-     * @return transport modes for given stop place id.
-     */
-    TransportModes getTransportModesForQuayId(QuayId quayId);
-
-    /**
-     * Refresh the cache with data retrieved from the Stop Place Register.
-     */
-    void refreshCache();
-
+  /**
+   * Refresh the cache with data retrieved from the Stop Place Register.
+   */
+  void refreshCache();
 }

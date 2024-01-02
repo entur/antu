@@ -1,10 +1,9 @@
 package no.entur.antu.validator.nonincreasingpassingtime;
 
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
-
 import javax.annotation.Nonnull;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 /**
  * Test mapping support utility functions - shared between tests.
@@ -20,10 +19,9 @@ public class MappingSupport {
    * @see #createRef(String, Class)
    * @see #createJaxbElement(Object)
    */
-  public static <T extends VersionOfObjectRefStructure> JAXBElement<T> createWrappedRef(
-    String id,
-    Class<T> clazz
-  ) {
+  public static <
+    T extends VersionOfObjectRefStructure
+  > JAXBElement<T> createWrappedRef(String id, Class<T> clazz) {
     return createJaxbElement(createRef(id, clazz));
   }
 
@@ -36,7 +34,10 @@ public class MappingSupport {
    * @param <T>   the type of the created ref structure
    */
   @SuppressWarnings("unchecked")
-  public static <T extends VersionOfObjectRefStructure> T createRef(String id, Class<T> clazz) {
+  public static <T extends VersionOfObjectRefStructure> T createRef(
+    String id,
+    Class<T> clazz
+  ) {
     try {
       return (T) clazz.newInstance().withRef(id);
     } catch (Exception e) {
@@ -53,6 +54,10 @@ public class MappingSupport {
    */
   @SuppressWarnings("unchecked")
   public static <T> JAXBElement<T> createJaxbElement(@Nonnull T value) {
-    return new JAXBElement<>(new QName("x"), (Class<T>) value.getClass(), value);
+    return new JAXBElement<>(
+      new QName("x"),
+      (Class<T>) value.getClass(),
+      value
+    );
   }
 }
