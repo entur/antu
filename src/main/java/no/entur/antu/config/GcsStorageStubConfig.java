@@ -28,26 +28,29 @@ import org.springframework.context.annotation.Profile;
  * Stub implementation of GCS storage for testing purpose.
  */
 @Configuration
-@Profile({"in-memory-blobstore", "local-disk-blobstore"})
+@Profile({ "in-memory-blobstore", "local-disk-blobstore" })
 public class GcsStorageStubConfig {
 
-    @Bean
-    public Storage storage() {
-        return getStorage();
-    }
+  @Bean
+  public Storage storage() {
+    return getStorage();
+  }
 
-    @Bean
-    public Storage exchangeStorage() {
-        return getStorage();
-    }
+  @Bean
+  public Storage exchangeStorage() {
+    return getStorage();
+  }
 
-    @Bean
-    public Storage otpReportStorage() {
-        return getStorage();
-    }
+  @Bean
+  public Storage otpReportStorage() {
+    return getStorage();
+  }
 
-    private Storage getStorage() {
-        return StorageOptions.newBuilder().setProjectId("1234").build().getService();
-    }
-
+  private Storage getStorage() {
+    return StorageOptions
+      .newBuilder()
+      .setProjectId("1234")
+      .build()
+      .getService();
+  }
 }

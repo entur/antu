@@ -18,35 +18,45 @@
 
 package no.entur.antu.routes.blobstore;
 
+import static no.entur.antu.Constants.FILE_HANDLE;
+
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.services.AntuBlobStoreService;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
-import static no.entur.antu.Constants.FILE_HANDLE;
-
-
 @Component
 public class AntuBlobStoreRoute extends BaseRouteBuilder {
 
-    private final AntuBlobStoreService antuBlobStoreService;
+  private final AntuBlobStoreService antuBlobStoreService;
 
-    public AntuBlobStoreRoute(AntuBlobStoreService antuBlobStoreService) {
-        this.antuBlobStoreService = antuBlobStoreService;
-    }
+  public AntuBlobStoreRoute(AntuBlobStoreService antuBlobStoreService) {
+    this.antuBlobStoreService = antuBlobStoreService;
+  }
 
-    @Override
-    public void configure() {
+  @Override
+  public void configure() {
+    from("direct:getAntuBlob")
+      .bean(antuBlobStoreService, "getBlob")
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() +
+        "Returning from fetching file ${header." +
+        FILE_HANDLE +
+        "} from Antu bucket."
+      )
+      .routeId("blobstore-antu-download");
 
-        from("direct:getAntuBlob")
-                .bean(antuBlobStoreService, "getBlob")
-                .log(LoggingLevel.DEBUG, correlation() + "Returning from fetching file ${header." + FILE_HANDLE + "} from Antu bucket.")
-                .routeId("blobstore-antu-download");
-
-        from("direct:uploadAntuBlob")
-                .bean(antuBlobStoreService, "uploadBlob")
-                .setBody(constant(""))
-                .log(LoggingLevel.DEBUG, correlation() + "Stored file ${header." + FILE_HANDLE + "} in Antu bucket.")
-                .routeId("blobstore-antu-upload");
-    }
+    from("direct:uploadAntuBlob")
+      .bean(antuBlobStoreService, "uploadBlob")
+      .setBody(constant(""))
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() +
+        "Stored file ${header." +
+        FILE_HANDLE +
+        "} in Antu bucket."
+      )
+      .routeId("blobstore-antu-upload");
+  }
 }

@@ -29,8 +29,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class MardukBlobStoreService extends AbstractBlobStoreService {
 
-    public MardukBlobStoreService(@Value("${blobstore.gcs.marduk.container.name}") String containerName,
-                                  @Autowired BlobStoreRepository repository) {
-        super(containerName, repository);
-    }
+  public MardukBlobStoreService(
+    @Value("${blobstore.gcs.marduk.container.name}") String containerName,
+    @Autowired BlobStoreRepository repository
+  ) {
+    super(containerName, repository);
+  }
 }
