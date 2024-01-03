@@ -85,7 +85,7 @@ public class TestConfig {
 
             @Override
             public StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId) {
-                return null;
+                return new StopPlaceCoordinates(0, 0);
             }
 
             @Override
