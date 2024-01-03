@@ -1,4 +1,4 @@
-package no.entur.antu.validator.nonincreasingpassingtime.stoptime;
+package no.entur.antu.stoptime;
 
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
@@ -54,12 +54,21 @@ public sealed interface StopTime permits AbstractStopTime {
      */
     int normalizedArrivalTimeOrElseDepartureTime();
 
-    Object timetabledPassingTimeId();
+    String timetabledPassingTimeId();
 
     /**
      * Return {@code true} if this stop-time is before the given {@code next} stop time.
      */
     boolean isStopTimesIncreasing(StopTime next);
+
+    /**
+     * Return time between this and given time values with offset handling.
+     */
+    int getStopTimeDiff(StopTime given);
+
+    boolean isDepartureInMinutesResolution();
+
+    boolean isArrivalInMinutesResolution();
 
     /**
      * Return the elapsed time in second since midnight for a given local time, taking into account

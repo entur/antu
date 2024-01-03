@@ -52,7 +52,7 @@ import static no.entur.antu.Constants.*;
 public class ValidatorConfig {
 
     @Bean
-    public NetexSchemaValidator netexSchemaValidator(@Value("${antu.netex.validation.entries.max:100}") int maxValidationError) {
+    public NetexSchemaValidator netexSchemaValidator(@Value("${antu.netex.validation.entries.maxSpeed:100}") int maxValidationError) {
         return new NetexSchemaValidator(maxValidationError);
     }
 

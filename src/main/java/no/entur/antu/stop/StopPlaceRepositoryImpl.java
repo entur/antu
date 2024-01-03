@@ -16,11 +16,11 @@
 package no.entur.antu.stop;
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
-import no.entur.antu.model.TransportSubMode;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * StopPlaceRepository implementation using the new API exposed in Tiamat.
@@ -42,6 +43,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
     private final Map<String, Set<String>> stopPlaceCache;
     private final Set<QuayId> quayIdNotFoundCache;
     private final Map<QuayId, TransportModes> transportModesForQuayIdCache;
+    private final Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache;
     private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
     private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
     private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
@@ -50,6 +52,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
                                    Map<String, Set<String>> stopPlaceCache,
                                    Set<QuayId> quayIdNotFoundCache,
                                    Map<QuayId, TransportModes> transportModesForQuayIdCache,
+                                   Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
                                    NetexEntityFetcher<Quay, QuayId> quayFetcher,
                                    NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
                                    NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher) {
@@ -57,6 +60,7 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         this.stopPlaceCache = stopPlaceCache;
         this.transportModesForQuayIdCache = transportModesForQuayIdCache;
         this.quayIdNotFoundCache = quayIdNotFoundCache;
+        this.coordinatesPerQuayIdCache = coordinatesPerQuayIdCache;
         this.quayFetcher = quayFetcher;
         this.stopPlaceFetcher = stopPlaceFetcher;
         this.stopPlaceForQuayIdFetcher = stopPlaceForQuayIdFetcher;
@@ -96,22 +100,30 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
 
     @Override
     public TransportModes getTransportModesForQuayId(QuayId quayId) {
+        return getDataForQuayId(quayId, transportModesForQuayIdCache, TransportModes::of);
+    }
+
+    @Override
+    public StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId) {
+        return getDataForQuayId(quayId, coordinatesPerQuayIdCache, StopPlaceCoordinates::of);
+    }
+
+    public <D> D getDataForQuayId(QuayId quayId,
+                                  Map<QuayId, D> cache,
+                                  Function<StopPlace, D> dataOfStopPlace) {
         // Intentionally not using the "Map.computeIfAbsent()", because we need
         // to call the readApi from computeIfAbsent, which is somewhat long-running
         // operation, which holds the RedissonLock.lock, causing java.lang.InterruptedException.
-        TransportModes transportModes = transportModesForQuayIdCache.get(quayId);
-        if (transportModes == null) {
+        D data = cache.get(quayId);
+        if (data == null) {
             StopPlace stopPlace = tryFetchWithNotFoundCheck(quayId, stopPlaceForQuayIdFetcher);
             if (stopPlace != null) {
-                TransportModes transportModesFromReadApi = new TransportModes(
-                        stopPlace.getTransportMode(),
-                        TransportSubMode.from(stopPlace).orElse(null)
-                );
-                transportModesForQuayIdCache.put(quayId, transportModesFromReadApi);
-                return transportModesFromReadApi;
+                D dataFromReadApi = dataOfStopPlace.apply(stopPlace);
+                cache.put(quayId, dataFromReadApi);
+                return dataFromReadApi;
             }
         }
-        return transportModes;
+        return data;
     }
 
     @Override
@@ -120,14 +132,17 @@ public class StopPlaceRepositoryImpl implements StopPlaceRepository {
         stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceResource.getStopPlaceIds());
         stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
         transportModesForQuayIdCache.putAll(stopPlaceResource.getTransportModesPerQuayId());
+        coordinatesPerQuayIdCache.putAll(stopPlaceResource.getCoordinatesPerQuayId());
         quayIdNotFoundCache.clear();
 
         LOGGER.info("Updated cache with " +
-                        "{} stop places ids, " +
-                        "{} quays ids, " +
-                        "{} transport modes per quay id",
+                    "{} stop places ids, " +
+                    "{} quays ids, " +
+                    "{} transport modes per quay id, " +
+                    "{} coordinates per quay id",
                 stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(),
                 stopPlaceCache.get(QUAY_CACHE_KEY).size(),
-                transportModesForQuayIdCache.size());
+                transportModesForQuayIdCache.size(),
+                coordinatesPerQuayIdCache.size());
     }
 }

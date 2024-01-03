@@ -2,8 +2,8 @@ package no.entur.antu.validator.nonincreasingpassingtime;
 
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.nonincreasingpassingtime.stoptime.SortedStopTimes;
-import no.entur.antu.validator.nonincreasingpassingtime.stoptime.StopTime;
+import no.entur.antu.stoptime.SortedStopTimes;
+import no.entur.antu.stoptime.StopTime;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -19,7 +19,7 @@ public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NonIncreasingPassingTimeValidator.class);
 
-    protected enum RuleCode {
+    enum RuleCode {
         TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
         TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
         TIMETABLED_PASSING_TIME_NON_INCREASING_TIME

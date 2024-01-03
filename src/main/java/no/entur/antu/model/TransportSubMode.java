@@ -12,7 +12,7 @@ public record TransportSubMode(String name) {
         Objects.requireNonNull(name, "Invalid transport sub mode " + name);
     }
 
-    public static Optional<TransportSubMode> from(StopPlace stopPlace) {
+    public static Optional<TransportSubMode> of(StopPlace stopPlace) {
         String subModeName = switch (stopPlace.getTransportMode()) {
             case AIR -> stopPlace.getAirSubmode() == null ? null : stopPlace.getAirSubmode().value();
             case BUS -> stopPlace.getBusSubmode() == null ? null : stopPlace.getBusSubmode().value();

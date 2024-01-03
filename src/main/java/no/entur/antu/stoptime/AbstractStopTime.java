@@ -1,4 +1,4 @@
-package no.entur.antu.validator.nonincreasingpassingtime.stoptime;
+package no.entur.antu.stoptime;
 
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
@@ -24,28 +24,8 @@ abstract sealed class AbstractStopTime
     }
 
     @Override
-    public final Object timetabledPassingTimeId() {
+    public final String timetabledPassingTimeId() {
         return timetabledPassingTime.getId();
-    }
-
-    @Override
-    public final boolean isStopTimesIncreasing(StopTime next) {
-        // This can be replaced with pattern-matching or polymorphic inheritance, BUT as long as we
-        // only have 4 cases the "if" keep the rules together and make it easier to read/get the hole
-        // picture - so keep it together until more cases are added.
-        if (this instanceof RegularStopTime) {
-            if (next instanceof RegularStopTime) {
-                return isRegularStopFollowedByRegularStopValid(next);
-            } else {
-                return isRegularStopFollowedByAreaStopValid(next);
-            }
-        } else {
-            if (next instanceof RegularStopTime) {
-                return isAreaStopFollowedByRegularStopValid(next);
-            } else {
-                return isAreaStopFollowedByAreaStopValid(next);
-            }
-        }
     }
 
     protected LocalTime arrivalTime() {
@@ -80,29 +60,11 @@ abstract sealed class AbstractStopTime
         return timetabledPassingTime.getEarliestDepartureDayOffset();
     }
 
-    private boolean isRegularStopFollowedByRegularStopValid(StopTime next) {
-        return (
-                normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime()
-        );
-    }
-
-    private boolean isAreaStopFollowedByAreaStopValid(StopTime next) {
-        int earliestDepartureTime = normalizedEarliestDepartureTime();
-        int nextEarliestDepartureTime = next.normalizedEarliestDepartureTime();
-        int latestArrivalTime = normalizedLatestArrivalTime();
-        int nextLatestArrivalTime = next.normalizedLatestArrivalTime();
-
-        return (
-                earliestDepartureTime <= nextEarliestDepartureTime &&
-                        latestArrivalTime <= nextLatestArrivalTime
-        );
-    }
-
-    private boolean isRegularStopFollowedByAreaStopValid(StopTime next) {
+    protected boolean isRegularStopFollowedByAreaStopValid(FlexibleStopTime next) {
         return normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedEarliestDepartureTime();
     }
 
-    private boolean isAreaStopFollowedByRegularStopValid(StopTime next) {
+    protected boolean isAreaStopFollowedByRegularStopValid(RegularStopTime next) {
         return normalizedLatestArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime();
     }
 }

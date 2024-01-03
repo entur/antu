@@ -2,11 +2,19 @@ package no.entur.antu.model;
 
 import no.entur.antu.exception.AntuException;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-
+import org.rutebanken.netex.model.StopPlace;
 
 public record TransportModes(
         AllVehicleModesOfTransportEnumeration mode,
         TransportSubMode subMode) {
+
+
+    public static TransportModes of(StopPlace stopPlace) {
+        return new TransportModes(
+                stopPlace.getTransportMode(),
+                TransportSubMode.of(stopPlace).orElse(null)
+        );
+    }
 
     /*
      * Used to encode data to store in redis.
@@ -18,9 +26,9 @@ public record TransportModes(
     }
 
     /*
-    * Used to decode data stored in redis.
-    * Caution: Changes in this method can effect data stored in redis.
-    */
+     * Used to decode data stored in redis.
+     * Caution: Changes in this method can effect data stored in redis.
+     */
     public static TransportModes fromString(String stopPlaceTransportModes) {
         if (stopPlaceTransportModes != null) {
             String[] split = stopPlaceTransportModes.split("§");
