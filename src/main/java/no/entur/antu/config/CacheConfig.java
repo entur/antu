@@ -3,6 +3,7 @@ package no.entur.antu.config;
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.codec.QuayIdCodec;
+import no.entur.antu.codec.StopPlaceCoordinatesCodec;
 import no.entur.antu.codec.TransportModesCodec;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
@@ -106,8 +107,13 @@ public class CacheConfig {
     }
 
     @Bean(name = COORDINATES_PER_QUAY_ID_CACHE)
-    public Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache(RedissonClient redissonClient) {
-        return redissonClient.getLocalCachedMap(COORDINATES_PER_QUAY_ID_CACHE, LocalCachedMapOptions.defaults());
+    public Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache(RedissonClient redissonClient,
+                                                                       QuayIdCodec quayIdCodec,
+                                                                       StopPlaceCoordinatesCodec stopPlaceCoordinatesCodec) {
+        return redissonClient.getLocalCachedMap(
+                COORDINATES_PER_QUAY_ID_CACHE,
+                new CompositeCodec(quayIdCodec, stopPlaceCoordinatesCodec),
+                LocalCachedMapOptions.defaults());
     }
 
     @Bean
