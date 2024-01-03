@@ -48,3 +48,6 @@ validationRuleConfigs:
   - code: HIGH_SPEED_PROGRESSION
     name: Vehicle is moving too fast
     severity: ERROR
+  - code: WARNING_SPEED_PROGRESSION
+    name: ServiceJourney has unexpected speed progression
+    severity: ERROR
