@@ -16,16 +16,22 @@
 
 package no.entur.antu.config;
 
-import no.entur.antu.stop.StopPlaceResourceImpl;
-import no.entur.antu.stop.StopPlaceRepositoryImpl;
+import static no.entur.antu.config.CacheConfig.COORDINATES_PER_QUAY_ID_CACHE;
+import static no.entur.antu.config.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
+import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE;
+
+import java.util.Map;
+import java.util.Set;
+import no.entur.antu.model.QuayId;
+import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stop.StopPlaceRepositoryImpl;
+import no.entur.antu.stop.StopPlaceResourceImpl;
 import no.entur.antu.stop.fetcher.QuayFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceForQuayIdFetcher;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.TransportModes;
-import no.entur.antu.model.StopPlaceCoordinates;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -36,62 +42,64 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Map;
-import java.util.Set;
-
-import static no.entur.antu.config.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
-import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE;
-import static no.entur.antu.config.CacheConfig.COORDINATES_PER_QUAY_ID_CACHE;
-
 @Configuration
 public class StopPlaceConfig {
 
-    private static final String ET_CLIENT_ID_HEADER = "ET-Client-ID";
-    private static final String ET_CLIENT_NAME_HEADER = "ET-Client-Name";
+  private static final String ET_CLIENT_ID_HEADER = "ET-Client-ID";
+  private static final String ET_CLIENT_NAME_HEADER = "ET-Client-Name";
 
-    @Bean
-    @Profile("!test")
-    StopPlaceResourceImpl stopPlaceResource(StopPlacesDatasetLoader stopPlacesDatasetLoader) {
-        return new StopPlaceResourceImpl(stopPlacesDatasetLoader);
-    }
+  @Bean
+  @Profile("!test")
+  StopPlaceResourceImpl stopPlaceResource(
+    StopPlacesDatasetLoader stopPlacesDatasetLoader
+  ) {
+    return new StopPlaceResourceImpl(stopPlacesDatasetLoader);
+  }
 
-    @Bean
-    @Profile("!test")
-    StopPlaceRepository stopPlaceRepository(@Qualifier("stopPlaceAndQuayCache")
-                                            Map<String, Set<String>> stopPlaceCache,
-                                            StopPlaceFetcher stopPlaceFetcher,
-                                            QuayFetcher quayFetcher,
-                                            StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
-                                            @Qualifier(TRANSPORT_MODES_FOR_QUAY_ID_CACHE)
-                                            Map<QuayId, TransportModes> transportModesForQuayIdCache,
-                                            @Qualifier(QUAY_ID_NOT_FOUND_CACHE)
-                                            Set<QuayId> quayIdNotFoundCache,
-                                            @Qualifier(COORDINATES_PER_QUAY_ID_CACHE)
-                                            Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
-                                            @Qualifier("stopPlaceResource")
-                                            StopPlaceResourceImpl stopPlaceResourceImpl) {
-        return new StopPlaceRepositoryImpl(
-                stopPlaceResourceImpl,
-                stopPlaceCache,
-                quayIdNotFoundCache,
-                transportModesForQuayIdCache,
-                coordinatesPerQuayIdCache,
-                quayFetcher,
-                stopPlaceFetcher,
-                stopPlaceForQuayIdFetcher
-        );
-    }
+  @Bean
+  @Profile("!test")
+  StopPlaceRepository stopPlaceRepository(
+    @Qualifier("stopPlaceAndQuayCache") Map<String, Set<String>> stopPlaceCache,
+    StopPlaceFetcher stopPlaceFetcher,
+    QuayFetcher quayFetcher,
+    StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
+    @Qualifier(
+      TRANSPORT_MODES_FOR_QUAY_ID_CACHE
+    ) Map<QuayId, TransportModes> transportModesForQuayIdCache,
+    @Qualifier(QUAY_ID_NOT_FOUND_CACHE) Set<QuayId> quayIdNotFoundCache,
+    @Qualifier(
+      COORDINATES_PER_QUAY_ID_CACHE
+    ) Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
+    @Qualifier("stopPlaceResource") StopPlaceResourceImpl stopPlaceResourceImpl
+  ) {
+    return new StopPlaceRepositoryImpl(
+      stopPlaceResourceImpl,
+      stopPlaceCache,
+      quayIdNotFoundCache,
+      transportModesForQuayIdCache,
+      coordinatesPerQuayIdCache,
+      quayFetcher,
+      stopPlaceFetcher,
+      stopPlaceForQuayIdFetcher
+    );
+  }
 
-    @Bean("stopPlaceWebClient")
-    WebClient stopPlaceWebClient(@Value("${stopplace.registry.url:https://api.dev.entur.io/stop-places/v1/read}") String stopPlaceRegistryUrl,
-                                 @Value("${http.client.name:antu}") String clientName,
-                                 @Value("${http.client.id:antu}") String clientId, ClientHttpConnector clientHttpConnector) {
-        return WebClient.builder()
-                .baseUrl(stopPlaceRegistryUrl)
-                .clientConnector(clientHttpConnector)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
-                .defaultHeader(ET_CLIENT_NAME_HEADER, clientName)
-                .defaultHeader(ET_CLIENT_ID_HEADER, clientId)
-                .build();
-    }
+  @Bean("stopPlaceWebClient")
+  WebClient stopPlaceWebClient(
+    @Value(
+      "${stopplace.registry.url:https://api.dev.entur.io/stop-places/v1/read}"
+    ) String stopPlaceRegistryUrl,
+    @Value("${http.client.name:antu}") String clientName,
+    @Value("${http.client.id:antu}") String clientId,
+    ClientHttpConnector clientHttpConnector
+  ) {
+    return WebClient
+      .builder()
+      .baseUrl(stopPlaceRegistryUrl)
+      .clientConnector(clientHttpConnector)
+      .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
+      .defaultHeader(ET_CLIENT_NAME_HEADER, clientName)
+      .defaultHeader(ET_CLIENT_ID_HEADER, clientId)
+      .build();
+  }
 }
