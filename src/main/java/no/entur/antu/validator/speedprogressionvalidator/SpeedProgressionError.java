@@ -8,8 +8,8 @@ public record SpeedProgressionError(
 
     public enum RuleCode {
         LOW_SPEED_PROGRESSION("ServiceJourney has low speed progression"),
-        HIGH_SPEED_PROGRESSION("ServiceJourney has high speed progression"),
-        WARNING_SPEED_PROGRESSION("ServiceJourney has unexpected speed progression");
+        HIGH_SPEED_PROGRESSION("ServiceJourney has too high speed progression"),
+        WARNING_SPEED_PROGRESSION("ServiceJourney has high speed progression");
 
         private final String errorMessage;
 

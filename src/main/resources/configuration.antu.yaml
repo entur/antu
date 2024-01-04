@@ -43,11 +43,12 @@ validationRuleConfigs:
     name: ServiceJourney has non-increasing TimetabledPassingTime
     severity: ERROR
   - code: LOW_SPEED_PROGRESSION
-    name: Vehicle is moving too slow
-    severity: ERROR
+    name: Slow travel in ServiceJourney
+    severity: WARNING
+  # TODO: HIGH_SPEED_PROGRESSION should be ERROR, setting it to WARNING until the rule is fixed.
   - code: HIGH_SPEED_PROGRESSION
-    name: Vehicle is moving too fast
-    severity: ERROR
+    name: Too fast travel in ServiceJourney
+    severity: WARNING
   - code: WARNING_SPEED_PROGRESSION
-    name: ServiceJourney has unexpected speed progression
-    severity: ERROR
+    name: Fast travel in ServiceJourney
+    severity: WARNING
