@@ -1,15 +1,15 @@
 package no.entur.antu.validator.speedprogressionvalidator;
 
 public record SpeedProgressionError(
-        PassingTimes passingTimes,
-        RuleCode ruleCode,
-        String expectedSpeed,
-        String calculatedSpeed) {
-
-    public enum RuleCode {
-        LOW_SPEED_PROGRESSION("ServiceJourney has low speed progression"),
-        HIGH_SPEED_PROGRESSION("ServiceJourney has too high speed progression"),
-        WARNING_SPEED_PROGRESSION("ServiceJourney has high speed progression");
+  PassingTimes passingTimes,
+  RuleCode ruleCode,
+  String expectedSpeed,
+  String calculatedSpeed
+) {
+  public enum RuleCode {
+    LOW_SPEED_PROGRESSION("ServiceJourney has low speed progression"),
+    HIGH_SPEED_PROGRESSION("ServiceJourney has too high speed progression"),
+    WARNING_SPEED_PROGRESSION("ServiceJourney has high speed progression");
 
     private final String errorMessage;
 
