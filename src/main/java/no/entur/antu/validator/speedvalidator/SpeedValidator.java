@@ -1,8 +1,9 @@
-package no.entur.antu.validator.speedprogressionvalidator;
+package no.entur.antu.validator.speedvalidator;
 
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.validator.AntuNetexValidator;
 import no.entur.antu.validator.RuleCode;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
@@ -21,17 +22,17 @@ import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.stream.IntStream;
 
-import static no.entur.antu.validator.speedprogressionvalidator.ServiceJourneyContextBuilder.*;
+import static no.entur.antu.validator.speedvalidator.ServiceJourneyContextBuilder.*;
 
-public class SpeedProgressionValidator extends AntuNetexValidator {
+public class SpeedValidator extends AntuNetexValidator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpeedProgressionValidator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpeedValidator.class);
     private final CommonDataRepository commonDataRepository;
     private final StopPlaceRepository stopPlaceRepository;
 
-    public SpeedProgressionValidator(ValidationReportEntryFactory validationReportEntryFactory,
-                                     CommonDataRepository commonDataRepository,
-                                     StopPlaceRepository stopPlaceRepository) {
+    public SpeedValidator(ValidationReportEntryFactory validationReportEntryFactory,
+                          CommonDataRepository commonDataRepository,
+                          StopPlaceRepository stopPlaceRepository) {
         super(validationReportEntryFactory);
         this.commonDataRepository = commonDataRepository;
         this.stopPlaceRepository = stopPlaceRepository;
@@ -39,13 +40,13 @@ public class SpeedProgressionValidator extends AntuNetexValidator {
 
     @Override
     protected RuleCode[] getRuleCodes() {
-        return SpeedProgressionError.RuleCode.values();
+        return SpeedError.RuleCode.values();
     }
 
     @Override
     public void validate(ValidationReport validationReport, ValidationContext validationContext) {
 
-        LOGGER.debug("Validating Speed progression");
+        LOGGER.debug("Validating Speed");
 
         if (validationContext.isCommonFile()) {
             return;
@@ -83,7 +84,7 @@ public class SpeedProgressionValidator extends AntuNetexValidator {
 
         } else {
             throw new AntuException(
-                    "Received invalid validation context in Speed Progression validator"
+                    "Received invalid validation context in Speed validator"
             );
         }
     }
@@ -168,10 +169,10 @@ public class SpeedProgressionValidator extends AntuNetexValidator {
         if (optimisticSpeed < expectedSpeed.minSpeed()) {
             // too slow
             reportError.accept(
-                    new SpeedProgressionError(
+                    new SpeedError(
                             context.serviceJourney().getId(),
                             passingTimes,
-                            SpeedProgressionError.RuleCode.LOW_SPEED_PROGRESSION,
+                            SpeedError.RuleCode.LOW_SPEED,
                             Long.toString(expectedSpeed.minSpeed()),
                             Double.toString(optimisticSpeed))
             );
@@ -179,19 +180,19 @@ public class SpeedProgressionValidator extends AntuNetexValidator {
             // too fast
             if (pessimisticSpeed > expectedSpeed.maxSpeed()) {
                 reportError.accept(
-                        new SpeedProgressionError(
+                        new SpeedError(
                                 context.serviceJourney().getId(),
                                 passingTimes,
-                                SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION,
+                                SpeedError.RuleCode.HIGH_SPEED,
                                 Long.toString(expectedSpeed.maxSpeed()),
                                 Double.toString(pessimisticSpeed))
                 );
             } else {
                 reportError.accept(
-                        new SpeedProgressionError(
+                        new SpeedError(
                                 context.serviceJourney().getId(),
                                 passingTimes,
-                                SpeedProgressionError.RuleCode.WARNING_SPEED_PROGRESSION,
+                                SpeedError.RuleCode.WARNING_SPEED,
                                 Long.toString(expectedSpeed.warningSpeed()),
                                 Double.toString(pessimisticSpeed))
                 );

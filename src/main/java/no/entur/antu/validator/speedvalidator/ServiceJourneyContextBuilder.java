@@ -1,9 +1,10 @@
-package no.entur.antu.validator.speedprogressionvalidator;
+package no.entur.antu.validator.speedvalidator;
 
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.StopTime;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.*;

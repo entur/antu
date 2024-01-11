@@ -42,13 +42,13 @@ validationRuleConfigs:
   - code: TIMETABLED_PASSING_TIME_NON_INCREASING_TIME
     name: ServiceJourney has non-increasing TimetabledPassingTime
     severity: ERROR
-  - code: LOW_SPEED_PROGRESSION
+  - code: LOW_SPEED
     name: Slow travel in ServiceJourney
     severity: WARNING
-  - code: HIGH_SPEED_PROGRESSION
+  - code: HIGH_SPEED
     name: Too fast travel in ServiceJourney
     severity: ERROR
-  - code: WARNING_SPEED_PROGRESSION
+  - code: WARNING_SPEED
     name: Fast travel in ServiceJourney
     severity: WARNING
   - code: SAME_DEPARTURE_ARRIVAL_TIME

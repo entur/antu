@@ -1,6 +1,4 @@
-package no.entur.antu.validator.speedprogressionvalidator;
-
-import no.entur.antu.stoptime.StopTime;
+package no.entur.antu.stoptime;
 
 public record PassingTimes(StopTime from, StopTime to) {
     public boolean isValid() {

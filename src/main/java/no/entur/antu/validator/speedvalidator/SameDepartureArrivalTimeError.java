@@ -1,18 +1,15 @@
-package no.entur.antu.validator.speedprogressionvalidator;
+package no.entur.antu.validator.speedvalidator;
 
+import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.validator.ValidationError;
 
-public record SpeedProgressionError (
+public record SameDepartureArrivalTimeError (
         String serviceJourneyId,
         PassingTimes passingTimes,
-        RuleCode ruleCode,
-        String expectedSpeed,
-        String calculatedSpeed) implements ValidationError {
+        RuleCode ruleCode) implements ValidationError {
 
-    public enum RuleCode implements no.entur.antu.validator.RuleCode {
-        LOW_SPEED_PROGRESSION("ServiceJourney has low speed progression"),
-        HIGH_SPEED_PROGRESSION("ServiceJourney has too high speed progression"),
-        WARNING_SPEED_PROGRESSION("ServiceJourney has high speed progression");
+    public enum RuleCode {
+        SAME_DEPARTURE_ARRIVAL_TIME("Same departure/arrival time for consecutive stops");
 
         private final String errorMessage;
 
@@ -20,7 +17,6 @@ public record SpeedProgressionError (
             this.errorMessage = errorMessage;
         }
 
-        @Override
         public String getErrorMessage() {
             return errorMessage;
         }
@@ -40,14 +36,10 @@ public record SpeedProgressionError (
     public String validationReportEntryMessage() {
         return String.format("%s, " +
                         "ServiceJourneyId = %s, " +
-                        "ExpectedSpeed = %s, " +
-                        "ActualSpeed = %s, " +
                         "from TimetabledPassingTime = %s, " +
                         "to TimetabledPassingTime = %s",
                 ruleCode().getErrorMessage(),
                 serviceJourneyId,
-                expectedSpeed(),
-                calculatedSpeed(),
                 passingTimes().from().timetabledPassingTimeId(),
                 passingTimes().to().timetabledPassingTimeId()
         );

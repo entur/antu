@@ -1,4 +1,4 @@
-package no.entur.antu.validator.speedprogressionvalidator;
+package no.entur.antu.validator.speedvalidator;
 
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 
