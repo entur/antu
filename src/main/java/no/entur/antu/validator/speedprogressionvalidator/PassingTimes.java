@@ -5,12 +5,8 @@ import no.entur.antu.stoptime.StopTime;
 public record PassingTimes(StopTime from, StopTime to) {
     public boolean isValid() {
         return from.isComplete() && from.isConsistent()
-                && (to.isComplete() || to.isConsistent()
-                || from.isStopTimesIncreasing(to));
-    }
-
-    public boolean hasValidTimeDifference() {
-        return getTimeDifference() >= 0;
+                && to.isComplete() && to.isConsistent()
+                && from.isStopTimesIncreasing(to);
     }
 
     /**

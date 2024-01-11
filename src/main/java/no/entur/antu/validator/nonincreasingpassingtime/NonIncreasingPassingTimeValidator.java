@@ -1,9 +1,12 @@
 package no.entur.antu.validator.nonincreasingpassingtime;
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.validator.AntuNetexValidator;
+import no.entur.antu.validator.RuleCode;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
 import no.entur.antu.stoptime.SortedStopTimes;
 import no.entur.antu.stoptime.StopTime;
+import no.entur.antu.validator.ValidationError;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -12,21 +15,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
+public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NonIncreasingPassingTimeValidator.class);
 
-    enum RuleCode {
-        TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
-        TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
-        TIMETABLED_PASSING_TIME_NON_INCREASING_TIME
-    }
-
     public NonIncreasingPassingTimeValidator(ValidationReportEntryFactory validationReportEntryFactory) {
         super(validationReportEntryFactory);
+    }
+
+    @Override
+    protected RuleCode[] getRuleCodes() {
+        return NonIncreasingPassingTimeError.RuleCode.values();
     }
 
     @Override
@@ -50,52 +51,44 @@ public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
                             .toList();
 
 
-            serviceJourneys.forEach(serviceJourney -> validateServiceJourney(
-                    serviceJourney,
-                    index,
-                    ((stopTime, validationCode) ->
-                            addValidationReportEntry(
-                                    validationReport, validationContext, serviceJourney, stopTime, validationCode
+            serviceJourneys.forEach(
+                    serviceJourney -> validateServiceJourney(
+                            serviceJourney,
+                            index,
+                            validationError -> addValidationReportEntry(
+                                    validationReport,
+                                    validationContext,
+                                    serviceJourney,
+                                    validationError
                             )
-                    )
-            ));
+                    ));
 
         } else {
             throw new AntuException("Received invalid validation context in " +
-                                    "Validating ServiceJourney non-increasing passing time");
+                    "Validating ServiceJourney non-increasing passing time");
         }
     }
 
     public void validateServiceJourney(ServiceJourney serviceJourney,
                                        NetexEntitiesIndex netexEntitiesIndex,
-                                       BiConsumer<StopTime, RuleCode> validationError) {
+                                       Consumer<ValidationError> reportError) {
 
         List<StopTime> sortedTimetabledPassingTime = SortedStopTimes.from(serviceJourney, netexEntitiesIndex);
 
         var previousPassingTime = sortedTimetabledPassingTime.get(0);
-        if (!previousPassingTime.isComplete()) {
-            validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME);
-            return;
-        }
-        if (!previousPassingTime.isConsistent()) {
-            validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME);
-            return;
-        }
+        if (validateStopTime(serviceJourney, previousPassingTime, reportError)) return;
 
         for (int i = 1; i < sortedTimetabledPassingTime.size(); i++) {
             var currentPassingTime = sortedTimetabledPassingTime.get(i);
 
-            if (!currentPassingTime.isComplete()) {
-                validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME);
-                return;
-            }
-            if (!currentPassingTime.isConsistent()) {
-                validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME);
-                return;
-            }
+            if (validateStopTime(serviceJourney, currentPassingTime, reportError)) return;
 
             if (!previousPassingTime.isStopTimesIncreasing(currentPassingTime)) {
-                validationError.accept(previousPassingTime, RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME);
+                reportError.accept(new NonIncreasingPassingTimeError(
+                        NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME,
+                        previousPassingTime,
+                        serviceJourney.getId()
+                ));
                 return;
             }
 
@@ -103,61 +96,25 @@ public class NonIncreasingPassingTimeValidator extends AbstractNetexValidator {
         }
     }
 
-    private void addValidationReportEntry(ValidationReport validationReport,
-                                          ValidationContext validationContext,
-                                          ServiceJourney serviceJourney,
-                                          StopTime stopTime,
-                                          RuleCode ruleCode) {
-
-        String fileName = validationContext.getFileName();
-        ValidationReportEntry validationReportEntry = createValidationReportEntry(
-                ruleCode.toString(),
-                findDataLocation(validationContext, serviceJourney, fileName),
-                String.format(
-                        "%s. ServiceJourney = %s, TimetabledPassingTime = %s",
-                        getValidationMessage(ruleCode),
-                        serviceJourney.getId(),
-                        stopTime.timetabledPassingTimeId()
-                )
-        );
-
-        validationReport.addValidationReportEntry(validationReportEntry);
-    }
-
-    private static DataLocation findDataLocation(ValidationContext validationContext,
-                                                 ServiceJourney serviceJourney,
-                                                 String fileName) {
-        return validationContext.getLocalIds().stream()
-                .filter(localId -> localId.getId().equals(serviceJourney.getId()))
-                .findFirst()
-                .map(idVersion ->
-                        new DataLocation(
-                                idVersion.getId(),
-                                fileName,
-                                idVersion.getLineNumber(),
-                                idVersion.getColumnNumber()
-                        ))
-                .orElse(new DataLocation(serviceJourney.getId(), fileName, 0, 0));
-    }
-
-    @Override
-    public Set<String> getRuleDescriptions() {
-        return Set.of(
-                createRuleDescription(RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME.toString(),
-                        getValidationMessage(RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME)),
-                createRuleDescription(RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME.toString(),
-                        getValidationMessage(RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME)),
-                createRuleDescription(RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME.toString(),
-                        getValidationMessage(RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME))
-        );
-    }
-
-    private String getValidationMessage(RuleCode ruleCode) {
-        return switch (ruleCode) {
-            case TIMETABLED_PASSING_TIME_INCOMPLETE_TIME -> "ServiceJourney has incomplete TimetabledPassingTime";
-            case TIMETABLED_PASSING_TIME_INCONSISTENT_TIME -> "ServiceJourney has inconsistent TimetabledPassingTime";
-            case TIMETABLED_PASSING_TIME_NON_INCREASING_TIME ->
-                    "ServiceJourney has non-increasing TimetabledPassingTime";
-        };
+    private static boolean validateStopTime(ServiceJourney serviceJourney,
+                                            StopTime stopTime,
+                                            Consumer<ValidationError> reportError) {
+        if (!stopTime.isComplete()) {
+            reportError.accept(new NonIncreasingPassingTimeError(
+                    NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
+                    stopTime,
+                    serviceJourney.getId()
+            ));
+            return true;
+        }
+        if (!stopTime.isConsistent()) {
+            reportError.accept(new NonIncreasingPassingTimeError(
+                    NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
+                    stopTime,
+                    serviceJourney.getId()
+            ));
+            return true;
+        }
+        return false;
     }
 }

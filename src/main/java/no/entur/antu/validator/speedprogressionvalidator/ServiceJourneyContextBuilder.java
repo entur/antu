@@ -94,7 +94,7 @@ public class ServiceJourneyContextBuilder {
             String scheduledStopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
             QuayId quayId = commonDataRepository.findQuayIdForScheduledStopPoint(scheduledStopPointRef, validationReportId);
             StopPlaceCoordinates coordinatesForQuayId = stopPlaceRepository.getCoordinatesForQuayId(quayId);
-            return Map.entry(timetabledPassingTime.getId(), coordinatesForQuayId);
+            return coordinatesForQuayId == null ? null : Map.entry(timetabledPassingTime.getId(), coordinatesForQuayId);
         }
         return null;
     }

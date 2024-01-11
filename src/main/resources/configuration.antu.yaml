@@ -45,10 +45,12 @@ validationRuleConfigs:
   - code: LOW_SPEED_PROGRESSION
     name: Slow travel in ServiceJourney
     severity: WARNING
-  # TODO: HIGH_SPEED_PROGRESSION should be ERROR, setting it to WARNING until the rule is fixed.
   - code: HIGH_SPEED_PROGRESSION
     name: Too fast travel in ServiceJourney
-    severity: WARNING
+    severity: ERROR
   - code: WARNING_SPEED_PROGRESSION
     name: Fast travel in ServiceJourney
     severity: WARNING
+  - code: SAME_DEPARTURE_ARRIVAL_TIME
+    name: Same departure/arrival time for consecutive stops
+    severity: INFO

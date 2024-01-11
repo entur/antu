@@ -119,6 +119,23 @@ class SpeedProgressionValidatorTest {
         );
     }
 
+    @Test
+    void testSpeedIsCalculatedCorrect() {
+
+        ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+                List.of(
+                        StopPlaceCoordinates.fromString("11.189184§60.41041"),
+                        StopPlaceCoordinates.fromString("11.193265§60.446804")
+                )
+        );
+
+        assertThat(validationReport.getValidationReportEntries().size(), is(1));
+        assertThat(
+                validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).toList(),
+                is(List.of(SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION.name()))
+        );
+    }
+
     private static ValidationReport runTestWithStopPlaceCoordinates(List<StopPlaceCoordinates> stopPlaceCoordinates) {
         NetexTestDataSample sample = new NetexTestDataSample();
         ServiceJourney serviceJourney = sample.getServiceJourney();
