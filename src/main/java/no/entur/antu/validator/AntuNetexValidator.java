@@ -2,7 +2,6 @@ package no.entur.antu.validator;
 
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
-import org.rutebanken.netex.model.EntityStructure;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -18,19 +17,11 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
 
     protected void addValidationReportEntry(ValidationReport validationReport,
                                             ValidationContext validationContext,
-                                            EntityStructure entityStructure,
-                                            ValidationError validationError) {
-        addValidationReportEntry(validationReport, validationContext, entityStructure.getId(), validationError);
-    }
-
-    protected void addValidationReportEntry(ValidationReport validationReport,
-                                            ValidationContext validationContext,
-                                            String entityId,
                                             ValidationError validationError) {
 
         ValidationReportEntry validationReportEntry = createValidationReportEntry(
                 validationError.getRuleCode(),
-                findDataLocation(validationContext, entityId),
+                findDataLocation(validationContext, validationError.getEntityId()),
                 validationError.validationReportEntryMessage()
         );
 

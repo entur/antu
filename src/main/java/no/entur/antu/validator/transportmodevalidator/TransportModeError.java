@@ -16,6 +16,11 @@ public record TransportModeError(
     }
 
     @Override
+    public String getEntityId() {
+        return serviceJourneyId();
+    }
+
+    @Override
     public String validationReportEntryMessage() {
         return String.format(
                 "Invalid transport mode %s found in service journey with id %s",
@@ -25,7 +30,7 @@ public record TransportModeError(
     }
 
     enum RuleCode implements no.entur.antu.validator.RuleCode {
-        NETEX_TRANSPORT_MODE_1("Invalid transport mode");
+        INVALID_TRANSPORT_MODE("Invalid transport mode");
         private final String errorMessage;
 
         RuleCode(String errorMessage) {

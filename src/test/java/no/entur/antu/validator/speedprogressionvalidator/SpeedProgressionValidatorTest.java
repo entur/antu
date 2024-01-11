@@ -120,9 +120,10 @@ class SpeedProgressionValidatorTest {
     }
 
     @Test
-    void testSpeedIsCalculatedCorrect() {
+    void testSameDepartureArrivalTimeErrorThrown() {
 
         ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+                new NetexTestDataSample(new int[]{0, 0}), // Same departure time for both passingTimes.
                 List.of(
                         StopPlaceCoordinates.fromString("11.189184§60.41041"),
                         StopPlaceCoordinates.fromString("11.193265§60.446804")
@@ -132,12 +133,16 @@ class SpeedProgressionValidatorTest {
         assertThat(validationReport.getValidationReportEntries().size(), is(1));
         assertThat(
                 validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).toList(),
-                is(List.of(SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION.name()))
+                is(List.of(SameDepartureArrivalTimeError.RuleCode.SAME_DEPARTURE_ARRIVAL_TIME.name()))
         );
     }
 
     private static ValidationReport runTestWithStopPlaceCoordinates(List<StopPlaceCoordinates> stopPlaceCoordinates) {
-        NetexTestDataSample sample = new NetexTestDataSample();
+        return runTestWithStopPlaceCoordinates(new NetexTestDataSample(), stopPlaceCoordinates);
+    }
+
+    private static ValidationReport runTestWithStopPlaceCoordinates(NetexTestDataSample sample,
+                                                                    List<StopPlaceCoordinates> stopPlaceCoordinates) {
         ServiceJourney serviceJourney = sample.getServiceJourney();
         JourneyPattern journeyPattern = sample.getJourneyPattern();
 

@@ -32,6 +32,11 @@ public record SpeedProgressionError (
     }
 
     @Override
+    public String getEntityId() {
+        return serviceJourneyId;
+    }
+
+    @Override
     public String validationReportEntryMessage() {
         return String.format("%s, " +
                         "ServiceJourneyId = %s, " +

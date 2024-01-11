@@ -76,7 +76,6 @@ public class SpeedProgressionValidator extends AntuNetexValidator {
                                     error -> addValidationReportEntry(
                                             validationReport,
                                             validationContext,
-                                            context.serviceJourney(),
                                             error
                                     )
                             )

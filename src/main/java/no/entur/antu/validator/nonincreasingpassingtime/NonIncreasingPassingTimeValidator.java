@@ -58,7 +58,6 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
                             validationError -> addValidationReportEntry(
                                     validationReport,
                                     validationContext,
-                                    serviceJourney,
                                     validationError
                             )
                     ));

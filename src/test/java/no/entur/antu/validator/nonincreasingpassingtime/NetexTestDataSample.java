@@ -35,7 +35,10 @@ public class NetexTestDataSample {
     private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneyBySjId = ArrayListMultimap.create();
 
     public NetexTestDataSample() {
-        final int[] stopTimes = {0, 4, 10, 15};
+        this(new int[]{0, 4, 10, 15});
+    }
+
+    public NetexTestDataSample(int[] stopTimes) {
         final int NUM_OF_STOPS = stopTimes.length;
 
         Line line = new Line()

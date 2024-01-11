@@ -51,18 +51,20 @@ public class TransportModeValidator extends AntuNetexValidator {
         getServiceJourneys(validationContext).stream()
                 .map(serviceJourneyContextBuilder::build)
                 .filter(Predicate.not(
-                        serviceJourneyContext ->
-                                validateServiceJourney(serviceJourneyContext, validationReport.getValidationReportId())))
-                .forEach(serviceJourneyContext -> addValidationReportEntry(
-                        validationReport,
-                        validationContext,
-                        serviceJourneyContext.serviceJourneyId(),
-                        new TransportModeError(
-                                TransportModeError.RuleCode.NETEX_TRANSPORT_MODE_1,
-                                serviceJourneyContext.transportModes().mode(),
-                                serviceJourneyContext.serviceJourneyId()
-                        )
-                ));
+                        context ->
+                                validateServiceJourney(
+                                        context,
+                                        validationReport.getValidationReportId())))
+                .forEach(context ->
+                        addValidationReportEntry(
+                                validationReport,
+                                validationContext,
+                                new TransportModeError(
+                                        TransportModeError.RuleCode.INVALID_TRANSPORT_MODE,
+                                        context.transportModes().mode(),
+                                        context.serviceJourneyId()
+                                )
+                        ));
     }
 
     private boolean validateServiceJourney(ServiceJourneyContext serviceJourneyContext,
