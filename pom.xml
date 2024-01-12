@@ -27,8 +27,9 @@
         <entur.google.pubsub.emulator.download.skip>true</entur.google.pubsub.emulator.download.skip>
         <camel.version>4.10.4</camel.version>
         <entur.helpers.version>5.11</entur.helpers.version>
-        <netex-validator-java.version>10.1.0</netex-validator-java.version>
-        <netex-parser-java.version>3.1.47</netex-parser-java.version>
+        <netex-validator-java.version>11.0.0-SNAPSHOT</netex-validator-java.version>
+        <netex-parser-java.version>4.0.0-SNAPSHOT</netex-parser-java.version>
+        <netex-java-model.version>1.0.16-SNAPSHOT</netex-java-model.version>
         <jts-core.version>1.20.0</jts-core.version>
         <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.17</zt-zip.version>
@@ -70,7 +71,7 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-parser-java</artifactId>
-            <version>3.1.49</version>
+            <version>${netex-parser-java.version}</version>
         </dependency>
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
