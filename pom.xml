@@ -35,6 +35,9 @@
         <embedded-redis.version>0.8.3</embedded-redis.version>
         <netex-parser-java.version>2.3.0</netex-parser-java.version>
         <netex-java-model.version>1.0.15</netex-java-model.version>
+        <prettier-java.version>2.1.0</prettier-java.version>
+        <prettier-maven-plugin.version>0.21</prettier-maven-plugin.version>
+        <plugin.prettier.goal>write</plugin.prettier.goal>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
@@ -283,6 +286,22 @@
                     <execution>
                         <goals>
                             <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+                <version>${prettier-maven-plugin.version}</version>
+                <configuration>
+                    <prettierJavaVersion>${prettier-java.version}</prettierJavaVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>${plugin.prettier.goal}</goal>
                         </goals>
                     </execution>
                 </executions>

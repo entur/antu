@@ -33,49 +33,53 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class OAuth2Config {
 
-    @Bean
-    public RoleAssignmentExtractor roleAssignmentExtractor() {
-        return new JwtRoleAssignmentExtractor();
-    }
+  @Bean
+  public RoleAssignmentExtractor roleAssignmentExtractor() {
+    return new JwtRoleAssignmentExtractor();
+  }
 
-    /**
-     * Build a @{@link JwtDecoder} for RoR Auth0 domain.
-     *
-     * @return a @{@link JwtDecoder} for Auth0.
-     */
-    @Bean
-    @Profile("!test")
-    public JwtDecoder rorAuth0JwtDecoder(OAuth2ResourceServerProperties properties,
-                                         @Value("${antu.oauth2.resourceserver.auth0.ror.jwt.audience}") String rorAuth0Audience,
-                                         @Value("${antu.oauth2.resourceserver.auth0.ror.claim.namespace}") String rorAuth0ClaimNamespace) {
+  /**
+   * Build a @{@link JwtDecoder} for RoR Auth0 domain.
+   *
+   * @return a @{@link JwtDecoder} for Auth0.
+   */
+  @Bean
+  @Profile("!test")
+  public JwtDecoder rorAuth0JwtDecoder(
+    OAuth2ResourceServerProperties properties,
+    @Value(
+      "${antu.oauth2.resourceserver.auth0.ror.jwt.audience}"
+    ) String rorAuth0Audience,
+    @Value(
+      "${antu.oauth2.resourceserver.auth0.ror.claim.namespace}"
+    ) String rorAuth0ClaimNamespace
+  ) {
+    String rorAuth0Issuer = properties.getJwt().getIssuerUri();
+    return new RoRJwtDecoderBuilder()
+      .withIssuer(rorAuth0Issuer)
+      .withAudience(rorAuth0Audience)
+      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
+      .build();
+  }
 
-        String rorAuth0Issuer = properties.getJwt().getIssuerUri();
-        return new RoRJwtDecoderBuilder().withIssuer(rorAuth0Issuer)
-                .withAudience(rorAuth0Audience)
-                .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
-                .build();
-    }
-
-
-    @Bean("orgRegisterWebClient")
-    @Profile("!test")
-    WebClient orgRegisterWebClient(WebClient.Builder webClientBuilder,
-                                   OAuth2ClientProperties properties,
-                                   @Value("${orgregister.oauth2.client.audience}")
-                                   String audience,
-                                   ClientHttpConnector clientHttpConnector,
-                                   @Value("${antu.organisation.registry.url}") String organisationRegistryUrl) {
-        return new AuthorizedWebClientBuilder(webClientBuilder)
-                .withOAuth2ClientProperties(properties)
-                .withAudience(audience)
-                .withClientRegistrationId("orgregister")
-                .build()
-                .mutate()
-                .clientConnector(clientHttpConnector)
-                .defaultHeader("Et-Client-Name", "entur-antu")
-                .baseUrl(organisationRegistryUrl)
-                .build();
-    }
-
+  @Bean("orgRegisterWebClient")
+  @Profile("!test")
+  WebClient orgRegisterWebClient(
+    WebClient.Builder webClientBuilder,
+    OAuth2ClientProperties properties,
+    @Value("${orgregister.oauth2.client.audience}") String audience,
+    ClientHttpConnector clientHttpConnector,
+    @Value("${antu.organisation.registry.url}") String organisationRegistryUrl
+  ) {
+    return new AuthorizedWebClientBuilder(webClientBuilder)
+      .withOAuth2ClientProperties(properties)
+      .withAudience(audience)
+      .withClientRegistrationId("orgregister")
+      .build()
+      .mutate()
+      .clientConnector(clientHttpConnector)
+      .defaultHeader("Et-Client-Name", "entur-antu")
+      .baseUrl(organisationRegistryUrl)
+      .build();
+  }
 }
-

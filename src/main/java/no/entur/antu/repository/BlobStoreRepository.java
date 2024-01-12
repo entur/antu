@@ -26,18 +26,16 @@ import java.io.InputStream;
  * A simple implementation {@link LocalDiskBlobStoreRepository} is available for testing in a local environment.
  */
 public interface BlobStoreRepository {
+  boolean existBlob(String objectName);
 
-    boolean existBlob(String objectName);
-
-    InputStream getBlob(String objectName);
+  InputStream getBlob(String objectName);
 
   /**
-     * Upload a blob.
-     * @param objectName the name of the blob in GCS
-     * @param inputStream the blob data
-     */
-    void uploadBlob(String objectName, InputStream inputStream);
+   * Upload a blob.
+   * @param objectName the name of the blob in GCS
+   * @param inputStream the blob data
+   */
+  void uploadBlob(String objectName, InputStream inputStream);
 
-    void setContainerName(String containerName);
-
+  void setContainerName(String containerName);
 }

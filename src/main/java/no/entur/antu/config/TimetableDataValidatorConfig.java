@@ -16,21 +16,23 @@
 
 package no.entur.antu.config;
 
+import java.util.List;
+import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
-import no.entur.antu.validator.stoppointinjourneypatternvalidator.StopPointInJourneyPatternValidator;
-import no.entur.antu.validator.speedprogressionvalidator.SpeedProgressionValidator;
-import no.entur.antu.validator.transportmodevalidator.TransportModeValidator;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.nonincreasingpassingtime.NonIncreasingPassingTimeValidator;
+import no.entur.antu.validator.speedprogressionvalidator.SpeedProgressionValidator;
+import no.entur.antu.validator.stoppointinjourneypatternvalidator.StopPointInJourneyPatternValidator;
+import no.entur.antu.validator.transportmodevalidator.TransportModeValidator;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
+import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
@@ -42,80 +44,116 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-import java.util.Set;
-
 @Configuration
 public class TimetableDataValidatorConfig {
 
-    @Bean
-    public ValidationTreeFactory timetableDataValidationTreeFactory(OrganisationRepository organisationRepository) {
-        return new EnturTimetableDataValidationTreeFactory(organisationRepository);
-    }
+  @Bean
+  public ValidationTreeFactory timetableDataValidationTreeFactory(
+    OrganisationRepository organisationRepository
+  ) {
+    return new EnturTimetableDataValidationTreeFactory(organisationRepository);
+  }
 
-    @Bean
-    public XPathValidator timetableDataXPathValidator(@Qualifier("timetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory,
-                                                      ValidationReportEntryFactory validationReportEntryFactory) {
-        return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
-    }
+  @Bean
+  public XPathValidator timetableDataXPathValidator(
+    @Qualifier(
+      "timetableDataValidationTreeFactory"
+    ) ValidationTreeFactory validationTreeFactory,
+    ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new XPathValidator(
+      validationTreeFactory,
+      validationReportEntryFactory
+    );
+  }
 
-    @Bean
-    public TransportModeValidator transportModeValidator(@Qualifier("validationReportEntryFactory")
-                                                         ValidationReportEntryFactory validationReportEntryFactory,
-                                                         CommonDataRepository commonDataRepository,
-                                                         StopPlaceRepository stopPlaceRepository) {
-        return new TransportModeValidator(validationReportEntryFactory, commonDataRepository, stopPlaceRepository);
-    }
+  @Bean
+  public TransportModeValidator transportModeValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new TransportModeValidator(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
+  }
 
-    @Bean
-    public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator(@Qualifier("validationReportEntryFactory")
-                                                                               ValidationReportEntryFactory validationReportEntryFactory) {
-        return new NonIncreasingPassingTimeValidator(validationReportEntryFactory);
-    }
+  @Bean
+  public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new NonIncreasingPassingTimeValidator(validationReportEntryFactory);
+  }
 
-    @Bean
-    public SpeedProgressionValidator speedProgressionValidator(@Qualifier("validationReportEntryFactory")
-                                                               ValidationReportEntryFactory validationReportEntryFactory,
-                                                               CommonDataRepository commonDataRepository,
-                                                               StopPlaceRepository stopPlaceRepository) {
-        return new SpeedProgressionValidator(validationReportEntryFactory, commonDataRepository, stopPlaceRepository);
-    }
+  @Bean
+  public SpeedProgressionValidator speedProgressionValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new SpeedProgressionValidator(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
+  }
 
-    @Bean
-    public StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator(@Qualifier("validationReportEntryFactory")
-                                                                                 ValidationReportEntryFactory validationReportEntryFactory,
-                                                                                 CommonDataRepository commonDataRepository) {
-        return new StopPointInJourneyPatternValidator(validationReportEntryFactory, commonDataRepository);
-    }
+  @Bean
+  public StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository
+  ) {
+    return new StopPointInJourneyPatternValidator(
+      validationReportEntryFactory,
+      commonDataRepository
+    );
+  }
 
-    @Bean
-    public NetexValidatorsRunner timetableDataValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
-                                                               @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
-                                                               NetexIdValidator netexIdValidator,
-                                                               VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
-                                                               VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
-                                                               ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
-                                                               NetexReferenceValidator netexReferenceValidator,
-                                                               @Qualifier("netexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator,
-                                                               TransportModeValidator transportModeValidator,
-                                                               NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator,
-                                                               SpeedProgressionValidator speedProgressionValidator,
-                                                               StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator) {
-        List<NetexValidator> netexValidators = List.of(
-                xpathValidator,
-                netexIdValidator,
-                versionOnLocalNetexIdValidator,
-                versionOnRefToLocalNetexIdValidator,
-                referenceToValidEntityTypeValidator,
-                netexReferenceValidator,
-                netexIdUniquenessValidator,
-                transportModeValidator,
-                nonIncreasingPassingTimeValidator,
-                speedProgressionValidator,
-                stopPointInJourneyPatternValidator
-        );
-        NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
-        return new NetexValidatorRunnerWithNetexEntitiesIndex(netexXMLParser, netexSchemaValidator, netexValidators);
-    }
-
+  @Bean
+  public NetexValidatorsRunner timetableDataValidatorsRunner(
+    NetexSchemaValidator netexSchemaValidator,
+    @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
+    NetexIdValidator netexIdValidator,
+    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
+    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
+    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
+    NetexReferenceValidator netexReferenceValidator,
+    @Qualifier(
+      "netexIdUniquenessValidator"
+    ) NetexIdUniquenessValidator netexIdUniquenessValidator,
+    TransportModeValidator transportModeValidator,
+    NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator,
+    SpeedProgressionValidator speedProgressionValidator,
+    StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator
+  ) {
+    List<NetexValidator> netexValidators = List.of(
+      xpathValidator,
+      netexIdValidator,
+      versionOnLocalNetexIdValidator,
+      versionOnRefToLocalNetexIdValidator,
+      referenceToValidEntityTypeValidator,
+      netexReferenceValidator,
+      netexIdUniquenessValidator,
+      transportModeValidator,
+      nonIncreasingPassingTimeValidator,
+      speedProgressionValidator,
+      stopPointInJourneyPatternValidator
+    );
+    NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
+    return new NetexValidatorRunnerWithNetexEntitiesIndex(
+      netexXMLParser,
+      netexSchemaValidator,
+      netexValidators
+    );
+  }
 }

@@ -1,30 +1,36 @@
 package no.entur.antu.validator.id;
 
-import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
-import org.entur.netex.validation.validator.id.IdVersion;
-
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
+import org.entur.netex.validation.validator.id.IdVersion;
 
 /**
  * Validate that TrainElement objects refer to the PEN codespace (Entur-plass).
  */
-public class TrainElementRegistryIdValidator implements ExternalReferenceValidator {
-    static final String TRAIN_ELEMENT_CODESPACE = "PEN";
+public class TrainElementRegistryIdValidator
+  implements ExternalReferenceValidator {
 
-    static final String TRAIN_ELEMENT_TYPE = "TrainElement";
+  static final String TRAIN_ELEMENT_CODESPACE = "PEN";
 
-    @Override
-    public Set<IdVersion> validateReferenceIds(Set<IdVersion> externalIds) {
-        Objects.requireNonNull(externalIds);
-        return externalIds.stream().filter(TrainElementRegistryIdValidator::isValidTrainElementId).collect(Collectors.toSet());
-    }
+  static final String TRAIN_ELEMENT_TYPE = "TrainElement";
 
-    private static boolean isValidTrainElementId(IdVersion idVersion) {
-        String[] idParts = idVersion.getId().split(":");
-        return idParts.length == 3 && TRAIN_ELEMENT_CODESPACE.equals(idParts[0]) && TRAIN_ELEMENT_TYPE.equals(idParts[1]);
-    }
+  @Override
+  public Set<IdVersion> validateReferenceIds(Set<IdVersion> externalIds) {
+    Objects.requireNonNull(externalIds);
+    return externalIds
+      .stream()
+      .filter(TrainElementRegistryIdValidator::isValidTrainElementId)
+      .collect(Collectors.toSet());
+  }
 
+  private static boolean isValidTrainElementId(IdVersion idVersion) {
+    String[] idParts = idVersion.getId().split(":");
+    return (
+      idParts.length == 3 &&
+      TRAIN_ELEMENT_CODESPACE.equals(idParts[0]) &&
+      TRAIN_ELEMENT_TYPE.equals(idParts[1])
+    );
+  }
 }
