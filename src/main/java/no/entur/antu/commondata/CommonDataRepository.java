@@ -3,12 +3,14 @@ package no.entur.antu.commondata;
 import no.entur.antu.model.QuayId;
 
 public interface CommonDataRepository {
+  boolean hasQuayIds(String validationReportId);
 
-    boolean hasQuayIds(String validationReportId);
+  QuayId findQuayIdForScheduledStopPoint(
+    String scheduledStopPoint,
+    String validationReportId
+  );
 
-    QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint, String validationReportId);
+  void loadCommonDataCache(byte[] fileContent, String validationReportId);
 
-    void loadCommonDataCache(byte[] fileContent, String validationReportId);
-
-    void cleanUp(String validationReportId);
+  void cleanUp(String validationReportId);
 }

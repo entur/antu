@@ -15,29 +15,35 @@
 
 package no.entur.antu.routes.blobstore;
 
+import static no.entur.antu.Constants.FILE_HANDLE;
+
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.services.AntuExchangeBlobStoreService;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
-import static no.entur.antu.Constants.FILE_HANDLE;
-
 @Component
 public class AntuExchangeBlobStoreRoute extends BaseRouteBuilder {
 
-    private final AntuExchangeBlobStoreService antuExchangeBlobStoreService;
+  private final AntuExchangeBlobStoreService antuExchangeBlobStoreService;
 
-    public AntuExchangeBlobStoreRoute(AntuExchangeBlobStoreService antuExchangeBlobStoreService) {
-        this.antuExchangeBlobStoreService = antuExchangeBlobStoreService;
-    }
+  public AntuExchangeBlobStoreRoute(
+    AntuExchangeBlobStoreService antuExchangeBlobStoreService
+  ) {
+    this.antuExchangeBlobStoreService = antuExchangeBlobStoreService;
+  }
 
-    @Override
-    public void configure() {
-
-        from("direct:getAntuExchangeBlob")
-                .bean(antuExchangeBlobStoreService, "getBlob")
-                .log(LoggingLevel.DEBUG, correlation() + "Returning from fetching file ${header." + FILE_HANDLE + "} from Antu Exchange bucket.")
-                .routeId("blobstore-antu-exchange-download");
-
-    }
+  @Override
+  public void configure() {
+    from("direct:getAntuExchangeBlob")
+      .bean(antuExchangeBlobStoreService, "getBlob")
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() +
+        "Returning from fetching file ${header." +
+        FILE_HANDLE +
+        "} from Antu Exchange bucket."
+      )
+      .routeId("blobstore-antu-exchange-download");
+  }
 }

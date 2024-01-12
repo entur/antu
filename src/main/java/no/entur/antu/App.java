@@ -32,29 +32,26 @@ import org.springframework.context.annotation.Import;
 /**
  * A spring-boot application that includes a Camel route builder to set up the Camel context.
  */
-@SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class})
-@Import({GcsStorageConfig.class, GooglePubSubConfig.class})
+@SpringBootApplication(exclude = { UserDetailsServiceAutoConfiguration.class })
+@Import({ GcsStorageConfig.class, GooglePubSubConfig.class })
 public class App extends RouteBuilder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
-    @Value("${antu.shutdown.timeout:300}")
-    private Long shutdownTimeout;
+  @Value("${antu.shutdown.timeout:300}")
+  private Long shutdownTimeout;
 
-    // must have a main method spring-boot can run
-    public static void main(String[] args) {
-        LOGGER.info("Starting antu...");
-        SpringApplication.run(App.class, args);
-    }
+  // must have a main method spring-boot can run
+  public static void main(String[] args) {
+    LOGGER.info("Starting antu...");
+    SpringApplication.run(App.class, args);
+  }
 
-    @Override
-    public void configure() {
-
-        getContext().getShutdownStrategy().setTimeout(shutdownTimeout);
-        getContext().setUseMDCLogging(true);
-        getContext().setUseBreadcrumb(true);
-        getContext().setMessageHistory(true);
-    }
-
-
+  @Override
+  public void configure() {
+    getContext().getShutdownStrategy().setTimeout(shutdownTimeout);
+    getContext().setUseMDCLogging(true);
+    getContext().setUseBreadcrumb(true);
+    getContext().setMessageHistory(true);
+  }
 }
