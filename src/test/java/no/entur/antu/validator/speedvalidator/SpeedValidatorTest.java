@@ -134,10 +134,14 @@ class SpeedValidatorTest {
     );
   }
 
-    private static ValidationReport runTestWithStopPlaceCoordinates(List<StopPlaceCoordinates> stopPlaceCoordinates) {
-        NetexTestData testData = new NetexTestData();
-        JourneyPattern journeyPattern = testData.journeyPattern().create();
-        ServiceJourney serviceJourney = testData.serviceJourney(journeyPattern).create();
+  private static ValidationReport runTestWithStopPlaceCoordinates(
+    List<StopPlaceCoordinates> stopPlaceCoordinates
+  ) {
+    NetexTestData testData = new NetexTestData();
+    JourneyPattern journeyPattern = testData.journeyPattern().create();
+    ServiceJourney serviceJourney = testData
+      .serviceJourney(journeyPattern)
+      .create();
 
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
