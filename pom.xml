@@ -25,8 +25,9 @@
     <properties>
         <entur.helpers.version>7.3.0</entur.helpers.version>
         <spring-cloud-gcp-dependencies.version>8.1.1</spring-cloud-gcp-dependencies.version>
-        <netex-validator-java.version>11.0.31</netex-validator-java.version>
-        <netex-parser-java.version>3.1.84</netex-parser-java.version>
+        <netex-validator-java.version>12.0.5</netex-validator-java.version>
+        <netex-parser-java.version>4.0.12</netex-parser-java.version>
+        <netex-java-model.version>2.0.16.1</netex-java-model.version>
         <jts-core.version>1.20.0</jts-core.version>
         <zt-zip.version>1.18.2</zt-zip.version>
         <redisson.version>4.6.1</redisson.version>
@@ -66,6 +67,16 @@
                 <version>${spring-cloud-gcp-dependencies.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!--
+              netex-validator-java and netex-parser-java both pull netex-java-model in at the same
+              depth, pinning different patch versions, so the winner would be whichever of the two is
+              declared first rather than the newer schema set. Pin it here instead.
+            -->
+            <dependency>
+                <groupId>org.entur</groupId>
+                <artifactId>netex-java-model</artifactId>
+                <version>${netex-java-model.version}</version>
             </dependency>
 
         </dependencies>

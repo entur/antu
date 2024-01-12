@@ -21,4 +21,9 @@ validationRuleConfigs:
     name: SE/Authority URL
     severity: WARNING
 
+  # Reduced severity for invalid service links
+  - code: SERVICE_LINK_3
+    name: SE/ServiceLink missing element Projections
+    severity: WARNING
+
 
