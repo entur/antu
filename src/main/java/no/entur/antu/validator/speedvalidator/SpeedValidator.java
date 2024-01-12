@@ -17,10 +17,12 @@ import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static no.entur.antu.validator.speedvalidator.ServiceJourneyContextBuilder.*;
 
@@ -40,7 +42,11 @@ public class SpeedValidator extends AntuNetexValidator {
 
     @Override
     protected RuleCode[] getRuleCodes() {
-        return SpeedError.RuleCode.values();
+        return Stream.concat(
+                        Arrays.stream(SpeedError.RuleCode.values()),
+                        Arrays.stream(SameDepartureArrivalTimeError.RuleCode.values()))
+                .map(RuleCode.class::cast)
+                .toArray(RuleCode[]::new);
     }
 
     @Override

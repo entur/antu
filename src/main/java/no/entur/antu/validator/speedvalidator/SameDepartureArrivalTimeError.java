@@ -8,7 +8,7 @@ public record SameDepartureArrivalTimeError (
         PassingTimes passingTimes,
         RuleCode ruleCode) implements ValidationError {
 
-    public enum RuleCode {
+    public enum RuleCode implements no.entur.antu.validator.RuleCode {
         SAME_DEPARTURE_ARRIVAL_TIME("Same departure/arrival time for consecutive stops");
 
         private final String errorMessage;
@@ -17,6 +17,7 @@ public record SameDepartureArrivalTimeError (
             this.errorMessage = errorMessage;
         }
 
+        @Override
         public String getErrorMessage() {
             return errorMessage;
         }
