@@ -57,7 +57,7 @@ public sealed interface StopTime permits AbstractStopTime {
     String timetabledPassingTimeId();
 
     /**
-     * Return {@code true} if this stop-time is before the given {@code next} stop time.
+     * Return {@code true} if this stop-time is before or equal to the given {@code next} stop time.
      */
     boolean isStopTimesIncreasing(StopTime next);
 

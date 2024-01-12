@@ -6,8 +6,8 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.model.TransportModes;
-import org.entur.netex.validation.validator.AbstractNetexValidator;
-import org.entur.netex.validation.validator.DataLocation;
+import no.entur.antu.validator.AntuNetexValidator;
+import no.entur.antu.validator.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -20,9 +20,7 @@ import java.util.function.Predicate;
 
 import static no.entur.antu.validator.transportmodevalidator.ServiceJourneyContextBuilder.*;
 
-public class TransportModeValidator extends AbstractNetexValidator {
-
-    private static final String RULE_CODE_NETEX_TRANSPORT_MODE_1 = "NETEX_TRANSPORT_MODE_1";
+public class TransportModeValidator extends AntuNetexValidator {
 
     private final CommonDataRepository commonDataRepository;
 
@@ -37,8 +35,8 @@ public class TransportModeValidator extends AbstractNetexValidator {
     }
 
     @Override
-    public Set<String> getRuleDescriptions() {
-        return Set.of(createRuleDescription(RULE_CODE_NETEX_TRANSPORT_MODE_1, "Invalid transport mode"));
+    protected RuleCode[] getRuleCodes() {
+        return TransportModeError.RuleCode.values();
     }
 
     @Override
@@ -53,35 +51,20 @@ public class TransportModeValidator extends AbstractNetexValidator {
         getServiceJourneys(validationContext).stream()
                 .map(serviceJourneyContextBuilder::build)
                 .filter(Predicate.not(
-                        serviceJourneyContext ->
-                                validateServiceJourney(serviceJourneyContext, validationReport.getValidationReportId())))
-                .forEach(serviceJourneyContext -> validationReport.addValidationReportEntry(
-                        createValidationReportEntry(
-                                RULE_CODE_NETEX_TRANSPORT_MODE_1,
-                                findDataLocation(validationContext, serviceJourneyContext),
-                                String.format(
-                                        "Invalid transport mode %s found in service journey with id %s",
-                                        serviceJourneyContext.transportModes().mode(),
-                                        serviceJourneyContext.serviceJourneyId()
+                        context ->
+                                validateServiceJourney(
+                                        context,
+                                        validationReport.getValidationReportId())))
+                .forEach(context ->
+                        addValidationReportEntry(
+                                validationReport,
+                                validationContext,
+                                new TransportModeError(
+                                        TransportModeError.RuleCode.INVALID_TRANSPORT_MODE,
+                                        context.transportModes().mode(),
+                                        context.serviceJourneyId()
                                 )
-                        )
-                ));
-    }
-
-    private DataLocation findDataLocation(ValidationContext validationContext,
-                                          ServiceJourneyContext serviceJourneyContext) {
-        String fileName = validationContext.getFileName();
-        return validationContext.getLocalIds().stream()
-                .filter(localId -> localId.getId().equals(serviceJourneyContext.serviceJourneyId()))
-                .findFirst()
-                .map(idVersion ->
-                        new DataLocation(
-                                idVersion.getId(),
-                                fileName,
-                                idVersion.getLineNumber(),
-                                idVersion.getColumnNumber()
-                        ))
-                .orElse(new DataLocation(serviceJourneyContext.serviceJourneyId(), fileName, 0, 0));
+                        ));
     }
 
     private boolean validateServiceJourney(ServiceJourneyContext serviceJourneyContext,
@@ -105,7 +88,7 @@ public class TransportModeValidator extends AbstractNetexValidator {
     }
 
     private boolean isValidTransportMode(TransportModes datasetTransportModes,
-                                                TransportModes transportModes) {
+                                         TransportModes transportModes) {
 
         if (transportModes == null
                 || transportModes.mode() == null

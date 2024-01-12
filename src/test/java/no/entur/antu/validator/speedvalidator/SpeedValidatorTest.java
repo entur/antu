@@ -1,4 +1,4 @@
-package no.entur.antu.validator.speedprogressionvalidator;
+package no.entur.antu.validator.speedvalidator;
 
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.stop.StopPlaceRepository;
@@ -23,10 +23,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class SpeedProgressionValidatorTest {
+class SpeedValidatorTest {
 
     @Test
-    void normalSpeedProgressionShouldNotReturnAnyValidationEntry() {
+    void normalSpeedShouldNotReturnAnyValidationEntry() {
 
         ValidationReport validationReport = runTestWithStopPlaceCoordinates(
                 List.of(
@@ -41,7 +41,7 @@ class SpeedProgressionValidatorTest {
     }
 
     @Test
-    void lowSpeedProgressionShouldReturnValidationEntryForLowSpeed() {
+    void lowSpeedShouldReturnValidationEntryForLowSpeed() {
 
         ValidationReport validationReport = runTestWithStopPlaceCoordinates(
                 List.of(
@@ -55,12 +55,12 @@ class SpeedProgressionValidatorTest {
         assertThat(validationReport.getValidationReportEntries().size(), is(1));
         assertThat(
                 validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).findFirst().orElse(null),
-                is(SpeedProgressionError.RuleCode.LOW_SPEED_PROGRESSION.name())
+                is(SpeedError.RuleCode.LOW_SPEED.name())
         );
     }
 
     @Test
-    void highSpeedProgressionShouldReturnValidationEntryForHighSpeed() {
+    void highSpeedShouldReturnValidationEntryForHighSpeed() {
 
         ValidationReport validationReport = runTestWithStopPlaceCoordinates(
                 List.of(
@@ -74,12 +74,12 @@ class SpeedProgressionValidatorTest {
         assertThat(validationReport.getValidationReportEntries().size(), is(1));
         assertThat(
                 validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).findFirst().orElse(null),
-                is(SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION.name())
+                is(SpeedError.RuleCode.HIGH_SPEED.name())
         );
     }
 
     @Test
-    void warningSpeedProgressionShouldReturnValidationEntryForHighSpeed() {
+    void warningSpeedShouldReturnValidationEntryForHighSpeed() {
 
         ValidationReport validationReport = runTestWithStopPlaceCoordinates(
                 List.of(
@@ -93,7 +93,7 @@ class SpeedProgressionValidatorTest {
         assertThat(validationReport.getValidationReportEntries().size(), is(1));
         assertThat(
                 validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).findFirst().orElse(null),
-                is(SpeedProgressionError.RuleCode.WARNING_SPEED_PROGRESSION.name())
+                is(SpeedError.RuleCode.WARNING_SPEED.name())
         );
     }
 
@@ -113,14 +113,36 @@ class SpeedProgressionValidatorTest {
         assertThat(
                 validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).toList(),
                 is(List.of(
-                        SpeedProgressionError.RuleCode.LOW_SPEED_PROGRESSION.name(),
-                        SpeedProgressionError.RuleCode.HIGH_SPEED_PROGRESSION.name())
+                        SpeedError.RuleCode.LOW_SPEED.name(),
+                        SpeedError.RuleCode.HIGH_SPEED.name())
                 )
         );
     }
 
+    @Test
+    void testSameDepartureArrivalTimeErrorThrown() {
+
+        ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+                new NetexTestDataSample(new int[]{0, 0}), // Same departure time for both passingTimes.
+                List.of(
+                        StopPlaceCoordinates.fromString("11.189184§60.41041"),
+                        StopPlaceCoordinates.fromString("11.193265§60.446804")
+                )
+        );
+
+        assertThat(validationReport.getValidationReportEntries().size(), is(1));
+        assertThat(
+                validationReport.getValidationReportEntries().stream().map(ValidationReportEntry::getName).toList(),
+                is(List.of(SameDepartureArrivalTimeError.RuleCode.SAME_DEPARTURE_ARRIVAL_TIME.name()))
+        );
+    }
+
     private static ValidationReport runTestWithStopPlaceCoordinates(List<StopPlaceCoordinates> stopPlaceCoordinates) {
-        NetexTestDataSample sample = new NetexTestDataSample();
+        return runTestWithStopPlaceCoordinates(new NetexTestDataSample(), stopPlaceCoordinates);
+    }
+
+    private static ValidationReport runTestWithStopPlaceCoordinates(NetexTestDataSample sample,
+                                                                    List<StopPlaceCoordinates> stopPlaceCoordinates) {
         ServiceJourney serviceJourney = sample.getServiceJourney();
         JourneyPattern journeyPattern = sample.getJourneyPattern();
 
@@ -165,8 +187,8 @@ class SpeedProgressionValidatorTest {
                                                           CommonDataRepository commonDataRepository,
                                                           StopPlaceRepository stopPlaceRepository) {
 
-        SpeedProgressionValidator speedProgressionValidator =
-                new SpeedProgressionValidator(
+        SpeedValidator speedValidator =
+                new SpeedValidator(
                         (code, message, dataLocation) ->
                                 new ValidationReportEntry(message, code, ValidationReportEntrySeverity.ERROR),
                         commonDataRepository, stopPlaceRepository);
@@ -176,7 +198,7 @@ class SpeedProgressionValidatorTest {
         ValidationContextWithNetexEntitiesIndex validationContext = mock(ValidationContextWithNetexEntitiesIndex.class);
         when(validationContext.getNetexEntitiesIndex()).thenReturn(netexEntitiesIndex);
 
-        speedProgressionValidator.validate(testValidationReport, validationContext);
+        speedValidator.validate(testValidationReport, validationContext);
 
         return testValidationReport;
     }

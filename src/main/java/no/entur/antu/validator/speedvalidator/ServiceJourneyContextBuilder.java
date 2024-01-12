@@ -1,9 +1,10 @@
-package no.entur.antu.validator.speedprogressionvalidator;
+package no.entur.antu.validator.speedvalidator;
 
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.StopTime;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.*;
@@ -94,7 +95,7 @@ public class ServiceJourneyContextBuilder {
             String scheduledStopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
             QuayId quayId = commonDataRepository.findQuayIdForScheduledStopPoint(scheduledStopPointRef, validationReportId);
             StopPlaceCoordinates coordinatesForQuayId = stopPlaceRepository.getCoordinatesForQuayId(quayId);
-            return Map.entry(timetabledPassingTime.getId(), coordinatesForQuayId);
+            return coordinatesForQuayId == null ? null : Map.entry(timetabledPassingTime.getId(), coordinatesForQuayId);
         }
         return null;
     }

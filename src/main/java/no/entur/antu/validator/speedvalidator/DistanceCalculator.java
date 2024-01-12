@@ -1,6 +1,7 @@
-package no.entur.antu.validator.speedprogressionvalidator;
+package no.entur.antu.validator.speedvalidator;
 
 import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.StopTime;
 
 import java.util.HashMap;
@@ -52,8 +53,7 @@ public class DistanceCalculator {
      * Haversine formula to find distance between two points on a sphere
      * </a>
      */
-    private static double calculateDistanceWithHaversineFormula(StopPlaceCoordinates from,
-                                                                StopPlaceCoordinates to) {
+    private static double calculateDistanceWithHaversineFormula(StopPlaceCoordinates from, StopPlaceCoordinates to) {
 
         // distance between latitudes and longitudes
         double distanceLatitude = Math.toRadians(to.latitude() - from.latitude());

@@ -1,6 +1,7 @@
 package no.entur.antu.validator.nonincreasingpassingtime;
 
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
+import no.entur.antu.validator.nonincreasingpassingtime.NonIncreasingPassingTimeError.RuleCode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -11,10 +12,8 @@ import org.rutebanken.netex.model.*;
 
 import java.time.LocalTime;
 
-import static no.entur.antu.validator.nonincreasingpassingtime.NonIncreasingPassingTimeValidator.RuleCode;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
