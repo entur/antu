@@ -1,10 +1,8 @@
 package no.entur.antu.validation.validator.servicejourney.servicealteration.support;
 
-import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 
 public class ServiceAlterationUtils {
 
@@ -17,11 +15,11 @@ public class ServiceAlterationUtils {
       .datedServiceJourneys()
       .stream()
       .filter(dsj ->
-        dsj
-          .getJourneyRef()
-          .stream()
-          .map(JAXBElement::getValue)
-          .anyMatch(DatedServiceJourneyRefStructure.class::isInstance)
+        dsj.getReplacedJourneys() != null &&
+        !dsj
+          .getReplacedJourneys()
+          .getDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef()
+          .isEmpty()
       )
       .toList();
   }
