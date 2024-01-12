@@ -794,30 +794,32 @@ public class NetexEntitiesTestFactory {
 
     public DatedServiceJourney create() {
       DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
-        .withId(ref());
-
-      Collection<JAXBElement<? extends JourneyRefStructure>> journeyRefs =
-        new ArrayList<>();
-      journeyRefs.add(
-        createJaxbElement(
-          new ServiceJourneyRefStructure().withRef(serviceJourneyRef.ref())
-        )
-      );
-      if (datedServiceJourneyRef != null) {
-        journeyRefs.add(
+        .withId(ref())
+        .withJourneyRef(
           createJaxbElement(
-            new DatedServiceJourneyRefStructure()
-              .withRef(datedServiceJourneyRef.ref())
+            new ServiceJourneyRefStructure().withRef(serviceJourneyRef.ref())
           )
-        );
-      }
-
-      return datedServiceJourney
-        .withJourneyRef(journeyRefs)
+        )
         .withOperatingDayRef(
           new OperatingDayRefStructure().withRef(operatingDayRef.ref())
         )
         .withServiceAlteration(serviceAlteration);
+
+      if (datedServiceJourneyRef != null) {
+        ReplacedJourneys_RelStructure replacedDSJ =
+          new ReplacedJourneys_RelStructure();
+        replacedDSJ
+          .getDatedVehicleJourneyRefOrNormalDatedVehicleJourneyRef()
+          .add(
+            createJaxbElement(
+              new DatedVehicleJourneyRefStructure()
+                .withRef(datedServiceJourneyRef.ref())
+            )
+          );
+        datedServiceJourney.withReplacedJourneys(replacedDSJ);
+      }
+
+      return datedServiceJourney;
     }
   }
 
