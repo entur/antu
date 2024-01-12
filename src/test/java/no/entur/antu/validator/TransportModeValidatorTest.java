@@ -27,7 +27,7 @@ class TransportModeValidatorTest {
 
     private static final NetexXMLParser NETEX_XML_PARSER = new NetexXMLParser();
 
-    private static class TestData {
+    static class TestData {
 
         enum LineType {Line, FlexibleLine}
 
@@ -426,7 +426,7 @@ class TransportModeValidatorTest {
         assertThat(validationReport.getValidationReportEntries().size(), is(1));
         assertThat(
                 validationReport.getValidationReportEntries().stream().findFirst().map(ValidationReportEntry::getName),
-                is(Optional.of("NETEX_TRANSPORT_MODE_1"))
+                is(Optional.of("INVALID_TRANSPORT_MODE"))
         );
         assertThat(
                 validationReport.getValidationReportEntries().stream().findFirst().map(ValidationReportEntry::getMessage),
@@ -490,7 +490,7 @@ class TransportModeValidatorTest {
         assertThat(validationReport.getValidationReportEntries().size(), is(1));
         assertThat(
                 validationReport.getValidationReportEntries().stream().findFirst().map(ValidationReportEntry::getName),
-                is(Optional.of("NETEX_TRANSPORT_MODE_1"))
+                is(Optional.of("INVALID_TRANSPORT_MODE"))
         );
         assertThat(
                 validationReport.getValidationReportEntries().stream().findFirst().map(ValidationReportEntry::getMessage),
