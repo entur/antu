@@ -16,9 +16,6 @@
 
 package no.entur.antu.sweden.config;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import no.entur.antu.sweden.stop.RedisSwedenStopPlaceNetexIdRepository;
 import no.entur.antu.sweden.stop.SwedenStopPlaceNetexIdRepository;
 import no.entur.antu.sweden.stop.SwedenStopPlaceValidator;
@@ -34,9 +31,9 @@ import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.BlockJourneyReferencesIgnorer;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
+import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
-import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.ServiceJourneyInterchangeIgnorer;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
@@ -51,130 +48,95 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Configuration for validating timetable data from Sweden.
  */
 @Configuration
 public class TimetableDataSwedenValidatorConfig {
 
-  @Bean
-  public ValidationConfigLoader swedenValidationConfigLoader(
-    @Value(
-      "${antu.netex.validation.configuration.file:configuration.antu.yaml}"
-    ) String antuConfigurationFile,
-    @Value(
-      "${antu.netex.validation.configuration.file.sweden:configuration.antu.sweden.yaml}"
-    ) String swedenConfigurationFile
-  ) {
-    return new DefaultValidationConfigLoader(
-      List.of(antuConfigurationFile, swedenConfigurationFile)
-    );
-  }
+    @Bean
+    public ValidationConfigLoader swedenValidationConfigLoader(
+            @Value("${antu.netex.validation.configuration.file:configuration.antu.yaml}") String antuConfigurationFile,
+            @Value("${antu.netex.validation.configuration.file.sweden:configuration.antu.sweden.yaml}") String swedenConfigurationFile) {
+        return new DefaultValidationConfigLoader(List.of(antuConfigurationFile, swedenConfigurationFile));
+    }
 
-  @Bean
-  public ValidationReportEntryFactory swedenValidationReportEntryFactory(
-    @Qualifier(
-      "swedenValidationConfigLoader"
-    ) ValidationConfigLoader validationConfigLoader
-  ) {
-    return new DefaultValidationEntryFactory(validationConfigLoader);
-  }
+    @Bean
+    public ValidationReportEntryFactory swedenValidationReportEntryFactory(
+            @Qualifier("swedenValidationConfigLoader") ValidationConfigLoader validationConfigLoader) {
+        return new DefaultValidationEntryFactory(validationConfigLoader);
+    }
 
-  @Bean
-  public ValidationTreeFactory swedenTimetableDataValidationTreeFactory() {
-    return new EnturTimetableDataSwedenValidationTreeFactory();
-  }
+    @Bean
+    public ValidationTreeFactory swedenTimetableDataValidationTreeFactory() {
+        return new EnturTimetableDataSwedenValidationTreeFactory();
+    }
 
-  @Bean
-  public XPathValidator swedenTimetableDataXPathValidator(
-    @Qualifier(
-      "swedenTimetableDataValidationTreeFactory"
-    ) ValidationTreeFactory validationTreeFactory,
-    @Qualifier(
-      "swedenValidationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new XPathValidator(
-      validationTreeFactory,
-      validationReportEntryFactory
-    );
-  }
+    @Bean
+    public XPathValidator swedenTimetableDataXPathValidator(
+            @Qualifier("swedenTimetableDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory,
+            @Qualifier("swedenValidationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+        return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
+    }
 
-  @Bean
-  public NetexReferenceValidator swedenNetexReferenceValidator(
-    NetexIdRepository netexIdRepository,
-    @Qualifier(
-      "swedenValidationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    List<ExternalReferenceValidator> externalReferenceValidators =
-      new ArrayList<>();
-    externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
-    externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
-    externalReferenceValidators.add(new OrganisationRefOnStopPlaceIgnorer());
-    externalReferenceValidators.add(new LineRefOnGroupOfLinesIgnorer());
-    return new NetexReferenceValidator(
-      netexIdRepository,
-      externalReferenceValidators,
-      validationReportEntryFactory
-    );
-  }
+    @Bean
+    public NetexReferenceValidator swedenNetexReferenceValidator(
+            NetexIdRepository netexIdRepository,
+            @Qualifier("swedenValidationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
 
-  @Bean
-  public SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository(
-    RedissonClient redissonClient
-  ) {
-    return new RedisSwedenStopPlaceNetexIdRepository(redissonClient);
-  }
+        List<ExternalReferenceValidator> externalReferenceValidators = new ArrayList<>();
+        externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
+        externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
+        externalReferenceValidators.add(new OrganisationRefOnStopPlaceIgnorer());
+        externalReferenceValidators.add(new LineRefOnGroupOfLinesIgnorer());
+        return new NetexReferenceValidator(netexIdRepository, externalReferenceValidators, validationReportEntryFactory);
+    }
 
-  @Bean
-  public SwedenStopPlaceValidator swedenStopPlaceValidator(
-    SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository,
-    @Qualifier(
-      "swedenValidationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new SwedenStopPlaceValidator(
-      swedenStopPlaceNetexIdRepository,
-      validationReportEntryFactory
-    );
-  }
+    @Bean
+    public SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository(
+            RedissonClient redissonClient) {
 
-  @Bean
-  public NetexValidatorsRunner swedenTimetableDataSwedenValidatorsRunner(
-    NetexSchemaValidator netexSchemaValidator,
-    @Qualifier(
-      "swedenTimetableDataXPathValidator"
-    ) XPathValidator swedenXPathValidator,
-    NetexIdValidator netexIdValidator,
-    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
-    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
-    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
-    SwedenStopPlaceValidator swedenStopPlaceValidator,
-    @Qualifier(
-      "swedenNetexReferenceValidator"
-    ) NetexReferenceValidator swedenNetexReferenceValidator,
-    NetexIdUniquenessValidator netexIdUniquenessValidator
-  ) {
-    List<NetexValidator> netexValidators = List.of(
-      swedenXPathValidator,
-      netexIdValidator,
-      versionOnLocalNetexIdValidator,
-      versionOnRefToLocalNetexIdValidator,
-      referenceToValidEntityTypeValidator,
-      swedenStopPlaceValidator,
-      swedenNetexReferenceValidator,
-      netexIdUniquenessValidator
-    );
+        return new RedisSwedenStopPlaceNetexIdRepository(redissonClient);
+    }
 
-    // ignore navigationPaths and equipments elements
-    NetexXMLParser netexXMLParser = new NetexXMLParser(
-      Set.of("navigationPaths", "equipments")
-    );
-    return new NetexValidatorsRunner(
-      netexXMLParser,
-      netexSchemaValidator,
-      netexValidators
-    );
-  }
+    @Bean
+    public SwedenStopPlaceValidator swedenStopPlaceValidator(
+            SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository,
+            @Qualifier("swedenValidationReportEntryFactory") ValidationReportEntryFactory validationReportEntryFactory) {
+
+        return new SwedenStopPlaceValidator(swedenStopPlaceNetexIdRepository, validationReportEntryFactory);
+    }
+
+
+    @Bean
+    public NetexValidatorsRunner swedenTimetableDataSwedenValidatorsRunner(
+            NetexSchemaValidator netexSchemaValidator,
+            @Qualifier("swedenTimetableDataXPathValidator") XPathValidator swedenXPathValidator,
+            NetexIdValidator netexIdValidator,
+            VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
+            VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
+            ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
+            SwedenStopPlaceValidator swedenStopPlaceValidator,
+            @Qualifier("swedenNetexReferenceValidator") NetexReferenceValidator swedenNetexReferenceValidator,
+            NetexIdUniquenessValidator netexIdUniquenessValidator) {
+
+        List<NetexValidator> netexValidators = List.of(
+                swedenXPathValidator,
+                netexIdValidator,
+                versionOnLocalNetexIdValidator,
+                versionOnRefToLocalNetexIdValidator,
+                referenceToValidEntityTypeValidator,
+                swedenStopPlaceValidator,
+                swedenNetexReferenceValidator,
+                netexIdUniquenessValidator
+        );
+
+        // ignore navigationPaths and equipments elements
+        NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("navigationPaths", "equipments"));
+        return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
+    }
 }

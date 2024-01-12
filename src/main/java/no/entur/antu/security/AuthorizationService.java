@@ -16,8 +16,6 @@
 
 package no.entur.antu.security;
 
-import java.util.List;
-import java.util.Locale;
 import org.rutebanken.helper.organisation.AuthorizationConstants;
 import org.rutebanken.helper.organisation.RoleAssignment;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
@@ -27,79 +25,60 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Locale;
+
 @Service
 public class AuthorizationService {
 
-  private final RoleAssignmentExtractor roleAssignmentExtractor;
-  protected final boolean authorizationEnabled;
+    private final RoleAssignmentExtractor roleAssignmentExtractor;
+    protected final boolean authorizationEnabled;
 
-  public AuthorizationService(
-    RoleAssignmentExtractor roleAssignmentExtractor,
-    @Value("${authorization.enabled:true}") boolean authorizationEnabled
-  ) {
-    this.roleAssignmentExtractor = roleAssignmentExtractor;
-    this.authorizationEnabled = authorizationEnabled;
-  }
-
-  public void verifyAdministratorPrivileges() {
-    verifyAtLeastOne(
-      new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_ADMIN)
-    );
-  }
-
-  /**
-   * Users can edit route data if they have administrator privileges,
-   * or if it has editor privileges for this provider.
-   *
-   * @param codespace
-   */
-  public void verifyRouteDataEditorPrivileges(String codespace) {
-    verifyAtLeastOne(
-      new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_ADMIN),
-      new AuthorizationClaim(
-        AuthorizationConstants.ROLE_ROUTE_DATA_EDIT,
-        codespace.toUpperCase(Locale.ROOT)
-      )
-    );
-  }
-
-  protected void verifyAtLeastOne(AuthorizationClaim... claims) {
-    if (!authorizationEnabled) {
-      return;
+    public AuthorizationService(RoleAssignmentExtractor roleAssignmentExtractor, @Value("${authorization.enabled:true}") boolean authorizationEnabled) {
+        this.roleAssignmentExtractor = roleAssignmentExtractor;
+        this.authorizationEnabled = authorizationEnabled;
     }
 
-    Authentication authentication = SecurityContextHolder
-      .getContext()
-      .getAuthentication();
-    List<RoleAssignment> roleAssignments =
-      roleAssignmentExtractor.getRoleAssignmentsForUser(authentication);
-
-    boolean authorized = false;
-    for (AuthorizationClaim claim : claims) {
-      if (claim.getCodespace() == null) {
-        authorized |=
-          roleAssignments
-            .stream()
-            .anyMatch(ra -> claim.getRequiredRole().equals(ra.getRole()));
-      } else {
-        authorized |= hasRoleForCodespace(roleAssignments, claim);
-      }
+    public void verifyAdministratorPrivileges() {
+        verifyAtLeastOne(new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_ADMIN));
     }
 
-    if (!authorized) {
-      throw new AccessDeniedException("Insufficient privileges for operation");
+    /**
+     * Users can edit route data if they have administrator privileges,
+     * or if it has editor privileges for this provider.
+     *
+     * @param codespace
+     */
+    public void verifyRouteDataEditorPrivileges(String codespace) {
+        verifyAtLeastOne(new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_ADMIN),
+                new AuthorizationClaim(AuthorizationConstants.ROLE_ROUTE_DATA_EDIT, codespace.toUpperCase(Locale.ROOT)));
     }
-  }
 
-  private boolean hasRoleForCodespace(
-    List<RoleAssignment> roleAssignments,
-    AuthorizationClaim claim
-  ) {
-    return roleAssignments
-      .stream()
-      .anyMatch(roleAssignment ->
-        claim.getCodespace().equals(roleAssignment.getOrganisation()) &&
-        claim.getRequiredRole().equals(roleAssignment.getRole())
-      );
-  }
+    protected void verifyAtLeastOne(AuthorizationClaim... claims) {
+        if (!authorizationEnabled) {
+            return;
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        List<RoleAssignment> roleAssignments = roleAssignmentExtractor.getRoleAssignmentsForUser(authentication);
+
+        boolean authorized = false;
+        for (AuthorizationClaim claim : claims) {
+            if (claim.getCodespace() == null) {
+                authorized |= roleAssignments.stream().anyMatch(ra -> claim.getRequiredRole().equals(ra.getRole()));
+            } else {
+                authorized |= hasRoleForCodespace(roleAssignments, claim);
+            }
+        }
+
+        if (!authorized) {
+            throw new AccessDeniedException("Insufficient privileges for operation");
+        }
+
+    }
+
+    private boolean hasRoleForCodespace(List<RoleAssignment> roleAssignments, AuthorizationClaim claim) {
+        return roleAssignments.stream().anyMatch(roleAssignment -> claim.getCodespace().equals(roleAssignment.getOrganisation()) && claim.getRequiredRole().equals(roleAssignment.getRole()));
+    }
+
 }

@@ -33,7 +33,6 @@ package no.entur.antu;/*
  */
 
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
-import javax.annotation.PostConstruct;
 import no.entur.antu.repository.InMemoryBlobStoreRepository;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -46,51 +45,47 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.annotation.PostConstruct;
+
 @CamelSpringBootTest
 @UseAdviceWith
-@ActiveProfiles(
-  {
-    "test",
-    "default",
-    "in-memory-blobstore",
-    "google-pubsub-emulator",
-    "google-pubsub-autocreate",
-  }
-)
+@ActiveProfiles({"test", "default", "in-memory-blobstore", "google-pubsub-emulator", "google-pubsub-autocreate"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AntuRouteBuilderIntegrationTestBase {
 
-  @Value("${blobstore.gcs.antu.exchange.container.name}")
-  private String antuExchangeContainerName;
 
-  @Value("${blobstore.gcs.antu.container.name}")
-  private String antuContainerName;
+    @Value("${blobstore.gcs.antu.exchange.container.name}")
+    private String antuExchangeContainerName;
 
-  @Autowired
-  protected ModelCamelContext context;
+    @Value("${blobstore.gcs.antu.container.name}")
+    private String antuContainerName;
 
-  @Autowired
-  protected PubSubTemplate pubSubTemplate;
 
-  @Autowired
-  protected InMemoryBlobStoreRepository antuExchangeInMemoryBlobStoreRepository;
+    @Autowired
+    protected ModelCamelContext context;
 
-  @Autowired
-  protected InMemoryBlobStoreRepository antuInMemoryBlobStoreRepository;
+    @Autowired
+    protected PubSubTemplate pubSubTemplate;
 
-  @EndpointInject("mock:sink")
-  protected MockEndpoint sink;
+    @Autowired
+    protected InMemoryBlobStoreRepository antuExchangeInMemoryBlobStoreRepository;
 
-  @PostConstruct
-  void initInMemoryBlobStoreRepositories() {
-    antuExchangeInMemoryBlobStoreRepository.setContainerName(
-      antuExchangeContainerName
-    );
-    antuInMemoryBlobStoreRepository.setContainerName(antuContainerName);
-  }
+    @Autowired
+    protected InMemoryBlobStoreRepository antuInMemoryBlobStoreRepository;
 
-  @AfterEach
-  void stopContext() {
-    context.stop();
-  }
+
+    @EndpointInject("mock:sink")
+    protected MockEndpoint sink;
+
+    @PostConstruct
+    void initInMemoryBlobStoreRepositories() {
+        antuExchangeInMemoryBlobStoreRepository.setContainerName(antuExchangeContainerName);
+        antuInMemoryBlobStoreRepository.setContainerName(antuContainerName);
+    }
+
+    @AfterEach
+    void stopContext() {
+        context.stop();
+    }
+
 }

@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class QuayIdCodec extends StringCodec {
 
-  @Override
-  public Decoder<Object> getValueDecoder() {
-    return (ByteBuf buf, State state) -> {
-      String str = (String) super.getValueDecoder().decode(buf, state);
-      return new QuayId(str);
-    };
-  }
+    @Override
+    public Decoder<Object> getValueDecoder() {
+        return (ByteBuf buf, State state) -> {
+            String str = (String) super.getValueDecoder().decode(buf, state);
+            return new QuayId(str);
+        };
+    }
 }

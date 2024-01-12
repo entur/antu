@@ -17,11 +17,11 @@
 
 package no.entur.antu.routes.memorystore;
 
-import static no.entur.antu.Constants.*;
-
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
+
+import static no.entur.antu.Constants.*;
 
 /**
  * Upload and download files to a memory store.
@@ -31,67 +31,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class MemoryStoreRoute extends BaseRouteBuilder {
 
-  public static final String MEMORY_STORE_FILE_NAME = "MemoryStoreFileName";
+    public static final String MEMORY_STORE_FILE_NAME = "MemoryStoreFileName";
 
-  @Override
-  public void configure() {
-    from("direct:downloadBlobFromMemoryStore")
-      .bean(
-        "temporaryFileRepository",
-        "download(${header." +
-        VALIDATION_REPORT_ID_HEADER +
-        "},${header." +
-        TEMPORARY_FILE_NAME +
-        "})"
-      )
-      .log(
-        LoggingLevel.DEBUG,
-        correlation() +
-        "Returning from fetching file ${header." +
-        TEMPORARY_FILE_NAME +
-        "} from memory store."
-      )
-      .routeId("memory-store-download");
+    @Override
+    public void configure() {
 
-    from("direct:uploadBlobToMemoryStore")
-      .bean(
-        "temporaryFileRepository",
-        "upload(${header." +
-        VALIDATION_REPORT_ID_HEADER +
-        "},${header." +
-        TEMPORARY_FILE_NAME +
-        "}, ${body} )"
-      )
-      .setBody(constant(""))
-      .log(
-        LoggingLevel.DEBUG,
-        correlation() +
-        "Stored file ${header." +
-        TEMPORARY_FILE_NAME +
-        "} in memory store."
-      )
-      .routeId("memory-store-upload");
+        from("direct:downloadBlobFromMemoryStore")
+                .bean("temporaryFileRepository", "download(${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + TEMPORARY_FILE_NAME + "})")
+                .log(LoggingLevel.DEBUG, correlation() + "Returning from fetching file ${header." + TEMPORARY_FILE_NAME + "} from memory store.")
+                .routeId("memory-store-download");
 
-    from("direct:downloadSingleNetexFileFromMemoryStore")
-      .streamCaching()
-      .log(
-        LoggingLevel.DEBUG,
-        correlation() +
-        "Downloading single NeTEx file ${header." +
-        FILE_HANDLE +
-        "}"
-      )
-      .setHeader(TEMPORARY_FILE_NAME, header(MEMORY_STORE_FILE_NAME))
-      .to("direct:downloadBlobFromMemoryStore")
-      .log(
-        LoggingLevel.DEBUG,
-        correlation() +
-        "Downloaded single NeTEx file ${header." +
-        FILE_HANDLE +
-        "}"
-      )
-      .unmarshal()
-      .zipFile()
-      .routeId("memory-store-download-single-netex-file");
-  }
+        from("direct:uploadBlobToMemoryStore")
+                .bean("temporaryFileRepository", "upload(${header." + VALIDATION_REPORT_ID_HEADER + "},${header." + TEMPORARY_FILE_NAME + "}, ${body} )")
+                .setBody(constant(""))
+                .log(LoggingLevel.DEBUG, correlation() + "Stored file ${header." + TEMPORARY_FILE_NAME + "} in memory store.")
+                .routeId("memory-store-upload");
+
+        from("direct:downloadSingleNetexFileFromMemoryStore").streamCaching()
+                .log(LoggingLevel.DEBUG, correlation() + "Downloading single NeTEx file ${header." + FILE_HANDLE + "}")
+                .setHeader(TEMPORARY_FILE_NAME, header(MEMORY_STORE_FILE_NAME))
+                .to("direct:downloadBlobFromMemoryStore")
+                .log(LoggingLevel.DEBUG, correlation() + "Downloaded single NeTEx file ${header." + FILE_HANDLE + "}")
+                .unmarshal().zipFile()
+                .routeId("memory-store-download-single-netex-file");
+    }
 }

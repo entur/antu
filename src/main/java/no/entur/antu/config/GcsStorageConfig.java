@@ -29,18 +29,19 @@ import org.springframework.context.annotation.Profile;
 @Profile("gcs-blobstore")
 public class GcsStorageConfig {
 
-  @Value("${blobstore.gcs.credential.path:#{null}}")
-  private String credentialPath;
+    @Value("${blobstore.gcs.credential.path:#{null}}")
+    private String credentialPath;
 
-  @Value("${blobstore.gcs.project.id}")
-  private String projectId;
+    @Value("${blobstore.gcs.project.id}")
+    private String projectId;
 
-  @Bean
-  public Storage storage() {
-    if (credentialPath == null || credentialPath.isEmpty()) {
-      return BlobStoreHelper.getStorage(projectId);
-    } else {
-      return BlobStoreHelper.getStorage(credentialPath, projectId);
+    @Bean
+    public Storage storage() {
+        if (credentialPath == null || credentialPath.isEmpty()) {
+            return BlobStoreHelper.getStorage(projectId);
+        } else {
+            return BlobStoreHelper.getStorage(credentialPath, projectId);
+        }
     }
-  }
+
 }

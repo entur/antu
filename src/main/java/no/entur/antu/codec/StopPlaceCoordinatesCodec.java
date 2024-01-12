@@ -9,12 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StopPlaceCoordinatesCodec extends StringCodec {
-
-  @Override
-  public Decoder<Object> getValueDecoder() {
-    return (ByteBuf buf, State state) ->
-      StopPlaceCoordinates.fromString(
-        String.valueOf(super.getValueDecoder().decode(buf, state))
-      );
-  }
+    @Override
+    public Decoder<Object> getValueDecoder() {
+        return (ByteBuf buf, State state) -> StopPlaceCoordinates.fromString(
+                String.valueOf(super.getValueDecoder().decode(buf, state))
+        );
+    }
 }
+

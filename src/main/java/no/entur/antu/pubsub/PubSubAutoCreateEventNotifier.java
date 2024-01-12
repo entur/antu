@@ -36,42 +36,32 @@ import org.springframework.stereotype.Component;
 @Profile("google-pubsub-autocreate")
 public class PubSubAutoCreateEventNotifier extends EventNotifierSupport {
 
-  private final EnturGooglePubSubAdmin enturGooglePubSubAdmin;
+    private final EnturGooglePubSubAdmin enturGooglePubSubAdmin;
 
-  public PubSubAutoCreateEventNotifier(
-    EnturGooglePubSubAdmin enturGooglePubSubAdmin
-  ) {
-    this.enturGooglePubSubAdmin = enturGooglePubSubAdmin;
-  }
-
-  @Override
-  public void notify(CamelEvent event) {
-    if (
-      event instanceof CamelEvent.CamelContextStartingEvent camelContextStartingEvent
-    ) {
-      CamelContext context = camelContextStartingEvent.getContext();
-      context
-        .getEndpoints()
-        .stream()
-        .filter(e -> e.getEndpointUri().startsWith("google-pubsub"))
-        .forEach(this::createSubscriptionIfMissing);
+    public PubSubAutoCreateEventNotifier(EnturGooglePubSubAdmin enturGooglePubSubAdmin) {
+        this.enturGooglePubSubAdmin = enturGooglePubSubAdmin;
     }
-  }
 
-  private void createSubscriptionIfMissing(Endpoint e) {
-    GooglePubsubEndpoint gep;
-    if (e instanceof GooglePubsubEndpoint googlePubsubEndpoint) {
-      gep = googlePubsubEndpoint;
-    } else if (
-      e instanceof DefaultInterceptSendToEndpoint defaultInterceptSendToEndpoint
-    ) {
-      gep =
-        (GooglePubsubEndpoint) defaultInterceptSendToEndpoint.getOriginalEndpoint();
-    } else {
-      throw new IllegalStateException("Incompatible endpoint: " + e);
+    @Override
+    public void notify(CamelEvent event) {
+
+        if (event instanceof CamelEvent.CamelContextStartingEvent camelContextStartingEvent) {
+            CamelContext context = camelContextStartingEvent.getContext();
+            context.getEndpoints().stream().filter(e -> e.getEndpointUri().startsWith("google-pubsub")).forEach(this::createSubscriptionIfMissing);
+        }
+
     }
-    enturGooglePubSubAdmin.createSubscriptionIfMissing(
-      gep.getDestinationName()
-    );
-  }
+
+    private void createSubscriptionIfMissing(Endpoint e) {
+        GooglePubsubEndpoint gep;
+        if (e instanceof GooglePubsubEndpoint googlePubsubEndpoint) {
+            gep = googlePubsubEndpoint;
+        } else if (e instanceof DefaultInterceptSendToEndpoint defaultInterceptSendToEndpoint) {
+            gep = (GooglePubsubEndpoint) defaultInterceptSendToEndpoint.getOriginalEndpoint();
+        } else {
+            throw new IllegalStateException("Incompatible endpoint: " + e);
+        }
+        enturGooglePubSubAdmin.createSubscriptionIfMissing(gep.getDestinationName());
+    }
+
 }

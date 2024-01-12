@@ -18,37 +18,30 @@
 
 package no.entur.antu.services;
 
-import java.io.InputStream;
 import no.entur.antu.Constants;
 import no.entur.antu.repository.BlobStoreRepository;
 import org.apache.camel.Header;
 
+import java.io.InputStream;
+
 public abstract class AbstractBlobStoreService {
 
-  protected final BlobStoreRepository repository;
+    protected final BlobStoreRepository repository;
 
-  protected AbstractBlobStoreService(
-    String containerName,
-    BlobStoreRepository repository
-  ) {
-    this.repository = repository;
-    this.repository.setContainerName(containerName);
-  }
+    protected AbstractBlobStoreService(String containerName, BlobStoreRepository repository) {
+        this.repository = repository;
+        this.repository.setContainerName(containerName);
+    }
 
-  public boolean existBlob(@Header(value = Constants.FILE_HANDLE) String name) {
-    return repository.existBlob(name);
-  }
+    public boolean existBlob(@Header(value = Constants.FILE_HANDLE) String name) {
+        return repository.existBlob(name);
+    }
 
-  public InputStream getBlob(
-    @Header(value = Constants.FILE_HANDLE) String name
-  ) {
-    return repository.getBlob(name);
-  }
+    public InputStream getBlob(@Header(value = Constants.FILE_HANDLE) String name) {
+        return repository.getBlob(name);
+    }
 
-  public void uploadBlob(
-    @Header(value = Constants.FILE_HANDLE) String name,
-    InputStream inputStream
-  ) {
-    repository.uploadBlob(name, inputStream);
-  }
+    public void uploadBlob(@Header(value = Constants.FILE_HANDLE) String name, InputStream inputStream) {
+        repository.uploadBlob(name, inputStream);
+    }
 }

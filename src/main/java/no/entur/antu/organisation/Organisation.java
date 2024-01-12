@@ -16,6 +16,7 @@
 package no.entur.antu.organisation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -24,54 +25,56 @@ import java.util.Set;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Organisation {
+    public static final String NETEX_AUTHORITY_ID_REFERENCE_KEY = "netexAuthorityId";
+    public static final String NETEX_OPERATOR_ID_REFERENCE_KEY = "netexOperatorId";
+    public static final String AUTHORITY_TYPE = "authority";
+    public static final String OPERATOR_TYPE = "operator";
 
-  public static final String NETEX_AUTHORITY_ID_REFERENCE_KEY =
-    "netexAuthorityId";
-  public static final String NETEX_OPERATOR_ID_REFERENCE_KEY =
-    "netexOperatorId";
-  public static final String AUTHORITY_TYPE = "authority";
-  public static final String OPERATOR_TYPE = "operator";
+    public static final String COMPANY_NUMBER_REFERENCE_KEY = "companyNumber";
+    public String id;
+    public String name;
+    public String version;
 
-  public static final String COMPANY_NUMBER_REFERENCE_KEY = "companyNumber";
-  public String id;
-  public String name;
-  public String version;
+    public String legalName;
+    public Map<String, String> references;
+    public Set<String> types;
 
-  public String legalName;
-  public Map<String, String> references;
-  public Set<String> types;
 
-  public OrganisationContact contact;
-  public OrganisationContact customerContact;
+    public OrganisationContact contact;
+    public OrganisationContact customerContact;
 
-  public String getAuthorityNetexId() {
-    if (!isAuthority() || references == null) {
-      return null;
+    public String getAuthorityNetexId() {
+        if (!isAuthority() || references == null) {
+            return null;
+        }
+
+        return references.get(NETEX_AUTHORITY_ID_REFERENCE_KEY);
     }
 
-    return references.get(NETEX_AUTHORITY_ID_REFERENCE_KEY);
-  }
+    public String getOperatorNetexId() {
+        if (!isOperator() || references == null) {
+            return null;
+        }
 
-  public String getOperatorNetexId() {
-    if (!isOperator() || references == null) {
-      return null;
+        return references.get(NETEX_OPERATOR_ID_REFERENCE_KEY);
     }
 
-    return references.get(NETEX_OPERATOR_ID_REFERENCE_KEY);
-  }
 
-  public String getCompanyNumber() {
-    if (references == null) {
-      return null;
+    public String getCompanyNumber() {
+        if (references == null) {
+            return null;
+
+        }
+        return references.get(COMPANY_NUMBER_REFERENCE_KEY);
     }
-    return references.get(COMPANY_NUMBER_REFERENCE_KEY);
-  }
 
-  public boolean isOperator() {
-    return types != null && types.contains(OPERATOR_TYPE);
-  }
+    public boolean isOperator() {
+        return types != null && types.contains(OPERATOR_TYPE);
+    }
 
-  public boolean isAuthority() {
-    return types != null && types.contains(AUTHORITY_TYPE);
-  }
+    public boolean isAuthority() {
+        return types != null && types.contains(AUTHORITY_TYPE);
+    }
+
+
 }

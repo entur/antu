@@ -16,6 +16,7 @@
 
 package no.entur.antu.routes.stop;
 
+
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,45 +28,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class StopRouteBuilder extends BaseRouteBuilder {
 
-  private final String quartzTrigger;
+    private final String quartzTrigger;
 
-  public StopRouteBuilder(
-    @Value(
-      "${antu.stop.refresh.interval:trigger.repeatCount=0}"
-    ) String quartzTrigger
-  ) {
-    super();
-    this.quartzTrigger = quartzTrigger;
-  }
+    public StopRouteBuilder(@Value("${antu.stop.refresh.interval:trigger.repeatCount=0}") String quartzTrigger) {
+        super();
+        this.quartzTrigger = quartzTrigger;
+    }
 
-  @Override
-  public void configure() throws Exception {
-    super.configure();
+    @Override
+    public void configure() throws Exception {
+        super.configure();
 
-    from(
-      "quartz://antu/refreshStopPlaceCacheAtStartup?" + "?trigger.repeatCount=0"
-    )
-      .log(
-        LoggingLevel.INFO,
-        correlation() + "Refreshing stop place cache at startup"
-      )
-      .to("direct:refresh-stop-cache")
-      .routeId("refresh-stop-cache-at-startup");
+        from("quartz://antu/refreshStopPlaceCacheAtStartup?" + "?trigger.repeatCount=0")
+                .log(LoggingLevel.INFO, correlation() + "Refreshing stop place cache at startup")
+                .to("direct:refresh-stop-cache")
+                .routeId("refresh-stop-cache-at-startup");
 
-    from(
-      "master:lockOnAntuRefreshStopCachePeriodically:quartz://antu/refreshStopPlaceCachePeriodically?" +
-      quartzTrigger
-    )
-      .log(
-        LoggingLevel.INFO,
-        correlation() + "Refreshing stop place cache periodically"
-      )
-      .to("direct:refresh-stop-cache")
-      .routeId("refresh-stop-cache-periodically");
+        from("master:lockOnAntuRefreshStopCachePeriodically:quartz://antu/refreshStopPlaceCachePeriodically?" + quartzTrigger)
+                .log(LoggingLevel.INFO, correlation() + "Refreshing stop place cache periodically")
+                .to("direct:refresh-stop-cache")
+                .routeId("refresh-stop-cache-periodically");
 
-    from("direct:refresh-stop-cache")
-      .bean("stopPlaceRepository", "refreshCache")
-      .log(LoggingLevel.INFO, correlation() + "Refreshed stop place cache")
-      .routeId("refresh-stop-cache");
-  }
+        from("direct:refresh-stop-cache")
+                .bean("stopPlaceRepository", "refreshCache")
+                .log(LoggingLevel.INFO, correlation() + "Refreshed stop place cache")
+                .routeId("refresh-stop-cache");
+    }
 }
+

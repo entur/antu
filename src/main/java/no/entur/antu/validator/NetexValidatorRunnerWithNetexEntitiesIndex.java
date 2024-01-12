@@ -1,10 +1,5 @@
 package no.entur.antu.validator;
 
-import java.io.ByteArrayInputStream;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Supplier;
 import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XdmNode;
 import org.entur.netex.NetexParser;
@@ -17,56 +12,35 @@ import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
 
-public class NetexValidatorRunnerWithNetexEntitiesIndex
-  extends NetexValidatorsRunner {
+import java.io.ByteArrayInputStream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
 
-  private final NetexXMLParser netexXMLParser;
+public class NetexValidatorRunnerWithNetexEntitiesIndex extends NetexValidatorsRunner {
 
-  public NetexValidatorRunnerWithNetexEntitiesIndex(
-    NetexXMLParser netexXMLParser,
-    NetexSchemaValidator netexSchemaValidator,
-    List<NetexValidator> netexValidators
-  ) {
-    super(netexXMLParser, netexSchemaValidator, netexValidators);
-    this.netexXMLParser = netexXMLParser;
-  }
+    private final NetexXMLParser netexXMLParser;
 
-  @Override
-  protected ValidationContext prepareValidationContext(
-    String codespace,
-    String filename,
-    byte[] fileContent
-  ) {
-    XdmNode document = netexXMLParser.parseByteArrayToXdmNode(fileContent);
-    XPathCompiler xPathCompiler = netexXMLParser.getXPathCompiler();
-    Set<IdVersion> localIds = new HashSet<>(
-      NetexIdExtractorHelper.collectEntityIdentifiers(
-        document,
-        xPathCompiler,
-        filename,
-        Set.of("Codespace")
-      )
-    );
-    List<IdVersion> localRefs = NetexIdExtractorHelper.collectEntityReferences(
-      document,
-      xPathCompiler,
-      filename,
-      null
-    );
+    public NetexValidatorRunnerWithNetexEntitiesIndex(NetexXMLParser netexXMLParser, NetexSchemaValidator netexSchemaValidator, List<NetexValidator> netexValidators) {
+        super(netexXMLParser, netexSchemaValidator, netexValidators);
+        this.netexXMLParser = netexXMLParser;
+    }
 
-    Supplier<NetexEntitiesIndex> getNetexEntitiesIndex = () -> {
-      NetexParser netexParser = new NetexParser();
-      return netexParser.parse(new ByteArrayInputStream(fileContent));
-    };
+    @Override
+    protected ValidationContext prepareValidationContext(String codespace, String filename, byte[] fileContent) {
+        XdmNode document = netexXMLParser.parseByteArrayToXdmNode(fileContent);
+        XPathCompiler xPathCompiler = netexXMLParser.getXPathCompiler();
+        Set<IdVersion> localIds = new HashSet<>(NetexIdExtractorHelper.collectEntityIdentifiers(document, xPathCompiler, filename, Set.of("Codespace")));
+        List<IdVersion> localRefs = NetexIdExtractorHelper.collectEntityReferences(document, xPathCompiler, filename, null);
 
-    return new ValidationContextWithNetexEntitiesIndex(
-      document,
-      netexXMLParser,
-      getNetexEntitiesIndex,
-      codespace,
-      filename,
-      localIds,
-      localRefs
-    );
-  }
+        Supplier<NetexEntitiesIndex> getNetexEntitiesIndex = () -> {
+            NetexParser netexParser = new NetexParser();
+            return netexParser.parse(new ByteArrayInputStream(fileContent));
+        };
+
+        return new ValidationContextWithNetexEntitiesIndex(
+                document, netexXMLParser, getNetexEntitiesIndex, codespace, filename, localIds, localRefs
+        );
+    }
 }

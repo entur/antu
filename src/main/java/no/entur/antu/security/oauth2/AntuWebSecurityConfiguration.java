@@ -1,8 +1,5 @@
 package no.entur.antu.security.oauth2;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import java.util.Arrays;
 import org.entur.oauth2.RorAuthenticationConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +12,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
+import static org.springframework.security.config.Customizer.withDefaults;
+
 /**
  * Authentication and authorization configuration for Antu.
  * All requests must be authenticated except for the Swagger and Actuator endpoints.
@@ -25,55 +26,30 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class AntuWebSecurityConfiguration {
 
-  @Bean
-  CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedHeaders(
-      Arrays.asList(
-        "Origin",
-        "Accept",
-        "X-Requested-With",
-        "Content-Type",
-        "Access-Control-Request-Method",
-        "Access-Control-Request-Headers",
-        "Authorization",
-        "x-correlation-id"
-      )
-    );
-    configuration.addAllowedOrigin("*");
-    configuration.setAllowedMethods(
-      Arrays.asList("GET", "PUT", "POST", "DELETE")
-    );
-    UrlBasedCorsConfigurationSource source =
-      new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration);
-    return source;
-  }
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedHeaders(Arrays.asList("Origin", "Accept", "X-Requested-With", "Content-Type", "Access-Control-Request-Method", "Access-Control-Request-Headers", "Authorization", "x-correlation-id"));
+        configuration.addAllowedOrigin("*");
+        configuration.setAllowedMethods(Arrays.asList("GET", "PUT", "POST", "DELETE"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-      .cors(withDefaults())
-      .csrf()
-      .disable()
-      .authorizeHttpRequests(authz ->
-        authz
-          .antMatchers("/services/validation-report/swagger.json")
-          .permitAll()
-          .antMatchers("/services/swagger.json")
-          .permitAll()
-          .antMatchers("/actuator/prometheus")
-          .permitAll()
-          .antMatchers("/actuator/health/liveness")
-          .permitAll()
-          .antMatchers("/actuator/health/readiness")
-          .permitAll()
-          .anyRequest()
-          .authenticated()
-      )
-      .oauth2ResourceServer()
-      .jwt()
-      .jwtAuthenticationConverter(new RorAuthenticationConverter());
-    return http.build();
-  }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors(withDefaults())
+                .csrf().disable()
+                .authorizeHttpRequests(authz -> authz
+                        .antMatchers("/services/validation-report/swagger.json").permitAll()
+                        .antMatchers("/services/swagger.json").permitAll()
+                        .antMatchers("/actuator/prometheus").permitAll()
+                        .antMatchers("/actuator/health/liveness").permitAll()
+                        .antMatchers("/actuator/health/readiness").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer().jwt().jwtAuthenticationConverter(new RorAuthenticationConverter());
+        return http.build();
+    }
 }

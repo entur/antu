@@ -36,10 +36,6 @@ package no.entur.antu.routes.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.Constants;
 import no.entur.antu.TestApp;
@@ -53,68 +49,54 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest(
-  webEnvironment = SpringBootTest.WebEnvironment.NONE,
-  classes = TestApp.class,
-  properties = { "antu.netex.validation.entries.max=1" }
-)
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = TestApp.class, properties = {
+        "antu.netex.validation.entries.max=1"})
 class ValidateFileRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
 
-  @Produce("direct:saveValidationReport")
-  protected ProducerTemplate saveValidationReport;
+    @Produce("direct:saveValidationReport")
+    protected ProducerTemplate saveValidationReport;
 
-  @EndpointInject("mock:uploadValidationReport")
-  protected MockEndpoint uploadValidationReport;
+    @EndpointInject("mock:uploadValidationReport")
+    protected MockEndpoint uploadValidationReport;
 
-  @Test
-  void testJSonSerialization() throws Exception {
-    ValidationReport validationReport = new ValidationReport(
-      "codespace",
-      "reportId"
-    );
-    LocalDateTime creationDateAsObject = validationReport.getCreationDate();
+    @Test
+    void testJSonSerialization() throws Exception {
 
-    AdviceWith.adviceWith(
-      context,
-      "save-validation-report",
-      a -> {
-        a
-          .weaveAddFirst()
-          .process(exchange ->
-            exchange.getIn().setBody(validationReport, ValidationReport.class)
-          );
+        ValidationReport validationReport = new ValidationReport("codespace", "reportId");
+        LocalDateTime creationDateAsObject = validationReport.getCreationDate();
 
-        a
-          .interceptSendToEndpoint("direct:uploadValidationReport")
-          .skipSendToOriginalEndpoint()
-          .to("mock:uploadValidationReport");
-      }
-    );
+        AdviceWith.adviceWith(context, "save-validation-report", a -> {
 
-    uploadValidationReport.expectedMessageCount(1);
-    uploadValidationReport.setResultWaitTime(15000);
+                    a.weaveAddFirst().process(exchange -> exchange.getIn().setBody(validationReport, ValidationReport.class));
 
-    context.start();
-    Map<String, Object> headers = new HashMap<>();
-    headers.put(Constants.DATASET_CODESPACE, "FLB");
-    saveValidationReport.sendBodyAndHeaders(" ", headers);
-    uploadValidationReport.assertIsSatisfied();
-    String body = uploadValidationReport
-      .getExchanges()
-      .stream()
-      .findFirst()
-      .orElseThrow()
-      .getIn()
-      .getBody(String.class);
-    Assertions.assertNotNull(body);
-    ObjectMapper objectMapper = new ObjectMapper();
-    JsonNode creationDate = objectMapper.readTree(body).get("creationDate");
-    Assertions.assertNotNull(creationDate);
-    String creationDateAsString = creationDate.asText();
-    Assertions.assertNotNull(creationDateAsString);
-    Assertions.assertEquals(
-      DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(creationDateAsObject),
-      creationDateAsString
-    );
-  }
+            a.interceptSendToEndpoint("direct:uploadValidationReport").skipSendToOriginalEndpoint()
+                    .to("mock:uploadValidationReport");
+        }
+        );
+
+        uploadValidationReport.expectedMessageCount(1);
+        uploadValidationReport.setResultWaitTime(15000);
+
+        context.start();
+        Map<String, Object> headers = new HashMap<>();
+        headers.put(Constants.DATASET_CODESPACE, "FLB");
+        saveValidationReport.sendBodyAndHeaders(" ", headers);
+        uploadValidationReport.assertIsSatisfied();
+        String body = uploadValidationReport.getExchanges().stream().findFirst().orElseThrow().getIn().getBody(String.class);
+        Assertions.assertNotNull(body);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode creationDate = objectMapper.readTree(body).get("creationDate");
+        Assertions.assertNotNull(creationDate);
+        String creationDateAsString = creationDate.asText();
+        Assertions.assertNotNull(creationDateAsString);
+        Assertions.assertEquals(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(creationDateAsObject), creationDateAsString);
+
+    }
+
 }

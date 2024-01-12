@@ -2,6 +2,7 @@ package no.entur.antu.stoptime;
 
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
+
 /**
  * Wrapper around {@link TimetabledPassingTime} that provides a simpler interface
  * for passing times comparison.
@@ -9,106 +10,85 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  */
 final class FlexibleStopTime extends AbstractStopTime {
 
-  FlexibleStopTime(TimetabledPassingTime timetabledPassingTime) {
-    super(timetabledPassingTime);
-  }
-
-  @Override
-  public boolean isComplete() {
-    return hasLatestArrivalTime() && hasEarliestDepartureTime();
-  }
-
-  @Override
-  public boolean isConsistent() {
-    return (
-      !isComplete() ||
-      normalizedLatestArrivalTime() >= normalizedEarliestDepartureTime()
-    );
-  }
-
-  @Override
-  public boolean isStopTimesIncreasing(StopTime next) {
-    if (next instanceof RegularStopTime regularStopTime) {
-      return isAreaStopFollowedByRegularStopValid(regularStopTime);
+    FlexibleStopTime(TimetabledPassingTime timetabledPassingTime) {
+        super(timetabledPassingTime);
     }
-    return isAreaStopFollowedByAreaStopValid((FlexibleStopTime) next);
-  }
 
-  @Override
-  public int getStopTimeDiff(StopTime given) {
-    // TODO: This should be fixed. We need to take into account the type of given.
-    //  Is it the same type as this, or not. See how we have done in
-    //  isRegularStopFollowedByRegularStopValid, isAreaStopFollowedByAreaStopValid,
-    //  isRegularStopFollowedByAreaStopValid, isAreaStopFollowedByRegularStopValid
-
-    if (given instanceof FlexibleStopTime) {
-      return isComplete()
-        ? normalizedEarliestDepartureTime() - normalizedLatestArrivalTime()
-        : 0;
+    @Override
+    public boolean isComplete() {
+        return hasLatestArrivalTime() && hasEarliestDepartureTime();
     }
-    return (
-      given.normalizedEarliestDepartureTime() -
-      normalizedArrivalTimeOrElseDepartureTime()
-    );
-  }
 
-  @Override
-  public int normalizedEarliestDepartureTime() {
-    return elapsedTimeSinceMidnight(
-      earliestDepartureTime(),
-      earliestDepartureDayOffset()
-    );
-  }
+    @Override
+    public boolean isConsistent() {
+        return !isComplete() || normalizedLatestArrivalTime() >= normalizedEarliestDepartureTime();
+    }
 
-  @Override
-  public int normalizedLatestArrivalTime() {
-    return elapsedTimeSinceMidnight(
-      latestArrivalTime(),
-      latestArrivalDayOffset()
-    );
-  }
+    @Override
+    public boolean isStopTimesIncreasing(StopTime next) {
+        if (next instanceof RegularStopTime regularStopTime) {
+            return isAreaStopFollowedByRegularStopValid(regularStopTime);
+        }
+        return isAreaStopFollowedByAreaStopValid((FlexibleStopTime) next);
+    }
 
-  @Override
-  public int normalizedDepartureTimeOrElseArrivalTime() {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public int getStopTimeDiff(StopTime given) {
+        // TODO: This should be fixed. We need to take into account the type of given.
+        //  Is it the same type as this, or not. See how we have done in
+        //  isRegularStopFollowedByRegularStopValid, isAreaStopFollowedByAreaStopValid,
+        //  isRegularStopFollowedByAreaStopValid, isAreaStopFollowedByRegularStopValid
 
-  @Override
-  public int normalizedArrivalTimeOrElseDepartureTime() {
-    throw new UnsupportedOperationException();
-  }
+        if (given instanceof FlexibleStopTime) {
+            return isComplete() ? normalizedEarliestDepartureTime() - normalizedLatestArrivalTime() : 0;
+        }
+        return given.normalizedEarliestDepartureTime() - normalizedArrivalTimeOrElseDepartureTime();
+    }
 
-  private boolean hasLatestArrivalTime() {
-    return latestArrivalTime() != null;
-  }
+    @Override
+    public int normalizedEarliestDepartureTime() {
+        return elapsedTimeSinceMidnight(earliestDepartureTime(), earliestDepartureDayOffset());
+    }
 
-  private boolean hasEarliestDepartureTime() {
-    return earliestDepartureTime() != null;
-  }
+    @Override
+    public int normalizedLatestArrivalTime() {
+        return elapsedTimeSinceMidnight(latestArrivalTime(), latestArrivalDayOffset());
+    }
 
-  private boolean isAreaStopFollowedByAreaStopValid(FlexibleStopTime next) {
-    int earliestDepartureTime = normalizedEarliestDepartureTime();
-    int nextEarliestDepartureTime = next.normalizedEarliestDepartureTime();
-    int latestArrivalTime = normalizedLatestArrivalTime();
-    int nextLatestArrivalTime = next.normalizedLatestArrivalTime();
+    @Override
+    public int normalizedDepartureTimeOrElseArrivalTime() {
+        throw new UnsupportedOperationException();
+    }
 
-    return (
-      earliestDepartureTime <= nextEarliestDepartureTime &&
-      latestArrivalTime <= nextLatestArrivalTime
-    );
-  }
+    @Override
+    public int normalizedArrivalTimeOrElseDepartureTime() {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public boolean isArrivalInMinutesResolution() {
-    return hasLatestArrivalTime()
-      ? latestArrivalTime().getSecond() == 0
-      : earliestDepartureTime().getSecond() == 0;
-  }
+    private boolean hasLatestArrivalTime() {
+        return latestArrivalTime() != null;
+    }
 
-  @Override
-  public boolean isDepartureInMinutesResolution() {
-    return hasEarliestDepartureTime()
-      ? earliestDepartureTime().getSecond() == 0
-      : latestArrivalTime().getSecond() == 0;
-  }
+    private boolean hasEarliestDepartureTime() {
+        return earliestDepartureTime() != null;
+    }
+
+    private boolean isAreaStopFollowedByAreaStopValid(FlexibleStopTime next) {
+        int earliestDepartureTime = normalizedEarliestDepartureTime();
+        int nextEarliestDepartureTime = next.normalizedEarliestDepartureTime();
+        int latestArrivalTime = normalizedLatestArrivalTime();
+        int nextLatestArrivalTime = next.normalizedLatestArrivalTime();
+
+        return earliestDepartureTime <= nextEarliestDepartureTime && latestArrivalTime <= nextLatestArrivalTime;
+    }
+
+    @Override
+    public boolean isArrivalInMinutesResolution() {
+        return hasLatestArrivalTime() ? latestArrivalTime().getSecond() == 0 : earliestDepartureTime().getSecond() == 0;
+    }
+
+    @Override
+    public boolean isDepartureInMinutesResolution() {
+        return hasEarliestDepartureTime() ? earliestDepartureTime().getSecond() == 0 : latestArrivalTime().getSecond() == 0;
+    }
 }

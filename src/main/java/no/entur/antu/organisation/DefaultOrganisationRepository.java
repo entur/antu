@@ -15,6 +15,9 @@
 
 package no.entur.antu.organisation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,95 +25,57 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * OrganisationRepository implementation that stores data in a Redis cache.
  */
 public class DefaultOrganisationRepository implements OrganisationRepository {
 
-  private static final String ORGANISATION_CACHE_KEY_PREFIX =
-    "ORGANISATION_CACHE_";
+    private static final String ORGANISATION_CACHE_KEY_PREFIX = "ORGANISATION_CACHE_";
 
-  private static final String REFERENCE_CODESPACE = "codeSpace";
-  private static final String REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST =
-    "netexAuthorityIdsWhitelist";
+    private static final String REFERENCE_CODESPACE = "codeSpace";
+    private static final String REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST = "netexAuthorityIdsWhitelist";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    DefaultOrganisationRepository.class
-  );
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOrganisationRepository.class);
 
-  private final OrganisationResource organisationResource;
-  private final Map<String, Set<String>> organisationCache;
+    private final OrganisationResource organisationResource;
+    private final Map<String, Set<String>> organisationCache;
 
-  public DefaultOrganisationRepository(
-    OrganisationResource organisationResource,
-    Map<String, Set<String>> organisationCache
-  ) {
-    this.organisationResource = organisationResource;
-    this.organisationCache = organisationCache;
-  }
-
-  @Override
-  public void refreshCache() {
-    Collection<Organisation> organisations =
-      organisationResource.getOrganisations();
-
-    Map<String, Set<String>> authorityIdWhitelistByCodespace = organisations
-      .stream()
-      .filter(organisation ->
-        organisation.references.containsKey(REFERENCE_CODESPACE)
-      )
-      .filter(organisation ->
-        organisation.references.containsKey(
-          REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST
-        )
-      )
-      .collect(
-        Collectors.toUnmodifiableMap(
-          organisation ->
-            getOrganisationKey(
-              organisation.references
-                .get(REFERENCE_CODESPACE)
-                .toLowerCase(Locale.ROOT)
-            ),
-          organisation ->
-            Arrays
-              .stream(
-                organisation.references
-                  .get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST)
-                  .split(",")
-              )
-              .collect(Collectors.toUnmodifiableSet())
-        )
-      );
-
-    // remove deleted organisations
-    organisationCache
-      .keySet()
-      .retainAll(authorityIdWhitelistByCodespace.keySet());
-    // update existing organisations and add new ones
-    organisationCache.putAll(authorityIdWhitelistByCodespace);
-
-    LOGGER.debug(
-      "Updated organisation cache. Cache now has {} elements",
-      organisationCache.size()
-    );
-  }
-
-  @Override
-  public Set<String> getWhitelistedAuthorityIds(String codespace) {
-    Set<String> whitelistedIds = organisationCache.get(
-      getOrganisationKey(codespace)
-    );
-    if (whitelistedIds == null) {
-      return Collections.emptySet();
+    public DefaultOrganisationRepository(OrganisationResource organisationResource, Map<String, Set<String>> organisationCache) {
+        this.organisationResource = organisationResource;
+        this.organisationCache = organisationCache;
     }
-    return whitelistedIds;
-  }
 
-  private static String getOrganisationKey(String codespace) {
-    return ORGANISATION_CACHE_KEY_PREFIX + codespace;
-  }
+    @Override
+    public void refreshCache() {
+        Collection<Organisation> organisations = organisationResource.getOrganisations();
+
+        Map<String, Set<String>> authorityIdWhitelistByCodespace = organisations.stream()
+                .filter(organisation -> organisation.references.containsKey(REFERENCE_CODESPACE))
+                .filter(organisation -> organisation.references.containsKey(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST))
+                .collect(Collectors.toUnmodifiableMap(
+                        organisation -> getOrganisationKey(organisation.references.get(REFERENCE_CODESPACE).toLowerCase(Locale.ROOT)),
+                        organisation -> Arrays.stream(organisation.references.get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST).split(",")).collect(Collectors.toUnmodifiableSet())));
+
+        // remove deleted organisations
+        organisationCache.keySet().retainAll(authorityIdWhitelistByCodespace.keySet());
+        // update existing organisations and add new ones
+        organisationCache.putAll(authorityIdWhitelistByCodespace);
+
+        LOGGER.debug("Updated organisation cache. Cache now has {} elements", organisationCache.size());
+    }
+
+    @Override
+    public Set<String> getWhitelistedAuthorityIds(String codespace) {
+        Set<String> whitelistedIds = organisationCache.get(getOrganisationKey(codespace));
+        if (whitelistedIds == null) {
+            return Collections.emptySet();
+        }
+        return whitelistedIds;
+    }
+
+    private static String getOrganisationKey(String codespace) {
+        return ORGANISATION_CACHE_KEY_PREFIX + codespace;
+    }
+
 }

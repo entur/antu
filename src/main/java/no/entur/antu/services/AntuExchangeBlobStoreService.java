@@ -29,12 +29,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AntuExchangeBlobStoreService extends AbstractBlobStoreService {
 
-  public AntuExchangeBlobStoreService(
-    @Value(
-      "${blobstore.gcs.antu.exchange.container.name}"
-    ) String containerName,
-    @Autowired BlobStoreRepository repository
-  ) {
-    super(containerName, repository);
-  }
+    public AntuExchangeBlobStoreService(@Value("${blobstore.gcs.antu.exchange.container.name}") String containerName,
+                                        @Autowired BlobStoreRepository repository) {
+        super(containerName, repository);
+    }
 }

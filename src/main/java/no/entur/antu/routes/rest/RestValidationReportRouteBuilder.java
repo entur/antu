@@ -16,12 +16,6 @@
 
 package no.entur.antu.routes.rest;
 
-import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
-import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
-
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
 import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.security.AuthorizationService;
@@ -34,210 +28,185 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotFoundException;
+
+import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
+import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
+
 @Component
 public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
 
-  private static final String PLAIN = "text/plain";
-  private static final String JSON = "application/json";
-  private static final String SWAGGER_DATA_TYPE_STRING = "string";
-  private static final String CODESPACE_PARAM = "codespace";
-  private static final String VALIDATION_REPORT_ID_PARAM = "id";
 
-  private final AuthorizationService authorizationService;
-  private final String host;
-  private final String port;
+    private static final String PLAIN = "text/plain";
+    private static final String JSON = "application/json";
+    private static final String SWAGGER_DATA_TYPE_STRING = "string";
+    private static final String CODESPACE_PARAM = "codespace";
+    private static final String VALIDATION_REPORT_ID_PARAM = "id";
 
-  public RestValidationReportRouteBuilder(
-    AuthorizationService authorizationService,
-    @Value("${server.host:0.0.0.0}") String host,
-    @Value("${server.port:8080}") String port
-  ) {
-    this.authorizationService = authorizationService;
-    this.host = host;
-    this.port = port;
-  }
+    private final AuthorizationService authorizationService;
+    private final String host;
+    private final String port;
 
-  @Override
-  public void configure() throws Exception {
-    super.configure();
+    public RestValidationReportRouteBuilder(AuthorizationService authorizationService, @Value("${server.host:0.0.0.0}") String host, @Value("${server.port:8080}") String port) {
+        this.authorizationService = authorizationService;
+        this.host = host;
+        this.port = port;
+    }
 
-    onException(AccessDeniedException.class)
-      .handled(true)
-      .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(403))
-      .setHeader(Exchange.CONTENT_TYPE, constant(PLAIN))
-      .transform(exceptionMessage());
+    @Override
+    public void configure() throws Exception {
+        super.configure();
 
-    onException(BadRequestException.class)
-      .handled(true)
-      .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(400))
-      .setHeader(Exchange.CONTENT_TYPE, constant(PLAIN))
-      .transform(exceptionMessage());
+        onException(AccessDeniedException.class)
+                .handled(true)
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(403))
+                .setHeader(Exchange.CONTENT_TYPE, constant(PLAIN))
+                .transform(exceptionMessage());
 
-    onException(NotFoundException.class)
-      .handled(true)
-      .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
-      .setHeader(Exchange.CONTENT_TYPE, constant(PLAIN))
-      .transform(exceptionMessage());
+        onException(BadRequestException.class)
+                .handled(true)
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(400))
+                .setHeader(Exchange.CONTENT_TYPE, constant(PLAIN))
+                .transform(exceptionMessage());
 
-    restConfiguration()
-      .component("servlet")
-      .contextPath("/services")
-      .bindingMode(RestBindingMode.off)
-      .endpointProperty("matchOnUriPrefix", "true")
-      .apiContextPath("/swagger.json")
-      .apiProperty("api.title", "Antu NeTEx Validation API")
-      .apiProperty("api.version", "1.0");
+        onException(NotFoundException.class)
+                .handled(true)
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
+                .setHeader(Exchange.CONTENT_TYPE, constant(PLAIN))
+                .transform(exceptionMessage());
 
-    rest("")
-      .apiDocs(false)
-      .description(
-        "Wildcard definitions necessary to get Jetty to match authorization filters to endpoints with path params"
-      )
-      .get()
-      .to("direct:adminRouteAuthorizeGet")
-      .post()
-      .to("direct:adminRouteAuthorizePost")
-      .put()
-      .to("direct:adminRouteAuthorizePut")
-      .delete()
-      .to("direct:adminRouteAuthorizeDelete");
 
-    String commonApiDocEndpoint =
-      "http:" +
-      host +
-      ":" +
-      port +
-      "/services/swagger.json?bridgeEndpoint=true";
+        restConfiguration()
+                .component("servlet")
+                .contextPath("/services")
+                .bindingMode(RestBindingMode.off)
+                .endpointProperty("matchOnUriPrefix", "true")
+                .apiContextPath("/swagger.json")
+                .apiProperty("api.title", "Antu NeTEx Validation API")
+                .apiProperty("api.version", "1.0");
 
-    rest("/validation-report")
-      .get("/{" + CODESPACE_PARAM + "}/{" + VALIDATION_REPORT_ID_PARAM + '}')
-      .description(
-        "Return the validation report for a given validation report id"
-      )
-      .param()
-      .name(CODESPACE_PARAM)
-      .type(RestParamType.path)
-      .description("Provider Codespace")
-      .dataType(SWAGGER_DATA_TYPE_STRING)
-      .required(true)
-      .endParam()
-      .param()
-      .name(VALIDATION_REPORT_ID_PARAM)
-      .type(RestParamType.path)
-      .description("Unique Id of the validation report")
-      .dataType(SWAGGER_DATA_TYPE_STRING)
-      .required(true)
-      .endParam()
-      .consumes(PLAIN)
-      .produces(JSON)
-      .responseMessage()
-      .code(200)
-      .endResponseMessage()
-      .responseMessage()
-      .code(404)
-      .message("Unknown codespace")
-      .endResponseMessage()
-      .responseMessage()
-      .code(500)
-      .message("Internal error")
-      .endResponseMessage()
-      .to("direct:validationReport")
-      .get("/swagger.json")
-      .apiDocs(false)
-      .bindingMode(RestBindingMode.off)
-      .to(commonApiDocEndpoint);
+        rest("")
+                .apiDocs(false)
+                .description("Wildcard definitions necessary to get Jetty to match authorization filters to endpoints with path params")
+                .get()
+                .to("direct:adminRouteAuthorizeGet")
+                .post()
+                .to("direct:adminRouteAuthorizePost")
+                .put()
+                .to("direct:adminRouteAuthorizePut")
+                .delete()
+                .to("direct:adminRouteAuthorizeDelete");
 
-    rest("/cache-admin")
-      .post("/clear-cache")
-      .description("Clear the cache")
-      .consumes(PLAIN)
-      .produces(PLAIN)
-      .responseMessage()
-      .code(200)
-      .message("Command accepted")
-      .endResponseMessage()
-      .to("direct:adminCacheClear")
-      .get("/dump-keys")
-      .description("Clear the cache")
-      .consumes(PLAIN)
-      .produces(PLAIN)
-      .responseMessage()
-      .code(200)
-      .message("Command accepted")
-      .endResponseMessage()
-      .to("direct:adminCacheDumpKeys");
+        String commonApiDocEndpoint = "http:" + host + ":" + port + "/services/swagger.json?bridgeEndpoint=true";
 
-    from("direct:adminRouteAuthorizeGet")
-      .throwException(new NotFoundException())
-      .routeId("admin-route-authorize-get");
+        rest("/validation-report")
 
-    from("direct:adminRouteAuthorizePost")
-      .throwException(new NotFoundException())
-      .routeId("admin-route-authorize-post");
+                .get("/{" + CODESPACE_PARAM + "}/{" + VALIDATION_REPORT_ID_PARAM + '}')
+                .description("Return the validation report for a given validation report id")
+                .param().name(CODESPACE_PARAM)
+                .type(RestParamType.path)
+                .description("Provider Codespace")
+                .dataType(SWAGGER_DATA_TYPE_STRING)
+                .required(true)
+                .endParam()
+                .param().name(VALIDATION_REPORT_ID_PARAM)
+                .type(RestParamType.path)
+                .description("Unique Id of the validation report")
+                .dataType(SWAGGER_DATA_TYPE_STRING)
+                .required(true)
+                .endParam()
+                .consumes(PLAIN)
+                .produces(JSON)
+                .responseMessage().code(200).endResponseMessage()
+                .responseMessage().code(404).message("Unknown codespace").endResponseMessage()
+                .responseMessage().code(500).message("Internal error").endResponseMessage()
+                .to("direct:validationReport")
 
-    from("direct:adminRouteAuthorizePut")
-      .throwException(new NotFoundException())
-      .routeId("admin-route-authorize-put");
+                .get("/swagger.json")
+                .apiDocs(false)
+                .bindingMode(RestBindingMode.off)
+                .to(commonApiDocEndpoint);
 
-    from("direct:adminRouteAuthorizeDelete")
-      .throwException(new NotFoundException())
-      .routeId("admin-route-authorize-delete");
 
-    from("direct:validationReport")
-      .to("direct:authorizeEditorRequest")
-      .setHeader(
-        FILE_HANDLE,
-        constant(BLOBSTORE_PATH_ANTU_REPORTS)
-          .append(header(CODESPACE_PARAM))
-          .append(Constants.VALIDATION_REPORT_PREFIX)
-          .append(header(VALIDATION_REPORT_ID_PARAM))
-          .append(VALIDATION_REPORT_SUFFIX)
-      )
-      .log(
-        LoggingLevel.INFO,
-        correlation() +
-        "Downloading NeTEx validation report ${header." +
-        FILE_HANDLE +
-        "}"
-      )
-      .process(this::removeAllCamelHttpHeaders)
-      .to("direct:getAntuBlob")
-      .filter(simple("${body} == null"))
-      .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
-      // end filter
-      .end()
-      .setHeader(Exchange.CONTENT_ENCODING, constant("gzip"))
-      .removeHeader(HttpHeaders.AUTHORIZATION)
-      .routeId("validation-report");
+        rest("/cache-admin")
 
-    from("direct:adminCacheClear")
-      .to("direct:authorizeAdminRequest")
-      .log(LoggingLevel.INFO, correlation() + "Clear cache")
-      .process(this::removeAllCamelHttpHeaders)
-      .bean("cacheAdmin", "clear")
-      .log(LoggingLevel.INFO, correlation() + "Cleared cache")
-      .routeId("admin-cache-clear");
+                .post("/clear-cache")
+                .description("Clear the cache")
+                .consumes(PLAIN)
+                .produces(PLAIN)
+                .responseMessage().code(200).message("Command accepted").endResponseMessage()
+                .to("direct:adminCacheClear")
 
-    from("direct:adminCacheDumpKeys")
-      .to("direct:authorizeAdminRequest")
-      .log(LoggingLevel.INFO, correlation() + "Dump keys")
-      .process(this::removeAllCamelHttpHeaders)
-      .bean("cacheAdmin", "dumpKeys")
-      .log(LoggingLevel.INFO, correlation() + "Dumped keys")
-      .routeId("admin-cache-dump-keys");
+                .get("/dump-keys")
+                .description("Clear the cache")
+                .consumes(PLAIN)
+                .produces(PLAIN)
+                .responseMessage().code(200).message("Command accepted").endResponseMessage()
+                .to("direct:adminCacheDumpKeys");
 
-    from("direct:authorizeEditorRequest")
-      .validate(header(CODESPACE_PARAM).isNotNull())
-      .doTry()
-      .bean(
-        authorizationService,
-        "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})"
-      )
-      .routeId("admin-authorize-editor-request");
 
-    from("direct:authorizeAdminRequest")
-      .doTry()
-      .process(e -> authorizationService.verifyAdministratorPrivileges())
-      .routeId("admin-authorize-admin-request");
-  }
+        from("direct:adminRouteAuthorizeGet")
+                .throwException(new NotFoundException())
+                .routeId("admin-route-authorize-get");
+
+        from("direct:adminRouteAuthorizePost")
+                .throwException(new NotFoundException())
+                .routeId("admin-route-authorize-post");
+
+        from("direct:adminRouteAuthorizePut")
+                .throwException(new NotFoundException())
+                .routeId("admin-route-authorize-put");
+
+        from("direct:adminRouteAuthorizeDelete")
+                .throwException(new NotFoundException())
+                .routeId("admin-route-authorize-delete");
+
+        from("direct:validationReport")
+                .to("direct:authorizeEditorRequest")
+                .setHeader(FILE_HANDLE, constant(BLOBSTORE_PATH_ANTU_REPORTS)
+                        .append(header(CODESPACE_PARAM))
+                        .append(Constants.VALIDATION_REPORT_PREFIX)
+                        .append(header(VALIDATION_REPORT_ID_PARAM))
+                        .append(VALIDATION_REPORT_SUFFIX))
+                .log(LoggingLevel.INFO, correlation() + "Downloading NeTEx validation report ${header." + FILE_HANDLE + "}")
+                .process(this::removeAllCamelHttpHeaders)
+                .to("direct:getAntuBlob")
+                .filter(simple("${body} == null"))
+                .setHeader(Exchange.HTTP_RESPONSE_CODE, constant(404))
+                // end filter
+                .end()
+                .setHeader(Exchange.CONTENT_ENCODING, constant("gzip"))
+                .removeHeader(HttpHeaders.AUTHORIZATION)
+                .routeId("validation-report");
+
+        from("direct:adminCacheClear")
+                .to("direct:authorizeAdminRequest")
+                .log(LoggingLevel.INFO, correlation() + "Clear cache")
+                .process(this::removeAllCamelHttpHeaders)
+                .bean("cacheAdmin", "clear")
+                .log(LoggingLevel.INFO, correlation() + "Cleared cache")
+                .routeId("admin-cache-clear");
+
+        from("direct:adminCacheDumpKeys")
+                .to("direct:authorizeAdminRequest")
+                .log(LoggingLevel.INFO, correlation() + "Dump keys")
+                .process(this::removeAllCamelHttpHeaders)
+                .bean("cacheAdmin", "dumpKeys")
+                .log(LoggingLevel.INFO, correlation() + "Dumped keys")
+                .routeId("admin-cache-dump-keys");
+
+        from("direct:authorizeEditorRequest")
+                .validate(header(CODESPACE_PARAM).isNotNull())
+                .doTry()
+                .bean(authorizationService, "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})")
+                .routeId("admin-authorize-editor-request");
+
+        from("direct:authorizeAdminRequest")
+                .doTry()
+                .process(e -> authorizationService.verifyAdministratorPrivileges())
+                .routeId("admin-authorize-admin-request");
+    }
+
 }

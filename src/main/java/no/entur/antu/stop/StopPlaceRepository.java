@@ -16,40 +16,42 @@
 package no.entur.antu.stop;
 
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.StopPlaceCoordinates;
 
 /**
  * A repository to store and cache the stop place and quay ids retrieved from the National Stop Register.
  */
 public interface StopPlaceRepository {
-  /**
-   * Checks if stop place id present in the cache or try getting it from Read api.
-   * @return stop place id.
-   */
-  boolean hasStopPlaceId(StopPlaceId stopPlaceId);
 
-  /**
-   * Checks if quay id present in the cache or try getting it from Read api.
-   * @return stop place id.
-   */
-  boolean hasQuayId(QuayId quayId);
+    /**
+     * Checks if stop place id present in the cache or try getting it from Read api.
+     * @return stop place id.
+     */
+    boolean hasStopPlaceId(StopPlaceId stopPlaceId);
 
-  /**
-   * Returns the transport modes for quay id present in the cache or try getting it from Read api.
-   * @return transport modes for given stop place id.
-   */
-  TransportModes getTransportModesForQuayId(QuayId quayId);
+    /**
+     * Checks if quay id present in the cache or try getting it from Read api.
+     * @return stop place id.
+     */
+    boolean hasQuayId(QuayId quayId);
 
-  /**
-   * Returns the coordinates for quay id present in the cache or try getting it from Read api.
-   * @return coordinates for given stop place id.
-   */
-  StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId);
+    /**
+     * Returns the transport modes for quay id present in the cache or try getting it from Read api.
+     * @return transport modes for given stop place id.
+     */
+    TransportModes getTransportModesForQuayId(QuayId quayId);
 
-  /**
-   * Refresh the cache with data retrieved from the Stop Place Register.
-   */
-  void refreshCache();
+    /**
+     * Returns the coordinates for quay id present in the cache or try getting it from Read api.
+     * @return coordinates for given stop place id.
+     */
+    StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId);
+
+    /**
+     * Refresh the cache with data retrieved from the Stop Place Register.
+     */
+    void refreshCache();
+
 }

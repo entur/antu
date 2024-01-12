@@ -16,9 +16,6 @@
 
 package no.entur.antu.flex.merging.config;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
@@ -29,6 +26,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Configuration for validating a dataset containing both fixed and flexible transport timetable data.
  * This profile checks only duplicated NeTEx IDs. It assumes that all other validation rules have been applied to the source datasets before they were merged.
@@ -36,32 +37,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TimetableDataFlexMergingValidatorConfig {
 
-  @Bean
-  public NetexIdUniquenessValidator flexMergingNetexIdUniquenessValidator(
-    NetexIdRepository netexIdRepository,
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    Set<String> ignorableElements = new HashSet<>(
-      NetexIdUniquenessValidator.getDefaultIgnorableElements()
-    );
-    ignorableElements.add("Authority");
-    ignorableElements.add("Operator");
-    return new NetexIdUniquenessValidator(
-      netexIdRepository,
-      validationReportEntryFactory,
-      ignorableElements
-    );
-  }
 
-  @Bean
-  public NetexValidatorsRunner flexMergingTimetableDataValidatorsRunner(
-    @Qualifier(
-      "flexMergingNetexIdUniquenessValidator"
-    ) NetexIdUniquenessValidator netexIdUniquenessValidator
-  ) {
-    List<NetexValidator> netexValidators = List.of(netexIdUniquenessValidator);
-    // do not ignore SiteFrame
-    NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return new NetexValidatorsRunner(netexXMLParser, netexValidators);
-  }
+    @Bean
+    public NetexIdUniquenessValidator flexMergingNetexIdUniquenessValidator(NetexIdRepository netexIdRepository, ValidationReportEntryFactory validationReportEntryFactory) {
+        Set<String> ignorableElements = new HashSet<>(NetexIdUniquenessValidator.getDefaultIgnorableElements());
+        ignorableElements.add("Authority");
+        ignorableElements.add("Operator");
+        return new NetexIdUniquenessValidator(netexIdRepository, validationReportEntryFactory, ignorableElements);
+    }
+
+    @Bean
+    public NetexValidatorsRunner flexMergingTimetableDataValidatorsRunner(@Qualifier("flexMergingNetexIdUniquenessValidator") NetexIdUniquenessValidator netexIdUniquenessValidator) {
+        List<NetexValidator> netexValidators = List.of(netexIdUniquenessValidator);
+        // do not ignore SiteFrame
+        NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
+        return new NetexValidatorsRunner(netexXMLParser, netexValidators);
+    }
+
 }

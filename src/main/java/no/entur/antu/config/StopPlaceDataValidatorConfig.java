@@ -16,14 +16,13 @@
 
 package no.entur.antu.config;
 
-import java.util.List;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.xpath.EnturStopPlaceDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.NetexReferenceValidator;
+import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
@@ -35,52 +34,41 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
 public class StopPlaceDataValidatorConfig {
 
-  @Bean
-  public ValidationTreeFactory stopPlaceDataValidationTreeFactory() {
-    return new EnturStopPlaceDataValidationTreeFactory();
-  }
+    @Bean
+    public ValidationTreeFactory stopPlaceDataValidationTreeFactory() {
+        return new EnturStopPlaceDataValidationTreeFactory();
+    }
 
-  @Bean
-  public XPathValidator stopPlaceDataXPathValidator(
-    @Qualifier(
-      "stopPlaceDataValidationTreeFactory"
-    ) ValidationTreeFactory validationTreeFactory,
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new XPathValidator(
-      validationTreeFactory,
-      validationReportEntryFactory
-    );
-  }
+    @Bean
+    public XPathValidator stopPlaceDataXPathValidator(@Qualifier("stopPlaceDataValidationTreeFactory") ValidationTreeFactory validationTreeFactory,
+                                                      ValidationReportEntryFactory validationReportEntryFactory) {
+        return new XPathValidator(validationTreeFactory, validationReportEntryFactory);
+    }
 
-  @Bean
-  public NetexValidatorsRunner stopPlaceDataValidatorsRunner(
-    NetexSchemaValidator netexSchemaValidator,
-    @Qualifier("stopPlaceDataXPathValidator") XPathValidator xpathValidator,
-    NetexIdValidator netexIdValidator,
-    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
-    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
-    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
-    NetexReferenceValidator netexReferenceValidator,
-    NetexIdUniquenessValidator netexIdUniquenessValidator
-  ) {
-    List<NetexValidator> netexValidators = List.of(
-      xpathValidator,
-      netexIdValidator,
-      versionOnLocalNetexIdValidator,
-      versionOnRefToLocalNetexIdValidator,
-      referenceToValidEntityTypeValidator,
-      netexReferenceValidator,
-      netexIdUniquenessValidator
-    );
-    NetexXMLParser netexXMLParser = new NetexXMLParser();
-    return new NetexValidatorsRunner(
-      netexXMLParser,
-      netexSchemaValidator,
-      netexValidators
-    );
-  }
+    @Bean
+    public NetexValidatorsRunner stopPlaceDataValidatorsRunner(NetexSchemaValidator netexSchemaValidator,
+                                                               @Qualifier("stopPlaceDataXPathValidator") XPathValidator xpathValidator,
+                                                               NetexIdValidator netexIdValidator,
+                                                               VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
+                                                               VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
+                                                               ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
+                                                               NetexReferenceValidator netexReferenceValidator,
+                                                               NetexIdUniquenessValidator netexIdUniquenessValidator) {
+        List<NetexValidator> netexValidators = List.of(
+                xpathValidator,
+                netexIdValidator,
+                versionOnLocalNetexIdValidator,
+                versionOnRefToLocalNetexIdValidator,
+                referenceToValidEntityTypeValidator,
+                netexReferenceValidator,
+                netexIdUniquenessValidator
+        );
+        NetexXMLParser netexXMLParser = new NetexXMLParser();
+        return new NetexValidatorsRunner(netexXMLParser, netexSchemaValidator, netexValidators);
+    }
 }
