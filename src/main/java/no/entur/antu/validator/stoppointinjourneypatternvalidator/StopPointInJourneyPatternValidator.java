@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
@@ -127,7 +128,7 @@ public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
         validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
 
       StopPointInJourneyPatternContextBuilder builder =
-        new StopPointInJourneyPatternContextBuilder(commonDataRepository);
+        new StopPointInJourneyPatternContextBuilder(validationReport.getValidationReportId(), commonDataRepository);
       List<StopPointInJourneyPatternContext> stopPointInJourneyPatternContexts =
         index
           .getJourneyPatternIndex()
@@ -135,7 +136,7 @@ public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
           .stream()
           .flatMap(journeyPattern ->
             builder
-              .build(journeyPattern, validationReport.getValidationReportId())
+              .build(journeyPattern)
               .stream()
           )
           .toList();
