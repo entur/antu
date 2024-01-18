@@ -127,17 +127,16 @@ public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
         validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
 
       StopPointInJourneyPatternContextBuilder builder =
-        new StopPointInJourneyPatternContextBuilder(commonDataRepository);
+        new StopPointInJourneyPatternContextBuilder(
+          validationReport.getValidationReportId(),
+          commonDataRepository
+        );
       List<StopPointInJourneyPatternContext> stopPointInJourneyPatternContexts =
         index
           .getJourneyPatternIndex()
           .getAll()
           .stream()
-          .flatMap(journeyPattern ->
-            builder
-              .build(journeyPattern, validationReport.getValidationReportId())
-              .stream()
-          )
+          .flatMap(journeyPattern -> builder.build(journeyPattern).stream())
           .toList();
 
       Predicate<StopPointInJourneyPatternContext> hasNoStopPointAssignmentInCommonFile =
