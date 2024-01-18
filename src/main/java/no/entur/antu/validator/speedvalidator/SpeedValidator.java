@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
@@ -68,14 +69,16 @@ public class SpeedValidator extends AntuNetexValidator {
     if (
       validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
     ) {
-      NetexEntitiesIndex index =
+      NetexEntitiesIndex netexEntitiesIndex =
         validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
       ServiceJourneyContextBuilder contextBuilder =
         new ServiceJourneyContextBuilder(
+          validationReport.getValidationReportId(),
+          netexEntitiesIndex,
           commonDataRepository,
           stopPlaceRepository
         );
-      List<ServiceJourney> serviceJourneys = index
+      List<ServiceJourney> serviceJourneys = netexEntitiesIndex
         .getTimetableFrames()
         .stream()
         .flatMap(timetableFrame ->
@@ -90,17 +93,11 @@ public class SpeedValidator extends AntuNetexValidator {
 
       serviceJourneys
         .stream()
-        .map(serviceJourney ->
-          contextBuilder.build(
-            index,
-            serviceJourney,
-            validationReport.getValidationReportId()
-          )
-        )
+        .map(contextBuilder::build)
         .forEach(context ->
           validateServiceJourney(
             context,
-            index,
+            netexEntitiesIndex,
             error ->
               addValidationReportEntry(
                 validationReport,

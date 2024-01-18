@@ -3,6 +3,7 @@ package no.entur.antu.validator.speedvalidator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
@@ -54,21 +55,25 @@ public class ServiceJourneyContextBuilder {
     }
   }
 
+  private final String validationReportId;
+  private final NetexEntitiesIndex netexEntitiesIndex;
   private final CommonDataRepository commonDataRepository;
   private final StopPlaceRepository stopPlaceRepository;
 
   public ServiceJourneyContextBuilder(
+    String validationReportId,
+    NetexEntitiesIndex netexEntitiesIndex,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
+    this.validationReportId = validationReportId;
+    this.netexEntitiesIndex = netexEntitiesIndex;
     this.commonDataRepository = commonDataRepository;
     this.stopPlaceRepository = stopPlaceRepository;
   }
 
   public ServiceJourneyContext build(
-    NetexEntitiesIndex index,
-    ServiceJourney serviceJourney,
-    String validationReportId
+    ServiceJourney serviceJourney
   ) {
     String journeyPatternRef = serviceJourney
       .getJourneyPatternRef()
@@ -81,11 +86,8 @@ public class ServiceJourneyContextBuilder {
         .stream()
         .map(timetabledPassingTime ->
           findStopPlaceCoordinates(
-            index,
             timetabledPassingTime,
-            journeyPatternRef,
-            validationReportId
-          )
+            journeyPatternRef)
         )
         .filter(Objects::nonNull)
         .collect(
@@ -97,25 +99,24 @@ public class ServiceJourneyContextBuilder {
         );
     return new ServiceJourneyContext(
       serviceJourney,
-      findTransportMode(index, serviceJourney),
+      findTransportMode(serviceJourney),
       stopPlaceCoordinatesPerTimetabledPassingTimeId
     );
   }
 
   private AllVehicleModesOfTransportEnumeration findTransportMode(
-    NetexEntitiesIndex index,
     ServiceJourney serviceJourney
   ) {
     AllVehicleModesOfTransportEnumeration transportMode =
       serviceJourney.getTransportMode();
     if (transportMode == null) {
-      JourneyPattern journeyPattern = index
+      JourneyPattern journeyPattern = netexEntitiesIndex
         .getJourneyPatternIndex()
         .get(serviceJourney.getJourneyPatternRef().getValue().getRef());
-      Route route = index
+      Route route = netexEntitiesIndex
         .getRouteIndex()
         .get(journeyPattern.getRouteRef().getRef());
-      Line line = index
+      Line line = netexEntitiesIndex
         .getLineIndex()
         .get(route.getLineRef().getValue().getRef());
       return line.getTransportMode();
@@ -124,10 +125,8 @@ public class ServiceJourneyContextBuilder {
   }
 
   private Map.Entry<String, StopPlaceCoordinates> findStopPlaceCoordinates(
-    NetexEntitiesIndex index,
     TimetabledPassingTime timetabledPassingTime,
-    String journeyPatternRef,
-    String validationReportId
+    String journeyPatternRef
   ) {
     String stopPointInJourneyPatternRef = timetabledPassingTime
       .getPointInJourneyPatternRef()
@@ -136,9 +135,7 @@ public class ServiceJourneyContextBuilder {
     StopPointInJourneyPattern stopPointInJourneyPattern =
       getStopPointInJourneyPattern(
         stopPointInJourneyPatternRef,
-        journeyPatternRef,
-        index
-      );
+        journeyPatternRef);
     if (stopPointInJourneyPattern != null) {
       String scheduledStopPointRef = stopPointInJourneyPattern
         .getScheduledStopPointRef()
@@ -159,10 +156,9 @@ public class ServiceJourneyContextBuilder {
 
   private StopPointInJourneyPattern getStopPointInJourneyPattern(
     String stopPointInJourneyPatternRef,
-    String journeyPatternRef,
-    NetexEntitiesIndex index
+    String journeyPatternRef
   ) {
-    return index
+    return netexEntitiesIndex
       .getJourneyPatternIndex()
       .get(journeyPatternRef)
       .getPointsInSequence()
