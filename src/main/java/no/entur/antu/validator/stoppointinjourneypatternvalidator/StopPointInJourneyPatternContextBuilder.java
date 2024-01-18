@@ -7,11 +7,14 @@ import org.rutebanken.netex.model.*;
 
 public class StopPointInJourneyPatternContextBuilder {
 
+  private final String validationReportId;
   private final CommonDataRepository commonDataRepository;
 
   public StopPointInJourneyPatternContextBuilder(
+    String validationReportId,
     CommonDataRepository commonDataRepository
   ) {
+    this.validationReportId = validationReportId;
     this.commonDataRepository = commonDataRepository;
   }
 
@@ -22,8 +25,7 @@ public class StopPointInJourneyPatternContextBuilder {
   ) {}
 
   public List<StopPointInJourneyPatternContext> build(
-    JourneyPattern journeyPattern,
-    String validationReportId
+    JourneyPattern journeyPattern
   ) {
     return journeyPattern
       .getPointsInSequence()
