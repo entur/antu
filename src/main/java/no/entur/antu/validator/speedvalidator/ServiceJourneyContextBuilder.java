@@ -118,7 +118,23 @@ public class ServiceJourneyContextBuilder {
       Line line = index
         .getLineIndex()
         .get(route.getLineRef().getValue().getRef());
-      return line.getTransportMode();
+
+      if (line != null) {
+        return line.getTransportMode();
+      }
+
+      FlexibleLine flexibleLine = index
+        .getFlexibleLineIndex()
+        .get(route.getLineRef().getValue().getRef());
+
+      if (
+        flexibleLine != null &&
+        flexibleLine.getFlexibleLineType() == FlexibleLineTypeEnumeration.FIXED
+      ) {
+        return flexibleLine.getTransportMode();
+      }
+
+      return null;
     }
     return transportMode;
   }
