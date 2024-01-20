@@ -10,9 +10,9 @@ import java.util.List;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.netextestdata.NetexTestData;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.nonincreasingpassingtime.NetexTestData;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -134,6 +134,48 @@ class SpeedValidatorTest {
     );
   }
 
+  @Test
+  void testSameDepartureArrivalTimeErrorThrown() {
+    NetexTestData testData = new NetexTestData();
+    JourneyPattern journeyPattern = testData
+      .journeyPattern()
+      .withNumberOfStopPointInJourneyPattern(2)
+      .create();
+
+    // Setting departureTimeOffset to 0 to will make the departure time same for both passingTimes.
+    ServiceJourney serviceJourney = testData
+      .serviceJourney(journeyPattern)
+      .withCreateTimetabledPassingTimes(
+        testData.timetabledPassingTimes().withDepartureTimeOffset(0)
+      )
+      .create();
+
+    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+
+    ValidationReport validationReport = runTestWith(
+      List.of(
+        new StopPlaceCoordinates(6.622312, 60.481548),
+        new StopPlaceCoordinates(6.632312, 60.491548)
+      ),
+      journeyPattern,
+      serviceJourney
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(1));
+    assertThat(
+      validationReport
+        .getValidationReportEntries()
+        .stream()
+        .map(ValidationReportEntry::getName)
+        .toList(),
+      is(
+        List.of(
+          SameDepartureArrivalTimeError.RuleCode.SAME_DEPARTURE_ARRIVAL_TIME.name()
+        )
+      )
+    );
+  }
+
   private static ValidationReport runTestWithStopPlaceCoordinates(
     List<StopPlaceCoordinates> stopPlaceCoordinates
   ) {
@@ -142,9 +184,16 @@ class SpeedValidatorTest {
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
       .create();
-
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
+    return runTestWith(stopPlaceCoordinates, journeyPattern, serviceJourney);
+  }
+
+  private static ValidationReport runTestWith(
+    List<StopPlaceCoordinates> stopPlaceCoordinates,
+    JourneyPattern journeyPattern,
+    ServiceJourney serviceJourney
+  ) {
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
     );

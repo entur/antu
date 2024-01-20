@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalTime;
+import no.entur.antu.netextestdata.NetexTestData;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
 import no.entur.antu.validator.nonincreasingpassingtime.NonIncreasingPassingTimeError.RuleCode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
