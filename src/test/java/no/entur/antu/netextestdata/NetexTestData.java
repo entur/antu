@@ -1,7 +1,7 @@
-package no.entur.antu.validator.nonincreasingpassingtime;
+package no.entur.antu.netextestdata;
 
-import static no.entur.antu.validator.nonincreasingpassingtime.MappingSupport.createJaxbElement;
-import static no.entur.antu.validator.nonincreasingpassingtime.MappingSupport.createWrappedRef;
+import static no.entur.antu.netextestdata.MappingSupport.createJaxbElement;
+import static no.entur.antu.netextestdata.MappingSupport.createWrappedRef;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
@@ -41,6 +41,10 @@ public class NetexTestData {
 
   public CreateServiceJourney serviceJourney(JourneyPattern journeyPattern) {
     return new CreateServiceJourney(journeyPattern);
+  }
+
+  public CreateTimetabledPassingTimes timetabledPassingTimes() {
+    return new CreateTimetabledPassingTimes();
   }
 
   public CreateDeadRun deadRun(JourneyPattern journeyPattern) {
@@ -243,12 +247,22 @@ public class NetexTestData {
 
     private final JourneyPattern journeyPattern;
 
+    private CreateTimetabledPassingTimes createTimetabledPassingTimes;
+
     public CreateDeadRun(JourneyPattern journeyPattern) {
       this.journeyPattern = journeyPattern;
+      this.createTimetabledPassingTimes = new CreateTimetabledPassingTimes();
     }
 
     public CreateDeadRun withId(int id) {
       this.id = id;
+      return this;
+    }
+
+    public CreateDeadRun withCreateTimetabledPassingTimes(
+      CreateTimetabledPassingTimes createTimetabledPassingTimes
+    ) {
+      this.createTimetabledPassingTimes = createTimetabledPassingTimes;
       return this;
     }
 
@@ -261,11 +275,7 @@ public class NetexTestData {
         .withPassingTimes(
           new TimetabledPassingTimes_RelStructure()
             .withTimetabledPassingTime(
-              createTimetabledPassingTimes(
-                journeyPattern
-                  .getPointsInSequence()
-                  .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-              )
+              createTimetabledPassingTimes.create(journeyPattern)
             )
         );
     }
@@ -276,12 +286,22 @@ public class NetexTestData {
     private int id = 1;
     private final JourneyPattern journeyPattern;
 
+    private CreateTimetabledPassingTimes createTimetabledPassingTimes;
+
     public CreateServiceJourney(JourneyPattern journeyPattern) {
       this.journeyPattern = journeyPattern;
+      this.createTimetabledPassingTimes = new CreateTimetabledPassingTimes();
     }
 
     public CreateServiceJourney withId(int id) {
       this.id = id;
+      return this;
+    }
+
+    public CreateServiceJourney withCreateTimetabledPassingTimes(
+      CreateTimetabledPassingTimes createTimetabledPassingTimes
+    ) {
+      this.createTimetabledPassingTimes = createTimetabledPassingTimes;
       return this;
     }
 
@@ -294,31 +314,46 @@ public class NetexTestData {
         .withPassingTimes(
           new TimetabledPassingTimes_RelStructure()
             .withTimetabledPassingTime(
-              createTimetabledPassingTimes(
-                journeyPattern
-                  .getPointsInSequence()
-                  .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-              )
+              createTimetabledPassingTimes.create(journeyPattern)
             )
         );
     }
   }
 
-  private List<TimetabledPassingTime> createTimetabledPassingTimes(
-    List<PointInLinkSequence_VersionedChildStructure> pointsInLink
-  ) {
-    // Create timetable with 4 stops using the stopTimes above
-    return IntStream
-      .range(0, pointsInLink.size())
-      .mapToObj(index ->
-        new TimetabledPassingTime()
-          .withId("TTPT-" + (index + 1))
-          .withDepartureTime(LocalTime.of(5, index * 5))
-          .withPointInJourneyPatternRef(
-            createStopPointRef(pointsInLink.get(index).getId())
-          )
-      )
-      .toList();
+  public static class CreateTimetabledPassingTimes {
+
+    private int departureTimeOffset = 5;
+
+    public CreateTimetabledPassingTimes withDepartureTimeOffset(
+      int departureTimeOffset
+    ) {
+      this.departureTimeOffset = departureTimeOffset;
+      return this;
+    }
+
+    public List<TimetabledPassingTime> create(JourneyPattern journeyPattern) {
+      return createTimetabledPassingTimes(
+        journeyPattern
+          .getPointsInSequence()
+          .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      );
+    }
+
+    private List<TimetabledPassingTime> createTimetabledPassingTimes(
+      List<PointInLinkSequence_VersionedChildStructure> pointsInLink
+    ) {
+      return IntStream
+        .range(0, pointsInLink.size())
+        .mapToObj(index ->
+          new TimetabledPassingTime()
+            .withId("TTPT-" + (index + 1))
+            .withDepartureTime(LocalTime.of(5, index * departureTimeOffset))
+            .withPointInJourneyPatternRef(
+              createStopPointRef(pointsInLink.get(index).getId())
+            )
+        )
+        .toList();
+    }
   }
 
   private static DayTypeRefs_RelStructure createEveryDayRefs() {
