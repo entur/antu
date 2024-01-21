@@ -7,10 +7,14 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 import javax.xml.bind.JAXBElement;
+import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.rutebanken.netex.model.*;
 
 public class NetexTestData {
@@ -74,6 +78,19 @@ public class NetexTestData {
         new CreateServiceJourney(journeyPattern).withId(index).create()
       )
       .toList();
+  }
+
+  public CreateNetexEntitiesIndex netexEntitiesIndex() {
+    return new CreateNetexEntitiesIndex();
+  }
+
+  public CreateNetexEntitiesIndex netexEntitiesIndex(
+    JourneyPattern journeyPattern,
+    Journey_VersionStructure journey
+  ) {
+    return new CreateNetexEntitiesIndex()
+      .addJourneyPatterns(journeyPattern)
+      .addServiceJourneys(journey);
   }
 
   public static class CreateDatedServiceJourney {
@@ -353,6 +370,51 @@ public class NetexTestData {
             )
         )
         .toList();
+    }
+  }
+
+  public class CreateNetexEntitiesIndex {
+
+    private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
+    private final List<Journey_VersionStructure> journeys = new ArrayList<>();
+
+    public CreateNetexEntitiesIndex addServiceJourneys(
+      Journey_VersionStructure... serviceJourney
+    ) {
+      this.journeys.addAll(Arrays.asList(serviceJourney));
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addJourneyPatterns(
+      JourneyPattern... journeyPatterns
+    ) {
+      this.journeyPatterns.addAll(Arrays.asList(journeyPatterns));
+      return this;
+    }
+
+    public NetexEntitiesIndex create() {
+      NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
+      journeyPatterns.forEach(journeyPattern ->
+        netexEntitiesIndex
+          .getJourneyPatternIndex()
+          .put(journeyPattern.getId(), journeyPattern)
+      );
+
+      journeys.forEach(journey ->
+        netexEntitiesIndex
+          .getTimetableFrames()
+          .add(
+            new TimetableFrame()
+              .withVehicleJourneys(
+                new JourneysInFrame_RelStructure()
+                  .withId("JR:123")
+                  .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
+                    journey
+                  )
+              )
+          )
+      );
+      return netexEntitiesIndex;
     }
   }
 

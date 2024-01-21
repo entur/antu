@@ -32,10 +32,10 @@ class StopPointInJourneyPatternValidatorTest {
       .serviceJourney(journeyPattern)
       .create();
 
-    NetexEntitiesIndex netexEntitiesIndex = createNetexEntitiesIndex(
-      journeyPattern,
-      serviceJourney
-    );
+    NetexEntitiesIndex netexEntitiesIndex = testData
+      .netexEntitiesIndex(journeyPattern, serviceJourney)
+      .create();
+
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
     );
@@ -76,10 +76,10 @@ class StopPointInJourneyPatternValidatorTest {
       .serviceJourney(journeyPattern)
       .create();
 
-    NetexEntitiesIndex netexEntitiesIndex = createNetexEntitiesIndex(
-      journeyPattern,
-      serviceJourney
-    );
+    NetexEntitiesIndex netexEntitiesIndex = testData
+      .netexEntitiesIndex(journeyPattern, serviceJourney)
+      .create();
+
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
     );
@@ -126,10 +126,15 @@ class StopPointInJourneyPatternValidatorTest {
       .map(NetexTestData.CreateServiceJourney::create)
       .map(Journey_VersionStructure.class::cast)
       .toList();
-    NetexEntitiesIndex netexEntitiesIndex = createNetexEntitiesIndex(
-      journeyPatterns,
-      serviceJourneys
-    );
+
+    NetexEntitiesIndex netexEntitiesIndex = testData
+      .netexEntitiesIndex()
+      .addJourneyPatterns(journeyPatterns.toArray(JourneyPattern[]::new))
+      .addServiceJourneys(
+        serviceJourneys.toArray(Journey_VersionStructure[]::new)
+      )
+      .create();
+
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
     );
@@ -150,6 +155,7 @@ class StopPointInJourneyPatternValidatorTest {
     NetexTestData testData = new NetexTestData();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
 
+    // TODO: ???
     NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
     netexEntitiesIndex
       .getJourneyPatternIndex()
@@ -176,10 +182,10 @@ class StopPointInJourneyPatternValidatorTest {
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     DeadRun deadRun = testData.deadRun(journeyPattern).create();
 
-    NetexEntitiesIndex netexEntitiesIndex = createNetexEntitiesIndex(
-      journeyPattern,
-      deadRun
-    );
+    NetexEntitiesIndex netexEntitiesIndex = testData
+      .netexEntitiesIndex(journeyPattern, deadRun)
+      .create();
+
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
     );
@@ -204,10 +210,12 @@ class StopPointInJourneyPatternValidatorTest {
       .serviceJourney(journeyPattern)
       .create();
 
-    NetexEntitiesIndex netexEntitiesIndex = createNetexEntitiesIndex(
-      journeyPattern,
-      List.of(deadRun, serviceJourney)
-    );
+    NetexEntitiesIndex netexEntitiesIndex = testData
+      .netexEntitiesIndex()
+      .addJourneyPatterns(journeyPattern)
+      .addServiceJourneys(deadRun, serviceJourney)
+      .create();
+
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
     );
@@ -228,10 +236,10 @@ class StopPointInJourneyPatternValidatorTest {
       .serviceJourney(journeyPattern)
       .create();
 
-    NetexEntitiesIndex netexEntitiesIndex = createNetexEntitiesIndex(
-      journeyPattern,
-      serviceJourney
-    );
+    NetexEntitiesIndex netexEntitiesIndex = testData
+      .netexEntitiesIndex(journeyPattern, serviceJourney)
+      .create();
+
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
     );
@@ -297,85 +305,5 @@ class StopPointInJourneyPatternValidatorTest {
     );
 
     return testValidationReport;
-  }
-
-  private static NetexEntitiesIndex createNetexEntitiesIndex(
-    JourneyPattern journeyPattern,
-    Journey_VersionStructure journey
-  ) {
-    NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
-    netexEntitiesIndex
-      .getJourneyPatternIndex()
-      .put(journeyPattern.getId(), journeyPattern);
-
-    netexEntitiesIndex
-      .getTimetableFrames()
-      .add(
-        new TimetableFrame()
-          .withVehicleJourneys(
-            new JourneysInFrame_RelStructure()
-              .withId("JR:123")
-              .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-                journey
-              )
-          )
-      );
-
-    return netexEntitiesIndex;
-  }
-
-  private static NetexEntitiesIndex createNetexEntitiesIndex(
-    JourneyPattern journeyPattern,
-    List<Journey_VersionStructure> journeys
-  ) {
-    NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
-    netexEntitiesIndex
-      .getJourneyPatternIndex()
-      .put(journeyPattern.getId(), journeyPattern);
-
-    journeys.forEach(journey ->
-      netexEntitiesIndex
-        .getTimetableFrames()
-        .add(
-          new TimetableFrame()
-            .withVehicleJourneys(
-              new JourneysInFrame_RelStructure()
-                .withId("JR:123")
-                .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-                  journey
-                )
-            )
-        )
-    );
-
-    return netexEntitiesIndex;
-  }
-
-  private static NetexEntitiesIndex createNetexEntitiesIndex(
-    List<JourneyPattern> journeyPatterns,
-    List<Journey_VersionStructure> journeys
-  ) {
-    NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
-    journeyPatterns.forEach(journeyPattern ->
-      netexEntitiesIndex
-        .getJourneyPatternIndex()
-        .put(journeyPattern.getId(), journeyPattern)
-    );
-
-    journeys.forEach(journey ->
-      netexEntitiesIndex
-        .getTimetableFrames()
-        .add(
-          new TimetableFrame()
-            .withVehicleJourneys(
-              new JourneysInFrame_RelStructure()
-                .withId("JR:123")
-                .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-                  journey
-                )
-            )
-        )
-    );
-    return netexEntitiesIndex;
   }
 }
