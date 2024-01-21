@@ -157,8 +157,7 @@ class SpeedValidatorTest {
         new StopPlaceCoordinates(6.622312, 60.481548),
         new StopPlaceCoordinates(6.632312, 60.491548)
       ),
-      journeyPattern,
-      serviceJourney
+      testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -186,13 +185,15 @@ class SpeedValidatorTest {
       .create();
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
-    return runTestWith(stopPlaceCoordinates, journeyPattern, serviceJourney);
+    return runTestWith(
+      stopPlaceCoordinates,
+      testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
+    );
   }
 
   private static ValidationReport runTestWith(
     List<StopPlaceCoordinates> stopPlaceCoordinates,
-    JourneyPattern journeyPattern,
-    ServiceJourney serviceJourney
+    NetexEntitiesIndex netexEntitiesIndex
   ) {
     CommonDataRepository commonDataRepository = Mockito.mock(
       CommonDataRepository.class
@@ -218,35 +219,10 @@ class SpeedValidatorTest {
     }
 
     return setupAndRunValidation(
-      createNetexEntitiesIndex(journeyPattern, serviceJourney),
+      netexEntitiesIndex,
       commonDataRepository,
       stopPlaceRepository
     );
-  }
-
-  private static NetexEntitiesIndex createNetexEntitiesIndex(
-    JourneyPattern journeyPattern,
-    ServiceJourney serviceJourney
-  ) {
-    NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
-    netexEntitiesIndex
-      .getJourneyPatternIndex()
-      .put(journeyPattern.getId(), journeyPattern);
-
-    netexEntitiesIndex
-      .getTimetableFrames()
-      .add(
-        new TimetableFrame()
-          .withVehicleJourneys(
-            new JourneysInFrame_RelStructure()
-              .withId("JR:123")
-              .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-                serviceJourney
-              )
-          )
-      );
-
-    return netexEntitiesIndex;
   }
 
   private static ValidationReport setupAndRunValidation(
