@@ -33,7 +33,7 @@ package no.entur.antu;/*
  */
 
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import no.entur.antu.repository.InMemoryBlobStoreRepository;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;

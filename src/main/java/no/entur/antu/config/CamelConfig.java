@@ -19,8 +19,8 @@ package no.entur.antu.config;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import no.entur.antu.memorystore.RedisTemporaryFileRepository;
@@ -64,6 +64,6 @@ public class CamelConfig {
    */
   @Bean
   KubernetesClient kubernetesClient() {
-    return new DefaultKubernetesClient();
+    return new KubernetesClientBuilder().build();
   }
 }
