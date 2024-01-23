@@ -119,7 +119,7 @@ public class ServiceJourneyContextBuilder {
         return line.getTransportMode();
       }
 
-      FlexibleLine flexibleLine = index
+      FlexibleLine flexibleLine = netexEntitiesIndex
         .getFlexibleLineIndex()
         .get(route.getLineRef().getValue().getRef());
 

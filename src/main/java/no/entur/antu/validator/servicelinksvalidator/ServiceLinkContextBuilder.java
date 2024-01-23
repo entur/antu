@@ -1,9 +1,12 @@
 package no.entur.antu.validator.servicelinksvalidator;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.xml.bind.JAXBElement;
+import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
@@ -102,34 +105,44 @@ public class ServiceLinkContextBuilder {
       .filter(LinkSequenceProjection_VersionStructure.class::isInstance)
       .map(LinkSequenceProjection_VersionStructure.class::cast)
       .map(LinkSequenceProjection_VersionStructure::getLineString)
+      .filter(Objects::nonNull)
+      .map(this::getCoordinates)
       .filter(this::isProjectionValid)
       .map(this::createLineStringFromLineStringType)
       .filter(Objects::nonNull)
       .findFirst();
   }
 
-  private boolean isProjectionValid(LineStringType lineString) {
-    if (lineString == null) {
-      return false;
+  /**
+   * Validating that we have at least two coordinates (4 values) and the list size is even
+   */
+  private boolean isProjectionValid(List<Double> coordinates) {
+    return coordinates.size() >= 4 && coordinates.size() % 2 == 0;
+  }
+
+  private List<Double> getCoordinates(LineStringType lineString) {
+    if (lineString.getPosList() != null) {
+      return lineString.getPosList().getValue();
+    } else if (lineString.getPosOrPointProperty() != null) {
+      return lineString
+        .getPosOrPointProperty()
+        .stream()
+        .filter(DirectPositionType.class::isInstance)
+        .map(DirectPositionType.class::cast)
+        .map(DirectPositionType::getValue)
+        .flatMap(Collection::stream)
+        .toList();
     }
-
-    // Assuming getPosList() and getValue() are guaranteed to be non-null.
-    List<Double> coordinates = lineString.getPosList().getValue();
-
-    // Validating that we have at least two coordinates, i.e. start and end point
-    if (coordinates.size() < 4) {
-      return false;
-    }
-
-    // Check if the coordinates list size is even
-    // Validating that we have both longitude and latitude for each coordinate
-    return coordinates.size() % 2 == 0;
+    LOGGER.debug(
+      "LineString without posList or PosOrPointProperty: {}",
+      lineString.getId()
+    );
+    return Collections.emptyList();
   }
 
   private LineString createLineStringFromLineStringType(
-    LineStringType lineStringType
+    List<Double> positionList
   ) {
-    List<Double> positionList = lineStringType.getPosList().getValue();
     Coordinate[] coordinates = new Coordinate[positionList.size() / 2];
     for (int i = 0; i < positionList.size(); i += 2) {
       coordinates[i / 2] =

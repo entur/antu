@@ -144,6 +144,18 @@ public class ServiceLinksValidator extends AntuNetexValidator {
     ServiceLinkContext context,
     Consumer<ValidationError> reportError
   ) {
+    if (distance > DISTANCE_MAX) {
+      reportError.accept(
+        createServiceLinksError(
+          isStart
+            ? ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
+            : ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
+          distance,
+          context
+        )
+      );
+      return;
+    }
     if (distance > DISTANCE_WARNING) {
       reportError.accept(
         createServiceLinksError(
@@ -154,17 +166,6 @@ public class ServiceLinksValidator extends AntuNetexValidator {
           context
         )
       );
-      if (distance > DISTANCE_MAX) {
-        reportError.accept(
-          createServiceLinksError(
-            isStart
-              ? ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
-              : ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
-            distance,
-            context
-          )
-        );
-      }
     }
   }
 
