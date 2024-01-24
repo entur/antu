@@ -65,8 +65,8 @@ data:
     antu.netex.stop.current.filename=tiamat/CurrentAndFuture_latest.zip
 
     # Redis
-    spring.redis.host=${REDIS_HOST}
-    spring.redis.port=${REDIS_PORT}
+    spring.data.redis.host=${REDIS_HOST}
+    spring.data.redis.port=${REDIS_PORT}
     antu.redis.server.trust.store.file=/deployments/truststore/redis-server-ca.jks
 
     # Actuator
