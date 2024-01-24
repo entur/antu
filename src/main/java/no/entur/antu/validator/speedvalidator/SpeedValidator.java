@@ -192,7 +192,7 @@ public class SpeedValidator extends AntuNetexValidator {
   ) {
     double distance = context.calculateDistance(passingTimes);
     if (distance < 1) {
-      LOGGER.info(
+      LOGGER.debug(
         "Distance between stops is less than 1 meter, skipping speed validation"
       );
       return;
@@ -200,7 +200,7 @@ public class SpeedValidator extends AntuNetexValidator {
 
     ExpectedSpeed expectedSpeed = ExpectedSpeed.of(context.transportMode());
     if (expectedSpeed == null) {
-      LOGGER.info(
+      LOGGER.debug(
         "No expected speed for transport mode {}, skipping speed validation",
         context.transportMode()
       );
