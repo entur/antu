@@ -57,3 +57,9 @@ validationRuleConfigs:
   - code: MISSING_SCHEDULED_STOP_ASSIGNMENT
     name: Missing ScheduledStopAssignment for StopPointInJourneyPattern
     severity: ERROR
+  - code: JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP
+    name: Last StopPointInJourneyPattern must not allow boarding
+    severity: ERROR
+  - code: JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP
+    name: First StopPointInJourneyPattern must not allow alighting
+    severity: ERROR
