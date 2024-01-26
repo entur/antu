@@ -119,29 +119,31 @@ Antu comes with the following rule sets, depending on the validation profile use
 
 ### For validation Profile `Timetable`
 
-| Sr. | Rule Code                                   |                                                      Rule Description                                                       |
-|-----|---------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------:|
-| 1   | NETEX_ID_4W                                 |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 2   | NETEX_ID_2                                  |                                               Invalid id structure on element                                               |
-| 3   | NETEX_ID_3                                  |                                           Invalid structure on id %s. Expected %s                                           |
-| 4   | NETEX_ID_4                                  |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 5   | NETEX_ID_8                                  |                                   Missing version attribute on elements with id attribute                                   |
-| 6   | NETEX_ID_9                                  |                                  Missing version attribute on reference to local elements                                   |
-| 7   | NETEX_ID_6                                  | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements if type XXXX |
-| 8   | NETEX_ID_7                                  |                                               Invalid id structure on element                                               |
-| 9   | NETEX_ID_5                                  |                                       Unresolved reference to external reference data                                       |
-| 10  | NETEX_ID_1                                  |                                         Duplicate element identifiers across files                                          |
-| 11  | NETEX_ID_10                                 |                                      Duplicate element identifiers across common files                                      |
-| 12  | NETEX_TRANSPORT_MODE_1                      |                                                   Invalid transport mode                                                    |
-| 13  | TIMETABLED_PASSING_TIME_INCONSISTENT_TIME   |                                    ServiceJourney has inconsistent TimetabledPassingTime                                    |
-| 14  | TIMETABLED_PASSING_TIME_NON_INCREASING_TIME |                                   ServiceJourney has non-increasing TimetabledPassingTime                                   |
-| 15  | TIMETABLED_PASSING_TIME_INCOMPLETE_TIME     |                                     ServiceJourney has incomplete TimetabledPassingTime                                     |
-| 16  | HIGH_SPEED_PROGRESSION                      |                                          ServiceJourney has high speed progression                                          |
-| 17  | LOW_SPEED_PROGRESSION                       |                                          ServiceJourney has low speed progression                                           |
-| 18  | WARNING_SPEED_PROGRESSION                   |                                       ServiceJourney has unexpected speed progression                                       |
-| 19  | MISSING_SCHEDULED_STOP_ASSIGNMENT           |               Missing ScheduledStopAssignment for StopPointInJourneyPattern, while the ServiceJourney exists.               |
-| 20  | CODESPACE                                   |              Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s               |
-| 21  | VERSION_NON_NUMERIC                         |                                                  Non-numeric NeTEx version                                                  |
+| Sr. | Rule Code                                          |                                                      Rule Description                                                       |
+|-----|----------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------:|
+| 1   | NETEX_ID_4                                         |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
+| 2   | NETEX_ID_4W                                        |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
+| 3   | NETEX_ID_2                                         |                                               Invalid id structure on element                                               |
+| 4   | NETEX_ID_3                                         |                                           Invalid structure on id %s. Expected %s                                           |
+| 5   | NETEX_ID_8                                         |                                   Missing version attribute on elements with id attribute                                   |
+| 6   | NETEX_ID_9                                         |                                  Missing version attribute on reference to local elements                                   |
+| 7   | NETEX_ID_6                                         | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements if type XXXX |
+| 8   | NETEX_ID_7                                         |                                               Invalid id structure on element                                               |
+| 9   | NETEX_ID_5                                         |                                       Unresolved reference to external reference data                                       |
+| 10  | NETEX_ID_1                                         |                                         Duplicate element identifiers across files                                          |
+| 11  | NETEX_ID_10                                        |                                      Duplicate element identifiers across common files                                      |
+| 12  | INVALID_TRANSPORT_MODE                             |                                                   Invalid transport mode                                                    |
+| 13  | TIMETABLED_PASSING_TIME_INCONSISTENT_TIME          |                                    ServiceJourney has inconsistent TimetabledPassingTime                                    |
+| 14  | TIMETABLED_PASSING_TIME_INCOMPLETE_TIME            |                                     ServiceJourney has incomplete TimetabledPassingTime                                     |
+| 15  | TIMETABLED_PASSING_TIME_NON_INCREASING_TIME        |                                   ServiceJourney has non-increasing TimetabledPassingTime                                   |
+| 16  | HIGH_SPEED                                         |                                              ServiceJourney has too high speed                                              |
+| 17  | LOW_SPEED                                          |                                                ServiceJourney has low speed                                                 |
+| 18  | WARNING_SPEED                                      |                                                ServiceJourney has high speed                                                |
+| 19  | SAME_DEPARTURE_ARRIVAL_TIME                        |                                      Same departure/arrival time for consecutive stops                                      |
+| 20  | CODESPACE                                          |              Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s               |
+| 21  | VERSION_NON_NUMERIC                                |                                                  Non-numeric NeTEx version                                                  |
+| 22  | JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP   |                                   Last StopPointInJourneyPattern must not allow boarding                                    |
+| 23  | JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP |                                  First StopPointInJourneyPattern must not allow alighting                                   |
 
 ### For validation Profiles `TimetableFlexibleTransport` and `ImportTimetableFlexibleTransport`
 
