@@ -9,6 +9,7 @@ import no.entur.antu.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.xpath.DefaultValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
+import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 /**
  * Build the tree of XPath validation rules with Entur-specific rules.
@@ -67,5 +68,62 @@ public class EnturTimetableDataValidationTreeFactory
       "DATED_SERVICE_JOURNEY_4"
     );
     return timetableFrameValidationTree;
+  }
+
+  @Override
+  protected ValidationTree getServiceFrameValidationTreeForLineFile(
+    String path
+  ) {
+    ValidationTree serviceFrameValidationTreeForLineFile =
+      super.getServiceFrameValidationTreeForLineFile(path);
+    var lastStopWithBoardingAllowed =
+      """
+      for-each(
+        journeyPatterns/JourneyPattern,
+        function($jp) {
+          sort(
+            $jp/pointsInSequence/StopPointInJourneyPattern,
+            (),
+            function($sp) {
+              ($sp/xs:integer(number(@order)))
+            }
+          )[last()][count(ForBoarding) = 0 or ForBoarding != 'false' or ForAlighting = 'true']
+        }
+      )
+      """;
+
+    serviceFrameValidationTreeForLineFile.addValidationRule(
+      new ValidateNotExist(
+        lastStopWithBoardingAllowed,
+        "Last StopPointInJourneyPattern must not allow boarding",
+        "JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP"
+      )
+    );
+
+    var firstStopWithAlightingAllowed =
+      """
+      for-each(
+        journeyPatterns/JourneyPattern,
+        function($jp) {
+          sort(
+            $jp/pointsInSequence/StopPointInJourneyPattern,
+            (),
+            function($sp) {
+              ($sp/xs:integer(number(@order)))
+            }
+          )[1][count(ForAlighting) = 0 or ForAlighting != 'false' or ForBoarding = 'true']
+        }
+      )
+      """;
+
+    serviceFrameValidationTreeForLineFile.addValidationRule(
+      new ValidateNotExist(
+        firstStopWithAlightingAllowed,
+        "First StopPointInJourneyPattern must not allow alighting",
+        "JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP"
+      )
+    );
+
+    return serviceFrameValidationTreeForLineFile;
   }
 }
