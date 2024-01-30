@@ -11,6 +11,8 @@ import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.StopTime;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServiceJourneyContextBuilder {
 
@@ -53,6 +55,10 @@ public class ServiceJourneyContextBuilder {
       );
     }
   }
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    ServiceJourneyContextBuilder.class
+  );
 
   private final CommonDataRepository commonDataRepository;
   private final StopPlaceRepository stopPlaceRepository;
@@ -160,10 +166,24 @@ public class ServiceJourneyContextBuilder {
         .getScheduledStopPointRef()
         .getValue()
         .getRef();
-      QuayId quayId = commonDataRepository.findQuayIdForScheduledStopPoint(
-        scheduledStopPointRef,
-        validationReportId
-      );
+
+      QuayId quayId = commonDataRepository.hasQuayIds(validationReportId)
+        ? commonDataRepository.findQuayIdForScheduledStopPoint(
+          scheduledStopPointRef,
+          validationReportId
+        )
+        : new QuayId(
+          index.getQuayIdByStopPointRefIndex().get(scheduledStopPointRef)
+        );
+
+      if (quayId == null) {
+        LOGGER.debug(
+          "Quay id not found for scheduled stop point with id: {}",
+          scheduledStopPointRef
+        );
+        return null;
+      }
+
       StopPlaceCoordinates coordinatesForQuayId =
         stopPlaceRepository.getCoordinatesForQuayId(quayId);
       return coordinatesForQuayId == null
