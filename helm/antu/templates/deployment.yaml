@@ -52,14 +52,11 @@ spec:
                 secretKeyRef:
                   key: redis-authentication-string
                   name: ror-antu-secret
-            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ORGREGISTER_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: partner-auth0-secret
-                  name: ror-antu-secret
           envFrom:
             - configMapRef:
                 name: antu-redis-configmap
+            - configMapRef:
+                name: partner-auth0-secret
           ports:
             - containerPort: {{ .Values.service.http.internalPort }}
               name: http
@@ -117,6 +114,9 @@ spec:
                 secretKeyRef:
                   key: redis-server-trust-store-password
                   name: ror-antu-secret
+          envFrom:
+            - secretRef:
+                name: es-slack
           command: [ "keytool" ]
           args: [ "-importcert", "-v", "-noprompt", "-file", "/etc/antu-redis-config/redis-server-ca.pem", "-keystore", "/deployments/truststore/redis-server-ca.jks", "-storepass", "$(ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD)" ]
           securityContext:
