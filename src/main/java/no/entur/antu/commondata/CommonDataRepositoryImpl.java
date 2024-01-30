@@ -25,7 +25,10 @@ public class CommonDataRepositoryImpl implements CommonDataRepository {
 
   @Override
   public boolean hasQuayIds(String validationReportId) {
-    return scheduledStopPointAndQuayIdCache.get(validationReportId) != null;
+    Map<String, QuayId> idsForReport = scheduledStopPointAndQuayIdCache.get(
+      validationReportId
+    );
+    return idsForReport != null && !idsForReport.isEmpty();
   }
 
   @Override

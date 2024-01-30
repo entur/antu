@@ -196,6 +196,9 @@ class SpeedValidatorTest {
         )
         .thenReturn(testQuayId);
       Mockito
+        .when(commonDataRepository.hasQuayIds(anyString()))
+        .thenReturn(true);
+      Mockito
         .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
         .thenReturn(stopPlaceCoordinates.get(i));
     }
