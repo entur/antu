@@ -1,18 +1,23 @@
 package no.entur.antu.validator.stoppointinjourneypatternvalidator;
 
 import java.util.List;
+import java.util.function.Function;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
+import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.*;
 
 public class StopPointInJourneyPatternContextBuilder {
 
   private final CommonDataRepository commonDataRepository;
+  private final NetexEntitiesIndex netexEntitiesIndex;
 
   public StopPointInJourneyPatternContextBuilder(
-    CommonDataRepository commonDataRepository
+    CommonDataRepository commonDataRepository,
+    NetexEntitiesIndex netexEntitiesIndex
   ) {
     this.commonDataRepository = commonDataRepository;
+    this.netexEntitiesIndex = netexEntitiesIndex;
   }
 
   public record StopPointInJourneyPatternContext(
@@ -25,6 +30,19 @@ public class StopPointInJourneyPatternContextBuilder {
     JourneyPattern journeyPattern,
     String validationReportId
   ) {
+    Function<String, QuayId> quayIdForScheduleStopPoint =
+      scheduledStopPointRef ->
+        commonDataRepository.hasQuayIds(validationReportId)
+          ? commonDataRepository.findQuayIdForScheduledStopPoint(
+            scheduledStopPointRef,
+            validationReportId
+          )
+          : new QuayId(
+            netexEntitiesIndex
+              .getQuayIdByStopPointRefIndex()
+              .get(scheduledStopPointRef)
+          );
+
     return journeyPattern
       .getPointsInSequence()
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
@@ -35,12 +53,11 @@ public class StopPointInJourneyPatternContextBuilder {
         new StopPointInJourneyPatternContext(
           journeyPattern,
           stopPointInJourneyPattern,
-          commonDataRepository.findQuayIdForScheduledStopPoint(
+          quayIdForScheduleStopPoint.apply(
             stopPointInJourneyPattern
               .getScheduledStopPointRef()
               .getValue()
-              .getRef(),
-            validationReportId
+              .getRef()
           )
         )
       )

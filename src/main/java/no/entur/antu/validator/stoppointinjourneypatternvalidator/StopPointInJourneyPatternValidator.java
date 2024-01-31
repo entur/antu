@@ -127,7 +127,10 @@ public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
         validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
 
       StopPointInJourneyPatternContextBuilder builder =
-        new StopPointInJourneyPatternContextBuilder(commonDataRepository);
+        new StopPointInJourneyPatternContextBuilder(
+          commonDataRepository,
+          index
+        );
       List<StopPointInJourneyPatternContext> stopPointInJourneyPatternContexts =
         index
           .getJourneyPatternIndex()
