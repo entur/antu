@@ -3,6 +3,7 @@ package no.entur.antu.netextestdata;
 import static no.entur.antu.netextestdata.MappingSupport.createJaxbElement;
 import static no.entur.antu.netextestdata.MappingSupport.createWrappedRef;
 
+import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,7 +13,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
-import javax.xml.bind.JAXBElement;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
