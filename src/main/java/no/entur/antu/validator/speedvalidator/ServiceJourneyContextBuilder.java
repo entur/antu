@@ -166,7 +166,9 @@ public class ServiceJourneyContextBuilder {
           validationReportId
         )
         : new QuayId(
-          netexEntitiesIndex.getQuayIdByStopPointRefIndex().get(scheduledStopPointRef)
+          netexEntitiesIndex
+            .getQuayIdByStopPointRefIndex()
+            .get(scheduledStopPointRef)
         );
 
       if (quayId == null) {
