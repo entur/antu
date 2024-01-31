@@ -19,7 +19,6 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.rutebanken.netex.model.*;
 
 class StopPointInJourneyPatternValidatorTest {
@@ -36,9 +35,11 @@ class StopPointInJourneyPatternValidatorTest {
       journeyPattern,
       serviceJourney
     );
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
+
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     IntStream
       .range(
@@ -50,13 +51,12 @@ class StopPointInJourneyPatternValidatorTest {
       )
       .forEach(index -> {
         QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
-        Mockito
-          .when(
-            commonDataRepository.findQuayIdForScheduledStopPoint(
-              eq("RUT:ScheduledStopPoint:" + (index + 1)),
-              anyString()
-            )
+        when(
+          commonDataRepository.findQuayIdForScheduledStopPoint(
+            eq("RUT:ScheduledStopPoint:" + (index + 1)),
+            anyString()
           )
+        )
           .thenReturn(testQuayId);
       });
 
@@ -80,9 +80,11 @@ class StopPointInJourneyPatternValidatorTest {
       journeyPattern,
       serviceJourney
     );
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
+
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     IntStream
       .range(
@@ -95,13 +97,12 @@ class StopPointInJourneyPatternValidatorTest {
       )
       .forEach(index -> {
         QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
-        Mockito
-          .when(
-            commonDataRepository.findQuayIdForScheduledStopPoint(
-              eq("RUT:ScheduledStopPoint:" + (index + 1)),
-              anyString()
-            )
+        when(
+          commonDataRepository.findQuayIdForScheduledStopPoint(
+            eq("RUT:ScheduledStopPoint:" + (index + 1)),
+            anyString()
           )
+        )
           .thenReturn(testQuayId);
       });
 
@@ -130,7 +131,7 @@ class StopPointInJourneyPatternValidatorTest {
       journeyPatterns,
       serviceJourneys
     );
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
 
@@ -155,7 +156,7 @@ class StopPointInJourneyPatternValidatorTest {
       .getJourneyPatternIndex()
       .put(journeyPattern.getId(), journeyPattern);
 
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
 
@@ -180,7 +181,7 @@ class StopPointInJourneyPatternValidatorTest {
       journeyPattern,
       deadRun
     );
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
 
@@ -208,7 +209,7 @@ class StopPointInJourneyPatternValidatorTest {
       journeyPattern,
       List.of(deadRun, serviceJourney)
     );
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
 
@@ -232,9 +233,11 @@ class StopPointInJourneyPatternValidatorTest {
       journeyPattern,
       serviceJourney
     );
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
+
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     IntStream
       .range(
@@ -247,13 +250,12 @@ class StopPointInJourneyPatternValidatorTest {
       )
       .forEach(index -> {
         QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
-        Mockito
-          .when(
-            commonDataRepository.findQuayIdForScheduledStopPoint(
-              eq("RUT:ScheduledStopPoint:" + (index + 1)),
-              anyString()
-            )
+        when(
+          commonDataRepository.findQuayIdForScheduledStopPoint(
+            eq("RUT:ScheduledStopPoint:" + (index + 1)),
+            anyString()
           )
+        )
           .thenReturn(testQuayId);
       });
 
@@ -288,6 +290,9 @@ class StopPointInJourneyPatternValidatorTest {
     ValidationContextWithNetexEntitiesIndex validationContext = mock(
       ValidationContextWithNetexEntitiesIndex.class
     );
+
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
+
     when(validationContext.getNetexEntitiesIndex())
       .thenReturn(netexEntitiesIndex);
 
