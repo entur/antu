@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import no.entur.antu.commondata.CommonDataRepository;
