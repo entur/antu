@@ -1,4 +1,4 @@
-package no.entur.antu.validator;
+package no.entur.antu.validator.transportmodevalidator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
