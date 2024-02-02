@@ -202,6 +202,7 @@ resource "kubernetes_secret" "ror-antu-secret" {
   data = {
     "redis-server-trust-store-password" = random_password.truststore-password.result
     "redis-authentication-string" =  google_redis_instance.antu-redis.auth_string
+    "partner-auth0-secret" = var.ror-partner-auth0-secret
   }
 }
 
