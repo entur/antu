@@ -198,6 +198,15 @@ public class SpeedValidator extends AntuNetexValidator {
       return;
     }
 
+    if (context.transportMode() == null) {
+      // TransportMode on Line is mandatory. At this point, the validation entry for the Missing transport mode,
+      // will already be created. So we will simply ignore it, if there is no transportModeForServiceJourney exists.
+      // stopPlaceTransportModes should never be null at this point, as it is mandatory in stop places file in tiamat.
+      // In worst case we will return true to ignore the validation.
+      LOGGER.debug("Transport mode is missing, skipping speed validation");
+      return;
+    }
+
     ExpectedSpeed expectedSpeed = ExpectedSpeed.of(context.transportMode());
     if (expectedSpeed == null) {
       LOGGER.debug(
