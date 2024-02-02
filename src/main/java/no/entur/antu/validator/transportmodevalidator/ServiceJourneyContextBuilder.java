@@ -72,6 +72,10 @@ public final class ServiceJourneyContextBuilder {
     transportModesForLine = findTransportModes(lineItem);
   }
 
+  public TransportModes getTransportModesForLine() {
+    return transportModesForLine;
+  }
+
   public ServiceJourneyContext build(XdmItem serviceJourneyItem) {
     return new ServiceJourneyContext(
       validationContext,
