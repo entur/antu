@@ -117,9 +117,6 @@ spec:
                 secretKeyRef:
                   key: redis-server-trust-store-password
                   name: ror-antu-secret
-          envFrom:
-            - secretRef:
-                name: es-slack
           command: [ "keytool" ]
           args: [ "-importcert", "-v", "-noprompt", "-file", "/etc/antu-redis-config/redis-server-ca.pem", "-keystore", "/deployments/truststore/redis-server-ca.jks", "-storepass", "$(ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD)" ]
           securityContext:
