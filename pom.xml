@@ -36,7 +36,7 @@
         <netex-parser-java.version>3.1.9</netex-parser-java.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <prettier-java.version>2.1.0</prettier-java.version>
-        <prettier-maven-plugin.version>0.21</prettier-maven-plugin.version>
+        <prettier-maven-plugin.version>0.22</prettier-maven-plugin.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
