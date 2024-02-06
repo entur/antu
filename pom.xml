@@ -29,7 +29,7 @@
         <entur.helpers.version>2.5</entur.helpers.version>
         <netex-validator-java.version>2.0.2</netex-validator-java.version>
         <commons-io.version>2.11.0</commons-io.version>
-        <zt-zip.version>1.16</zt-zip.version>
+        <zt-zip.version>1.17</zt-zip.version>
         <redisson.version>3.25.2</redisson.version>
         <kryo.version>5.6.0</kryo.version>
         <embedded-redis.version>0.8.3</embedded-redis.version>
