@@ -87,7 +87,7 @@ public class EnturTimetableDataValidationTreeFactory
             function($sp) {
               ($sp/xs:integer(number(@order)))
             }
-          )[last()][count(ForBoarding) = 0 or ForBoarding != 'false' or ForAlighting = 'true']
+          )[last()][count(ForBoarding) = 0 or ForBoarding != 'false']
         }
       )
       """;
@@ -111,7 +111,7 @@ public class EnturTimetableDataValidationTreeFactory
             function($sp) {
               ($sp/xs:integer(number(@order)))
             }
-          )[1][count(ForAlighting) = 0 or ForAlighting != 'false' or ForBoarding = 'true']
+          )[1][count(ForAlighting) = 0 or ForAlighting != 'false']
         }
       )
       """;
