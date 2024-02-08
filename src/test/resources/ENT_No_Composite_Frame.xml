@@ -1,0 +1,296 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:gml="http://www.opengis.net/gml/3.2" version="1.08:NO-NeTEx-networktimetable:1.3">
+  <PublicationTimestamp>2024-02-05T15:35:51.625776</PublicationTimestamp>
+  <ParticipantRef>PyNeTExConv</ParticipantRef>
+  <dataObjects>
+    <ServiceFrame id="ENT:ServiceFrame:N600" version="1">
+      <routes>
+        <Route id="ENT:Route:8DCBE9FE" version="1">
+          <Name>8DCBE9FE</Name>
+          <LineRef version="1" ref="ENT:Line:N600"/>
+        </Route>
+        <Route id="ENT:Route:D5D50787" version="1">
+          <Name>D5D50787</Name>
+          <LineRef version="1" ref="ENT:Line:N600"/>
+        </Route>
+      </routes>
+      <lines>
+        <Line id="ENT:Line:N600" version="1">
+          <Name>Stockholm - Oslo</Name>
+          <ShortName>FlixBus N600</ShortName>
+          <TransportMode>bus</TransportMode>
+          <PublicCode>FlixBus N600</PublicCode>
+          <OperatorRef ref="ENT:Operator:FLIXBUS-eu" versionRef="1"/>
+          <Presentation>
+            <Colour>73D700</Colour>
+            <TextColour>FFFFFF</TextColour>
+          </Presentation>
+        </Line>
+      </lines>
+      <journeyPatterns>
+        <JourneyPattern id="ENT:JourneyPattern:8DCBE9FE" version="1">
+          <Name>8DCBE9FE</Name>
+          <RouteRef version="1" ref="ENT:Route:8DCBE9FE"/>
+          <pointsInSequence>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-1" version="1" order="1">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:dcc03476-9603-11e6-9066-549f350fcb0c" versionRef="1"/>
+              <ForAlighting>false</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-2" version="1" order="2">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:cbb7c38b-29b4-40ea-ae49-3c9e7ef04fe7" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-3" version="1" order="3">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:191c1ce4-c9e3-4f33-a131-53e595ac4a26" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-4" version="1" order="4">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:3a60555c-ef49-4287-bef1-e9d69314d8db" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-5" version="1" order="5">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:eb6950c9-97bd-4486-bdf2-ca7401b0c911" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-6" version="1" order="6">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:dd5e6677-34c6-4be2-86c6-3fbdfb6ec5e7" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-7" version="1" order="7">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:77b1e6b1-df82-4ca0-96c5-6fb737df4317" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-8" version="1" order="8">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:f15a36ff-6dc9-4ea2-919d-2f2cb1b5ba44" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:8DCBE9FE-9" version="1" order="9">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:dcc38945-9603-11e6-9066-549f350fcb0c" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>false</ForBoarding>
+            </StopPointInJourneyPattern>
+          </pointsInSequence>
+        </JourneyPattern>
+        <JourneyPattern id="ENT:JourneyPattern:D5D50787" version="1">
+          <Name>D5D50787</Name>
+          <RouteRef version="1" ref="ENT:Route:D5D50787"/>
+          <pointsInSequence>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-1" version="1" order="1">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:dcc38945-9603-11e6-9066-549f350fcb0c" versionRef="1"/>
+              <ForAlighting>false</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-2" version="1" order="2">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:f15a36ff-6dc9-4ea2-919d-2f2cb1b5ba44" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-3" version="1" order="3">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:77b1e6b1-df82-4ca0-96c5-6fb737df4317" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-4" version="1" order="4">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:dd5e6677-34c6-4be2-86c6-3fbdfb6ec5e7" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-5" version="1" order="5">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:eb6950c9-97bd-4486-bdf2-ca7401b0c911" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-6" version="1" order="6">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:3a60555c-ef49-4287-bef1-e9d69314d8db" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-7" version="1" order="7">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:191c1ce4-c9e3-4f33-a131-53e595ac4a26" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-8" version="1" order="8">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:cbb7c38b-29b4-40ea-ae49-3c9e7ef04fe7" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>true</ForBoarding>
+            </StopPointInJourneyPattern>
+            <StopPointInJourneyPattern id="ENT:StopPointInJourneyPattern:D5D50787-9" version="1" order="9">
+              <ScheduledStopPointRef ref="ENT:ScheduledStopPoint:dcc03476-9603-11e6-9066-549f350fcb0c" versionRef="1"/>
+              <ForAlighting>true</ForAlighting>
+              <ForBoarding>false</ForBoarding>
+            </StopPointInJourneyPattern>
+          </pointsInSequence>
+        </JourneyPattern>
+      </journeyPatterns>
+    </ServiceFrame>
+    <TimetableFrame id="ENT:TimetableFrame:N600" version="1">
+      <vehicleJourneys>
+        <ServiceJourney id="ENT:ServiceJourney:N600-3-2210012024-STO#OSL-00" version="1">
+          <dayTypes>
+            <DayTypeRef ref="ENT:DayType:N600-3-2210012024-STO#OSL" versionRef="1"/>
+          </dayTypes>
+          <JourneyPatternRef version="1" ref="ENT:JourneyPattern:8DCBE9FE"/>
+          <LineRef version="1" ref="ENT:Line:N600"/>
+          <DirectionType>inbound</DirectionType>
+          <passingTimes>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_1" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-1" order="1"/>
+              <ArrivalTime>22:10:00</ArrivalTime>
+              <ArrivalDayOffset>0</ArrivalDayOffset>
+              <DepartureTime>22:10:00</DepartureTime>
+              <DepartureDayOffset>0</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_2" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-2" order="2"/>
+              <ArrivalTime>23:25:00</ArrivalTime>
+              <ArrivalDayOffset>0</ArrivalDayOffset>
+              <DepartureTime>23:30:00</DepartureTime>
+              <DepartureDayOffset>0</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_3" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-3" order="3"/>
+              <ArrivalTime>00:40:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>00:45:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_4" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-4" order="4"/>
+              <ArrivalTime>01:20:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>01:20:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_5" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-5" order="5"/>
+              <ArrivalTime>01:40:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>01:40:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_6" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-6" order="6"/>
+              <ArrivalTime>02:20:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>02:30:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_7" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-7" order="7"/>
+              <ArrivalTime>03:40:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>03:40:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_8" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-8" order="8"/>
+              <ArrivalTime>03:55:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>03:55:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-3-2210012024-STO#OSL-00_9" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:8DCBE9FE-9" order="9"/>
+              <ArrivalTime>05:20:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>05:20:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+          </passingTimes>
+          <facilities>
+            <ServiceFacilitySet id="ENT:ServiceFacilitySet:N600-3-2210012024-STO#OSL-00" version="1">
+              <LuggageCarriageFacilityList>cyclesAllowed</LuggageCarriageFacilityList>
+            </ServiceFacilitySet>
+          </facilities>
+        </ServiceJourney>
+        <ServiceJourney id="ENT:ServiceJourney:N600-4-2220012024-OSL#STO-00" version="1">
+          <dayTypes>
+            <DayTypeRef ref="ENT:DayType:N600-4-2220012024-OSL#STO" versionRef="1"/>
+          </dayTypes>
+          <JourneyPatternRef version="1" ref="ENT:JourneyPattern:D5D50787"/>
+          <LineRef version="1" ref="ENT:Line:N600"/>
+          <DirectionType>outbound</DirectionType>
+          <passingTimes>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_1" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-1" order="1"/>
+              <ArrivalTime>22:20:00</ArrivalTime>
+              <ArrivalDayOffset>0</ArrivalDayOffset>
+              <DepartureTime>22:20:00</DepartureTime>
+              <DepartureDayOffset>0</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_2" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-2" order="2"/>
+              <ArrivalTime>23:40:00</ArrivalTime>
+              <ArrivalDayOffset>0</ArrivalDayOffset>
+              <DepartureTime>23:40:00</DepartureTime>
+              <DepartureDayOffset>0</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_3" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-3" order="3"/>
+              <ArrivalTime>23:55:00</ArrivalTime>
+              <ArrivalDayOffset>0</ArrivalDayOffset>
+              <DepartureTime>23:55:00</DepartureTime>
+              <DepartureDayOffset>0</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_4" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-4" order="4"/>
+              <ArrivalTime>01:05:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>01:15:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_5" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-5" order="5"/>
+              <ArrivalTime>01:55:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>01:55:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_6" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-6" order="6"/>
+              <ArrivalTime>02:15:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>02:15:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_7" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-7" order="7"/>
+              <ArrivalTime>02:50:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>02:55:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_8" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-8" order="8"/>
+              <ArrivalTime>04:05:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>04:10:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+            <TimetabledPassingTime id="ENT:TimetabledPassingTime:N600-4-2220012024-OSL#STO-00_9" version="1">
+              <StopPointInJourneyPatternRef version="1" ref="ENT:StopPointInJourneyPattern:D5D50787-9" order="9"/>
+              <ArrivalTime>05:25:00</ArrivalTime>
+              <ArrivalDayOffset>1</ArrivalDayOffset>
+              <DepartureTime>05:25:00</DepartureTime>
+              <DepartureDayOffset>1</DepartureDayOffset>
+            </TimetabledPassingTime>
+          </passingTimes>
+          <facilities>
+            <ServiceFacilitySet id="ENT:ServiceFacilitySet:N600-4-2220012024-OSL#STO-00" version="1">
+              <LuggageCarriageFacilityList>cyclesAllowed</LuggageCarriageFacilityList>
+            </ServiceFacilitySet>
+          </facilities>
+        </ServiceJourney>
+      </vehicleJourneys>
+    </TimetableFrame>
+  </dataObjects>
+</PublicationDelivery>
