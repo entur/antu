@@ -5,9 +5,7 @@ import static no.entur.antu.validator.transportmodevalidator.ServiceJourneyConte
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import net.sf.saxon.s9api.*;
 import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.StopPlaceRepository;
@@ -57,9 +55,17 @@ public class TransportModeValidator extends AntuNetexValidator {
     ServiceJourneyContextBuilder serviceJourneyContextBuilder =
       new ServiceJourneyContextBuilder(validationContext);
 
-    getServiceJourneys(validationContext)
+    if (!serviceJourneyContextBuilder.foundTransportModesForLine()) {
+      LOGGER.debug(
+        "Failed to find the TransportModes for the line in {}, " +
+        "skipping the validation of transport modes",
+        validationContext.getFileName()
+      );
+      return;
+    }
+
+    serviceJourneyContextBuilder.buildAll()
       .stream()
-      .map(serviceJourneyContextBuilder::build)
       .filter(
         Predicate.not(context ->
           validateServiceJourney(
@@ -190,22 +196,6 @@ public class TransportModeValidator extends AntuNetexValidator {
       }
     } else {
       return false;
-    }
-  }
-
-  List<XdmItem> getServiceJourneys(ValidationContext validationContext) {
-    try {
-      XPathSelector selector = validationContext
-        .getNetexXMLParser()
-        .getXPathCompiler()
-        .compile(
-          "PublicationDelivery/dataObjects/CompositeFrame/frames/*/vehicleJourneys/ServiceJourney"
-        )
-        .load();
-      selector.setContextItem(validationContext.getXmlNode());
-      return selector.stream().toList();
-    } catch (Exception ex) {
-      throw new AntuException(ex);
     }
   }
 }

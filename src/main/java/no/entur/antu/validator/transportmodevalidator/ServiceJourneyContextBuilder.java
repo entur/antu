@@ -1,7 +1,6 @@
 package no.entur.antu.validator.transportmodevalidator;
 
 import java.util.List;
-import java.util.Objects;
 import net.sf.saxon.s9api.*;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
@@ -11,6 +10,8 @@ import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ServiceJourneyContextBuilder {
 
@@ -19,7 +20,8 @@ public final class ServiceJourneyContextBuilder {
     XdmItem serviceJourneyItem,
     String serviceJourneyId,
     TransportModes transportModes,
-    List<String> scheduledStopPoints
+    List<String> scheduledStopPoints,
+    String pathToFrames
   ) {
     public QuayId findQuayIdForScheduledStopPoint(String scheduledStopPoint) {
       try {
@@ -27,15 +29,20 @@ public final class ServiceJourneyContextBuilder {
           .getNetexXMLParser()
           .getXPathCompiler()
           .compile(
-            "PublicationDelivery/dataObjects/CompositeFrame/frames/*/stopAssignments/PassengerStopAssignment" +
+            pathToFrames + "/stopAssignments/PassengerStopAssignment" +
             "/ScheduledStopPointRef[@ref = '" +
             scheduledStopPoint +
             "']"
           )
           .load();
         selector.setContextItem(validationContext.getXmlNode());
-        XdmNode scheduledStopPointRef = selector
-          .evaluateSingle()
+
+        XdmItem passengerStopAssignmentItem = selector.evaluateSingle();
+        if (passengerStopAssignmentItem == null ) {
+          LOGGER.debug("PassengerStopAssignment not found in line file, for scheduledStopPoint {}", scheduledStopPoint);
+          return null;
+        }
+        XdmNode scheduledStopPointRef = passengerStopAssignmentItem
           .stream()
           .asNode();
         XdmNode passengerStopAssignment = getParent(
@@ -58,22 +65,44 @@ public final class ServiceJourneyContextBuilder {
     }
   }
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    ServiceJourneyContextBuilder.class
+  );
+
   private final ValidationContext validationContext;
   private final TransportModes transportModesForLine;
+  private final String pathToFrames;
 
   public ServiceJourneyContextBuilder(ValidationContext validationContext) {
     this.validationContext = validationContext;
+    this.pathToFrames = isCompositeFrameExists() ? "PublicationDelivery/dataObjects/CompositeFrame/frames/*" : "PublicationDelivery/dataObjects/*";
     XdmItem lineItem = getRegularLine();
     if (lineItem == null) {
       lineItem = getFlexibleLine();
-      verifyFlexibleLineType(lineItem);
+      if (lineItem != null) {
+        verifyFlexibleLineType(lineItem);
+      }
     }
-    Objects.requireNonNull(lineItem, "Line or FlexibleLine not found.");
-    transportModesForLine = findTransportModes(lineItem);
+    if (lineItem != null) {
+      transportModesForLine = findTransportModes(lineItem);
+    } else {
+      transportModesForLine = null;
+      LOGGER.debug(
+        "Failed to find the Line or FlexibleLine in {}",
+        validationContext.getFileName()
+      );
+    }
   }
 
-  public TransportModes getTransportModesForLine() {
-    return transportModesForLine;
+  public boolean foundTransportModesForLine() {
+    return transportModesForLine != null;
+  }
+
+  public List<ServiceJourneyContext> buildAll() {
+    return getServiceJourneys()
+      .stream()
+      .map(this::build)
+      .toList();
   }
 
   public ServiceJourneyContext build(XdmItem serviceJourneyItem) {
@@ -82,7 +111,8 @@ public final class ServiceJourneyContextBuilder {
       serviceJourneyItem,
       serviceJourneyItem.stream().asNode().attribute("id"),
       findTransportModesForServiceJourney(serviceJourneyItem),
-      getScheduledStopPointsForServiceJourney(serviceJourneyItem)
+      getScheduledStopPointsForServiceJourney(serviceJourneyItem),
+      pathToFrames
     );
   }
 
@@ -143,6 +173,22 @@ public final class ServiceJourneyContextBuilder {
     }
   }
 
+  private List<XdmItem> getServiceJourneys() {
+    try {
+      XPathSelector selector = validationContext
+        .getNetexXMLParser()
+        .getXPathCompiler()
+        .compile(
+          pathToFrames + "/vehicleJourneys/ServiceJourney"
+        )
+        .load();
+      selector.setContextItem(validationContext.getXmlNode());
+      return selector.stream().toList();
+    } catch (Exception ex) {
+      throw new AntuException(ex);
+    }
+  }
+
   private List<String> getScheduledStopPointsForServiceJourney(
     XdmItem serviceJourneyItem
   ) {
@@ -150,11 +196,12 @@ public final class ServiceJourneyContextBuilder {
       String journeyPatternRef = getJourneyPatternRefFromServiceJourney(
         serviceJourneyItem
       );
+      String journeyPatternPath = pathToFrames + "/journeyPatterns/JourneyPattern";
       XPathSelector selector = validationContext
         .getNetexXMLParser()
         .getXPathCompiler()
         .compile(
-          "PublicationDelivery/dataObjects/CompositeFrame/frames/*/journeyPatterns/JourneyPattern" +
+          journeyPatternPath +
           "[@id = '" +
           journeyPatternRef +
           "']/pointsInSequence/StopPointInJourneyPattern/ScheduledStopPointRef"
@@ -189,9 +236,7 @@ public final class ServiceJourneyContextBuilder {
       XPathSelector selector = validationContext
         .getNetexXMLParser()
         .getXPathCompiler()
-        .compile(
-          "PublicationDelivery/dataObjects/CompositeFrame/frames/*/lines/Line"
-        )
+        .compile(pathToFrames + "/lines/Line")
         .load();
       selector.setContextItem(validationContext.getXmlNode());
       // Considering that lines will only have one Line child.
@@ -206,9 +251,7 @@ public final class ServiceJourneyContextBuilder {
       XPathSelector selector = validationContext
         .getNetexXMLParser()
         .getXPathCompiler()
-        .compile(
-          "PublicationDelivery/dataObjects/CompositeFrame/frames/*/lines/FlexibleLine"
-        )
+        .compile(pathToFrames + "/lines/FlexibleLine")
         .load();
       selector.setContextItem(validationContext.getXmlNode());
       // Considering that lines will only have one FlexibleLine child.
@@ -262,6 +305,20 @@ public final class ServiceJourneyContextBuilder {
       return iter.next();
     } else {
       return null;
+    }
+  }
+
+  private boolean isCompositeFrameExists() {
+    try {
+      XPathSelector selector = validationContext
+        .getNetexXMLParser()
+        .getXPathCompiler()
+        .compile("PublicationDelivery/dataObjects/CompositeFrame")
+        .load();
+      selector.setContextItem(validationContext.getXmlNode());
+      return selector.stream().exists();
+    } catch(Exception ex) {
+      throw new AntuException(ex);
     }
   }
 }

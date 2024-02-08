@@ -23,9 +23,11 @@ import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 
 class TransportModeValidatorIntegrationTest {
 
-  public static final String TEST_CODESPACE = "NWY";
   public static final String TEST_FILE_MISSING_TRANSPORT_MODE =
     "NWY_Line_8600_20240131_Missing_transport_mode.xml";
+
+  public static final String TEST_FILE_NO_COMPOSITE_FRAME =
+    "ENT_No_Composite_Frame.xml";
 
   /**
    * TransportMode on Line is mandatory. This is expected to be validated before this validation rule,
@@ -36,15 +38,25 @@ class TransportModeValidatorIntegrationTest {
   @Test
   void testFile() throws IOException {
     ValidationReport validationReport = getValidationReport(
-      TEST_FILE_MISSING_TRANSPORT_MODE
+      TEST_FILE_MISSING_TRANSPORT_MODE,
+      "NWY"
     );
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
   }
 
-  private ValidationReport getValidationReport(String testFile)
+  @Test
+  void testNoCompositeFrame() throws IOException {
+    ValidationReport validationReport = getValidationReport(
+      TEST_FILE_NO_COMPOSITE_FRAME,
+      "ENT"
+    );
+    assertTrue(validationReport.getValidationReportEntries().isEmpty());
+  }
+
+  private ValidationReport getValidationReport(String testFile, String codeSpace)
     throws IOException {
     ValidationReport testValidationReport = new ValidationReport(
-      TEST_CODESPACE,
+      codeSpace,
       "Test1122"
     );
 
@@ -71,7 +83,7 @@ class TransportModeValidatorIntegrationTest {
       );
 
       when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-      QuayId testQuayId = new QuayId(TEST_CODESPACE + ":Quay:1234");
+      QuayId testQuayId = new QuayId(codeSpace + ":Quay:1234");
 
       when(
         commonDataRepository.findQuayIdForScheduledStopPoint(
