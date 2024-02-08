@@ -16,6 +16,11 @@ import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validates that StopPointInJourneyPattern has a ScheduledStopAssignment.
+ * The only valid case for missing ScheduledStopAssignment is when the
+ * StopPointInJourneyPattern is assigned to a DeadRun.
+ */
 public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
