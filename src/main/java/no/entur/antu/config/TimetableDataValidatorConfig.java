@@ -137,7 +137,7 @@ public class TimetableDataValidatorConfig {
     return new NetexValidatorRunnerWithNetexEntitiesIndex(
       netexXMLParser,
       netexSchemaValidator,
-      List.of(transportModeValidator)
+      netexValidators
     );
   }
 }
