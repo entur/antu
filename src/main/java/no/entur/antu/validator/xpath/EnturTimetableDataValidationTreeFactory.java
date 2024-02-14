@@ -3,13 +3,14 @@ package no.entur.antu.validator.xpath;
 import java.util.List;
 import java.util.Objects;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.validator.stoppoint.NoAlightingAtFirstStopPointInJourneyPattern;
+import no.entur.antu.validator.stoppoint.NoBoardingAtLastStopPointInJourneyPattern;
 import no.entur.antu.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validator.xpath.rules.ValidateAuthorityId;
 import no.entur.antu.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.xpath.DefaultValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
-import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 /**
  * Build the tree of XPath validation rules with Entur-specific rules.
@@ -76,52 +77,15 @@ public class EnturTimetableDataValidationTreeFactory
   ) {
     ValidationTree serviceFrameValidationTreeForLineFile =
       super.getServiceFrameValidationTreeForLineFile(path);
-    var lastStopWithBoardingAllowed =
-      """
-      for-each(
-        journeyPatterns/JourneyPattern,
-        function($jp) {
-          sort(
-            $jp/pointsInSequence/StopPointInJourneyPattern,
-            (),
-            function($sp) {
-              ($sp/xs:integer(number(@order)))
-            }
-          )[last()][count(ForBoarding) = 0 or ForBoarding != 'false']
-        }
-      )
-      """;
 
+    // No boarding at last stop point in journey pattern
     serviceFrameValidationTreeForLineFile.addValidationRule(
-      new ValidateNotExist(
-        lastStopWithBoardingAllowed,
-        "Last StopPointInJourneyPattern must not allow boarding",
-        "JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP"
-      )
+      new NoBoardingAtLastStopPointInJourneyPattern(path)
     );
 
-    var firstStopWithAlightingAllowed =
-      """
-      for-each(
-        journeyPatterns/JourneyPattern,
-        function($jp) {
-          sort(
-            $jp/pointsInSequence/StopPointInJourneyPattern,
-            (),
-            function($sp) {
-              ($sp/xs:integer(number(@order)))
-            }
-          )[1][count(ForAlighting) = 0 or ForAlighting != 'false']
-        }
-      )
-      """;
-
+    // No alighting at first stop point in journey pattern
     serviceFrameValidationTreeForLineFile.addValidationRule(
-      new ValidateNotExist(
-        firstStopWithAlightingAllowed,
-        "First StopPointInJourneyPattern must not allow alighting",
-        "JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP"
-      )
+      new NoAlightingAtFirstStopPointInJourneyPattern(path)
     );
 
     return serviceFrameValidationTreeForLineFile;
