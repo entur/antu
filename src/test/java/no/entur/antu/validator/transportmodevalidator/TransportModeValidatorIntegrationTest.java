@@ -53,8 +53,10 @@ class TransportModeValidatorIntegrationTest {
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
   }
 
-  private ValidationReport getValidationReport(String testFile, String codeSpace)
-    throws IOException {
+  private ValidationReport getValidationReport(
+    String testFile,
+    String codeSpace
+  ) throws IOException {
     ValidationReport testValidationReport = new ValidationReport(
       codeSpace,
       "Test1122"

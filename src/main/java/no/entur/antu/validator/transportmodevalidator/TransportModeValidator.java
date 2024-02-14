@@ -64,7 +64,8 @@ public class TransportModeValidator extends AntuNetexValidator {
       return;
     }
 
-    serviceJourneyContextBuilder.buildAll()
+    serviceJourneyContextBuilder
+      .buildAll()
       .stream()
       .filter(
         Predicate.not(context ->
