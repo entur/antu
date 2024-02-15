@@ -20,6 +20,10 @@ import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validator for ServiceLinks by checking the distance between the stop points and the line string.
+ * The distance is checked against a warning limit and a max limit.
+ */
 public class ServiceLinksValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
@@ -99,6 +103,11 @@ public class ServiceLinksValidator extends AntuNetexValidator {
     }
   }
 
+  /**
+   * Validates the distance between the stop points and the line string.
+   * If the distance exceeds the warning limit, a warning is added to the validation report.
+   * If the distance exceeds the max limit, an error is added to the validation report.
+   */
   private void validateServiceLink(
     ServiceLinkContext serviceLinkContext,
     Consumer<ValidationError> reportError

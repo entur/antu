@@ -64,7 +64,7 @@ class ServiceLinksValidatorTest {
   }
 
   @Test
-  void endPointDistanceOverWarningLimitShouldReportError() {
+  void endPointDistanceOverWarningLimitShouldReportWarning() {
     ValidationReport validationReport = runTestWith(
       List.of(
         61.153299,
@@ -96,7 +96,7 @@ class ServiceLinksValidatorTest {
   }
 
   @Test
-  void startPointDistanceOverWarningLimitShouldReportError() {
+  void startPointDistanceOverWarningLimitShouldReportWarning() {
     ValidationReport validationReport = runTestWithDirectPositionType(
       List.of(
         new DirectPositionType().withValue(List.of(61.153499, 10.389999)),
@@ -184,7 +184,7 @@ class ServiceLinksValidatorTest {
   }
 
   @Test
-  void bothStartAndEndPointDistancesOverWarningLimitShouldReportError() {
+  void bothStartAndEndPointDistancesOverWarningLimitShouldReportWarning() {
     ValidationReport validationReport = runTestWith(
       List.of(
         61.153499,
@@ -301,6 +301,56 @@ class ServiceLinksValidatorTest {
         10.388828,
         61.153331,
         10.388738
+      ),
+      new StopPlaceCoordinates(10.389718, 61.153299),
+      new StopPlaceCoordinates(10.388738, 61.153331)
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
+  @Test
+  void validationShouldBeIgnoredIfThereAreNoStopPlaceCoordinates() {
+    ValidationReport validationReport = runTestWith(
+      List.of(
+        61.153299,
+        10.389718,
+        61.153299,
+        10.389576,
+        61.153328,
+        10.388828,
+        61.153331,
+        10.388738
+      ),
+      null,
+      null
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
+  @Test
+  void validationShouldBeIgnoredInCaseOfInvalidLineStringWithLessThenThreeCoordinates() {
+    ValidationReport validationReport = runTestWith(
+      List.of(61.153299, 10.389718, 61.153299),
+      new StopPlaceCoordinates(10.389718, 61.153299),
+      new StopPlaceCoordinates(10.388738, 61.153331)
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
+  @Test
+  void validationShouldBeIgnoredInCaseOfInvalidLineStringWithOddNumberOfCoordinates() {
+    ValidationReport validationReport = runTestWith(
+      List.of(
+        61.153299,
+        10.389718,
+        61.153299,
+        10.389576,
+        61.153328,
+        10.388828,
+        61.153331
       ),
       new StopPlaceCoordinates(10.389718, 61.153299),
       new StopPlaceCoordinates(10.388738, 61.153331)
