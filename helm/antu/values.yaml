@@ -1,5 +1,5 @@
 image:
-  identifier: ${artifact.metadata.image}
+  identifier: <+artifacts.primary.image>
   imagePullPolicy: Always
 
 service:
@@ -22,3 +22,6 @@ horizontalPodAutoscaler:
 kubernetes:
   namespace: antu
   maxPods: 10
+secrets:
+  auth:
+    - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ORGREGISTER_CLIENT_SECRET
