@@ -29,7 +29,8 @@ public final class ServiceJourneyContextBuilder {
           .getNetexXMLParser()
           .getXPathCompiler()
           .compile(
-            pathToFrames + "/stopAssignments/PassengerStopAssignment" +
+            pathToFrames +
+            "/stopAssignments/PassengerStopAssignment" +
             "/ScheduledStopPointRef[@ref = '" +
             scheduledStopPoint +
             "']"
@@ -38,8 +39,11 @@ public final class ServiceJourneyContextBuilder {
         selector.setContextItem(validationContext.getXmlNode());
 
         XdmItem passengerStopAssignmentItem = selector.evaluateSingle();
-        if (passengerStopAssignmentItem == null ) {
-          LOGGER.debug("PassengerStopAssignment not found in line file, for scheduledStopPoint {}", scheduledStopPoint);
+        if (passengerStopAssignmentItem == null) {
+          LOGGER.debug(
+            "PassengerStopAssignment not found in line file, for scheduledStopPoint {}",
+            scheduledStopPoint
+          );
           return null;
         }
         XdmNode scheduledStopPointRef = passengerStopAssignmentItem
@@ -75,7 +79,10 @@ public final class ServiceJourneyContextBuilder {
 
   public ServiceJourneyContextBuilder(ValidationContext validationContext) {
     this.validationContext = validationContext;
-    this.pathToFrames = isCompositeFrameExists() ? "PublicationDelivery/dataObjects/CompositeFrame/frames/*" : "PublicationDelivery/dataObjects/*";
+    this.pathToFrames =
+      isCompositeFrameExists()
+        ? "PublicationDelivery/dataObjects/CompositeFrame/frames/*"
+        : "PublicationDelivery/dataObjects/*";
     XdmItem lineItem = getRegularLine();
     if (lineItem == null) {
       lineItem = getFlexibleLine();
@@ -99,10 +106,7 @@ public final class ServiceJourneyContextBuilder {
   }
 
   public List<ServiceJourneyContext> buildAll() {
-    return getServiceJourneys()
-      .stream()
-      .map(this::build)
-      .toList();
+    return getServiceJourneys().stream().map(this::build).toList();
   }
 
   public ServiceJourneyContext build(XdmItem serviceJourneyItem) {
@@ -178,9 +182,7 @@ public final class ServiceJourneyContextBuilder {
       XPathSelector selector = validationContext
         .getNetexXMLParser()
         .getXPathCompiler()
-        .compile(
-          pathToFrames + "/vehicleJourneys/ServiceJourney"
-        )
+        .compile(pathToFrames + "/vehicleJourneys/ServiceJourney")
         .load();
       selector.setContextItem(validationContext.getXmlNode());
       return selector.stream().toList();
@@ -196,7 +198,8 @@ public final class ServiceJourneyContextBuilder {
       String journeyPatternRef = getJourneyPatternRefFromServiceJourney(
         serviceJourneyItem
       );
-      String journeyPatternPath = pathToFrames + "/journeyPatterns/JourneyPattern";
+      String journeyPatternPath =
+        pathToFrames + "/journeyPatterns/JourneyPattern";
       XPathSelector selector = validationContext
         .getNetexXMLParser()
         .getXPathCompiler()
@@ -317,7 +320,7 @@ public final class ServiceJourneyContextBuilder {
         .load();
       selector.setContextItem(validationContext.getXmlNode());
       return selector.stream().exists();
-    } catch(Exception ex) {
+    } catch (Exception ex) {
       throw new AntuException(ex);
     }
   }

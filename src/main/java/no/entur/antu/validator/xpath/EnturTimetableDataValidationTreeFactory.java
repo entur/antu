@@ -3,6 +3,8 @@ package no.entur.antu.validator.xpath;
 import java.util.List;
 import java.util.Objects;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.validator.stoppoint.NoAlightingAtFirstStopPointInJourneyPattern;
+import no.entur.antu.validator.stoppoint.NoBoardingAtLastStopPointInJourneyPattern;
 import no.entur.antu.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validator.xpath.rules.ValidateAuthorityId;
 import no.entur.antu.validator.xpath.rules.ValidateNSRCodespace;
@@ -67,5 +69,25 @@ public class EnturTimetableDataValidationTreeFactory
       "DATED_SERVICE_JOURNEY_4"
     );
     return timetableFrameValidationTree;
+  }
+
+  @Override
+  protected ValidationTree getServiceFrameValidationTreeForLineFile(
+    String path
+  ) {
+    ValidationTree serviceFrameValidationTreeForLineFile =
+      super.getServiceFrameValidationTreeForLineFile(path);
+
+    // No boarding at last stop point in journey pattern
+    serviceFrameValidationTreeForLineFile.addValidationRule(
+      new NoBoardingAtLastStopPointInJourneyPattern(path)
+    );
+
+    // No alighting at first stop point in journey pattern
+    serviceFrameValidationTreeForLineFile.addValidationRule(
+      new NoAlightingAtFirstStopPointInJourneyPattern(path)
+    );
+
+    return serviceFrameValidationTreeForLineFile;
   }
 }
