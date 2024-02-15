@@ -8,6 +8,9 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class for working with JTS geometries.
+ */
 public class GeometryUtils {
 
   private static final Logger LOG = LoggerFactory.getLogger(
@@ -22,6 +25,9 @@ public class GeometryUtils {
    */
   public static final CoordinateReferenceSystem WGS84_XY;
 
+  /*
+   * The WGS84 CRS (Coordinate Reference System) with longitude-first axis order.
+   */
   static {
     try {
       WGS84_XY =

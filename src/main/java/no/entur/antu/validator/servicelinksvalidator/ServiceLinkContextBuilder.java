@@ -51,7 +51,7 @@ public class ServiceLinkContextBuilder {
     QuayId toQuayId = getQuayId(serviceLink.getToPointRef());
 
     if (fromQuayId == null || toQuayId == null) {
-      LOGGER.debug(
+      LOGGER.warn(
         "Could not find quayId for either, from stopPoint or to stopPoint in serviceLink {}",
         serviceLink.getId()
       );
@@ -74,6 +74,14 @@ public class ServiceLinkContextBuilder {
     StopPlaceCoordinates to = stopPlaceRepository.getCoordinatesForQuayId(
       toQuayId
     );
+
+    if (from == null || to == null) {
+      LOGGER.warn(
+        "Could not find coordinates for either, from stopPoint or to stopPoint in serviceLink {}",
+        serviceLink.getId()
+      );
+      return null;
+    }
 
     return new ServiceLinkContext(serviceLink, lineString.get(), from, to);
   }
