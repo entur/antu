@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 # template for application version, the actual version number is set at build time
 appVersion: "0.1.99.1"
 description: Backend integration
