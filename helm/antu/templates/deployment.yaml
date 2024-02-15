@@ -52,12 +52,11 @@ spec:
                 secretKeyRef:
                   key: redis-authentication-string
                   name: ror-antu-secret
-            - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ORGREGISTER_CLIENT_SECRET
           envFrom:
             - configMapRef:
                 name: antu-redis-configmap
             - secretRef:
-                name: ror-auth-secret
+                name: antu-auth-secret
           ports:
             - containerPort: {{ .Values.service.http.internalPort }}
               name: http
