@@ -25,6 +25,11 @@ import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validates that the speed of a service journey is within expected limits.
+ * The expected speed is based on the transport mode of the service journey.
+ * The speed is calculated based on the distance between two stops and the time it takes to travel between them.
+ */
 public class SpeedValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
@@ -68,14 +73,16 @@ public class SpeedValidator extends AntuNetexValidator {
     if (
       validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
     ) {
-      NetexEntitiesIndex index =
+      NetexEntitiesIndex netexEntitiesIndex =
         validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
       ServiceJourneyContextBuilder contextBuilder =
         new ServiceJourneyContextBuilder(
+          validationReport.getValidationReportId(),
+          netexEntitiesIndex,
           commonDataRepository,
           stopPlaceRepository
         );
-      List<ServiceJourney> serviceJourneys = index
+      List<ServiceJourney> serviceJourneys = netexEntitiesIndex
         .getTimetableFrames()
         .stream()
         .flatMap(timetableFrame ->
@@ -90,17 +97,11 @@ public class SpeedValidator extends AntuNetexValidator {
 
       serviceJourneys
         .stream()
-        .map(serviceJourney ->
-          contextBuilder.build(
-            index,
-            serviceJourney,
-            validationReport.getValidationReportId()
-          )
-        )
+        .map(contextBuilder::build)
         .forEach(context ->
           validateServiceJourney(
             context,
-            index,
+            netexEntitiesIndex,
             error ->
               addValidationReportEntry(
                 validationReport,

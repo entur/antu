@@ -16,6 +16,10 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validates that the passing times of a service journey are non-decreasing.
+ * This means that the time between each stop must be greater than or equal to zero.
+ */
 public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(

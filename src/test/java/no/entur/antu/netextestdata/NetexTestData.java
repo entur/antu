@@ -1,16 +1,23 @@
-package no.entur.antu.validator.nonincreasingpassingtime;
+package no.entur.antu.netextestdata;
 
-import static no.entur.antu.validator.nonincreasingpassingtime.MappingSupport.createJaxbElement;
-import static no.entur.antu.validator.nonincreasingpassingtime.MappingSupport.createWrappedRef;
+import static no.entur.antu.netextestdata.MappingSupport.createJaxbElement;
+import static no.entur.antu.netextestdata.MappingSupport.createWrappedRef;
 
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
+import net.opengis.gml._3.DirectPositionListType;
+import net.opengis.gml._3.DirectPositionType;
+import net.opengis.gml._3.LineStringType;
+import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.rutebanken.netex.model.*;
 
 public class NetexTestData {
@@ -43,6 +50,10 @@ public class NetexTestData {
     return new CreateServiceJourney(journeyPattern);
   }
 
+  public CreateTimetabledPassingTimes timetabledPassingTimes() {
+    return new CreateTimetabledPassingTimes();
+  }
+
   public CreateDeadRun deadRun(JourneyPattern journeyPattern) {
     return new CreateDeadRun(journeyPattern);
   }
@@ -70,6 +81,32 @@ public class NetexTestData {
         new CreateServiceJourney(journeyPattern).withId(index).create()
       )
       .toList();
+  }
+
+  public CreateServiceLink serviceLink(
+    String fromScheduledStopPointRef,
+    String toScheduledStopPointRef
+  ) {
+    return new CreateServiceLink()
+      .withFromScheduledStopPointRef(fromScheduledStopPointRef)
+      .withToScheduledStopPointRef(toScheduledStopPointRef);
+  }
+
+  public CreateNetexEntitiesIndex netexEntitiesIndex() {
+    return new CreateNetexEntitiesIndex();
+  }
+
+  public CreateNetexEntitiesIndex netexEntitiesIndex(
+    JourneyPattern journeyPattern,
+    Journey_VersionStructure journey
+  ) {
+    return new CreateNetexEntitiesIndex()
+      .addJourneyPatterns(journeyPattern)
+      .addServiceJourneys(journey);
+  }
+
+  public CreateNetexEntitiesIndex netexEntitiesIndex(ServiceLink serviceLink) {
+    return new CreateNetexEntitiesIndex().addServiceLinks(serviceLink);
   }
 
   public static class CreateDatedServiceJourney {
@@ -243,12 +280,22 @@ public class NetexTestData {
 
     private final JourneyPattern journeyPattern;
 
+    private CreateTimetabledPassingTimes createTimetabledPassingTimes;
+
     public CreateDeadRun(JourneyPattern journeyPattern) {
       this.journeyPattern = journeyPattern;
+      this.createTimetabledPassingTimes = new CreateTimetabledPassingTimes();
     }
 
     public CreateDeadRun withId(int id) {
       this.id = id;
+      return this;
+    }
+
+    public CreateDeadRun withCreateTimetabledPassingTimes(
+      CreateTimetabledPassingTimes createTimetabledPassingTimes
+    ) {
+      this.createTimetabledPassingTimes = createTimetabledPassingTimes;
       return this;
     }
 
@@ -261,11 +308,7 @@ public class NetexTestData {
         .withPassingTimes(
           new TimetabledPassingTimes_RelStructure()
             .withTimetabledPassingTime(
-              createTimetabledPassingTimes(
-                journeyPattern
-                  .getPointsInSequence()
-                  .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-              )
+              createTimetabledPassingTimes.create(journeyPattern)
             )
         );
     }
@@ -276,12 +319,22 @@ public class NetexTestData {
     private int id = 1;
     private final JourneyPattern journeyPattern;
 
+    private CreateTimetabledPassingTimes createTimetabledPassingTimes;
+
     public CreateServiceJourney(JourneyPattern journeyPattern) {
       this.journeyPattern = journeyPattern;
+      this.createTimetabledPassingTimes = new CreateTimetabledPassingTimes();
     }
 
     public CreateServiceJourney withId(int id) {
       this.id = id;
+      return this;
+    }
+
+    public CreateServiceJourney withCreateTimetabledPassingTimes(
+      CreateTimetabledPassingTimes createTimetabledPassingTimes
+    ) {
+      this.createTimetabledPassingTimes = createTimetabledPassingTimes;
       return this;
     }
 
@@ -294,31 +347,186 @@ public class NetexTestData {
         .withPassingTimes(
           new TimetabledPassingTimes_RelStructure()
             .withTimetabledPassingTime(
-              createTimetabledPassingTimes(
-                journeyPattern
-                  .getPointsInSequence()
-                  .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+              createTimetabledPassingTimes.create(journeyPattern)
+            )
+        );
+    }
+  }
+
+  public static class CreateTimetabledPassingTimes {
+
+    private int departureTimeOffset = 5;
+
+    public CreateTimetabledPassingTimes withDepartureTimeOffset(
+      int departureTimeOffset
+    ) {
+      this.departureTimeOffset = departureTimeOffset;
+      return this;
+    }
+
+    public List<TimetabledPassingTime> create(JourneyPattern journeyPattern) {
+      return createTimetabledPassingTimes(
+        journeyPattern
+          .getPointsInSequence()
+          .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      );
+    }
+
+    private List<TimetabledPassingTime> createTimetabledPassingTimes(
+      List<PointInLinkSequence_VersionedChildStructure> pointsInLink
+    ) {
+      return IntStream
+        .range(0, pointsInLink.size())
+        .mapToObj(index ->
+          new TimetabledPassingTime()
+            .withId("TTPT-" + (index + 1))
+            .withDepartureTime(LocalTime.of(5, index * departureTimeOffset))
+            .withPointInJourneyPatternRef(
+              createStopPointRef(pointsInLink.get(index).getId())
+            )
+        )
+        .toList();
+    }
+  }
+
+  public static class CreateServiceLink {
+
+    private int id = 1;
+    private ScheduledStopPointRefStructure fromScheduledStopPointRef;
+    private ScheduledStopPointRefStructure toScheduledStopPointRef;
+    private LinkSequenceProjection_VersionStructure linkSequenceProjectionVersionStructure;
+
+    public CreateServiceLink withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreateServiceLink withFromScheduledStopPointRef(
+      String fromScheduledStopPointRef
+    ) {
+      this.fromScheduledStopPointRef =
+        new ScheduledStopPointRefStructure().withRef(fromScheduledStopPointRef);
+      return this;
+    }
+
+    public CreateServiceLink withToScheduledStopPointRef(
+      String toScheduledStopPointRef
+    ) {
+      this.toScheduledStopPointRef =
+        new ScheduledStopPointRefStructure().withRef(toScheduledStopPointRef);
+      return this;
+    }
+
+    public CreateServiceLink withLineStringList(
+      List<Double> lineStringPositions
+    ) {
+      this.linkSequenceProjectionVersionStructure =
+        new LinkSequenceProjection_VersionStructure()
+          .withId("ServiceLinkProjection:" + id)
+          .withLineString(
+            new LineStringType()
+              .withPosList(
+                new DirectPositionListType().withValue(lineStringPositions)
+              )
+          );
+      return this;
+    }
+
+    public CreateServiceLink withLineStringPositions(
+      List<DirectPositionType> lineStringPositions
+    ) {
+      this.linkSequenceProjectionVersionStructure =
+        new LinkSequenceProjection_VersionStructure()
+          .withId("ServiceLinkProjection:" + id)
+          .withLineString(
+            new LineStringType()
+              .withPosOrPointProperty(
+                lineStringPositions.toArray(Object[]::new)
+              )
+          );
+      return this;
+    }
+
+    public ServiceLink create() {
+      return new ServiceLink()
+        .withId("RUT:ServiceLink:" + id)
+        .withFromPointRef(fromScheduledStopPointRef)
+        .withToPointRef(toScheduledStopPointRef)
+        .withProjections(
+          new Projections_RelStructure()
+            .withProjectionRefOrProjection(
+              createLinkSequenceProjection_VersionStructureElement(
+                linkSequenceProjectionVersionStructure
               )
             )
         );
     }
   }
 
-  private List<TimetabledPassingTime> createTimetabledPassingTimes(
-    List<PointInLinkSequence_VersionedChildStructure> pointsInLink
-  ) {
-    // Create timetable with 4 stops using the stopTimes above
-    return IntStream
-      .range(0, pointsInLink.size())
-      .mapToObj(index ->
-        new TimetabledPassingTime()
-          .withId("TTPT-" + (index + 1))
-          .withDepartureTime(LocalTime.of(5, index * 5))
-          .withPointInJourneyPatternRef(
-            createStopPointRef(pointsInLink.get(index).getId())
+  public static class CreateNetexEntitiesIndex {
+
+    private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
+    private final List<Journey_VersionStructure> journeys = new ArrayList<>();
+    private final List<ServiceLink> serviceLinks = new ArrayList<>();
+
+    public CreateNetexEntitiesIndex addServiceJourneys(
+      Journey_VersionStructure... serviceJourney
+    ) {
+      this.journeys.addAll(Arrays.asList(serviceJourney));
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addJourneyPatterns(
+      JourneyPattern... journeyPatterns
+    ) {
+      this.journeyPatterns.addAll(Arrays.asList(journeyPatterns));
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addServiceLinks(
+      ServiceLink... serviceLinks
+    ) {
+      this.serviceLinks.addAll(Arrays.asList(serviceLinks));
+      return this;
+    }
+
+    public NetexEntitiesIndex create() {
+      NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
+      journeyPatterns.forEach(journeyPattern ->
+        netexEntitiesIndex
+          .getJourneyPatternIndex()
+          .put(journeyPattern.getId(), journeyPattern)
+      );
+
+      journeys.forEach(journey ->
+        netexEntitiesIndex
+          .getTimetableFrames()
+          .add(
+            new TimetableFrame()
+              .withVehicleJourneys(
+                new JourneysInFrame_RelStructure()
+                  .withId("JR:123")
+                  .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
+                    journey
+                  )
+              )
           )
-      )
-      .toList();
+      );
+
+      serviceLinks.forEach(serviceLink ->
+        netexEntitiesIndex
+          .getServiceFrames()
+          .add(
+            new ServiceFrame()
+              .withServiceLinks(
+                new ServiceLinksInFrame_RelStructure()
+                  .withServiceLink(serviceLink)
+              )
+          )
+      );
+
+      return netexEntitiesIndex;
+    }
   }
 
   private static DayTypeRefs_RelStructure createEveryDayRefs() {
@@ -327,6 +535,12 @@ public class NetexTestData {
   }
 
   /* private static utility methods */
+  private static JAXBElement<LinkSequenceProjection_VersionStructure> createLinkSequenceProjection_VersionStructureElement(
+    LinkSequenceProjection_VersionStructure value
+  ) {
+    return createJaxbElement(value);
+  }
+
   private static JAXBElement<ScheduledStopPointRefStructure> createScheduledStopPointRef(
     String id
   ) {
