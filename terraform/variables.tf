@@ -59,11 +59,6 @@ variable "redis_zone" {
 }
 
 
-variable ror-partner-auth0-secret {
-  description = "Auth0 client secret for Entur partner tenant"
-}
-
-
 
 
 
