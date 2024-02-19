@@ -27,13 +27,13 @@ class FlexibleAreaValidatorIntegrationTest {
       _ATB_FLEXIBLE_SHARED_DATA,
       "ATB"
     );
-    assertEquals(7, validationReport
-      .getValidationReportEntries()
-      .size());
+    assertEquals(7, validationReport.getValidationReportEntries().size());
   }
 
-  private ValidationReport getValidationReport(String testFile, String codeSpace)
-    throws IOException {
+  private ValidationReport getValidationReport(
+    String testFile,
+    String codeSpace
+  ) throws IOException {
     ValidationReport testValidationReport = new ValidationReport(
       codeSpace,
       "Test1122"
@@ -44,7 +44,6 @@ class FlexibleAreaValidatorIntegrationTest {
         .getResourceAsStream('/' + testFile)
     ) {
       assert testDatasetAsStream != null;
-
 
       NetexEntitiesIndex netexEntitiesIndex = NETEX_PARSER.parse(
         testDatasetAsStream
@@ -57,15 +56,14 @@ class FlexibleAreaValidatorIntegrationTest {
 
       when(validationContext.isCommonFile()).thenReturn(true);
 
-      FlexibleAreaValidator flexibleAreaValidator =
-        new FlexibleAreaValidator(
+      FlexibleAreaValidator flexibleAreaValidator = new FlexibleAreaValidator(
           (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            )
-        );
+        new ValidationReportEntry(
+          message,
+          code,
+          ValidationReportEntrySeverity.ERROR
+        )
+      );
 
       flexibleAreaValidator.validate(testValidationReport, validationContext);
     }

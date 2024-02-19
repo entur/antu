@@ -8,7 +8,6 @@ public record FlexibleAreaError(
   String flexibleStopPlaceId
 )
   implements ValidationError {
-
   @Override
   public String getRuleCode() {
     return ruleCode.toString();

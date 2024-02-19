@@ -20,7 +20,9 @@ public class FlexibleAreaValidator extends AntuNetexValidator {
     FlexibleAreaValidator.class
   );
 
-  protected FlexibleAreaValidator(ValidationReportEntryFactory validationReportEntryFactory) {
+  protected FlexibleAreaValidator(
+    ValidationReportEntryFactory validationReportEntryFactory
+  ) {
     super(validationReportEntryFactory);
   }
 
@@ -49,26 +51,27 @@ public class FlexibleAreaValidator extends AntuNetexValidator {
       FlexibleAreaContextBuilder flexibleAreaContextBuilder =
         new FlexibleAreaContextBuilder();
 
-      List<FlexibleAreaContextBuilder.FlexibleAreaContext> flexibleAreaContexts = flexibleAreaContextBuilder
-        .build(index.getFlexibleStopPlaceIndex());
+      List<FlexibleAreaContextBuilder.FlexibleAreaContext> flexibleAreaContexts =
+        flexibleAreaContextBuilder.build(index.getFlexibleStopPlaceIndex());
 
       flexibleAreaContexts
         .stream()
-        .filter(flexibleAreaContext -> !flexibleAreaContext
-          .linearRing()
-          .isValid())
-        .map(flexibleAreaContext -> new FlexibleAreaError(
-          INVALID_FLEXIBLE_AREA,
-          flexibleAreaContext.flexibleAreaId(),
-          flexibleAreaContext.flexibleStopPlaceId()
-        ))
-        .forEach(
-          flexibleAreaError ->
-            addValidationReportEntry(
-              validationReport,
-              validationContext,
-              flexibleAreaError
-            )
+        .filter(flexibleAreaContext ->
+          !flexibleAreaContext.linearRing().isValid()
+        )
+        .map(flexibleAreaContext ->
+          new FlexibleAreaError(
+            INVALID_FLEXIBLE_AREA,
+            flexibleAreaContext.flexibleAreaId(),
+            flexibleAreaContext.flexibleStopPlaceId()
+          )
+        )
+        .forEach(flexibleAreaError ->
+          addValidationReportEntry(
+            validationReport,
+            validationContext,
+            flexibleAreaError
+          )
         );
     } else {
       throw new AntuException(
