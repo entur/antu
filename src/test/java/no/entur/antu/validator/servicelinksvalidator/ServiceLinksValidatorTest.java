@@ -359,6 +359,19 @@ class ServiceLinksValidatorTest {
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
 
+  @Test
+  void datasetWithoutServiceLinksShouldBeIgnored() {
+    NetexTestData testData = new NetexTestData();
+
+    ValidationReport validationReport = setupAndRunValidation(
+      testData
+        .netexEntitiesIndex()
+        .create(), null, null
+    );
+
+    assertTrue(validationReport.getValidationReportEntries().isEmpty());
+  }
+
   private static ValidationReport runTestWithDirectPositionType(
     List<DirectPositionType> lineStringCoordinates,
     StopPlaceCoordinates fromStopPlaceCoordinates,

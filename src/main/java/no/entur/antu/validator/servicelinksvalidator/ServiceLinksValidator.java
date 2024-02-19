@@ -1,6 +1,7 @@
 package no.entur.antu.validator.servicelinksvalidator;
 
 import java.util.List;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Consumer;
 import no.entur.antu.commondata.CommonDataRepository;
@@ -78,7 +79,9 @@ public class ServiceLinksValidator extends AntuNetexValidator {
       List<ServiceLink> serviceLinks = index
         .getServiceFrames()
         .stream()
-        .flatMap(frame -> frame.getServiceLinks().getServiceLink().stream())
+        .map(frame -> frame.getServiceLinks().getServiceLink())
+        .filter(Objects::nonNull)
+        .flatMap(Collection::stream)
         .toList();
 
       serviceLinks
