@@ -4,7 +4,8 @@ import no.entur.antu.validator.ValidationError;
 
 public record FlexibleAreaError(
   RuleCode ruleCode,
-  String flexibleAreaId
+  String flexibleAreaId,
+  String flexibleStopPlaceId
 )
   implements ValidationError {
 

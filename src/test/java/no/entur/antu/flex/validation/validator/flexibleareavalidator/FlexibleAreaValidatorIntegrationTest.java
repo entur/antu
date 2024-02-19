@@ -1,6 +1,6 @@
 package no.entur.antu.flex.validation.validator.flexibleareavalidator;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,17 +17,19 @@ import org.junit.jupiter.api.Test;
 class FlexibleAreaValidatorIntegrationTest {
 
   public static final String _ATB_FLEXIBLE_SHARED_DATA =
-    "_ATB_flexible_shared_data.xml";
+    "_ATB_flexible_shared_data_2.xml";
 
   private static final NetexParser NETEX_PARSER = new NetexParser();
 
   @Test
-  void testFile() throws IOException {
+  void testFlexibleAreaValidator() throws IOException {
     ValidationReport validationReport = getValidationReport(
       _ATB_FLEXIBLE_SHARED_DATA,
       "ATB"
     );
-    assertTrue(validationReport.getValidationReportEntries().isEmpty());
+    assertEquals(7, validationReport
+      .getValidationReportEntries()
+      .size());
   }
 
   private ValidationReport getValidationReport(String testFile, String codeSpace)
