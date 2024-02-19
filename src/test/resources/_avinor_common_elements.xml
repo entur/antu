@@ -1,0 +1,1412 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:ns2="http://www.opengis.net/gml/3.2" xmlns:ns3="http://www.siri.org.uk/siri" version="1.15:NO-NeTEx-networktimetable:1.5">
+    <PublicationTimestamp>2024-02-19T03:10:31.575</PublicationTimestamp>
+    <ParticipantRef>Avinor</ParticipantRef>
+    <dataObjects>
+        <CompositeFrame created="2024-02-19T03:10:31.575" version="1" id="AVI:CompositeFrame:1555815">
+            <validityConditions>
+                <AvailabilityCondition version="1" id="AVI:AvailabilityCondition:8268767">
+                    <FromDate>2024-02-19T00:00:00</FromDate>
+                    <ToDate>2024-06-19T00:00:00</ToDate>
+                </AvailabilityCondition>
+            </validityConditions>
+            <codespaces>
+                <Codespace id="avi">
+                    <Xmlns>AVI</Xmlns>
+                    <XmlnsUrl>http://www.rutebanken.org/ns/avi</XmlnsUrl>
+                </Codespace>
+                <Codespace id="nsr">
+                    <Xmlns>NSR</Xmlns>
+                    <XmlnsUrl>http://www.rutebanken.org/ns/nsr</XmlnsUrl>
+                </Codespace>
+            </codespaces>
+            <FrameDefaults>
+                <DefaultLocale>
+                    <TimeZone>Europe/Oslo</TimeZone>
+                    <DefaultLanguage>no</DefaultLanguage>
+                </DefaultLocale>
+            </FrameDefaults>
+            <frames>
+                <ResourceFrame version="1" id="AVI:ResourceFrame:3670184">
+                    <typesOfValue>
+                        <Branding version="1" id="AVI:Branding:DY">
+                            <Name>Norwegian</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:SK">
+                            <Name>SAS</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:WF">
+                            <Name>Widerøe</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:M3">
+                            <Name>Air Norway</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:LTR">
+                            <Name>LuftTransport</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:DX">
+                            <Name>DAT</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:FI">
+                            <Name>Icelandair</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:AY">
+                            <Name>Finnair</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:BT">
+                            <Name>Air Baltic</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:D8">
+                            <Name>Norwegian</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:RC">
+                            <Name>Atlantic Airways</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:FR">
+                            <Name>Ryanair</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:EJU">
+                            <Name>EasyJet</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:KL">
+                            <Name>KLM</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:W2">
+                            <Name>Flexflight</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:AF">
+                            <Name>Air France</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:BA">
+                            <Name>British Airways</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:LH">
+                            <Name>Lufthansa</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:LO">
+                            <Name>LOT Polish Airlines</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:SN">
+                            <Name>Brussels International Airlines</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:SU">
+                            <Name>Aeroflot Russian Airlines</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:W6">
+                            <Name>Wizz Air</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:FL">
+                            <Name>Air Leap</Name>
+                        </Branding>
+                        <Branding version="1" id="AVI:Branding:FS">
+                            <Name>Flyr</Name>
+                        </Branding>
+                    </typesOfValue>
+                    <organisations>
+                        <Authority version="1" id="AVI:Authority:Avinor">
+                            <CompanyNumber>985198292</CompanyNumber>
+                            <Name>Avinor</Name>
+                            <LegalName>AVINOR AS</LegalName>
+                            <ContactDetails>
+<Phone>0047 815 30 550</Phone>
+<Url>https://www.avinor.no</Url>
+                            </ContactDetails>
+                            <OrganisationType>authority</OrganisationType>
+                        </Authority>
+                        <Operator version="1" id="AVI:Operator:DY">
+                            <BrandingRef ref="AVI:Branding:DY" version="1"/>
+                            <CompanyNumber>912084949</CompanyNumber>
+                            <Name>Norwegian</Name>
+                            <LegalName>NORWEGIAN AIR NORWAY AS</LegalName>
+                            <ContactDetails>
+<Phone>0047 815 21 815</Phone>
+<Url>https://www.norwegian.no</Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone>0047 815 21 815</Phone>
+<Url>https://www.norwegian.no</Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:SK">
+                            <BrandingRef ref="AVI:Branding:SK" version="1"/>
+                            <CompanyNumber>811176702</CompanyNumber>
+                            <Name>SAS</Name>
+                            <LegalName>SAS NORGE AS</LegalName>
+                            <ContactDetails>
+<Phone>0047 648 16 050</Phone>
+<Url>https://www.sas.no</Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone>0047 648 16 050</Phone>
+<Url>https://www.sas.no</Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:WF">
+                            <BrandingRef ref="AVI:Branding:WF" version="1"/>
+                            <CompanyNumber>917330557</CompanyNumber>
+                            <Name>Widerøe</Name>
+                            <LegalName>WIDERØE'S FLYVESELSKAP AS</LegalName>
+                            <ContactDetails>
+<Phone>0047 755 13 500</Phone>
+<Url>https://www.wideroe.no</Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone>0047 755 13 500</Phone>
+<Url>https://www.wideroe.no</Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:M3">
+                            <BrandingRef ref="AVI:Branding:M3" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Air Norway</Name>
+                            <LegalName>AIR NORWAY</LegalName>
+                            <ContactDetails>
+<Phone>0047 725 22 790</Phone>
+<Url>https://www.airnorway.no</Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone>0047 725 22 790</Phone>
+<Url>https://www.airnorway.no</Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:LTR">
+                            <BrandingRef ref="AVI:Branding:LTR" version="1"/>
+                            <CompanyNumber>912 692 930</CompanyNumber>
+                            <Name>LuftTransport</Name>
+                            <LegalName>LUFTTRANSPORT AS</LegalName>
+                            <ContactDetails>
+<Phone>0047 75 43 18 00</Phone>
+<Url>https://www.lufttransport.no</Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone>0047 75 43 18 00</Phone>
+<Url>https://www.lufttransport.no</Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:DX">
+                            <BrandingRef ref="AVI:Branding:DX" version="1"/>
+                            <CompanyNumber>0</CompanyNumber>
+                            <Name>DAT</Name>
+                            <LegalName>Danish Air Transport A/S</LegalName>
+                            <ContactDetails>
+<Phone>+45 76 92 30 40</Phone>
+<Url>https://dat.dk</Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone>+45 76 92 30 40</Phone>
+<Url>https://dat.dk</Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:FI">
+                            <BrandingRef ref="AVI:Branding:FI" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Icelandair</Name>
+                            <LegalName>Icelandair</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:AY">
+                            <BrandingRef ref="AVI:Branding:AY" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Finnair</Name>
+                            <LegalName>Finnair</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:BT">
+                            <BrandingRef ref="AVI:Branding:BT" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Air Baltic</Name>
+                            <LegalName>Air Baltic</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:D8">
+                            <BrandingRef ref="AVI:Branding:D8" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Norwegian</Name>
+                            <LegalName>Norwegian Air International</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:RC">
+                            <BrandingRef ref="AVI:Branding:RC" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Atlantic Airways</Name>
+                            <LegalName>Atlantic Airways</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:FR">
+                            <BrandingRef ref="AVI:Branding:FR" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Ryanair</Name>
+                            <LegalName>Ryanair</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:EJU">
+                            <BrandingRef ref="AVI:Branding:EJU" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>EasyJet</Name>
+                            <LegalName>EasyJet</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:KL">
+                            <BrandingRef ref="AVI:Branding:KL" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>KLM</Name>
+                            <LegalName>KLM</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:W2">
+                            <BrandingRef ref="AVI:Branding:W2" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Flexflight</Name>
+                            <LegalName>Flexflight</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:AF">
+                            <BrandingRef ref="AVI:Branding:AF" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Air France</Name>
+                            <LegalName>Air France</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:BA">
+                            <BrandingRef ref="AVI:Branding:BA" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>British Airways</Name>
+                            <LegalName>British Airways</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:LH">
+                            <BrandingRef ref="AVI:Branding:LH" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Lufthansa</Name>
+                            <LegalName>Lufthansa</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:LO">
+                            <BrandingRef ref="AVI:Branding:LO" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>LOT Polish Airlines</Name>
+                            <LegalName>LOT Polish Airlines</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:SN">
+                            <BrandingRef ref="AVI:Branding:SN" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Brussels International Airlines</Name>
+                            <LegalName>Brussels International Airlines</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:SU">
+                            <BrandingRef ref="AVI:Branding:SU" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Aeroflot Russian Airlines</Name>
+                            <LegalName>Aeroflot Russian Airlines</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:W6">
+                            <BrandingRef ref="AVI:Branding:W6" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Wizz Air</Name>
+                            <LegalName>Wizz Air</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:FL">
+                            <BrandingRef ref="AVI:Branding:FL" version="1"/>
+                            <CompanyNumber></CompanyNumber>
+                            <Name>Air Leap</Name>
+                            <LegalName>Air Leap</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url></Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                        <Operator version="1" id="AVI:Operator:FS">
+                            <BrandingRef ref="AVI:Branding:FS" version="1"/>
+                            <CompanyNumber>925566004</CompanyNumber>
+                            <Name>Flyr</Name>
+                            <LegalName>Flyr AS</LegalName>
+                            <ContactDetails>
+<Phone></Phone>
+<Url>https://flyr.com</Url>
+                            </ContactDetails>
+                            <OrganisationType>operator</OrganisationType>
+                            <CustomerServiceContactDetails>
+<Phone></Phone>
+<Url>https://flyr.com</Url>
+                            </CustomerServiceContactDetails>
+                        </Operator>
+                    </organisations>
+                </ResourceFrame>
+                <ServiceFrame version="1" id="AVI:ServiceFrame:6042018">
+                    <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:W2">
+                        <Name>Flexflight</Name>
+                        <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                    </Network>
+                    <additionalNetworks>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:RC">
+                            <Name>Atlantic Airways</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:WF">
+                            <Name>Widerøe</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:FS">
+                            <Name>Flyr</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:KL">
+                            <Name>KLM</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:AF">
+                            <Name>Air France</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:DY">
+                            <Name>Norwegian</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:LO">
+                            <Name>LOT Polish Airlines</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:SU">
+                            <Name>Aeroflot Russian Airlines</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:FR">
+                            <Name>Ryanair</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:SN">
+                            <Name>Brussels International Airlines</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:SK">
+                            <Name>SAS</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:LH">
+                            <Name>Lufthansa</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:BT">
+                            <Name>Air Baltic</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:D8">
+                            <Name>Norwegian</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:M3">
+                            <Name>Air Norway</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:DX">
+                            <Name>DAT</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:LTR">
+                            <Name>LuftTransport</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:FL">
+                            <Name>Air Leap</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:EJU">
+                            <Name>EasyJet</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:BA">
+                            <Name>British Airways</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:AY">
+                            <Name>Finnair</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:FI">
+                            <Name>Icelandair</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                        <Network changed="2024-02-19T03:10:31.575" version="1" id="AVI:Network:W6">
+                            <Name>Wizz Air</Name>
+                            <AuthorityRef ref="AVI:Authority:Avinor" version="1"/>
+                        </Network>
+                    </additionalNetworks>
+                    <routePoints>
+                        <RoutePoint version="1" id="AVI:RoutePoint:64687">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:64687">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:64687" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:64891">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:64891">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:64891" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:64971">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:64971">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:64971" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:65619">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:65619">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:65619" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:65706">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:65706">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:65706" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:65790">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:65790">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:65790" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:65922">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:65922">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:65922" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:65954">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:65954">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:65954" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:66163">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:66163">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:66163" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:67772">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:67772">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:67772" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:69044">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:69044">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:69044" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:69363">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:69363">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:69363" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:69447">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:69447">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:69447" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:69891">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:69891">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:69891" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:70663">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:70663">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:70663" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:71272">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:71272">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:71272" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:71292">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:71292">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:71292" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:71446">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:71446">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:71446" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:71661">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:71661">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:71661" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:71727">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:71727">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:71727" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:71929">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:71929">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:71929" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:74478">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:74478">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:74478" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:74700">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:74700">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:74700" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:74733">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:74733">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:74733" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:75437">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:75437">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:75437" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:75439">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:75439">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:75439" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:75877">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:75877">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:75877" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:76208">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:76208">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:76208" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:76361">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:76361">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:76361" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:76522">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:76522">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:76522" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:76586">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:76586">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:76586" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:77628">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:77628">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:77628" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:77699">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:77699">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:77699" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:78340">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:78340">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:78340" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:78568">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:78568">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:78568" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:78581">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:78581">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:78581" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:81025">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:81025">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:81025" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:81427">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:81427">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:81427" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:81543">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:81543">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:81543" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:81949">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:81949">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:81949" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:82157">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:82157">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:82157" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:82166">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:82166">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:82166" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:82283">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:82283">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:82283" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:82286">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:82286">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:82286" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:82385">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:82385">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:82385" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:82410">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:82410">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:82410" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:82500">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:82500">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:82500" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:82503">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:82503">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:82503" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:83256">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:83256">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:83256" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:83334">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:83334">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:83334" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:83336">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:83336">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:83336" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:84748">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:84748">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:84748" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:84820">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:84820">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:84820" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:84837">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:84837">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:84837" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                        <RoutePoint version="1" id="AVI:RoutePoint:85277">
+                            <projections>
+<PointProjection version="1" id="AVI:PointProjection:85277">
+    <ProjectedPointRef ref="AVI:ScheduledStopPoint:85277" version="1"/>
+</PointProjection>
+                            </projections>
+                        </RoutePoint>
+                    </routePoints>
+                    <scheduledStopPoints>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:64687">
+                            <Name>Ålesund Lufthavn</Name>
+                            <ShortName>AES</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:64891">
+                            <Name>Alta Lufthavn</Name>
+                            <ShortName>ALF</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:64971">
+                            <Name>Andøya Lufthavn</Name>
+                            <ShortName>ANX</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:65619">
+                            <Name>Bardufoss Lufthavn</Name>
+                            <ShortName>BDU</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:65706">
+                            <Name>Bergen Lufthavn</Name>
+                            <ShortName>BGO</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:65790">
+                            <Name>Båtsfjord Lufthavn</Name>
+                            <ShortName>BJF</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:65922">
+                            <Name>Brønnøysund Lufthavn</Name>
+                            <ShortName>BNN</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:65954">
+                            <Name>Bodø Lufthavn</Name>
+                            <ShortName>BOO</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:66163">
+                            <Name>Berlevåg Lufthavn</Name>
+                            <ShortName>BVG</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:67772">
+                            <Name>Geilo lufthavn Dagali</Name>
+                            <ShortName>DLD</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:69044">
+                            <Name>Harstad/Narvik Lufthavn</Name>
+                            <ShortName>EVE</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:69363">
+                            <Name>Farsund Lufthavn, Lista</Name>
+                            <ShortName>FAN</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:69447">
+                            <Name>Førde Lufthamn</Name>
+                            <ShortName>FDE</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:69891">
+                            <Name>Florø Lufthamn</Name>
+                            <ShortName>FRO</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:70663">
+                            <Name>Gol Flyplass, Klanten</Name>
+                            <ShortName>GLL</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:71272">
+                            <Name>Hasvik Lufthavn</Name>
+                            <ShortName>HAA</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:71292">
+                            <Name>Haugesund Lufthavn</Name>
+                            <ShortName>HAU</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:71446">
+                            <Name>Hammerfest Lufthavn</Name>
+                            <ShortName>HFT</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:71661">
+                            <Name>Hamar lufthavn</Name>
+                            <ShortName>HMR</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:71727">
+                            <Name>Ørsta-Volda Lufthamn</Name>
+                            <ShortName>HOV</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:71929">
+                            <Name>Honningsvåg Lufthavn</Name>
+                            <ShortName>HVG</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:74478">
+                            <Name>Kirkenes Lufthavn</Name>
+                            <ShortName>KKN</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:74700">
+                            <Name>Kristiansand Lufthavn</Name>
+                            <ShortName>KRS</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:74733">
+                            <Name>Kristiansund Lufthavn</Name>
+                            <ShortName>KSU</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:75437">
+                            <Name>Lakselv Lufthavn</Name>
+                            <ShortName>LKL</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:75439">
+                            <Name>Leknes Lufthavn</Name>
+                            <ShortName>LKN</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:75877">
+                            <Name>Svalbard Lufthavn</Name>
+                            <ShortName>LYR</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:76208">
+                            <Name>Mehamn Lufthavn</Name>
+                            <ShortName>MEH</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:76361">
+                            <Name>Mosjøen Lufthavn</Name>
+                            <ShortName>MJF</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:76522">
+                            <Name>Molde Lufthavn</Name>
+                            <ShortName>MOL</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:76586">
+                            <Name>Mo i Rana Lufthavn</Name>
+                            <ShortName>MQN</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:77628">
+                            <Name>Notodden lufthavn</Name>
+                            <ShortName>NTB</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:77699">
+                            <Name>Narvik Lufthavn</Name>
+                            <ShortName>NVK</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:78340">
+                            <Name>Ørland Lufthavn</Name>
+                            <ShortName>OLA</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:78568">
+                            <Name>Oslo Lufthavn</Name>
+                            <ShortName>OSL</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:78581">
+                            <Name>Namsos Lufthavn</Name>
+                            <ShortName>OSY</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:81025">
+                            <Name>Røst Lufthavn</Name>
+                            <ShortName>RET</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:81427">
+                            <Name>Røros Lufthavn</Name>
+                            <ShortName>RRS</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:81543">
+                            <Name>Rørvik Lufthavn</Name>
+                            <ShortName>RVK</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:81949">
+                            <Name>Sandane Lufthamn</Name>
+                            <ShortName>SDN</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:82157">
+                            <Name>Skien Lufthavn, Geiteryggen</Name>
+                            <ShortName>SKE</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:82166">
+                            <Name>Stokmarknes Lufthavn</Name>
+                            <ShortName>SKN</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:82283">
+                            <Name>Sogndal Lufthamn</Name>
+                            <ShortName>SOG</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:82286">
+                            <Name>Sørkjosen Lufthavn</Name>
+                            <ShortName>SOJ</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:82385">
+                            <Name>Stord Lufthavn, Sørstokken</Name>
+                            <ShortName>SRP</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:82410">
+                            <Name>Sandnessjøen Lufthavn</Name>
+                            <ShortName>SSJ</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:82500">
+                            <Name>Stavanger Lufthavn</Name>
+                            <ShortName>SVG</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:82503">
+                            <Name>Svolvær Lufthavn</Name>
+                            <ShortName>SVJ</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:83256">
+                            <Name>Tromsø Lufthavn</Name>
+                            <ShortName>TOS</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:83334">
+                            <Name>Trondheim Lufthavn</Name>
+                            <ShortName>TRD</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:83336">
+                            <Name>Sandefjord Lufthavn</Name>
+                            <ShortName>TRF</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:84748">
+                            <Name>Vardø Lufthavn</Name>
+                            <ShortName>VAW</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:84820">
+                            <Name>Fagernes Lufthamn</Name>
+                            <ShortName>VDB</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:84837">
+                            <Name>Vadsø Lufthavn</Name>
+                            <ShortName>VDS</ShortName>
+                        </ScheduledStopPoint>
+                        <ScheduledStopPoint version="1" id="AVI:ScheduledStopPoint:85277">
+                            <Name>Værøy Helikopterhavn</Name>
+                            <ShortName>VRY</ShortName>
+                        </ScheduledStopPoint>
+                    </scheduledStopPoints>
+                    <stopAssignments>
+                        <PassengerStopAssignment order="1" version="1" id="AVI:PassengerStopAssignment:64687">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:64687" version="1"/>
+                            <QuayRef ref="NSR:Quay:1206"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="2" version="1" id="AVI:PassengerStopAssignment:64891">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:64891" version="1"/>
+                            <QuayRef ref="NSR:Quay:1209"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="3" version="1" id="AVI:PassengerStopAssignment:64971">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:64971" version="1"/>
+                            <QuayRef ref="NSR:Quay:1210"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="4" version="1" id="AVI:PassengerStopAssignment:65619">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:65619" version="1"/>
+                            <QuayRef ref="NSR:Quay:1211"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="5" version="1" id="AVI:PassengerStopAssignment:65706">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:65706" version="1"/>
+                            <QuayRef ref="NSR:Quay:1213"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="6" version="1" id="AVI:PassengerStopAssignment:65790">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:65790" version="1"/>
+                            <QuayRef ref="NSR:Quay:1172"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="7" version="1" id="AVI:PassengerStopAssignment:65922">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:65922" version="1"/>
+                            <QuayRef ref="NSR:Quay:1180"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="8" version="1" id="AVI:PassengerStopAssignment:65954">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:65954" version="1"/>
+                            <QuayRef ref="NSR:Quay:1188"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="9" version="1" id="AVI:PassengerStopAssignment:66163">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:66163" version="1"/>
+                            <QuayRef ref="NSR:Quay:1196"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="10" version="1" id="AVI:PassengerStopAssignment:67772">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:67772" version="1"/>
+                            <QuayRef ref="NSR:Quay:101188"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="11" version="1" id="AVI:PassengerStopAssignment:69044">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:69044" version="1"/>
+                            <QuayRef ref="NSR:Quay:1202"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="12" version="1" id="AVI:PassengerStopAssignment:69363">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:69363" version="1"/>
+                            <QuayRef ref="NSR:Quay:101189"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="13" version="1" id="AVI:PassengerStopAssignment:69447">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:69447" version="1"/>
+                            <QuayRef ref="NSR:Quay:1208"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="14" version="1" id="AVI:PassengerStopAssignment:69891">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:69891" version="1"/>
+                            <QuayRef ref="NSR:Quay:1194"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="15" version="1" id="AVI:PassengerStopAssignment:70663">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:70663" version="1"/>
+                            <QuayRef ref="NSR:Quay:101190"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="16" version="1" id="AVI:PassengerStopAssignment:71272">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:71272" version="1"/>
+                            <QuayRef ref="NSR:Quay:1201"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="17" version="1" id="AVI:PassengerStopAssignment:71292">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:71292" version="1"/>
+                            <QuayRef ref="NSR:Quay:1207"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="18" version="1" id="AVI:PassengerStopAssignment:71446">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:71446" version="1"/>
+                            <QuayRef ref="NSR:Quay:1174"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="19" version="1" id="AVI:PassengerStopAssignment:71661">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:71661" version="1"/>
+                            <QuayRef ref="NSR:Quay:101191"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="20" version="1" id="AVI:PassengerStopAssignment:71727">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:71727" version="1"/>
+                            <QuayRef ref="NSR:Quay:1182"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="21" version="1" id="AVI:PassengerStopAssignment:71929">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:71929" version="1"/>
+                            <QuayRef ref="NSR:Quay:1187"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="22" version="1" id="AVI:PassengerStopAssignment:74478">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:74478" version="1"/>
+                            <QuayRef ref="NSR:Quay:1214"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="23" version="1" id="AVI:PassengerStopAssignment:74700">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:74700" version="1"/>
+                            <QuayRef ref="NSR:Quay:1216"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="24" version="1" id="AVI:PassengerStopAssignment:74733">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:74733" version="1"/>
+                            <QuayRef ref="NSR:Quay:1217"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="25" version="1" id="AVI:PassengerStopAssignment:75437">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:75437" version="1"/>
+                            <QuayRef ref="NSR:Quay:1212"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="26" version="1" id="AVI:PassengerStopAssignment:75439">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:75439" version="1"/>
+                            <QuayRef ref="NSR:Quay:1215"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="27" version="1" id="AVI:PassengerStopAssignment:75877">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:75877" version="1"/>
+                            <QuayRef ref="NSR:Quay:1218"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="28" version="1" id="AVI:PassengerStopAssignment:76208">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:76208" version="1"/>
+                            <QuayRef ref="NSR:Quay:1185"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="29" version="1" id="AVI:PassengerStopAssignment:76361">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:76361" version="1"/>
+                            <QuayRef ref="NSR:Quay:1186"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="30" version="1" id="AVI:PassengerStopAssignment:76522">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:76522" version="1"/>
+                            <QuayRef ref="NSR:Quay:1189"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="31" version="1" id="AVI:PassengerStopAssignment:76586">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:76586" version="1"/>
+                            <QuayRef ref="NSR:Quay:1181"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="32" version="1" id="AVI:PassengerStopAssignment:77628">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:77628" version="1"/>
+                            <QuayRef ref="NSR:Quay:100312"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="33" version="1" id="AVI:PassengerStopAssignment:77699">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:77699" version="1"/>
+                            <QuayRef ref="NSR:Quay:1183"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="34" version="1" id="AVI:PassengerStopAssignment:78340">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:78340" version="1"/>
+                            <QuayRef ref="NSR:Quay:1184"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="35" version="1" id="AVI:PassengerStopAssignment:78568">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:78568" version="1"/>
+                            <QuayRef ref="NSR:Quay:1173"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="36" version="1" id="AVI:PassengerStopAssignment:78581">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:78581" version="1"/>
+                            <QuayRef ref="NSR:Quay:1175"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="37" version="1" id="AVI:PassengerStopAssignment:81025">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:81025" version="1"/>
+                            <QuayRef ref="NSR:Quay:1176"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="38" version="1" id="AVI:PassengerStopAssignment:81427">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:81427" version="1"/>
+                            <QuayRef ref="NSR:Quay:1177"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="39" version="1" id="AVI:PassengerStopAssignment:81543">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:81543" version="1"/>
+                            <QuayRef ref="NSR:Quay:1178"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="40" version="1" id="AVI:PassengerStopAssignment:81949">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:81949" version="1"/>
+                            <QuayRef ref="NSR:Quay:1179"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="41" version="1" id="AVI:PassengerStopAssignment:82157">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:82157" version="1"/>
+                            <QuayRef ref="NSR:Quay:100311"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="42" version="1" id="AVI:PassengerStopAssignment:82166">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:82166" version="1"/>
+                            <QuayRef ref="NSR:Quay:1203"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="43" version="1" id="AVI:PassengerStopAssignment:82283">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:82283" version="1"/>
+                            <QuayRef ref="NSR:Quay:1204"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="44" version="1" id="AVI:PassengerStopAssignment:82286">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:82286" version="1"/>
+                            <QuayRef ref="NSR:Quay:1205"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="45" version="1" id="AVI:PassengerStopAssignment:82385">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:82385" version="1"/>
+                            <QuayRef ref="NSR:Quay:101193"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="46" version="1" id="AVI:PassengerStopAssignment:82410">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:82410" version="1"/>
+                            <QuayRef ref="NSR:Quay:1198"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="47" version="1" id="AVI:PassengerStopAssignment:82500">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:82500" version="1"/>
+                            <QuayRef ref="NSR:Quay:1199"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="48" version="1" id="AVI:PassengerStopAssignment:82503">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:82503" version="1"/>
+                            <QuayRef ref="NSR:Quay:1200"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="49" version="1" id="AVI:PassengerStopAssignment:83256">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:83256" version="1"/>
+                            <QuayRef ref="NSR:Quay:1190"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="50" version="1" id="AVI:PassengerStopAssignment:83334">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:83334" version="1"/>
+                            <QuayRef ref="NSR:Quay:1191"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="51" version="1" id="AVI:PassengerStopAssignment:83336">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:83336" version="1"/>
+                            <QuayRef ref="NSR:Quay:100310"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="52" version="1" id="AVI:PassengerStopAssignment:84748">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:84748" version="1"/>
+                            <QuayRef ref="NSR:Quay:1192"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="53" version="1" id="AVI:PassengerStopAssignment:84820">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:84820" version="1"/>
+                            <QuayRef ref="NSR:Quay:1193"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="54" version="1" id="AVI:PassengerStopAssignment:84837">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:84837" version="1"/>
+                            <QuayRef ref="NSR:Quay:1195"/>
+                        </PassengerStopAssignment>
+                        <PassengerStopAssignment order="55" version="1" id="AVI:PassengerStopAssignment:85277">
+                            <ScheduledStopPointRef ref="AVI:ScheduledStopPoint:85277" version="1"/>
+                            <QuayRef ref="NSR:Quay:1197"/>
+                        </PassengerStopAssignment>
+                    </stopAssignments>
+                </ServiceFrame>
+            </frames>
+        </CompositeFrame>
+    </dataObjects>
+</PublicationDelivery>
