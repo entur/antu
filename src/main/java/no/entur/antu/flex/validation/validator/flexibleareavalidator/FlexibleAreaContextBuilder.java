@@ -4,15 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import net.opengis.gml._3.AbstractRingType;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LinearRingType;
-import no.entur.antu.validator.servicelinksvalidator.GeometryUtils;
-import org.entur.netex.index.api.NetexEntityIndex;
+import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LinearRing;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
+import org.rutebanken.netex.model.FlexibleStopPlacesInFrame_RelStructure;
+import org.rutebanken.netex.model.Site_VersionFrameStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,60 +22,42 @@ public class FlexibleAreaContextBuilder {
   public record FlexibleAreaContext(
     String flexibleStopPlaceId,
     String flexibleAreaId,
-    LinearRing linearRing
-  ) {}
+    List<Double> coordinates
+  ) {
+
+    public Coordinate[] getJTSCoordinates() {
+      Coordinate[] jtsCoordinates = new Coordinate[coordinates.size() / 2];
+      for (int i = 0; i < coordinates.size(); i += 2) {
+        jtsCoordinates[i / 2] =
+          new Coordinate(coordinates.get(i + 1), coordinates.get(i));
+      }
+      return jtsCoordinates;
+    }
+
+    /**
+     * Validating that we have at least two coordinates (4 values) and the list size is even
+     */
+    public boolean isEvenCoordinates() {
+      return coordinates.size() % 2 == 0;
+    }
+  }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     FlexibleAreaContextBuilder.class
   );
 
-  /*
-  public List<FlexibleAreaContext> build(NetexEntityIndex<FlexibleStopPlace> flexibleStopPlaceIndex) {
-    return flexibleStopPlaceIndex
-      .getAll()
-      .stream()
-      .flatMap(flexibleStopPlace -> flexibleStopPlace
-        .getAreas()
-        .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
-        .stream()
-        .filter(FlexibleArea.class::isInstance)
-        .map(FlexibleArea.class::cast)
-        .filter(flexibleArea -> flexibleArea
-          .getPolygon()
-          .getExterior()
-          .getAbstractRing()
-          .getValue() instanceof LinearRingType)
-        .map(flexibleArea -> {
-          LinearRingType linearRingType = (LinearRingType) flexibleArea
-            .getPolygon()
-            .getExterior()
-            .getAbstractRing()
-            .getValue();
-          List<Double> coordinates = getCoordinates(linearRingType);
-          Coordinate[] jtsCoordinates = createJTSCoordinates(coordinates);
-          LinearRing linearRing = GeometryUtils
-            .getGeometryFactory()
-            .createLinearRing(jtsCoordinates);
-          return new FlexibleAreaContext(
-            flexibleArea
-              .getFlexibleStopPlaceRef()
-              .getRef(),
-            flexibleArea.getId(),
-            linearRing
-          );
-        }))
-      .toList();
-  }
-*/
-
   public List<FlexibleAreaContext> build(
-    NetexEntityIndex<FlexibleStopPlace> flexibleStopPlaceIndex
+    NetexEntitiesIndex index
   ) {
     List<FlexibleAreaContext> flexibleAreaContexts = new ArrayList<>();
 
-    List<FlexibleStopPlace> flexibleStopPlaces = flexibleStopPlaceIndex
-      .getAll()
+    List<FlexibleStopPlace> flexibleStopPlaces = index
+      .getSiteFrames()
       .stream()
+      .map(Site_VersionFrameStructure::getFlexibleStopPlaces)
+      .filter(Objects::nonNull)
+      .map(FlexibleStopPlacesInFrame_RelStructure::getFlexibleStopPlace)
+      .flatMap(List::stream)
       .toList();
 
     for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {
@@ -94,20 +77,13 @@ public class FlexibleAreaContextBuilder {
           .getValue();
 
         if (abstractRingType instanceof LinearRingType linearRingType) {
-          List<Double> coordinates = getCoordinates(linearRingType);
-          if (isProjectionValid(coordinates)) {
-            Coordinate[] jtsCoordinates = createJTSCoordinates(coordinates);
-            LinearRing linearRing = GeometryUtils
-              .getGeometryFactory()
-              .createLinearRing(jtsCoordinates);
-            flexibleAreaContexts.add(
-              new FlexibleAreaContext(
-                flexibleStopPlace.getId(),
-                flexibleArea.getId(),
-                linearRing
-              )
-            );
-          }
+          flexibleAreaContexts.add(
+            new FlexibleAreaContext(
+              flexibleStopPlace.getId(),
+              flexibleArea.getId(),
+              getCoordinates(linearRingType)
+            )
+          );
         }
       }
     }
@@ -116,7 +92,9 @@ public class FlexibleAreaContextBuilder {
 
   private List<Double> getCoordinates(LinearRingType linearRing) {
     if (linearRing.getPosList() != null) {
-      return linearRing.getPosList().getValue();
+      return linearRing
+        .getPosList()
+        .getValue();
     } else if (linearRing.getPosOrPointProperty() != null) {
       return linearRing
         .getPosOrPointProperty()
@@ -132,21 +110,5 @@ public class FlexibleAreaContextBuilder {
       linearRing
     );
     return Collections.emptyList();
-  }
-
-  private Coordinate[] createJTSCoordinates(List<Double> positionList) {
-    Coordinate[] coordinates = new Coordinate[positionList.size() / 2];
-    for (int i = 0; i < positionList.size(); i += 2) {
-      coordinates[i / 2] =
-        new Coordinate(positionList.get(i + 1), positionList.get(i));
-    }
-    return coordinates;
-  }
-
-  /**
-   * Validating that we have at least two coordinates (4 values) and the list size is even
-   */
-  private boolean isProjectionValid(List<Double> coordinates) {
-    return coordinates.size() >= 4 && coordinates.size() % 2 == 0;
   }
 }

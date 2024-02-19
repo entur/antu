@@ -5,7 +5,8 @@ import no.entur.antu.validator.ValidationError;
 public record FlexibleAreaError(
   RuleCode ruleCode,
   String flexibleAreaId,
-  String flexibleStopPlaceId
+  String flexibleStopPlaceId,
+  String description
 )
   implements ValidationError {
   @Override
@@ -15,10 +16,7 @@ public record FlexibleAreaError(
 
   @Override
   public String validationReportEntryMessage() {
-    return String.format(
-      "Invalid flexible area found with id %s",
-      flexibleAreaId()
-    );
+    return description();
   }
 
   @Override
