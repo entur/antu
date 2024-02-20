@@ -70,9 +70,7 @@ public class NetexTestData {
   ) {
     return IntStream
       .range(0, numberOfJourneyPatterns)
-      .mapToObj(index -> new CreateJourneyPattern()
-        .withId(index)
-        .create())
+      .mapToObj(index -> new CreateJourneyPattern().withId(index).create())
       .toList();
   }
 
@@ -83,9 +81,7 @@ public class NetexTestData {
     return IntStream
       .range(0, numberOfServiceJourneys)
       .mapToObj(index ->
-                  new CreateServiceJourney(journeyPattern)
-                    .withId(index)
-                    .create()
+        new CreateServiceJourney(journeyPattern).withId(index).create()
       )
       .toList();
   }
@@ -124,11 +120,15 @@ public class NetexTestData {
     return new CreateNetexEntitiesIndex().addServiceLinks(serviceLink);
   }
 
-  public CreateNetexEntitiesIndex netexEntitiesIndex(FlexibleStopPlace flexibleStopPlace) {
-    return new CreateNetexEntitiesIndex().addFlexibleStopPlace(flexibleStopPlace);
+  public CreateNetexEntitiesIndex netexEntitiesIndex(
+    FlexibleStopPlace flexibleStopPlace
+  ) {
+    return new CreateNetexEntitiesIndex()
+      .addFlexibleStopPlace(flexibleStopPlace);
   }
 
   public static class CreateFlexibleArea {
+
     private int id = 1;
 
     private List<Double> coordinates;
@@ -149,22 +149,24 @@ public class NetexTestData {
         .withValue(coordinates);
       linearRing.withPosList(positionList);
 
-
       return new FlexibleArea()
         .withId("RUT:FlexibleArea:" + id)
         .withName(new MultilingualString().withValue("FlexibleArea " + id))
         .withPolygon(
-          new PolygonType().withExterior(
-            new AbstractRingPropertyType()
-              .withAbstractRing(
-                new net.opengis.gml._3.ObjectFactory().createLinearRing(linearRing)
-              )
-          )
+          new PolygonType()
+            .withExterior(
+              new AbstractRingPropertyType()
+                .withAbstractRing(
+                  new net.opengis.gml._3.ObjectFactory()
+                    .createLinearRing(linearRing)
+                )
+            )
         );
     }
   }
 
   public static class CreateFlexibleStopPlace {
+
     private int id = 1;
 
     private FlexibleArea flexibleArea;
@@ -459,14 +461,12 @@ public class NetexTestData {
       return IntStream
         .range(0, pointsInLink.size())
         .mapToObj(index ->
-                    new TimetabledPassingTime()
-                      .withId("TTPT-" + (index + 1))
-                      .withDepartureTime(LocalTime.of(5, index * departureTimeOffset))
-                      .withPointInJourneyPatternRef(
-                        createStopPointRef(pointsInLink
-                                             .get(index)
-                                             .getId())
-                      )
+          new TimetabledPassingTime()
+            .withId("TTPT-" + (index + 1))
+            .withDepartureTime(LocalTime.of(5, index * departureTimeOffset))
+            .withPointInJourneyPatternRef(
+              createStopPointRef(pointsInLink.get(index).getId())
+            )
         )
         .toList();
     }
@@ -551,7 +551,8 @@ public class NetexTestData {
     private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
     private final List<Journey_VersionStructure> journeys = new ArrayList<>();
     private final List<ServiceLink> serviceLinks = new ArrayList<>();
-    private final List<FlexibleStopPlace> flexibleStopPlaces = new ArrayList<>();
+    private final List<FlexibleStopPlace> flexibleStopPlaces =
+      new ArrayList<>();
 
     public CreateNetexEntitiesIndex addFlexibleStopPlace(
       FlexibleStopPlace... flexibleStopPlace
@@ -584,48 +585,48 @@ public class NetexTestData {
     public NetexEntitiesIndex create() {
       NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
       journeyPatterns.forEach(journeyPattern ->
-                                netexEntitiesIndex
-                                  .getJourneyPatternIndex()
-                                  .put(journeyPattern.getId(), journeyPattern)
+        netexEntitiesIndex
+          .getJourneyPatternIndex()
+          .put(journeyPattern.getId(), journeyPattern)
       );
 
       journeys.forEach(journey ->
-                         netexEntitiesIndex
-                           .getTimetableFrames()
-                           .add(
-                             new TimetableFrame()
-                               .withVehicleJourneys(
-                                 new JourneysInFrame_RelStructure()
-                                   .withId("JR:123")
-                                   .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-                                     journey
-                                   )
-                               )
-                           )
+        netexEntitiesIndex
+          .getTimetableFrames()
+          .add(
+            new TimetableFrame()
+              .withVehicleJourneys(
+                new JourneysInFrame_RelStructure()
+                  .withId("JR:123")
+                  .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
+                    journey
+                  )
+              )
+          )
       );
 
       serviceLinks.forEach(serviceLink ->
-                             netexEntitiesIndex
-                               .getServiceFrames()
-                               .add(
-                                 new ServiceFrame()
-                                   .withServiceLinks(
-                                     new ServiceLinksInFrame_RelStructure()
-                                       .withServiceLink(serviceLink)
-                                   )
-                               )
+        netexEntitiesIndex
+          .getServiceFrames()
+          .add(
+            new ServiceFrame()
+              .withServiceLinks(
+                new ServiceLinksInFrame_RelStructure()
+                  .withServiceLink(serviceLink)
+              )
+          )
       );
 
       flexibleStopPlaces.forEach(flexibleStopPlace ->
-                                   netexEntitiesIndex
-                                     .getSiteFrames()
-                                     .add(
-                                       new SiteFrame()
-                                         .withFlexibleStopPlaces(
-                                           new FlexibleStopPlacesInFrame_RelStructure()
-                                             .withFlexibleStopPlace(flexibleStopPlace)
-                                         )
-                                     )
+        netexEntitiesIndex
+          .getSiteFrames()
+          .add(
+            new SiteFrame()
+              .withFlexibleStopPlaces(
+                new FlexibleStopPlacesInFrame_RelStructure()
+                  .withFlexibleStopPlace(flexibleStopPlace)
+              )
+          )
       );
 
       return netexEntitiesIndex;

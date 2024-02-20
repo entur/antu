@@ -1,7 +1,7 @@
 package no.entur.antu.validator.servicelinksvalidator;
 
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import no.entur.antu.commondata.CommonDataRepository;

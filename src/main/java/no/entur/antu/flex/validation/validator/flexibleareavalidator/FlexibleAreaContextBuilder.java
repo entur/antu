@@ -24,7 +24,6 @@ public class FlexibleAreaContextBuilder {
     String flexibleAreaId,
     List<Double> coordinates
   ) {
-
     public Coordinate[] getJTSCoordinates() {
       Coordinate[] jtsCoordinates = new Coordinate[coordinates.size() / 2];
       for (int i = 0; i < coordinates.size(); i += 2) {
@@ -46,9 +45,7 @@ public class FlexibleAreaContextBuilder {
     FlexibleAreaContextBuilder.class
   );
 
-  public List<FlexibleAreaContext> build(
-    NetexEntitiesIndex index
-  ) {
+  public List<FlexibleAreaContext> build(NetexEntitiesIndex index) {
     List<FlexibleAreaContext> flexibleAreaContexts = new ArrayList<>();
 
     List<FlexibleStopPlace> flexibleStopPlaces = index
@@ -92,9 +89,7 @@ public class FlexibleAreaContextBuilder {
 
   private List<Double> getCoordinates(LinearRingType linearRing) {
     if (linearRing.getPosList() != null) {
-      return linearRing
-        .getPosList()
-        .getValue();
+      return linearRing.getPosList().getValue();
     } else if (linearRing.getPosOrPointProperty() != null) {
       return linearRing
         .getPosOrPointProperty()

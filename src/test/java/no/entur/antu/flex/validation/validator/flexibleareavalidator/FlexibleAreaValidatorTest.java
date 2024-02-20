@@ -24,124 +24,148 @@ class FlexibleAreaValidatorTest {
     NetexTestData testData = new NetexTestData();
 
     ValidationReport validationReport = setupAndRunValidation(
-      testData
-        .netexEntitiesIndex()
-        .create()
+      testData.netexEntitiesIndex().create()
     );
 
-    assertTrue(validationReport
-                 .getValidationReportEntries()
-                 .isEmpty());
+    assertTrue(validationReport.getValidationReportEntries().isEmpty());
   }
 
   @Test
   void testLineStringWithValidLinearRing() {
-
     ValidationReport validationReport = runTestWithGivenCoordinates(
       List.of(
-        63.13858931533193, 9.928943287130938,
-        63.126880322529765, 9.924811717421225,
-        63.11070486401104, 9.963012144500766,
-        63.0899891971636, 9.983576501128129,
-        63.07437578651208, 10.019824646870518,
-        63.08307660166303, 10.051222872093758,
-        63.09826061189036, 10.04922025521767,
-        63.09929352506772, 10.063209726376083,
-        63.09769946405965, 10.074523158554369,
-        63.12506609202889, 10.120711232810317,
-        63.13858931533193, 9.928943287130938
+        63.13858931533193,
+        9.928943287130938,
+        63.126880322529765,
+        9.924811717421225,
+        63.11070486401104,
+        9.963012144500766,
+        63.0899891971636,
+        9.983576501128129,
+        63.07437578651208,
+        10.019824646870518,
+        63.08307660166303,
+        10.051222872093758,
+        63.09826061189036,
+        10.04922025521767,
+        63.09929352506772,
+        10.063209726376083,
+        63.09769946405965,
+        10.074523158554369,
+        63.12506609202889,
+        10.120711232810317,
+        63.13858931533193,
+        9.928943287130938
       )
     );
 
-    assertTrue(validationReport
-                 .getValidationReportEntries()
-                 .isEmpty());
+    assertTrue(validationReport.getValidationReportEntries().isEmpty());
   }
 
   @Test
   void testLineStringWithNonClosedLineStringShouldFail() {
-
     ValidationReport validationReport = runTestWithGivenCoordinates(
       List.of(
-        63.13858931533193, 9.928943287130938,
-        63.126880322529765, 9.924811717421225,
-        63.11070486401104, 9.963012144500766,
-        63.0899891971636, 9.983576501128129,
-        63.07437578651208, 10.019824646870518,
-        63.08307660166303, 10.051222872093758
+        63.13858931533193,
+        9.928943287130938,
+        63.126880322529765,
+        9.924811717421225,
+        63.11070486401104,
+        9.963012144500766,
+        63.0899891971636,
+        9.983576501128129,
+        63.07437578651208,
+        10.019824646870518,
+        63.08307660166303,
+        10.051222872093758
       )
     );
 
-    assertThat(validationReport
-                 .getValidationReportEntries()
-                 .size(), is(1));
+    assertThat(validationReport.getValidationReportEntries().size(), is(1));
   }
 
   @Test
   void testLineStringWithTooFewCoordinatesShouldFail() {
-
     ValidationReport validationReport = runTestWithGivenCoordinates(
       List.of(
-        63.13858931533193, 9.928943287130938,
-        63.126880322529765, 9.924811717421225
+        63.13858931533193,
+        9.928943287130938,
+        63.126880322529765,
+        9.924811717421225
       )
     );
 
-    assertThat(validationReport
-                 .getValidationReportEntries()
-                 .size(), is(1));
+    assertThat(validationReport.getValidationReportEntries().size(), is(1));
   }
 
   @Test
   void testSelfInteractingLinearRingShouldFail() {
-
     ValidationReport validationReport = runTestWithGivenCoordinates(
       List.of(
-        63.13858931533193, 9.928943287130938,
-        63.126880322529765, 9.924811717421225,
-        63.11070486401104, 9.963012144500766,
-        63.0899891971636, 9.983576501128129,
-        63.07437578651208, 10.019824646870518,
-        63.08307660166303, 10.051222872093758,
-        63.09826061189036, 10.04922025521767,
-        63.09929352506772, 10.063209726376083,
-        63.09769946405965, 10.074523158554369,
-        63.12506609202889, 10.120711232810317,
-        63.11070486401104, 9.963012144500766,
-        63.09769946405965, 10.074523158554369,
-        63.13858931533193, 9.928943287130938
+        63.13858931533193,
+        9.928943287130938,
+        63.126880322529765,
+        9.924811717421225,
+        63.11070486401104,
+        9.963012144500766,
+        63.0899891971636,
+        9.983576501128129,
+        63.07437578651208,
+        10.019824646870518,
+        63.08307660166303,
+        10.051222872093758,
+        63.09826061189036,
+        10.04922025521767,
+        63.09929352506772,
+        10.063209726376083,
+        63.09769946405965,
+        10.074523158554369,
+        63.12506609202889,
+        10.120711232810317,
+        63.11070486401104,
+        9.963012144500766,
+        63.09769946405965,
+        10.074523158554369,
+        63.13858931533193,
+        9.928943287130938
       )
     );
 
-    assertThat(validationReport
-                 .getValidationReportEntries()
-                 .size(), is(1));
+    assertThat(validationReport.getValidationReportEntries().size(), is(1));
   }
 
   @Test
   void testIncompleteCoordinatesShouldFail() {
-
     ValidationReport validationReport = runTestWithGivenCoordinates(
       List.of(
-        63.13858931533193, 9.928943287130938,
-        63.126880322529765, 9.924811717421225,
-        63.11070486401104, 9.963012144500766,
-        63.0899891971636, 9.983576501128129,
-        63.07437578651208, 10.019824646870518,
-        63.08307660166303, 10.051222872093758,
-        63.09826061189036, 10.04922025521767,
+        63.13858931533193,
+        9.928943287130938,
+        63.126880322529765,
+        9.924811717421225,
+        63.11070486401104,
+        9.963012144500766,
+        63.0899891971636,
+        9.983576501128129,
+        63.07437578651208,
+        10.019824646870518,
+        63.08307660166303,
+        10.051222872093758,
+        63.09826061189036,
+        10.04922025521767,
         63.09929352506772,
-        63.09769946405965, 10.074523158554369,
-        63.12506609202889, 10.120711232810317
+        63.09769946405965,
+        10.074523158554369,
+        63.12506609202889,
+        10.120711232810317
       )
     );
 
-    assertThat(validationReport
-                 .getValidationReportEntries()
-                 .size(), is(1));
+    assertThat(validationReport.getValidationReportEntries().size(), is(1));
   }
 
-  private static ValidationReport runTestWithGivenCoordinates(List<Double> coordinates) {
+  private static ValidationReport runTestWithGivenCoordinates(
+    List<Double> coordinates
+  ) {
     NetexTestData testData = new NetexTestData();
 
     FlexibleArea flexibleArea = testData
@@ -154,25 +178,21 @@ class FlexibleAreaValidatorTest {
       .create();
 
     return setupAndRunValidation(
-      testData
-        .netexEntitiesIndex(flexibleStopPlace)
-        .create()
+      testData.netexEntitiesIndex(flexibleStopPlace).create()
     );
-
   }
 
   private static ValidationReport setupAndRunValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    FlexibleAreaValidator flexibleAreaValidator =
-      new FlexibleAreaValidator(
+    FlexibleAreaValidator flexibleAreaValidator = new FlexibleAreaValidator(
         (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          )
-      );
+      new ValidationReportEntry(
+        message,
+        code,
+        ValidationReportEntrySeverity.ERROR
+      )
+    );
 
     ValidationReport testValidationReport = new ValidationReport(
       "TST",
@@ -184,13 +204,9 @@ class FlexibleAreaValidatorTest {
     );
     when(validationContext.getNetexEntitiesIndex())
       .thenReturn(netexEntitiesIndex);
-    when(validationContext.isCommonFile())
-      .thenReturn(true);
+    when(validationContext.isCommonFile()).thenReturn(true);
 
-    flexibleAreaValidator.validate(
-      testValidationReport,
-      validationContext
-    );
+    flexibleAreaValidator.validate(testValidationReport, validationContext);
 
     return testValidationReport;
   }

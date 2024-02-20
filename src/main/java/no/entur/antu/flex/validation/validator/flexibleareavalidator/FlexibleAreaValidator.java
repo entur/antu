@@ -60,17 +60,17 @@ public class FlexibleAreaValidator extends AntuNetexValidator {
       List<FlexibleAreaContextBuilder.FlexibleAreaContext> flexibleAreaContexts =
         flexibleAreaContextBuilder.build(index);
 
-      flexibleAreaContexts
-        .forEach(flexibleAreaContext ->
-                   validateFlexibleArea(
-                     flexibleAreaContext,
-                     flexibleAreaError -> addValidationReportEntry(
-                       validationReport,
-                       validationContext,
-                       flexibleAreaError
-                     )
-                   )
-        );
+      flexibleAreaContexts.forEach(flexibleAreaContext ->
+        validateFlexibleArea(
+          flexibleAreaContext,
+          flexibleAreaError ->
+            addValidationReportEntry(
+              validationReport,
+              validationContext,
+              flexibleAreaError
+            )
+        )
+      );
     } else {
       throw new AntuException(
         "Received invalid validation context in flexible area validator"
@@ -82,7 +82,6 @@ public class FlexibleAreaValidator extends AntuNetexValidator {
     FlexibleAreaContextBuilder.FlexibleAreaContext flexibleAreaContext,
     Consumer<FlexibleAreaError> flexibleAreaError
   ) {
-
     if (!flexibleAreaContext.isEvenCoordinates()) {
       flexibleAreaError.accept(
         new FlexibleAreaError(
@@ -113,9 +112,7 @@ public class FlexibleAreaValidator extends AntuNetexValidator {
             INVALID_FLEXIBLE_AREA,
             flexibleAreaContext.flexibleAreaId(),
             flexibleAreaContext.flexibleStopPlaceId(),
-            isValidOp
-              .getValidationError()
-              .toString()
+            isValidOp.getValidationError().toString()
           )
         );
       }
