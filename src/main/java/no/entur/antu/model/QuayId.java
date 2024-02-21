@@ -11,6 +11,10 @@ public record QuayId(String id) {
     }
   }
 
+  public static QuayId ofNullable(String id) {
+    return id == null ? null : new QuayId(id);
+  }
+
   public static boolean isValid(String quayId) {
     return quayId.contains(":Quay:");
   }

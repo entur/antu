@@ -35,6 +35,13 @@ public class ServiceJourneyContextBuilder {
       );
     }
 
+    public boolean isValid() {
+      return (
+        transportMode != null &&
+        !stopPlaceCoordinatesPerTimetabledPassingTimeId.isEmpty()
+      );
+    }
+
     public double calculateDistance(PassingTimes passingTimes) {
       return distanceCalculator.calculateDistance(
         passingTimes,
@@ -42,16 +49,16 @@ public class ServiceJourneyContextBuilder {
       );
     }
 
-    private StopPlaceCoordinates getCoordinates(StopTime passingTime) {
-      return stopPlaceCoordinatesPerTimetabledPassingTimeId.get(
-        passingTime.timetabledPassingTimeId()
-      );
-    }
-
     public boolean hasValidCoordinates(PassingTimes passingTimes) {
       return (
         getCoordinates(passingTimes.from()) != null &&
         getCoordinates(passingTimes.to()) != null
+      );
+    }
+
+    private StopPlaceCoordinates getCoordinates(StopTime passingTime) {
+      return stopPlaceCoordinatesPerTimetabledPassingTimeId.get(
+        passingTime.timetabledPassingTimeId()
       );
     }
   }
@@ -105,6 +112,11 @@ public class ServiceJourneyContextBuilder {
     );
   }
 
+  /**
+   * Find the transport mode for the given service journey.
+   * If the transport mode is not set on the service journey,
+   * it will be looked up from the line or flexible line.
+   */
   private AllVehicleModesOfTransportEnumeration findTransportMode(
     ServiceJourney serviceJourney
   ) {
@@ -160,19 +172,21 @@ public class ServiceJourneyContextBuilder {
         .getValue()
         .getRef();
 
+      // If the quay id is not found in the common data repository, it will be looked up from the netex entities index.
+      // Which basically means that if the PassengerStopAssignment are not in Common file, it will be looked up from the line file.
       QuayId quayId = commonDataRepository.hasQuayIds(validationReportId)
         ? commonDataRepository.findQuayIdForScheduledStopPoint(
           scheduledStopPointRef,
           validationReportId
         )
-        : new QuayId(
+        : QuayId.ofNullable(
           netexEntitiesIndex
             .getQuayIdByStopPointRefIndex()
             .get(scheduledStopPointRef)
         );
 
       if (quayId == null) {
-        LOGGER.debug(
+        LOGGER.warn(
           "Quay id not found for scheduled stop point with id: {}",
           scheduledStopPointRef
         );
@@ -188,6 +202,9 @@ public class ServiceJourneyContextBuilder {
     return null;
   }
 
+  /**
+   * Find the stop point in journey pattern for the given stop point in journey pattern reference.
+   */
   private StopPointInJourneyPattern getStopPointInJourneyPattern(
     String stopPointInJourneyPatternRef,
     String journeyPatternRef

@@ -14,7 +14,6 @@ import no.entur.antu.netextestdata.NetexTestData;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
@@ -175,6 +174,102 @@ class SpeedValidatorTest {
     );
   }
 
+  @Test
+  void testPassengerStopAssignmentsInLineFileAndNotOnCommonFileShouldBeOk() {
+    List<StopPlaceCoordinates> stopPlaceCoordinates = List.of(
+      new StopPlaceCoordinates(6.621791, 60.424023),
+      new StopPlaceCoordinates(6.612112, 60.471748),
+      new StopPlaceCoordinates(6.622312, 60.481548),
+      new StopPlaceCoordinates(6.632312, 60.491548)
+    );
+
+    NetexTestData testData = new NetexTestData();
+    JourneyPattern journeyPattern = testData.journeyPattern().create();
+    ServiceJourney serviceJourney = testData
+      .serviceJourney(journeyPattern)
+      .create();
+    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+
+    NetexTestData.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+      testData.netexEntitiesIndex(journeyPattern, serviceJourney);
+
+    CommonDataRepository commonDataRepository = Mockito.mock(
+      CommonDataRepository.class
+    );
+    StopPlaceRepository stopPlaceRepository = Mockito.mock(
+      StopPlaceRepository.class
+    );
+
+    for (int i = 0; i < stopPlaceCoordinates.size(); i++) {
+      QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
+
+      Mockito
+        .when(commonDataRepository.hasQuayIds(anyString()))
+        .thenReturn(false);
+      Mockito
+        .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
+        .thenReturn(stopPlaceCoordinates.get(i));
+
+      PassengerStopAssignment passengerStopAssignment = testData
+        .passengerStopAssignment()
+        .withScheduleStopPointId(i + 1)
+        .withStopPlaceId(i + 1)
+        .withQuayId(i + 1)
+        .create();
+
+      createNetexEntitiesIndex.addPassengerStopAssignment(
+        passengerStopAssignment
+      );
+    }
+
+    ValidationReport validationReport = setupAndRunValidation(
+      createNetexEntitiesIndex.create(),
+      commonDataRepository,
+      stopPlaceRepository
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
+  @Test
+  void testNoPassengerStopAssignmentsFoundShouldIgnoreValidationGracefully() {
+    List<StopPlaceCoordinates> stopPlaceCoordinates = List.of(
+      new StopPlaceCoordinates(6.621791, 60.424023),
+      new StopPlaceCoordinates(6.612112, 60.471748),
+      new StopPlaceCoordinates(6.622312, 60.481548),
+      new StopPlaceCoordinates(6.632312, 60.491548)
+    );
+
+    NetexTestData testData = new NetexTestData();
+    JourneyPattern journeyPattern = testData.journeyPattern().create();
+    ServiceJourney serviceJourney = testData
+      .serviceJourney(journeyPattern)
+      .create();
+    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+
+    NetexTestData.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+      testData.netexEntitiesIndex(journeyPattern, serviceJourney);
+
+    CommonDataRepository commonDataRepository = Mockito.mock(
+      CommonDataRepository.class
+    );
+    StopPlaceRepository stopPlaceRepository = Mockito.mock(
+      StopPlaceRepository.class
+    );
+
+    Mockito
+      .when(commonDataRepository.hasQuayIds(anyString()))
+      .thenReturn(false);
+
+    ValidationReport validationReport = setupAndRunValidation(
+      createNetexEntitiesIndex.create(),
+      commonDataRepository,
+      stopPlaceRepository
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
   private static ValidationReport runTestWithStopPlaceCoordinates(
     List<StopPlaceCoordinates> stopPlaceCoordinates
   ) {
@@ -208,7 +303,7 @@ class SpeedValidatorTest {
       Mockito
         .when(
           commonDataRepository.findQuayIdForScheduledStopPoint(
-            eq("RUT:ScheduledStopPoint:" + (i + 1)),
+            eq("TST:ScheduledStopPoint:" + (i + 1)),
             anyString()
           )
         )

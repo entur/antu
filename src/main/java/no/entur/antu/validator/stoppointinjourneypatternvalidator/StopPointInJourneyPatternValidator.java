@@ -2,11 +2,12 @@ package no.entur.antu.validator.stoppointinjourneypatternvalidator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.validator.AntuNetexValidator;
+import no.entur.antu.validator.RuleCode;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
 import no.entur.antu.validator.stoppointinjourneypatternvalidator.StopPointInJourneyPatternContextBuilder.StopPointInJourneyPatternContext;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -19,18 +20,24 @@ import org.slf4j.LoggerFactory;
 /**
  * Validates that StopPointInJourneyPattern has a ScheduledStopAssignment.
  * The only valid case for missing ScheduledStopAssignment is when the
- * StopPointInJourneyPattern is assigned to a DeadRun.
+ * StopPointInJourneyPattern is assigned to a DeadRun, and not to any ServiceJourney.
+ * <p>
+ * Missing SPA -> No DeadRun -> No SJ -> Error
+ * Missing SPA -> No DeadRun -> Yes SJ -> Error
+ * Missing SPA -> Yes DeadRun -> Yes SJ -> Error
+ * Missing SPA -> Yes DeadRun -> No SJ -> OK
  */
-public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
+public class StopPointInJourneyPatternValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     StopPointInJourneyPatternValidator.class
   );
-  private static final String MISSING_SCHEDULED_STOP_ASSIGNMENT =
-    "MISSING_SCHEDULED_STOP_ASSIGNMENT";
-  private static final String MISSING_SCHEDULED_STOP_ASSIGNMENT_DESCRIPTION =
-    "Missing ScheduledStopAssignment for StopPointInJourneyPattern, while the ServiceJourney exists.";
   private final CommonDataRepository commonDataRepository;
+
+  @Override
+  protected RuleCode[] getRuleCodes() {
+    return StopPointInJourneyPatternError.RuleCode.values();
+  }
 
   public StopPointInJourneyPatternValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
@@ -38,6 +45,112 @@ public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
   ) {
     super(validationReportEntryFactory);
     this.commonDataRepository = commonDataRepository;
+  }
+
+  @Override
+  public void validate(
+    ValidationReport validationReport,
+    ValidationContext validationContext
+  ) {
+    LOGGER.debug("Validating Stop place in journey pattern");
+
+    if (validationContext.isCommonFile()) {
+      return;
+    }
+
+    if (
+      validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
+    ) {
+      NetexEntitiesIndex index =
+        validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
+
+      StopPointInJourneyPatternContextBuilder builder =
+        new StopPointInJourneyPatternContextBuilder(
+          validationReport.getValidationReportId(),
+          commonDataRepository,
+          index
+        );
+
+      // Get all StopPointInJourneyPatternContexts
+      List<StopPointInJourneyPatternContext> stopPointInJourneyPatternContexts =
+        index
+          .getJourneyPatternIndex()
+          .getAll()
+          .stream()
+          .flatMap(journeyPattern -> builder.build(journeyPattern).stream())
+          .toList();
+
+      stopPointInJourneyPatternContexts
+        .stream()
+        .filter(
+          Predicate.not(
+            StopPointInJourneyPatternContext::hasPassengerStopAssignment
+          )
+        )
+        .filter(stopPointInJourneyPatternContext ->
+          !validateStopPointInJourneyPattern(
+            index,
+            stopPointInJourneyPatternContext
+          )
+        )
+        .forEach(stopPointInJourneyPattern ->
+          addValidationReportEntry(
+            validationReport,
+            validationContext,
+            new StopPointInJourneyPatternError(
+              stopPointInJourneyPattern.stopPointInJourneyPatternRef(),
+              stopPointInJourneyPattern.scheduledStopPointRef(),
+              StopPointInJourneyPatternError.RuleCode.MISSING_SCHEDULED_STOP_ASSIGNMENT
+            )
+          )
+        );
+    } else {
+      throw new AntuException(
+        "Received invalid validation context in Stop Point Validation"
+      );
+    }
+  }
+
+  private boolean validateStopPointInJourneyPattern(
+    NetexEntitiesIndex index,
+    StopPointInJourneyPatternContext stopPointInJourneyPatternContext
+  ) {
+    Map<Boolean, List<Journey_VersionStructure>> deadRunsAndRestOfServiceJourneys =
+      index
+        .getTimetableFrames()
+        .stream()
+        .flatMap(timetableFrame ->
+          timetableFrame
+            .getVehicleJourneys()
+            .getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()
+            .stream()
+        )
+        .collect(Collectors.partitioningBy(DeadRun.class::isInstance));
+
+    List<DeadRun> deadRuns = deadRunsAndRestOfServiceJourneys
+      .get(Boolean.TRUE)
+      .stream()
+      .filter(DeadRun.class::isInstance)
+      .map(DeadRun.class::cast)
+      .toList();
+
+    List<ServiceJourney> serviceJourneys = deadRunsAndRestOfServiceJourneys
+      .get(Boolean.FALSE)
+      .stream()
+      .filter(ServiceJourney.class::isInstance)
+      .map(ServiceJourney.class::cast)
+      .toList();
+
+    return (
+      isAssignedToDeadRun(
+        deadRuns,
+        stopPointInJourneyPatternContext.journeyPatternRef()
+      ) &&
+      isNotAssignedToAnyServiceJourney(
+        serviceJourneys,
+        stopPointInJourneyPatternContext.journeyPatternRef()
+      )
+    );
   }
 
   private boolean isAssignedToDeadRun(
@@ -64,185 +177,5 @@ public class StopPointInJourneyPatternValidator extends AbstractNetexValidator {
       .noneMatch(serviceJourneyJourneyPatternRef ->
         serviceJourneyJourneyPatternRef.equals(journeyPatternRef)
       );
-  }
-
-  private boolean validateStopPointInJourneyPattern(
-    NetexEntitiesIndex index,
-    StopPointInJourneyPatternContext stopPointInJourneyPatternContext
-  ) {
-    Map<Boolean, List<Journey_VersionStructure>> deadRunsAndRestOfServiceJourneys =
-      index
-        .getTimetableFrames()
-        .stream()
-        .flatMap(timetableFrame ->
-          timetableFrame
-            .getVehicleJourneys()
-            .getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()
-            .stream()
-        )
-        .collect(Collectors.partitioningBy(DeadRun.class::isInstance));
-
-    List<DeadRun> deadRuns = deadRunsAndRestOfServiceJourneys
-      .get(Boolean.TRUE)
-      .stream()
-      .filter(DeadRun.class::isInstance) // Don't need it
-      .map(DeadRun.class::cast)
-      .toList();
-
-    List<ServiceJourney> serviceJourneys = deadRunsAndRestOfServiceJourneys
-      .get(Boolean.FALSE)
-      .stream()
-      .filter(ServiceJourney.class::isInstance)
-      .map(ServiceJourney.class::cast)
-      .toList();
-
-    /*
-        Missing SPA -> No DeadRun -> No SJ -> Error
-        Missing SPA -> No DeadRun -> Yes SJ -> Error
-        Missing SPA -> Yes DeadRun -> Yes SJ -> Error
-        Missing SPA -> Yes DeadRun -> No SJ -> OK
-         */
-    return (
-      isAssignedToDeadRun(
-        deadRuns,
-        stopPointInJourneyPatternContext.journeyPattern().getId()
-      ) &&
-      isNotAssignedToAnyServiceJourney(
-        serviceJourneys,
-        stopPointInJourneyPatternContext.journeyPattern().getId()
-      )
-    );
-  }
-
-  @Override
-  public void validate(
-    ValidationReport validationReport,
-    ValidationContext validationContext
-  ) {
-    LOGGER.debug("Validating Stop place in journey pattern");
-
-    if (validationContext.isCommonFile()) {
-      return;
-    }
-
-    if (
-      validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
-    ) {
-      NetexEntitiesIndex index =
-        validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
-
-      StopPointInJourneyPatternContextBuilder builder =
-        new StopPointInJourneyPatternContextBuilder(
-          validationReport.getValidationReportId(),
-          commonDataRepository,
-          index
-        );
-      List<StopPointInJourneyPatternContext> stopPointInJourneyPatternContexts =
-        index
-          .getJourneyPatternIndex()
-          .getAll()
-          .stream()
-          .flatMap(journeyPattern -> builder.build(journeyPattern).stream())
-          .toList();
-
-      Predicate<StopPointInJourneyPatternContext> hasNoStopPointAssignmentInCommonFile =
-        stopPointInJourneyPatternContext ->
-          commonDataRepository.findQuayIdForScheduledStopPoint(
-            stopPointInJourneyPatternContext
-              .stopPointInJourneyPattern()
-              .getScheduledStopPointRef()
-              .getValue()
-              .getRef(),
-            validationReport.getValidationReportId()
-          ) ==
-          null;
-
-      Predicate<StopPointInJourneyPatternContext> hasNoStopPointAssignmentInLineFile =
-        stopPointInJourneyPatternContext ->
-          !index
-            .getPassengerStopAssignmentsByStopPointRefIndex()
-            .containsKey(
-              stopPointInJourneyPatternContext
-                .stopPointInJourneyPattern()
-                .getScheduledStopPointRef()
-                .getValue()
-                .getRef()
-            );
-
-      stopPointInJourneyPatternContexts
-        .stream()
-        .filter(
-          hasNoStopPointAssignmentInCommonFile.and(
-            hasNoStopPointAssignmentInLineFile
-          )
-        )
-        .filter(stopPointInJourneyPatternContext ->
-          !validateStopPointInJourneyPattern(
-            index,
-            stopPointInJourneyPatternContext
-          )
-        )
-        .map(StopPointInJourneyPatternContext::stopPointInJourneyPattern)
-        .forEach(stopPointInJourneyPattern ->
-          addValidationReportEntry(
-            validationReport,
-            validationContext,
-            stopPointInJourneyPattern
-          )
-        );
-    } else {
-      throw new AntuException(
-        "Received invalid validation context in Stop Point Validation"
-      );
-    }
-  }
-
-  private void addValidationReportEntry(
-    ValidationReport validationReport,
-    ValidationContext validationContext,
-    StopPointInJourneyPattern stopPointInJourneyPattern
-  ) {
-    ValidationReportEntry validationReportEntry = createValidationReportEntry(
-      MISSING_SCHEDULED_STOP_ASSIGNMENT,
-      findDataLocation(validationContext, stopPointInJourneyPattern),
-      MISSING_SCHEDULED_STOP_ASSIGNMENT_DESCRIPTION
-    );
-
-    validationReport.addValidationReportEntry(validationReportEntry);
-  }
-
-  private static DataLocation findDataLocation(
-    ValidationContext validationContext,
-    StopPointInJourneyPattern stopPointInJourneyPattern
-  ) {
-    String fileName = validationContext.getFileName();
-    return validationContext
-      .getLocalIds()
-      .stream()
-      .filter(localId ->
-        localId.getId().equals(stopPointInJourneyPattern.getId())
-      )
-      .findFirst()
-      .map(idVersion ->
-        new DataLocation(
-          idVersion.getId(),
-          fileName,
-          idVersion.getLineNumber(),
-          idVersion.getColumnNumber()
-        )
-      )
-      .orElse(
-        new DataLocation(stopPointInJourneyPattern.getId(), fileName, 0, 0)
-      );
-  }
-
-  @Override
-  public Set<String> getRuleDescriptions() {
-    return Set.of(
-      createRuleDescription(
-        MISSING_SCHEDULED_STOP_ASSIGNMENT,
-        MISSING_SCHEDULED_STOP_ASSIGNMENT_DESCRIPTION
-      )
-    );
   }
 }
