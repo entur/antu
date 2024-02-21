@@ -2,6 +2,7 @@ package no.entur.antu.validator.stoppointinjourneypatternvalidator;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -24,26 +25,40 @@ public class StopPointInJourneyPatternContextBuilder {
   }
 
   public record StopPointInJourneyPatternContext(
-    JourneyPattern journeyPattern, // trenger bare ID?
-    StopPointInJourneyPattern stopPointInJourneyPattern,
-    QuayId quayId
+    String journeyPatternRef,
+    String stopPointInJourneyPatternRef,
+    String scheduledStopPointRef,
+    boolean hasPassengerStopAssignment
   ) {}
 
   public List<StopPointInJourneyPatternContext> build(
     JourneyPattern journeyPattern
   ) {
-    Function<String, QuayId> quayIdForScheduleStopPoint =
-      scheduledStopPointRef ->
-        commonDataRepository.hasQuayIds(validationReportId)
-          ? commonDataRepository.findQuayIdForScheduledStopPoint(
+    Predicate<String> hasPassengerStopAssignment = scheduledStopPointRef -> {
+      if (commonDataRepository.hasQuayIds(validationReportId)) {
+        return (
+          commonDataRepository.findQuayIdForScheduledStopPoint(
             scheduledStopPointRef,
             validationReportId
-          )
-          : new QuayId(
-            netexEntitiesIndex
-              .getQuayIdByStopPointRefIndex()
-              .get(scheduledStopPointRef)
-          );
+          ) !=
+          null
+        );
+      } else {
+        return (
+          netexEntitiesIndex
+            .getQuayIdByStopPointRefIndex()
+            .get(scheduledStopPointRef) !=
+          null
+        );
+      }
+    };
+
+    Function<StopPointInJourneyPattern, String> scheduleStopPointRef =
+      stopPointInJourneyPattern ->
+        stopPointInJourneyPattern
+          .getScheduledStopPointRef()
+          .getValue()
+          .getRef();
 
     return journeyPattern
       .getPointsInSequence()
@@ -53,13 +68,11 @@ public class StopPointInJourneyPatternContextBuilder {
       .map(StopPointInJourneyPattern.class::cast)
       .map(stopPointInJourneyPattern ->
         new StopPointInJourneyPatternContext(
-          journeyPattern,
-          stopPointInJourneyPattern,
-          quayIdForScheduleStopPoint.apply(
-            stopPointInJourneyPattern
-              .getScheduledStopPointRef()
-              .getValue()
-              .getRef()
+          journeyPattern.getId(),
+          stopPointInJourneyPattern.getId(),
+          scheduleStopPointRef.apply(stopPointInJourneyPattern),
+          hasPassengerStopAssignment.test(
+            scheduleStopPointRef.apply(stopPointInJourneyPattern)
           )
         )
       )

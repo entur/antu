@@ -98,6 +98,7 @@ public class SpeedValidator extends AntuNetexValidator {
       serviceJourneys
         .stream()
         .map(contextBuilder::build)
+        .filter(ServiceJourneyContext::isValid)
         .forEach(context ->
           validateServiceJourney(
             context,
