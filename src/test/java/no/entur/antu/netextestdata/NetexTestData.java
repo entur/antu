@@ -92,6 +92,10 @@ public class NetexTestData {
       .withToScheduledStopPointRef(toScheduledStopPointRef);
   }
 
+  public CreatePassengerStopAssignment passengerStopAssignment() {
+    return new CreatePassengerStopAssignment();
+  }
+
   public CreateNetexEntitiesIndex netexEntitiesIndex() {
     return new CreateNetexEntitiesIndex();
   }
@@ -107,6 +111,55 @@ public class NetexTestData {
 
   public CreateNetexEntitiesIndex netexEntitiesIndex(ServiceLink serviceLink) {
     return new CreateNetexEntitiesIndex().addServiceLinks(serviceLink);
+  }
+
+  public static class CreatePassengerStopAssignment {
+
+    private int id;
+
+    private String scheduleStopPointRef;
+
+    private String stopPlaceRef;
+
+    private String quayRef;
+
+    public CreatePassengerStopAssignment withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreatePassengerStopAssignment withScheduleStopPointId(
+      int scheduleStopPointId
+    ) {
+      this.scheduleStopPointRef =
+        "TST:ScheduledStopPoint:" + scheduleStopPointId;
+      return this;
+    }
+
+    public CreatePassengerStopAssignment withStopPlaceId(int stopPlaceId) {
+      this.stopPlaceRef = "TST:StopPlace:" + stopPlaceId;
+      return this;
+    }
+
+    public CreatePassengerStopAssignment withQuayId(int quayId) {
+      this.quayRef = "TST:Quay:" + quayId;
+      return this;
+    }
+
+    public PassengerStopAssignment create() {
+      return new PassengerStopAssignment()
+        .withId("TST:PassengerStopAssignment:" + id)
+        .withScheduledStopPointRef(
+          createWrappedRef(
+            scheduleStopPointRef,
+            ScheduledStopPointRefStructure.class
+          )
+        )
+        .withQuayRef(createWrappedRef(quayRef, QuayRefStructure.class))
+        .withStopPlaceRef(
+          createWrappedRef(stopPlaceRef, StopPlaceRefStructure.class)
+        );
+    }
   }
 
   public static class CreateDatedServiceJourney {
@@ -132,7 +185,7 @@ public class NetexTestData {
         .withCalendarDate(operatingDayDate.atStartOfDay());
 
       return new DatedServiceJourney()
-        .withId("RUT:DatedServiceJourney:" + id)
+        .withId("TST:DatedServiceJourney:" + id)
         .withServiceAlteration(ServiceAlterationEnumeration.PLANNED)
         .withOperatingDayRef(
           new OperatingDayRefStructure().withRef(operatingDay.getId())
@@ -160,7 +213,7 @@ public class NetexTestData {
 
     private Line create() {
       return new Line()
-        .withId("RUT:Line:" + id)
+        .withId("TST:Line:" + id)
         .withName(new MultilingualString().withValue("Line " + id))
         .withTransportMode(transportMode);
     }
@@ -192,12 +245,12 @@ public class NetexTestData {
 
     public JourneyPattern create() {
       RouteRefStructure routeRef = new RouteRefStructure()
-        .withRef("RUT:Route:" + routeId);
+        .withRef("TST:Route:" + routeId);
 
       List<PointInLinkSequence_VersionedChildStructure> pointsInLink =
         createPointsInLink(numberOfStopPointInJourneyPattern);
       return new JourneyPattern()
-        .withId("RUT:JourneyPattern:" + id)
+        .withId("TST:JourneyPattern:" + id)
         .withRouteRef(routeRef)
         .withPointsInSequence(
           new PointsInJourneyPattern_RelStructure()
@@ -241,13 +294,13 @@ public class NetexTestData {
         .range(0, numberOfStopPointInJourneyPattern)
         .mapToObj(index -> {
           String stopPointId =
-            "RUT:StopPointInJourneyPattern:" + id + "_" + (index + 1);
+            "TST:StopPointInJourneyPattern:" + id + "_" + (index + 1);
           StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
             .withId(stopPointId)
             .withOrder(BigInteger.valueOf(index + 1))
             .withScheduledStopPointRef(
               createScheduledStopPointRef(
-                "RUT:ScheduledStopPoint:" + (index + 1)
+                "TST:ScheduledStopPoint:" + (index + 1)
               )
             );
 
@@ -301,7 +354,7 @@ public class NetexTestData {
 
     public DeadRun create() {
       return new DeadRun()
-        .withId("RUT:DeadRun:" + id)
+        .withId("TST:DeadRun:" + id)
         .withLineRef(getLineRef())
         .withDayTypes(createEveryDayRefs())
         .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
@@ -340,7 +393,7 @@ public class NetexTestData {
 
     public ServiceJourney create() {
       return new ServiceJourney()
-        .withId("RUT:ServiceJourney:" + id)
+        .withId("TST:ServiceJourney:" + id)
         .withLineRef(getLineRef())
         .withDayTypes(createEveryDayRefs())
         .withJourneyPatternRef(createJourneyPatternRef(journeyPattern.getId()))
@@ -449,7 +502,7 @@ public class NetexTestData {
 
     public ServiceLink create() {
       return new ServiceLink()
-        .withId("RUT:ServiceLink:" + id)
+        .withId("TST:ServiceLink:" + id)
         .withFromPointRef(fromScheduledStopPointRef)
         .withToPointRef(toScheduledStopPointRef)
         .withProjections(
@@ -468,6 +521,8 @@ public class NetexTestData {
     private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
     private final List<Journey_VersionStructure> journeys = new ArrayList<>();
     private final List<ServiceLink> serviceLinks = new ArrayList<>();
+    private final List<PassengerStopAssignment> passengerStopAssignments =
+      new ArrayList<>();
 
     public CreateNetexEntitiesIndex addServiceJourneys(
       Journey_VersionStructure... serviceJourney
@@ -487,6 +542,22 @@ public class NetexTestData {
       ServiceLink... serviceLinks
     ) {
       this.serviceLinks.addAll(Arrays.asList(serviceLinks));
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addPassengerStopAssignments(
+      PassengerStopAssignment... passengerStopAssignments
+    ) {
+      this.passengerStopAssignments.addAll(
+          Arrays.asList(passengerStopAssignments)
+        );
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addPassengerStopAssignment(
+      PassengerStopAssignment passengerStopAssignment
+    ) {
+      this.passengerStopAssignments.add(passengerStopAssignment);
       return this;
     }
 
@@ -524,6 +595,27 @@ public class NetexTestData {
               )
           )
       );
+
+      passengerStopAssignments.forEach(passengerStopAssignment -> {
+        netexEntitiesIndex
+          .getPassengerStopAssignmentsByStopPointRefIndex()
+          .put(
+            passengerStopAssignment
+              .getScheduledStopPointRef()
+              .getValue()
+              .getRef(),
+            passengerStopAssignment
+          );
+        netexEntitiesIndex
+          .getQuayIdByStopPointRefIndex()
+          .put(
+            passengerStopAssignment
+              .getScheduledStopPointRef()
+              .getValue()
+              .getRef(),
+            passengerStopAssignment.getQuayRef().getValue().getRef()
+          );
+      });
 
       return netexEntitiesIndex;
     }
