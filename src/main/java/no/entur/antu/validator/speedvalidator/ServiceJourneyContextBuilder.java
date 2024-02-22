@@ -35,6 +35,14 @@ public class ServiceJourneyContextBuilder {
       );
     }
 
+    public boolean isValid() {
+      return (
+        stopPlaceCoordinatesPerTimetabledPassingTimeId != null &&
+        !stopPlaceCoordinatesPerTimetabledPassingTimeId.isEmpty() &&
+        transportMode != null
+      );
+    }
+
     public double calculateDistance(PassingTimes passingTimes) {
       return distanceCalculator.calculateDistance(
         passingTimes,
@@ -87,6 +95,7 @@ public class ServiceJourneyContextBuilder {
         .getPassingTimes()
         .getTimetabledPassingTime()
         .stream()
+        .filter(timetabledPassingTime -> timetabledPassingTime.getId() != null)
         .map(timetabledPassingTime ->
           findStopPlaceCoordinates(timetabledPassingTime, journeyPatternRef)
         )
