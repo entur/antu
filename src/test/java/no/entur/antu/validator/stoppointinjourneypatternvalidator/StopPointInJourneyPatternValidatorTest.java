@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.stream.IntStream;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
+import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.netextestdata.NetexTestData;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
@@ -19,6 +21,7 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.rutebanken.netex.model.*;
 
 class StopPointInJourneyPatternValidatorTest {
@@ -38,7 +41,6 @@ class StopPointInJourneyPatternValidatorTest {
     CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
-
     when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     IntStream
@@ -53,7 +55,7 @@ class StopPointInJourneyPatternValidatorTest {
         QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
         when(
           commonDataRepository.findQuayIdForScheduledStopPoint(
-            eq("RUT:ScheduledStopPoint:" + (index + 1)),
+            eq("TST:ScheduledStopPoint:" + (index + 1)),
             anyString()
           )
         )
@@ -64,6 +66,7 @@ class StopPointInJourneyPatternValidatorTest {
       netexEntitiesIndex,
       commonDataRepository
     );
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
@@ -99,7 +102,7 @@ class StopPointInJourneyPatternValidatorTest {
         QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
         when(
           commonDataRepository.findQuayIdForScheduledStopPoint(
-            eq("RUT:ScheduledStopPoint:" + (index + 1)),
+            eq("TST:ScheduledStopPoint:" + (index + 1)),
             anyString()
           )
         )
@@ -110,6 +113,7 @@ class StopPointInJourneyPatternValidatorTest {
       netexEntitiesIndex,
       commonDataRepository
     );
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
   }
@@ -139,6 +143,7 @@ class StopPointInJourneyPatternValidatorTest {
     CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     ValidationReport validationReport = setupAndRunValidation(
       netexEntitiesIndex,
@@ -156,7 +161,6 @@ class StopPointInJourneyPatternValidatorTest {
     NetexTestData testData = new NetexTestData();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
 
-    // TODO: ???
     NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
     netexEntitiesIndex
       .getJourneyPatternIndex()
@@ -165,6 +169,7 @@ class StopPointInJourneyPatternValidatorTest {
     CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     ValidationReport validationReport = setupAndRunValidation(
       netexEntitiesIndex,
@@ -190,6 +195,7 @@ class StopPointInJourneyPatternValidatorTest {
     CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     ValidationReport validationReport = setupAndRunValidation(
       netexEntitiesIndex,
@@ -220,6 +226,8 @@ class StopPointInJourneyPatternValidatorTest {
     CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
+
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
     ValidationReport validationReport = setupAndRunValidation(
       netexEntitiesIndex,
@@ -260,7 +268,7 @@ class StopPointInJourneyPatternValidatorTest {
         QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
         when(
           commonDataRepository.findQuayIdForScheduledStopPoint(
-            eq("RUT:ScheduledStopPoint:" + (index + 1)),
+            eq("TST:ScheduledStopPoint:" + (index + 1)),
             anyString()
           )
         )
@@ -275,11 +283,56 @@ class StopPointInJourneyPatternValidatorTest {
     assertThat(validationReport.getValidationReportEntries().size(), is(2));
   }
 
+  @Test
+  void testPassengerStopAssignmentsInLineFileAndNotOnCommonFileShouldBeOk() {
+    NetexTestData testData = new NetexTestData();
+    JourneyPattern journeyPattern = testData.journeyPattern().create();
+    ServiceJourney serviceJourney = testData
+      .serviceJourney(journeyPattern)
+      .create();
+
+    NetexTestData.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+      testData.netexEntitiesIndex(journeyPattern, serviceJourney);
+
+    IntStream
+      .range(
+        0,
+        journeyPattern
+          .getPointsInSequence()
+          .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+          .size()
+      )
+      .forEach(index -> {
+        PassengerStopAssignment passengerStopAssignment = testData
+          .passengerStopAssignment()
+          .withScheduleStopPointId(index + 1)
+          .withStopPlaceId(index + 1)
+          .withQuayId(index + 1)
+          .create();
+
+        createNetexEntitiesIndex.addPassengerStopAssignment(
+          passengerStopAssignment
+        );
+      });
+
+    CommonDataRepository commonDataRepository = mock(
+      CommonDataRepository.class
+    );
+    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(false);
+
+    ValidationReport validationReport = setupAndRunValidation(
+      createNetexEntitiesIndex.create(),
+      commonDataRepository
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
   private static ValidationReport setupAndRunValidation(
     NetexEntitiesIndex netexEntitiesIndex,
     CommonDataRepository commonDataRepository
   ) {
-    StopPointInJourneyPatternValidator nonIncreasingPassingTimeValidator =
+    StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator =
       new StopPointInJourneyPatternValidator(
         (code, message, dataLocation) ->
           new ValidationReportEntry(
@@ -299,12 +352,10 @@ class StopPointInJourneyPatternValidatorTest {
       ValidationContextWithNetexEntitiesIndex.class
     );
 
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-
     when(validationContext.getNetexEntitiesIndex())
       .thenReturn(netexEntitiesIndex);
 
-    nonIncreasingPassingTimeValidator.validate(
+    stopPointInJourneyPatternValidator.validate(
       testValidationReport,
       validationContext
     );
