@@ -4,7 +4,7 @@ import static no.entur.antu.config.CacheConfig.SCHEDULED_STOP_POINT_AND_QUAY_ID_
 
 import java.util.Map;
 import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.commondata.CommonDataRepositoryImpl;
+import no.entur.antu.commondata.DefaultCommonDataRepository;
 import no.entur.antu.commondata.CommonDataResource;
 import no.entur.antu.model.QuayId;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,7 +29,7 @@ public class CommonDataConfig {
       SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE
     ) Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache
   ) {
-    return new CommonDataRepositoryImpl(
+    return new DefaultCommonDataRepository(
       commonDataResource,
       scheduledStopPointAndQuayIdCache
     );

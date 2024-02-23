@@ -23,11 +23,11 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validator.id.NetexIdValidator;
-import no.entur.antu.validator.nonincreasingpassingtime.NonIncreasingPassingTimeValidator;
-import no.entur.antu.validator.servicelinksvalidator.ServiceLinksValidator;
-import no.entur.antu.validator.speedvalidator.SpeedValidator;
-import no.entur.antu.validator.stoppointinjourneypatternvalidator.StopPointInJourneyPatternValidator;
-import no.entur.antu.validator.transportmodevalidator.TransportModeValidator;
+import no.entur.antu.validator.servicejourney.passingtime.NonIncreasingPassingTime;
+import no.entur.antu.validator.servicelinks.ServiceLinksValidator;
+import no.entur.antu.validator.servicejourney.speed.SpeedValidator;
+import no.entur.antu.validator.passengerstopassignment.MissingPassengerStopAssignment;
+import no.entur.antu.validator.servicejourney.transportmode.TransportModeValidator;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
@@ -84,12 +84,12 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator(
+  public NonIncreasingPassingTime nonIncreasingPassingTimeValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new NonIncreasingPassingTimeValidator(validationReportEntryFactory);
+    return new NonIncreasingPassingTime(validationReportEntryFactory);
   }
 
   @Bean
@@ -108,13 +108,13 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator(
+  public MissingPassengerStopAssignment stopPointInJourneyPatternValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository
   ) {
-    return new StopPointInJourneyPatternValidator(
+    return new MissingPassengerStopAssignment(
       validationReportEntryFactory,
       commonDataRepository
     );
@@ -148,9 +148,9 @@ public class TimetableDataValidatorConfig {
       "netexIdUniquenessValidator"
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
     TransportModeValidator transportModeValidator,
-    NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator,
+    NonIncreasingPassingTime nonIncreasingPassingTime,
     SpeedValidator speedValidator,
-    StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator,
+    MissingPassengerStopAssignment missingPassengerStopAssignment,
     ServiceLinksValidator serviceLinksValidator
   ) {
     List<NetexValidator> netexValidators = List.of(
@@ -162,9 +162,9 @@ public class TimetableDataValidatorConfig {
       netexReferenceValidator,
       netexIdUniquenessValidator,
       transportModeValidator,
-      nonIncreasingPassingTimeValidator,
+      nonIncreasingPassingTime,
       speedValidator,
-      stopPointInJourneyPatternValidator,
+      missingPassengerStopAssignment,
       serviceLinksValidator
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
