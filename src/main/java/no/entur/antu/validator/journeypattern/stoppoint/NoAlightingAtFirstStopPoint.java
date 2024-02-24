@@ -5,8 +5,7 @@ import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 /**
  * Validate that the first StopPointInJourneyPattern does not allow alighting.
  */
-public class NoAlightingAtFirstStopPoint
-  extends ValidateNotExist {
+public class NoAlightingAtFirstStopPoint extends ValidateNotExist {
 
   public NoAlightingAtFirstStopPoint(String path) {
     super(

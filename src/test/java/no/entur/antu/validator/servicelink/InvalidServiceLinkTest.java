@@ -1,4 +1,4 @@
-package no.entur.antu.validator.servicelinks;
+package no.entur.antu.validator.servicelink;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.rutebanken.netex.model.ServiceLink;
 
-class ServiceLinksValidatorTest {
+class InvalidServiceLinkTest {
 
   @Test
   void bothStartAndEndPointsWithinTheLimitsWithPositionListShouldNotReportAnyError() {
@@ -89,7 +89,7 @@ class ServiceLinksValidatorTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+          InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
         )
       )
     );
@@ -117,7 +117,7 @@ class ServiceLinksValidatorTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+          InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
         )
       )
     );
@@ -149,7 +149,7 @@ class ServiceLinksValidatorTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+          InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
         )
       )
     );
@@ -177,7 +177,7 @@ class ServiceLinksValidatorTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+          InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
         )
       )
     );
@@ -209,7 +209,7 @@ class ServiceLinksValidatorTest {
           entry
             .getName()
             .equals(
-              ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+              InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
             )
         )
     );
@@ -221,7 +221,7 @@ class ServiceLinksValidatorTest {
           entry
             .getName()
             .equals(
-              ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+              InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
             )
         )
     );
@@ -249,7 +249,7 @@ class ServiceLinksValidatorTest {
           entry
             .getName()
             .equals(
-              ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+              InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
             )
         )
     );
@@ -261,7 +261,7 @@ class ServiceLinksValidatorTest {
           entry
             .getName()
             .equals(
-              ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+              InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
             )
         )
     );
@@ -489,7 +489,7 @@ class ServiceLinksValidatorTest {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    ServiceLinksValidator serviceLinksValidator = new ServiceLinksValidator(
+    InvalidServiceLinks invalidServiceLinks = new InvalidServiceLinks(
       (code, message, dataLocation) ->
         new ValidationReportEntry(
           message,
@@ -512,7 +512,7 @@ class ServiceLinksValidatorTest {
       .thenReturn(netexEntitiesIndex);
     when(validationContext.isCommonFile()).thenReturn(true);
 
-    serviceLinksValidator.validate(testValidationReport, validationContext);
+    invalidServiceLinks.validate(testValidationReport, validationContext);
 
     return testValidationReport;
   }

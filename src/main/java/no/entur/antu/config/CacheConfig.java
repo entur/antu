@@ -98,13 +98,11 @@ public class CacheConfig {
 
   @Bean(name = TRANSPORT_MODES_FOR_QUAY_ID_CACHE)
   public Map<QuayId, TransportModes> transportModesForQuayIdCache(
-    RedissonClient redissonClient,
-    QuayIdCodec quayIdCodec,
-    TransportModesCodec transportModesCodec
+    RedissonClient redissonClient
   ) {
     return redissonClient.getLocalCachedMap(
       TRANSPORT_MODES_FOR_QUAY_ID_CACHE,
-      new CompositeCodec(quayIdCodec, transportModesCodec),
+      new CompositeCodec(new QuayIdCodec(), new TransportModesCodec()),
       LocalCachedMapOptions.defaults()
     );
   }
@@ -121,13 +119,11 @@ public class CacheConfig {
 
   @Bean(name = COORDINATES_PER_QUAY_ID_CACHE)
   public Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache(
-    RedissonClient redissonClient,
-    QuayIdCodec quayIdCodec,
-    StopPlaceCoordinatesCodec stopPlaceCoordinatesCodec
+    RedissonClient redissonClient
   ) {
     return redissonClient.getLocalCachedMap(
       COORDINATES_PER_QUAY_ID_CACHE,
-      new CompositeCodec(quayIdCodec, stopPlaceCoordinatesCodec),
+      new CompositeCodec(new QuayIdCodec(), new StopPlaceCoordinatesCodec()),
       LocalCachedMapOptions.defaults()
     );
   }

@@ -565,10 +565,7 @@ class NonIncreasingPassingTimeTest {
     when(validationContext.getNetexEntitiesIndex())
       .thenReturn(netexEntitiesIndex);
 
-    nonIncreasingPassingTime.validate(
-      testValidationReport,
-      validationContext
-    );
+    nonIncreasingPassingTime.validate(testValidationReport, validationContext);
 
     return testValidationReport;
   }

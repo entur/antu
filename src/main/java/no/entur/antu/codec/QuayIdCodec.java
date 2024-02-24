@@ -7,7 +7,6 @@ import org.redisson.client.handler.State;
 import org.redisson.client.protocol.Decoder;
 import org.springframework.stereotype.Component;
 
-@Component
 public class QuayIdCodec extends StringCodec {
 
   @Override

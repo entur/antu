@@ -2,10 +2,23 @@ package no.entur.antu.validator.servicejourney.speed;
 
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 
+/**
+ * Expected speed for different modes of transport.
+ * The expected speed is used to validate the speed of a service journey.
+ */
 public record ExpectedSpeed(long maxSpeed, long warningSpeed, long minSpeed) {
   private static ExpectedSpeed of(
+    /*
+     * The maximum speed for the mode of transport.
+     */
     long maxSpeed,
+    /*
+     * The speed that is considered a warning for the mode of transport.
+     */
     long warningSpeed,
+    /*
+     * The minimum speed for the mode of transport.
+     */
     long minSpeed
   ) {
     return new ExpectedSpeed(maxSpeed, warningSpeed, minSpeed);

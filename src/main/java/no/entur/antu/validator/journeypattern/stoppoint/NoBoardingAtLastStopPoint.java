@@ -5,8 +5,7 @@ import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 /**
  * Validate that the last StopPointInJourneyPattern does not allow boarding.
  */
-public class NoBoardingAtLastStopPoint
-  extends ValidateNotExist {
+public class NoBoardingAtLastStopPoint extends ValidateNotExist {
 
   public NoBoardingAtLastStopPoint(String path) {
     super(

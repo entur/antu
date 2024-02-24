@@ -3,7 +3,7 @@ package no.entur.antu.validator.servicejourney.transportmode;
 import no.entur.antu.validator.ValidationError;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 
-public record TransportModeError(
+public record MismatchedTransportModeError(
   RuleCode ruleCode,
   AllVehicleModesOfTransportEnumeration mode,
   String serviceJourneyId

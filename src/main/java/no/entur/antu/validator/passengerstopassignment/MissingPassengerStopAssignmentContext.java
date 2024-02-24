@@ -14,8 +14,8 @@ public record MissingPassengerStopAssignmentContext(
   String scheduledStopPointRef,
   boolean hasPassengerStopAssignment
 ) {
-  
   public static final class Builder {
+
     private final String validationReportId;
     private final CommonDataRepository commonDataRepository;
     private final NetexEntitiesIndex netexEntitiesIndex;
@@ -66,18 +66,16 @@ public record MissingPassengerStopAssignmentContext(
         .filter(StopPointInJourneyPattern.class::isInstance)
         .map(StopPointInJourneyPattern.class::cast)
         .map(stopPointInJourneyPattern ->
-               new MissingPassengerStopAssignmentContext(
-                 journeyPattern.getId(),
-                 stopPointInJourneyPattern.getId(),
-                 scheduleStopPointRef.apply(stopPointInJourneyPattern),
-                 hasPassengerStopAssignment.test(
-                   scheduleStopPointRef.apply(stopPointInJourneyPattern)
-                 )
-               )
+          new MissingPassengerStopAssignmentContext(
+            journeyPattern.getId(),
+            stopPointInJourneyPattern.getId(),
+            scheduleStopPointRef.apply(stopPointInJourneyPattern),
+            hasPassengerStopAssignment.test(
+              scheduleStopPointRef.apply(stopPointInJourneyPattern)
+            )
+          )
         )
         .toList();
     }
   }
 }
-
-

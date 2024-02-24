@@ -11,14 +11,22 @@ import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.*;
 
 /**
- * Provides a simpler interface for using {@link TimetabledPassingTime},
- * in {@link ServiceJourney}.
+ * This utility class is used to sort the timetabled passing times of a service journey according to
+ * their order in the journey pattern.
+ * The order of the passing times is determined by the order of the stop points in the journey pattern.
+ * The passing times are sorted by their order in the journey pattern, and warped in a StopTime object.
  */
-public interface SortedStopTimes {
+public final class SortStopTimesUtil {
+
+  /**
+   * Prevent instantiation of this utility class.
+   */
+  private SortStopTimesUtil() {}
+
   /**
    * Sort the timetabled passing times according to their order in the journey pattern.
    */
-  static List<StopTime> from(
+  public static List<StopTime> createSortedStopTimes(
     ServiceJourney serviceJourney,
     NetexEntitiesIndex netexEntitiesIndex
   ) {

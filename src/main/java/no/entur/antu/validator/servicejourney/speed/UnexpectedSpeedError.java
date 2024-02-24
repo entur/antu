@@ -3,7 +3,7 @@ package no.entur.antu.validator.servicejourney.speed;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.validator.ValidationError;
 
-public record SpeedError(
+public record UnexpectedSpeedError(
   String serviceJourneyId,
   PassingTimes passingTimes,
   RuleCode ruleCode,

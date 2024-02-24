@@ -23,11 +23,11 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validator.id.NetexIdValidator;
-import no.entur.antu.validator.servicejourney.passingtime.NonIncreasingPassingTime;
-import no.entur.antu.validator.servicelinks.ServiceLinksValidator;
-import no.entur.antu.validator.servicejourney.speed.SpeedValidator;
 import no.entur.antu.validator.passengerstopassignment.MissingPassengerStopAssignment;
-import no.entur.antu.validator.servicejourney.transportmode.TransportModeValidator;
+import no.entur.antu.validator.servicejourney.passingtime.NonIncreasingPassingTime;
+import no.entur.antu.validator.servicejourney.speed.UnexpectedSpeed;
+import no.entur.antu.validator.servicejourney.transportmode.MismatchedTransportMode;
+import no.entur.antu.validator.servicelink.InvalidServiceLinks;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
@@ -69,14 +69,14 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public TransportModeValidator transportModeValidator(
+  public MismatchedTransportMode transportModeValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new TransportModeValidator(
+    return new MismatchedTransportMode(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -93,14 +93,14 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public SpeedValidator speedValidator(
+  public UnexpectedSpeed speedValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new SpeedValidator(
+    return new UnexpectedSpeed(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -121,14 +121,14 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public ServiceLinksValidator serviceLinksValidator(
+  public InvalidServiceLinks serviceLinksValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new ServiceLinksValidator(
+    return new InvalidServiceLinks(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -147,11 +147,11 @@ public class TimetableDataValidatorConfig {
     @Qualifier(
       "netexIdUniquenessValidator"
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
-    TransportModeValidator transportModeValidator,
+    MismatchedTransportMode mismatchedTransportMode,
     NonIncreasingPassingTime nonIncreasingPassingTime,
-    SpeedValidator speedValidator,
+    UnexpectedSpeed unexpectedSpeed,
     MissingPassengerStopAssignment missingPassengerStopAssignment,
-    ServiceLinksValidator serviceLinksValidator
+    InvalidServiceLinks invalidServiceLinks
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -161,11 +161,11 @@ public class TimetableDataValidatorConfig {
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
       netexIdUniquenessValidator,
-      transportModeValidator,
+      mismatchedTransportMode,
       nonIncreasingPassingTime,
-      speedValidator,
+      unexpectedSpeed,
       missingPassengerStopAssignment,
-      serviceLinksValidator
+      invalidServiceLinks
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorRunnerWithNetexEntitiesIndex(
