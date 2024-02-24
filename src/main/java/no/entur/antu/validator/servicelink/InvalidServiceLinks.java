@@ -1,4 +1,4 @@
-package no.entur.antu.validator.servicelinks;
+package no.entur.antu.validator.servicelink;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,13 +21,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Validator for ServiceLinks by checking the distance between the stop points and the line string.
- * The distance is checked against a warning limit and a max limit.
+ * Validates ServiceLinks, by checking the distance between the stop points and the line string.
+ * Stop points are the start and end points of the service link, and the line string is the geometry of the service link.
+ * The distance is expected to be within a configured 'WARNING' and 'MAX' limits, and if it exceeds the limit,
+ * a warning or an error is added to the validation report.
  */
-public class ServiceLinksValidator extends AntuNetexValidator {
+public class InvalidServiceLinks extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    ServiceLinksValidator.class
+    InvalidServiceLinks.class
   );
 
   private static final int DISTANCE_WARNING = 20;
@@ -36,7 +38,7 @@ public class ServiceLinksValidator extends AntuNetexValidator {
   private final CommonDataRepository commonDataRepository;
   private final StopPlaceRepository stopPlaceRepository;
 
-  public ServiceLinksValidator(
+  public InvalidServiceLinks(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -48,7 +50,7 @@ public class ServiceLinksValidator extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return ServiceLinksError.RuleCode.values();
+    return InvalidServiceLinkError.RuleCode.values();
   }
 
   @Override
@@ -69,7 +71,7 @@ public class ServiceLinksValidator extends AntuNetexValidator {
       NetexEntitiesIndex index =
         validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
 
-      ServiceLinkContext.Builder contextBuilder = new ServiceLinkContext.Builder(
+      InvalidServiceLinkContext.Builder contextBuilder = new InvalidServiceLinkContext.Builder(
         validationReport.getValidationReportId(),
         commonDataRepository,
         stopPlaceRepository
@@ -88,9 +90,9 @@ public class ServiceLinksValidator extends AntuNetexValidator {
         .stream()
         .map(contextBuilder::build)
         .filter(Objects::nonNull)
-        .forEach(serviceLinkContext ->
+        .forEach(invalidServiceLinkContext ->
           validateServiceLink(
-            serviceLinkContext,
+            invalidServiceLinkContext,
             error ->
               addValidationReportEntry(
                 validationReport,
@@ -112,17 +114,19 @@ public class ServiceLinksValidator extends AntuNetexValidator {
    * If the distance exceeds the max limit, an error is added to the validation report.
    */
   private void validateServiceLink(
-    ServiceLinkContext serviceLinkContext,
+    InvalidServiceLinkContext invalidServiceLinkContext,
     Consumer<ValidationError> reportError
   ) {
-    Coordinate startCoordinate = serviceLinkContext.from().asJtsCoordinate();
-    Coordinate endCoordinate = serviceLinkContext.to().asJtsCoordinate();
+    Coordinate startCoordinate = invalidServiceLinkContext
+      .from().asJtsCoordinate();
+    Coordinate endCoordinate = invalidServiceLinkContext
+      .to().asJtsCoordinate();
 
-    Coordinate geometryStartCoordinate = serviceLinkContext
+    Coordinate geometryStartCoordinate = invalidServiceLinkContext
       .lineString()
       .getStartPoint()
       .getCoordinate();
-    Coordinate geometryEndCoordinate = serviceLinkContext
+    Coordinate geometryEndCoordinate = invalidServiceLinkContext
       .lineString()
       .getEndPoint()
       .getCoordinate();
@@ -139,13 +143,13 @@ public class ServiceLinksValidator extends AntuNetexValidator {
     checkDistanceAndReportError(
       distanceFromStart,
       true,
-      serviceLinkContext,
+      invalidServiceLinkContext,
       reportError
     );
     checkDistanceAndReportError(
       distanceFromEnd,
       false,
-      serviceLinkContext,
+      invalidServiceLinkContext,
       reportError
     );
   }
@@ -153,15 +157,15 @@ public class ServiceLinksValidator extends AntuNetexValidator {
   private void checkDistanceAndReportError(
     double distance,
     boolean isStart,
-    ServiceLinkContext context,
+    InvalidServiceLinkContext context,
     Consumer<ValidationError> reportError
   ) {
     if (distance > DISTANCE_MAX) {
       reportError.accept(
         createServiceLinksError(
           isStart
-            ? ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
-            : ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
+            ? InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
+            : InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
           distance,
           context
         )
@@ -172,8 +176,8 @@ public class ServiceLinksValidator extends AntuNetexValidator {
       reportError.accept(
         createServiceLinksError(
           isStart
-            ? ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
-            : ServiceLinksError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
+            ? InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
+            : InvalidServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
           distance,
           context
         )
@@ -181,12 +185,12 @@ public class ServiceLinksValidator extends AntuNetexValidator {
     }
   }
 
-  private ServiceLinksError createServiceLinksError(
-    ServiceLinksError.RuleCode ruleCode,
+  private InvalidServiceLinkError createServiceLinksError(
+    InvalidServiceLinkError.RuleCode ruleCode,
     double distance,
-    ServiceLinkContext context
+    InvalidServiceLinkContext context
   ) {
-    return new ServiceLinksError(
+    return new InvalidServiceLinkError(
       ruleCode,
       distance,
       context.serviceLink().getFromPointRef(),

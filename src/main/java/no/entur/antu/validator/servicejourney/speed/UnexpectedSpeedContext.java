@@ -22,13 +22,13 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record SpeedContext(
+public record UnexpectedSpeedContext(
   ServiceJourney serviceJourney,
   AllVehicleModesOfTransportEnumeration transportMode,
   Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId,
   DistanceCalculator distanceCalculator
 ) {
-  public SpeedContext(
+  public UnexpectedSpeedContext(
     ServiceJourney serviceJourney,
     AllVehicleModesOfTransportEnumeration transportMode,
     Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId
@@ -92,7 +92,7 @@ public record SpeedContext(
       this.stopPlaceRepository = stopPlaceRepository;
     }
 
-    public SpeedContext build(ServiceJourney serviceJourney) {
+    public UnexpectedSpeedContext build(ServiceJourney serviceJourney) {
       String journeyPatternRef = serviceJourney
         .getJourneyPatternRef()
         .getValue()
@@ -114,7 +114,7 @@ public record SpeedContext(
               (previous, latest) -> latest
             )
           );
-      return new SpeedContext(
+      return new UnexpectedSpeedContext(
         serviceJourney,
         findTransportMode(serviceJourney),
         stopPlaceCoordinatesPerTimetabledPassingTimeId

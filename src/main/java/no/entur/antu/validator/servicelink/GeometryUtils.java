@@ -1,4 +1,4 @@
-package no.entur.antu.validator.servicelinks;
+package no.entur.antu.validator.servicelink;
 
 import no.entur.antu.exception.AntuException;
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
