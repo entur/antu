@@ -12,6 +12,10 @@ import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceFrame;
 
+/**
+ * Represents a resource for common data.
+ * This resource is used to load and retrieve common data from the Netex Common file.
+ */
 public class CommonDataResource {
 
   private NetexEntitiesIndex netexEntitiesIndex;

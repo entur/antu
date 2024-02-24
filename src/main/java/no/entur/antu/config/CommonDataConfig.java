@@ -4,8 +4,8 @@ import static no.entur.antu.config.CacheConfig.SCHEDULED_STOP_POINT_AND_QUAY_ID_
 
 import java.util.Map;
 import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.commondata.DefaultCommonDataRepository;
 import no.entur.antu.commondata.CommonDataResource;
+import no.entur.antu.commondata.DefaultCommonDataRepository;
 import no.entur.antu.model.QuayId;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;

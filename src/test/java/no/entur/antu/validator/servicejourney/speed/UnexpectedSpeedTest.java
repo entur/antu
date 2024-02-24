@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.rutebanken.netex.model.*;
 
-class SpeedValidatorTest {
+class UnexpectedSpeedTest {
 
   @Test
   void normalSpeedShouldNotReturnAnyValidationEntry() {
@@ -56,7 +56,7 @@ class SpeedValidatorTest {
         .map(ValidationReportEntry::getName)
         .findFirst()
         .orElse(null),
-      is(SpeedError.RuleCode.LOW_SPEED.name())
+      is(UnexpectedSpeedError.RuleCode.LOW_SPEED.name())
     );
   }
 
@@ -79,7 +79,7 @@ class SpeedValidatorTest {
         .map(ValidationReportEntry::getName)
         .findFirst()
         .orElse(null),
-      is(SpeedError.RuleCode.HIGH_SPEED.name())
+      is(UnexpectedSpeedError.RuleCode.HIGH_SPEED.name())
     );
   }
 
@@ -102,7 +102,7 @@ class SpeedValidatorTest {
         .map(ValidationReportEntry::getName)
         .findFirst()
         .orElse(null),
-      is(SpeedError.RuleCode.WARNING_SPEED.name())
+      is(UnexpectedSpeedError.RuleCode.WARNING_SPEED.name())
     );
   }
 
@@ -126,8 +126,8 @@ class SpeedValidatorTest {
         .toList(),
       is(
         List.of(
-          SpeedError.RuleCode.LOW_SPEED.name(),
-          SpeedError.RuleCode.HIGH_SPEED.name()
+          UnexpectedSpeedError.RuleCode.LOW_SPEED.name(),
+          UnexpectedSpeedError.RuleCode.HIGH_SPEED.name()
         )
       )
     );
@@ -233,13 +233,6 @@ class SpeedValidatorTest {
 
   @Test
   void testNoPassengerStopAssignmentsFoundShouldIgnoreValidationGracefully() {
-    List<StopPlaceCoordinates> stopPlaceCoordinates = List.of(
-      new StopPlaceCoordinates(6.621791, 60.424023),
-      new StopPlaceCoordinates(6.612112, 60.471748),
-      new StopPlaceCoordinates(6.622312, 60.481548),
-      new StopPlaceCoordinates(6.632312, 60.491548)
-    );
-
     NetexTestFragment testData = new NetexTestFragment();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
@@ -328,7 +321,7 @@ class SpeedValidatorTest {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    SpeedValidator speedValidator = new SpeedValidator(
+    UnexpectedSpeed unexpectedSpeed = new UnexpectedSpeed(
       (code, message, dataLocation) ->
         new ValidationReportEntry(
           message,
@@ -350,7 +343,7 @@ class SpeedValidatorTest {
     when(validationContext.getNetexEntitiesIndex())
       .thenReturn(netexEntitiesIndex);
 
-    speedValidator.validate(testValidationReport, validationContext);
+    unexpectedSpeed.validate(testValidationReport, validationContext);
 
     return testValidationReport;
   }

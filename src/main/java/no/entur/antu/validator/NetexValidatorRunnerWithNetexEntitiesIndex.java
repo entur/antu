@@ -17,6 +17,9 @@ import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
 
+/**
+ * Represents a Netex validator runner with NetexEntitiesIndex.
+ */
 public class NetexValidatorRunnerWithNetexEntitiesIndex
   extends NetexValidatorsRunner {
 
@@ -54,6 +57,9 @@ public class NetexValidatorRunnerWithNetexEntitiesIndex
       null
     );
 
+    /*
+     * Supplier of the NetexEntitiesIndex.
+     */
     Supplier<NetexEntitiesIndex> getNetexEntitiesIndex = () -> {
       NetexParser netexParser = new NetexParser();
       return netexParser.parse(new ByteArrayInputStream(fileContent));

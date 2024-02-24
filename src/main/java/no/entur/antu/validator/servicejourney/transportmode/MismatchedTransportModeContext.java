@@ -18,7 +18,7 @@ import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record TransportModeContext(
+public record MismatchedTransportModeContext(
   ValidationContext validationContext,
   XdmItem serviceJourneyItem,
   String serviceJourneyId,
@@ -73,9 +73,7 @@ public record TransportModeContext(
 
   public static final class Builder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-      Builder.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
     private final ValidationContext validationContext;
     private final TransportModes transportModesForLine;
@@ -109,12 +107,12 @@ public record TransportModeContext(
       return transportModesForLine != null;
     }
 
-    public List<TransportModeContext> buildAll() {
+    public List<MismatchedTransportModeContext> buildAll() {
       return getServiceJourneys().stream().map(this::build).toList();
     }
 
-    public TransportModeContext build(XdmItem serviceJourneyItem) {
-      return new TransportModeContext(
+    public MismatchedTransportModeContext build(XdmItem serviceJourneyItem) {
+      return new MismatchedTransportModeContext(
         validationContext,
         serviceJourneyItem,
         serviceJourneyItem.stream().asNode().attribute("id"),

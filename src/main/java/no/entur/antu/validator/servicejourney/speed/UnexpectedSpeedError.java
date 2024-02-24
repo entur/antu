@@ -3,7 +3,7 @@ package no.entur.antu.validator.servicejourney.speed;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.validator.ValidationError;
 
-public record SpeedError(
+public record UnexpectedSpeedError(
   String serviceJourneyId,
   PassingTimes passingTimes,
   RuleCode ruleCode,
@@ -40,19 +40,16 @@ public record SpeedError(
 
   @Override
   public String validationReportEntryMessage() {
-    return String.format(
-      "%s, " +
-      "ServiceJourneyId = %s, " +
-      "ExpectedSpeed = %s, " +
-      "ActualSpeed = %s, " +
-      "from TimetabledPassingTime = %s, " +
-      "to TimetabledPassingTime = %s",
-      ruleCode().getErrorMessage(),
-      serviceJourneyId,
-      expectedSpeed(),
-      calculatedSpeed(),
-      passingTimes().from().timetabledPassingTimeId(),
-      passingTimes().to().timetabledPassingTimeId()
+    return (
+      ruleCode.getErrorMessage() +
+      ", from TimetabledPassingTime = " +
+      passingTimes().from().timetabledPassingTimeId() +
+      ", to TimetabledPassingTime = " +
+      passingTimes().to().timetabledPassingTimeId() +
+      ", ExpectedSpeed = " +
+      expectedSpeed() +
+      ", ActualSpeed = " +
+      calculatedSpeed()
     );
   }
 }

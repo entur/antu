@@ -18,19 +18,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Validates that the transport mode of a service journey is valid for the quays it visits.
- * The transport mode of a service journey must be valid for the quays it visits.
+ * Validates that the transport mode of a service journey matches the quays it visits.
+ * The transport mode of a service journey must be matched for the quays it visits.
  */
-public class TransportModeValidator extends AntuNetexValidator {
+public class MismatchedTransportMode extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    TransportModeValidator.class
+    MismatchedTransportMode.class
   );
   private final CommonDataRepository commonDataRepository;
 
   private final StopPlaceRepository stopPlaceRepository;
 
-  public TransportModeValidator(
+  public MismatchedTransportMode(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -42,7 +42,7 @@ public class TransportModeValidator extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return TransportModeError.RuleCode.values();
+    return MismatchedTransportModeError.RuleCode.values();
   }
 
   @Override
@@ -54,8 +54,8 @@ public class TransportModeValidator extends AntuNetexValidator {
       return;
     }
 
-    TransportModeContext.Builder builder =
-      new TransportModeContext.Builder(validationContext);
+    MismatchedTransportModeContext.Builder builder =
+      new MismatchedTransportModeContext.Builder(validationContext);
 
     if (!builder.foundTransportModesForLine()) {
       LOGGER.debug(
@@ -81,8 +81,8 @@ public class TransportModeValidator extends AntuNetexValidator {
         addValidationReportEntry(
           validationReport,
           validationContext,
-          new TransportModeError(
-            TransportModeError.RuleCode.INVALID_TRANSPORT_MODE,
+          new MismatchedTransportModeError(
+            MismatchedTransportModeError.RuleCode.INVALID_TRANSPORT_MODE,
             context.transportModes().mode(),
             context.serviceJourneyId()
           )
@@ -91,7 +91,7 @@ public class TransportModeValidator extends AntuNetexValidator {
   }
 
   private boolean validateServiceJourney(
-    TransportModeContext transportModeContext,
+    MismatchedTransportModeContext mismatchedTransportModeContext,
     String validationReportId
   ) {
     Function<String, QuayId> findQuayIdForScheduledStopPoint =
@@ -101,9 +101,9 @@ public class TransportModeValidator extends AntuNetexValidator {
             scheduledStopPoint,
             validationReportId
           )
-        : transportModeContext::findQuayIdForScheduledStopPoint;
+        : mismatchedTransportModeContext::findQuayIdForScheduledStopPoint;
 
-    return transportModeContext
+    return mismatchedTransportModeContext
       .scheduledStopPoints()
       .stream()
       .map(findQuayIdForScheduledStopPoint)
@@ -114,7 +114,7 @@ public class TransportModeValidator extends AntuNetexValidator {
       .filter(Objects::nonNull)
       .allMatch(quayId ->
         isValidTransportMode(
-          transportModeContext.transportModes(),
+          mismatchedTransportModeContext.transportModes(),
           stopPlaceRepository.getTransportModesForQuayId(quayId)
         )
       );
@@ -122,11 +122,11 @@ public class TransportModeValidator extends AntuNetexValidator {
 
   private boolean isValidTransportMode(
     TransportModes datasetTransportModes,
-    TransportModes transportModes
+    TransportModes expectedTransportModes
   ) {
     if (
-      transportModes == null ||
-      transportModes.mode() == null ||
+      expectedTransportModes == null ||
+      expectedTransportModes.mode() == null ||
       datasetTransportModes == null ||
       datasetTransportModes.mode() == null
     ) {
@@ -146,13 +146,15 @@ public class TransportModeValidator extends AntuNetexValidator {
         datasetTransportModes
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.COACH) &&
-        transportModes.mode().equals(AllVehicleModesOfTransportEnumeration.BUS)
+        expectedTransportModes
+          .mode()
+          .equals(AllVehicleModesOfTransportEnumeration.BUS)
       ) ||
       (
         datasetTransportModes
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.BUS) &&
-        transportModes
+        expectedTransportModes
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.COACH)
       )
@@ -166,10 +168,10 @@ public class TransportModeValidator extends AntuNetexValidator {
         .mode()
         .equals(AllVehicleModesOfTransportEnumeration.TAXI) &&
       (
-        transportModes
+        expectedTransportModes
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.BUS) ||
-        transportModes
+        expectedTransportModes
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.COACH)
       )
@@ -178,12 +180,15 @@ public class TransportModeValidator extends AntuNetexValidator {
     }
 
     if (
-      datasetTransportModes.mode().value().equals(transportModes.mode().value())
+      datasetTransportModes
+        .mode()
+        .value()
+        .equals(expectedTransportModes.mode().value())
     ) {
       // Only rail replacement bus service can visit rail replacement bus stops
       if (
-        transportModes.subMode() != null &&
-        transportModes
+        expectedTransportModes.subMode() != null &&
+        expectedTransportModes
           .subMode()
           .name()
           .equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())

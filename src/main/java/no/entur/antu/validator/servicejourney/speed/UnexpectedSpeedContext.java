@@ -22,13 +22,13 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record SpeedContext(
+public record UnexpectedSpeedContext(
   ServiceJourney serviceJourney,
   AllVehicleModesOfTransportEnumeration transportMode,
   Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId,
   DistanceCalculator distanceCalculator
 ) {
-  public SpeedContext(
+  public UnexpectedSpeedContext(
     ServiceJourney serviceJourney,
     AllVehicleModesOfTransportEnumeration transportMode,
     Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId
@@ -71,9 +71,7 @@ public record SpeedContext(
 
   public static final class Builder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-      Builder.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
     private final String validationReportId;
     private final NetexEntitiesIndex netexEntitiesIndex;
@@ -92,7 +90,7 @@ public record SpeedContext(
       this.stopPlaceRepository = stopPlaceRepository;
     }
 
-    public SpeedContext build(ServiceJourney serviceJourney) {
+    public UnexpectedSpeedContext build(ServiceJourney serviceJourney) {
       String journeyPatternRef = serviceJourney
         .getJourneyPatternRef()
         .getValue()
@@ -102,7 +100,8 @@ public record SpeedContext(
           .getPassingTimes()
           .getTimetabledPassingTime()
           .stream()
-          .filter(timetabledPassingTime -> timetabledPassingTime.getId() != null)
+          .filter(timetabledPassingTime -> timetabledPassingTime.getId() != null
+          )
           .map(timetabledPassingTime ->
             findStopPlaceCoordinates(timetabledPassingTime, journeyPatternRef)
           )
@@ -114,7 +113,7 @@ public record SpeedContext(
               (previous, latest) -> latest
             )
           );
-      return new SpeedContext(
+      return new UnexpectedSpeedContext(
         serviceJourney,
         findTransportMode(serviceJourney),
         stopPlaceCoordinatesPerTimetabledPassingTimeId
@@ -152,7 +151,8 @@ public record SpeedContext(
 
         if (
           flexibleLine != null &&
-          flexibleLine.getFlexibleLineType() == FlexibleLineTypeEnumeration.FIXED
+          flexibleLine.getFlexibleLineType() ==
+          FlexibleLineTypeEnumeration.FIXED
         ) {
           return flexibleLine.getTransportMode();
         }

@@ -6,6 +6,10 @@ import no.entur.antu.model.QuayId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Default implementation of CommonDataRepository.
+ * This repository is used to store and retrieve common data from Redis cache.
+ */
 public class DefaultCommonDataRepository implements CommonDataRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(

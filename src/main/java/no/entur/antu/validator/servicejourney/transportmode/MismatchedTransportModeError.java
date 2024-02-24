@@ -3,9 +3,9 @@ package no.entur.antu.validator.servicejourney.transportmode;
 import no.entur.antu.validator.ValidationError;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 
-public record TransportModeError(
+public record MismatchedTransportModeError(
   RuleCode ruleCode,
-  AllVehicleModesOfTransportEnumeration mode,
+  AllVehicleModesOfTransportEnumeration actualMode,
   String serviceJourneyId
 )
   implements ValidationError {
@@ -21,11 +21,7 @@ public record TransportModeError(
 
   @Override
   public String validationReportEntryMessage() {
-    return String.format(
-      "Invalid transport mode %s found in service journey with id %s",
-      mode(),
-      serviceJourneyId()
-    );
+    return String.format("Invalid transport mode %s", actualMode());
   }
 
   enum RuleCode implements no.entur.antu.validator.RuleCode {

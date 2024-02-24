@@ -52,9 +52,7 @@ class MissingPassengerStopAssignmentIntegrationTest {
     );
 
     assertFalse(validationReport.getValidationReportEntries().isEmpty());
-    assertEquals(18, validationReport
-      .getValidationReportEntries()
-      .size());
+    assertEquals(18, validationReport.getValidationReportEntries().size());
   }
 
   /**

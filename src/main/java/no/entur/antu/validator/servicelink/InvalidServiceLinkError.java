@@ -1,9 +1,9 @@
-package no.entur.antu.validator.servicelinks;
+package no.entur.antu.validator.servicelink;
 
 import no.entur.antu.validator.ValidationError;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 
-public record ServiceLinksError(
+public record InvalidServiceLinkError(
   RuleCode ruleCode,
   double distance,
   ScheduledStopPointRefStructure scheduledStopPointRef,
@@ -23,9 +23,8 @@ public record ServiceLinksError(
   @Override
   public String validationReportEntryMessage() {
     return String.format(
-      "%s. ServiceLink = %s, ScheduledStopPointRef = %s, distance = %s",
+      "%s. ScheduledStopPointRef = %s, distance = %s",
       ruleCode.getErrorMessage(),
-      serviceLinkId(),
       scheduledStopPointRef().getRef(),
       distance()
     );

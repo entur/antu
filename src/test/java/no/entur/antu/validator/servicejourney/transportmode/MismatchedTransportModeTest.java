@@ -14,7 +14,6 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.model.TransportSubMode;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validator.servicejourney.transportmode.TransportModeValidator;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
@@ -22,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.rutebanken.netex.model.*;
 
-class TransportModeValidatorTest {
+class MismatchedTransportModeTest {
 
   private static final NetexXMLParser NETEX_XML_PARSER = new NetexXMLParser();
 
@@ -674,8 +673,7 @@ class TransportModeValidatorTest {
         .map(ValidationReportEntry::getMessage),
       is(
         Optional.of(
-          "Invalid transport mode TAXI found in service journey with id " +
-          TestData.SERVICE_JOURNEY_REF
+          "Invalid transport mode TAXI"
         )
       )
     );
@@ -788,8 +786,7 @@ class TransportModeValidatorTest {
         .map(ValidationReportEntry::getMessage),
       is(
         Optional.of(
-          "Invalid transport mode METRO found in service journey with id " +
-          TestData.SERVICE_JOURNEY_REF
+          "Invalid transport mode METRO"
         )
       )
     );
@@ -938,7 +935,7 @@ class TransportModeValidatorTest {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    TransportModeValidator validator = new TransportModeValidator(
+    MismatchedTransportMode validator = new MismatchedTransportMode(
       (code, message, dataLocation) ->
         new ValidationReportEntry(
           message,

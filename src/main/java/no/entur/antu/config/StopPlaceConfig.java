@@ -25,9 +25,9 @@ import java.util.Set;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.model.TransportModes;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.DefaultStopPlaceResource;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stop.fetcher.QuayFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceFetcher;
 import no.entur.antu.stop.fetcher.StopPlaceForQuayIdFetcher;
@@ -70,7 +70,9 @@ public class StopPlaceConfig {
     @Qualifier(
       COORDINATES_PER_QUAY_ID_CACHE
     ) Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
-    @Qualifier("stopPlaceResource") DefaultStopPlaceResource defaultStopPlaceResource
+    @Qualifier(
+      "stopPlaceResource"
+    ) DefaultStopPlaceResource defaultStopPlaceResource
   ) {
     return new DefaultStopPlaceRepository(
       defaultStopPlaceResource,

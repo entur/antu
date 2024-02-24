@@ -5,9 +5,12 @@ import no.entur.antu.model.StopPlaceCoordinates;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.client.handler.State;
 import org.redisson.client.protocol.Decoder;
-import org.springframework.stereotype.Component;
 
-@Component
+/**
+ * Codec for StopPlaceCoordinates.
+ * This codec is used to decode StopPlaceCoordinates from Redis cache.
+ * Encoding is done by the toString method in StopPlaceCoordinates.
+ */
 public class StopPlaceCoordinatesCodec extends StringCodec {
 
   @Override

@@ -21,10 +21,9 @@ public record NonIncreasingPassingTimeError(
 
   @Override
   public String validationReportEntryMessage() {
-    return String.format(
-      "%s. ServiceJourney = %s, TimetabledPassingTime = %s",
-      ruleCode.getErrorMessage(),
-      serviceJourneyId(),
+    return (
+      ruleCode.getErrorMessage() +
+      "with ref: " +
       stopTime.timetabledPassingTimeId()
     );
   }

@@ -10,7 +10,7 @@ import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stoptime.PassingTimes;
-import no.entur.antu.stoptime.SortedStopTimes;
+import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
 import no.entur.antu.validator.AntuNetexValidator;
 import no.entur.antu.validator.RuleCode;
@@ -29,15 +29,15 @@ import org.slf4j.LoggerFactory;
  * The speed is calculated based on the distance between two stops
  * and the time it takes to travel between them.
  */
-public class SpeedValidator extends AntuNetexValidator {
+public class UnexpectedSpeed extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    SpeedValidator.class
+    UnexpectedSpeed.class
   );
   private final CommonDataRepository commonDataRepository;
   private final StopPlaceRepository stopPlaceRepository;
 
-  public SpeedValidator(
+  public UnexpectedSpeed(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -51,7 +51,7 @@ public class SpeedValidator extends AntuNetexValidator {
   protected RuleCode[] getRuleCodes() {
     return Stream
       .concat(
-        Arrays.stream(SpeedError.RuleCode.values()),
+        Arrays.stream(UnexpectedSpeedError.RuleCode.values()),
         Arrays.stream(SameDepartureArrivalTimeError.RuleCode.values())
       )
       .map(RuleCode.class::cast)
@@ -74,8 +74,8 @@ public class SpeedValidator extends AntuNetexValidator {
     ) {
       NetexEntitiesIndex netexEntitiesIndex =
         validationContextWithNetexEntitiesIndex.getNetexEntitiesIndex();
-      SpeedContext.Builder contextBuilder =
-        new SpeedContext.Builder(
+      UnexpectedSpeedContext.Builder contextBuilder =
+        new UnexpectedSpeedContext.Builder(
           validationReport.getValidationReportId(),
           netexEntitiesIndex,
           commonDataRepository,
@@ -97,7 +97,7 @@ public class SpeedValidator extends AntuNetexValidator {
       serviceJourneys
         .stream()
         .map(contextBuilder::build)
-        .filter(SpeedContext::isValid)
+        .filter(UnexpectedSpeedContext::isValid)
         .forEach(context ->
           validateServiceJourney(
             context,
@@ -118,14 +118,15 @@ public class SpeedValidator extends AntuNetexValidator {
   }
 
   private void validateServiceJourney(
-    SpeedContext context,
+    UnexpectedSpeedContext context,
     NetexEntitiesIndex netexEntitiesIndex,
     Consumer<ValidationError> reportError
   ) {
-    List<StopTime> sortedTimetabledPassingTime = SortedStopTimes.from(
-      context.serviceJourney(),
-      netexEntitiesIndex
-    );
+    List<StopTime> sortedTimetabledPassingTime =
+      SortStopTimesUtil.createSortedStopTimes(
+        context.serviceJourney(),
+        netexEntitiesIndex
+      );
 
     IntStream
       .range(1, sortedTimetabledPassingTime.size())
@@ -145,7 +146,7 @@ public class SpeedValidator extends AntuNetexValidator {
   }
 
   private boolean filterAndReportInValidTimeDifference(
-    SpeedContext context,
+    UnexpectedSpeedContext context,
     PassingTimes passingTimes,
     Consumer<ValidationError> reportError
   ) {
@@ -187,7 +188,7 @@ public class SpeedValidator extends AntuNetexValidator {
   }
 
   private static void validateSpeed(
-    SpeedContext context,
+    UnexpectedSpeedContext context,
     PassingTimes passingTimes,
     Consumer<ValidationError> reportError
   ) {
@@ -231,10 +232,10 @@ public class SpeedValidator extends AntuNetexValidator {
     if (optimisticSpeed < expectedSpeed.minSpeed()) {
       // too slow
       reportError.accept(
-        new SpeedError(
+        new UnexpectedSpeedError(
           context.serviceJourney().getId(),
           passingTimes,
-          SpeedError.RuleCode.LOW_SPEED,
+          UnexpectedSpeedError.RuleCode.LOW_SPEED,
           Long.toString(expectedSpeed.minSpeed()),
           Double.toString(optimisticSpeed)
         )
@@ -243,20 +244,20 @@ public class SpeedValidator extends AntuNetexValidator {
       // too fast
       if (pessimisticSpeed > expectedSpeed.maxSpeed()) {
         reportError.accept(
-          new SpeedError(
+          new UnexpectedSpeedError(
             context.serviceJourney().getId(),
             passingTimes,
-            SpeedError.RuleCode.HIGH_SPEED,
+            UnexpectedSpeedError.RuleCode.HIGH_SPEED,
             Long.toString(expectedSpeed.maxSpeed()),
             Double.toString(pessimisticSpeed)
           )
         );
       } else {
         reportError.accept(
-          new SpeedError(
+          new UnexpectedSpeedError(
             context.serviceJourney().getId(),
             passingTimes,
-            SpeedError.RuleCode.WARNING_SPEED,
+            UnexpectedSpeedError.RuleCode.WARNING_SPEED,
             Long.toString(expectedSpeed.warningSpeed()),
             Double.toString(pessimisticSpeed)
           )

@@ -1,4 +1,4 @@
-package no.entur.antu.validator.servicelinks;
+package no.entur.antu.validator.servicelink;
 
 import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
@@ -20,7 +20,7 @@ import org.rutebanken.netex.model.ServiceLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record ServiceLinkContext(
+public record InvalidServiceLinkContext(
   ServiceLink serviceLink,
   LineString lineString,
   StopPlaceCoordinates from,
@@ -28,9 +28,7 @@ public record ServiceLinkContext(
 ) {
   public static final class Builder {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(
-      Builder.class
-    );
+    private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
     private final String validationReportId;
     private final CommonDataRepository commonDataRepository;
@@ -46,7 +44,7 @@ public record ServiceLinkContext(
       this.stopPlaceRepository = stopPlaceRepository;
     }
 
-    public ServiceLinkContext build(ServiceLink serviceLink) {
+    public InvalidServiceLinkContext build(ServiceLink serviceLink) {
       QuayId fromQuayId = getQuayId(serviceLink.getFromPointRef());
       QuayId toQuayId = getQuayId(serviceLink.getToPointRef());
 
@@ -83,7 +81,12 @@ public record ServiceLinkContext(
         return null;
       }
 
-      return new ServiceLinkContext(serviceLink, lineString.get(), from, to);
+      return new InvalidServiceLinkContext(
+        serviceLink,
+        lineString.get(),
+        from,
+        to
+      );
     }
 
     public QuayId getQuayId(

@@ -13,7 +13,6 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.model.TransportSubMode;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validator.servicejourney.transportmode.TransportModeValidator;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
@@ -22,7 +21,7 @@ import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 
-class TransportModeValidatorIntegrationTest {
+class MismatchedTransportModeIntegrationTest {
 
   public static final String TEST_FILE_MISSING_TRANSPORT_MODE =
     "NWY_Line_8600_20240131_Missing_transport_mode.xml";
@@ -106,8 +105,8 @@ class TransportModeValidatorIntegrationTest {
           )
         );
 
-      TransportModeValidator transportModeValidator =
-        new TransportModeValidator(
+      MismatchedTransportMode mismatchedTransportMode =
+        new MismatchedTransportMode(
           (code, message, dataLocation) ->
             new ValidationReportEntry(
               message,
@@ -118,7 +117,7 @@ class TransportModeValidatorIntegrationTest {
           stopPlaceRepository
         );
 
-      transportModeValidator.validate(testValidationReport, validationContext);
+      mismatchedTransportMode.validate(testValidationReport, validationContext);
     }
 
     return testValidationReport;

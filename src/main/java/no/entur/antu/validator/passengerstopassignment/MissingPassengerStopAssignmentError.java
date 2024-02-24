@@ -10,7 +10,7 @@ public record MissingPassengerStopAssignmentError(
   implements ValidationError {
   public enum RuleCode implements no.entur.antu.validator.RuleCode {
     MISSING_SCHEDULED_STOP_ASSIGNMENT(
-      "Missing ScheduledStopAssignment for StopPointInJourneyPattern, while the ServiceJourney exists"
+      "Missing ScheduledStopAssignment for StopPointInJourneyPattern"
     );
 
     private final String errorMessage;
@@ -37,6 +37,10 @@ public record MissingPassengerStopAssignmentError(
 
   @Override
   public String validationReportEntryMessage() {
-    return ruleCode.getErrorMessage();
+    return (
+      ruleCode.getErrorMessage() +
+      "with ScheduledStopPointRef = " +
+      scheduleStoPointRef
+    );
   }
 }

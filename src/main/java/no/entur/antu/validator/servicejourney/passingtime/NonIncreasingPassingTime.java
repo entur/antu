@@ -3,7 +3,7 @@ package no.entur.antu.validator.servicejourney.passingtime;
 import java.util.List;
 import java.util.function.Consumer;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.stoptime.SortedStopTimes;
+import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
 import no.entur.antu.validator.AntuNetexValidator;
 import no.entur.antu.validator.RuleCode;
@@ -91,10 +91,11 @@ public class NonIncreasingPassingTime extends AntuNetexValidator {
     NetexEntitiesIndex netexEntitiesIndex,
     Consumer<ValidationError> reportError
   ) {
-    List<StopTime> sortedTimetabledPassingTime = SortedStopTimes.from(
-      serviceJourney,
-      netexEntitiesIndex
-    );
+    List<StopTime> sortedTimetabledPassingTime =
+      SortStopTimesUtil.createSortedStopTimes(
+        serviceJourney,
+        netexEntitiesIndex
+      );
 
     var previousPassingTime = sortedTimetabledPassingTime.get(0);
     if (
