@@ -23,11 +23,11 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.NetexValidatorRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validator.id.NetexIdValidator;
-import no.entur.antu.validator.nonincreasingpassingtime.NonIncreasingPassingTimeValidator;
-import no.entur.antu.validator.servicelinksvalidator.ServiceLinksValidator;
-import no.entur.antu.validator.speedvalidator.SpeedValidator;
-import no.entur.antu.validator.stoppointinjourneypatternvalidator.StopPointInJourneyPatternValidator;
-import no.entur.antu.validator.transportmodevalidator.TransportModeValidator;
+import no.entur.antu.validator.passengerstopassignment.MissingPassengerStopAssignment;
+import no.entur.antu.validator.servicejourney.passingtime.NonIncreasingPassingTime;
+import no.entur.antu.validator.servicejourney.speed.UnexpectedSpeed;
+import no.entur.antu.validator.servicejourney.transportmode.MismatchedTransportMode;
+import no.entur.antu.validator.servicelink.InvalidServiceLinks;
 import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
@@ -69,14 +69,14 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public TransportModeValidator transportModeValidator(
+  public MismatchedTransportMode transportModeValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new TransportModeValidator(
+    return new MismatchedTransportMode(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -84,23 +84,23 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator(
+  public NonIncreasingPassingTime nonIncreasingPassingTimeValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new NonIncreasingPassingTimeValidator(validationReportEntryFactory);
+    return new NonIncreasingPassingTime(validationReportEntryFactory);
   }
 
   @Bean
-  public SpeedValidator speedValidator(
+  public UnexpectedSpeed speedValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new SpeedValidator(
+    return new UnexpectedSpeed(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -108,27 +108,27 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator(
+  public MissingPassengerStopAssignment stopPointInJourneyPatternValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository
   ) {
-    return new StopPointInJourneyPatternValidator(
+    return new MissingPassengerStopAssignment(
       validationReportEntryFactory,
       commonDataRepository
     );
   }
 
   @Bean
-  public ServiceLinksValidator serviceLinksValidator(
+  public InvalidServiceLinks serviceLinksValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new ServiceLinksValidator(
+    return new InvalidServiceLinks(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -147,11 +147,11 @@ public class TimetableDataValidatorConfig {
     @Qualifier(
       "netexIdUniquenessValidator"
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
-    TransportModeValidator transportModeValidator,
-    NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator,
-    SpeedValidator speedValidator,
-    StopPointInJourneyPatternValidator stopPointInJourneyPatternValidator,
-    ServiceLinksValidator serviceLinksValidator
+    MismatchedTransportMode mismatchedTransportMode,
+    NonIncreasingPassingTime nonIncreasingPassingTime,
+    UnexpectedSpeed unexpectedSpeed,
+    MissingPassengerStopAssignment missingPassengerStopAssignment,
+    InvalidServiceLinks invalidServiceLinks
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -161,11 +161,11 @@ public class TimetableDataValidatorConfig {
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
       netexIdUniquenessValidator,
-      transportModeValidator,
-      nonIncreasingPassingTimeValidator,
-      speedValidator,
-      stopPointInJourneyPatternValidator,
-      serviceLinksValidator
+      mismatchedTransportMode,
+      nonIncreasingPassingTime,
+      unexpectedSpeed,
+      missingPassengerStopAssignment,
+      invalidServiceLinks
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorRunnerWithNetexEntitiesIndex(

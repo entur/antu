@@ -5,9 +5,12 @@ import no.entur.antu.model.QuayId;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.client.handler.State;
 import org.redisson.client.protocol.Decoder;
-import org.springframework.stereotype.Component;
 
-@Component
+/**
+ * Codec for QuayId.
+ * This codec is used to decode QuayId from Redis cache.
+ * Encoding is done by the toString method in QuayId.
+ */
 public class QuayIdCodec extends StringCodec {
 
   @Override

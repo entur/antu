@@ -9,8 +9,14 @@ import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
 
+/**
+ * Extends the ValidationContext with NetexEntitiesIndex, which is the in memory index of the Netex dataset.
+ */
 public class ValidationContextWithNetexEntitiesIndex extends ValidationContext {
 
+  /**
+   * The supplier of the NetexEntitiesIndex.
+   */
   private final Supplier<NetexEntitiesIndex> getNetexEntitiesIndex;
   private NetexEntitiesIndex netexEntitiesIndex;
 
@@ -27,6 +33,10 @@ public class ValidationContextWithNetexEntitiesIndex extends ValidationContext {
     this.getNetexEntitiesIndex = getNetexEntitiesIndex;
   }
 
+  /**
+   * Gets the NetexEntitiesIndex.
+   * @return the NetexEntitiesIndex
+   */
   public NetexEntitiesIndex getNetexEntitiesIndex() {
     if (netexEntitiesIndex == null) {
       netexEntitiesIndex = this.getNetexEntitiesIndex.get();
