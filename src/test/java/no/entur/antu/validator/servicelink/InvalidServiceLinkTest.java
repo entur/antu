@@ -13,7 +13,7 @@ import java.util.Optional;
 import net.opengis.gml._3.DirectPositionType;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
@@ -40,8 +40,8 @@ class InvalidServiceLinkTest {
         61.153331,
         10.388738
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -56,8 +56,8 @@ class InvalidServiceLinkTest {
         new DirectPositionType().withValue(List.of(61.153303, 10.389576)),
         new DirectPositionType().withValue(List.of(61.153328, 10.388828))
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -76,8 +76,8 @@ class InvalidServiceLinkTest {
         61.153642,
         10.388738
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -104,8 +104,8 @@ class InvalidServiceLinkTest {
         new DirectPositionType().withValue(List.of(61.153303, 10.389576)),
         new DirectPositionType().withValue(List.of(61.153328, 10.388828))
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -136,8 +136,8 @@ class InvalidServiceLinkTest {
         61.153642,
         10.399738
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -164,8 +164,8 @@ class InvalidServiceLinkTest {
         new DirectPositionType().withValue(List.of(61.153303, 10.389576)),
         new DirectPositionType().withValue(List.of(61.153328, 10.388828))
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -196,8 +196,8 @@ class InvalidServiceLinkTest {
         61.153642,
         10.388738
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(2));
@@ -236,8 +236,8 @@ class InvalidServiceLinkTest {
         new DirectPositionType().withValue(List.of(61.153303, 10.389576)),
         new DirectPositionType().withValue(List.of(61.156328, 10.388828))
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(2));
@@ -271,8 +271,8 @@ class InvalidServiceLinkTest {
   void oddNumberOfCoordinatesInLineStringShouldBeIgnored() {
     ValidationReport validationReport = runTestWith(
       List.of(61.153299, 10.389718, 10.388828, 61.153642, 10.399738),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -282,8 +282,8 @@ class InvalidServiceLinkTest {
   void lessThanFourCoordinatesPointsInLineStringShouldBeIgnored() {
     ValidationReport validationReport = runTestWith(
       List.of(61.153299, 10.389718),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -302,15 +302,15 @@ class InvalidServiceLinkTest {
         61.153331,
         10.388738
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
 
   @Test
-  void validationShouldBeIgnoredIfThereAreNoStopPlaceCoordinates() {
+  void validationShouldBeIgnoredIfThereAreNoQuayCoordinates() {
     ValidationReport validationReport = runTestWith(
       List.of(
         61.153299,
@@ -333,8 +333,8 @@ class InvalidServiceLinkTest {
   void validationShouldBeIgnoredInCaseOfInvalidLineStringWithLessThenThreeCoordinates() {
     ValidationReport validationReport = runTestWith(
       List.of(61.153299, 10.389718, 61.153299),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -352,8 +352,8 @@ class InvalidServiceLinkTest {
         10.388828,
         61.153331
       ),
-      new StopPlaceCoordinates(10.389718, 61.153299),
-      new StopPlaceCoordinates(10.388738, 61.153331)
+      new QuayCoordinates(10.389718, 61.153299),
+      new QuayCoordinates(10.388738, 61.153331)
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -374,8 +374,8 @@ class InvalidServiceLinkTest {
 
   private static ValidationReport runTestWithDirectPositionType(
     List<DirectPositionType> lineStringCoordinates,
-    StopPlaceCoordinates fromStopPlaceCoordinates,
-    StopPlaceCoordinates toStopPlaceCoordinates
+    QuayCoordinates fromQuayCoordinates,
+    QuayCoordinates toQuayCoordinates
   ) {
     String fromStopPointId = "TST:ScheduledStopPointId:1";
     String toStopPointId = "TST:ScheduledStopPointId:2";
@@ -415,11 +415,11 @@ class InvalidServiceLinkTest {
 
     Mockito
       .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId1))
-      .thenReturn(fromStopPlaceCoordinates);
+      .thenReturn(fromQuayCoordinates);
 
     Mockito
       .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId2))
-      .thenReturn(toStopPlaceCoordinates);
+      .thenReturn(toQuayCoordinates);
 
     return setupAndRunValidation(
       testData.netexEntitiesIndex(serviceLink).create(),
@@ -430,8 +430,8 @@ class InvalidServiceLinkTest {
 
   private static ValidationReport runTestWith(
     List<Double> lineStringCoordinates,
-    StopPlaceCoordinates fromStopPlaceCoordinates,
-    StopPlaceCoordinates toStopPlaceCoordinates
+    QuayCoordinates fromQuayCoordinates,
+    QuayCoordinates toQuayCoordinates
   ) {
     String fromStopPointId = "TST:ScheduledStopPointId:1";
     String toStopPointId = "TST:ScheduledStopPointId:2";
@@ -471,11 +471,11 @@ class InvalidServiceLinkTest {
 
     Mockito
       .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId1))
-      .thenReturn(fromStopPlaceCoordinates);
+      .thenReturn(fromQuayCoordinates);
 
     Mockito
       .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId2))
-      .thenReturn(toStopPlaceCoordinates);
+      .thenReturn(toQuayCoordinates);
 
     return setupAndRunValidation(
       testData.netexEntitiesIndex(serviceLink).create(),

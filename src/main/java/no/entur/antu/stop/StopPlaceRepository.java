@@ -16,7 +16,7 @@
 package no.entur.antu.stop;
 
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
 
@@ -46,7 +46,7 @@ public interface StopPlaceRepository {
    * Returns the coordinates for quay id present in the cache or try getting it from Read api.
    * @return coordinates for given stop place id.
    */
-  StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId);
+  QuayCoordinates getCoordinatesForQuayId(QuayId quayId);
 
   /**
    * Refresh the cache with data retrieved from the Stop Place Register.
