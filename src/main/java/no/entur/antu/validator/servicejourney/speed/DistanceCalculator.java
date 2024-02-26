@@ -3,7 +3,7 @@ package no.entur.antu.validator.servicejourney.speed;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.StopTime;
 
@@ -13,7 +13,7 @@ public class DistanceCalculator {
 
   public double calculateDistance(
     PassingTimes passingTimes,
-    Function<StopTime, StopPlaceCoordinates> getStopPlaceCoordinates
+    Function<StopTime, QuayCoordinates> getStopPlaceCoordinates
   ) {
     return calculateDistance(
       passingTimes.from().timetabledPassingTimeId(),
@@ -25,9 +25,9 @@ public class DistanceCalculator {
 
   private double calculateDistance(
     String previousTimetabledPassingTimeId,
-    StopPlaceCoordinates previousStopPlaceCoordinates,
+    QuayCoordinates previousQuayCoordinates,
     String currentTimetabledPassingTimeId,
-    StopPlaceCoordinates currentStopPlaceCoordinates
+    QuayCoordinates currentQuayCoordinates
   ) {
     String key =
       previousTimetabledPassingTimeId + "#" + currentTimetabledPassingTimeId;
@@ -44,8 +44,8 @@ public class DistanceCalculator {
     }
 
     double distance = calculateDistanceWithHaversineFormula(
-      previousStopPlaceCoordinates,
-      currentStopPlaceCoordinates
+      previousQuayCoordinates,
+      currentQuayCoordinates
     );
 
     distances.put(key, distance);
@@ -58,9 +58,9 @@ public class DistanceCalculator {
    * Haversine formula to find distance between two points on a sphere
    * </a>
    */
-  private static double calculateDistanceWithHaversineFormula(
-    StopPlaceCoordinates from,
-    StopPlaceCoordinates to
+  public static double calculateDistanceWithHaversineFormula(
+    QuayCoordinates from,
+    QuayCoordinates to
   ) {
     // distance between latitudes and longitudes
     double distanceLatitude = Math.toRadians(to.latitude() - from.latitude());

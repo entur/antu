@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.StopTime;
@@ -25,13 +25,13 @@ import org.slf4j.LoggerFactory;
 public record UnexpectedSpeedContext(
   ServiceJourney serviceJourney,
   AllVehicleModesOfTransportEnumeration transportMode,
-  Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId,
+  Map<String, QuayCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId,
   DistanceCalculator distanceCalculator
 ) {
   public UnexpectedSpeedContext(
     ServiceJourney serviceJourney,
     AllVehicleModesOfTransportEnumeration transportMode,
-    Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId
+    Map<String, QuayCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId
   ) {
     this(
       serviceJourney,
@@ -63,7 +63,7 @@ public record UnexpectedSpeedContext(
     );
   }
 
-  private StopPlaceCoordinates getCoordinates(StopTime passingTime) {
+  private QuayCoordinates getCoordinates(StopTime passingTime) {
     return stopPlaceCoordinatesPerTimetabledPassingTimeId.get(
       passingTime.timetabledPassingTimeId()
     );
@@ -95,7 +95,7 @@ public record UnexpectedSpeedContext(
         .getJourneyPatternRef()
         .getValue()
         .getRef();
-      Map<String, StopPlaceCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId =
+      Map<String, QuayCoordinates> stopPlaceCoordinatesPerTimetabledPassingTimeId =
         serviceJourney
           .getPassingTimes()
           .getTimetabledPassingTime()
@@ -162,7 +162,7 @@ public record UnexpectedSpeedContext(
       return transportMode;
     }
 
-    private Map.Entry<String, StopPlaceCoordinates> findStopPlaceCoordinates(
+    private Map.Entry<String, QuayCoordinates> findStopPlaceCoordinates(
       TimetabledPassingTime timetabledPassingTime,
       String journeyPatternRef
     ) {
@@ -202,7 +202,7 @@ public record UnexpectedSpeedContext(
           return null;
         }
 
-        StopPlaceCoordinates coordinatesForQuayId =
+        QuayCoordinates coordinatesForQuayId =
           stopPlaceRepository.getCoordinatesForQuayId(quayId);
         return coordinatesForQuayId == null
           ? null

@@ -11,7 +11,7 @@ import no.entur.antu.codec.QuayIdCodec;
 import no.entur.antu.codec.StopPlaceCoordinatesCodec;
 import no.entur.antu.codec.TransportModesCodec;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
@@ -118,7 +118,7 @@ public class CacheConfig {
   }
 
   @Bean(name = COORDINATES_PER_QUAY_ID_CACHE)
-  public Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache(
+  public Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache(
     RedissonClient redissonClient
   ) {
     return redissonClient.getLocalCachedMap(

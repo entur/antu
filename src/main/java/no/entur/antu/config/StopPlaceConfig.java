@@ -23,7 +23,7 @@ import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE
 import java.util.Map;
 import java.util.Set;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.DefaultStopPlaceResource;
@@ -69,7 +69,7 @@ public class StopPlaceConfig {
     @Qualifier(QUAY_ID_NOT_FOUND_CACHE) Set<QuayId> quayIdNotFoundCache,
     @Qualifier(
       COORDINATES_PER_QUAY_ID_CACHE
-    ) Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
+    ) Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
     @Qualifier(
       "stopPlaceResource"
     ) DefaultStopPlaceResource defaultStopPlaceResource

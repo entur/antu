@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.function.Function;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
@@ -44,7 +44,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   private final Map<String, Set<String>> stopPlaceCache;
   private final Set<QuayId> quayIdNotFoundCache;
   private final Map<QuayId, TransportModes> transportModesForQuayIdCache;
-  private final Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache;
+  private final Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache;
   private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
   private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
   private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
@@ -54,7 +54,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     Map<String, Set<String>> stopPlaceCache,
     Set<QuayId> quayIdNotFoundCache,
     Map<QuayId, TransportModes> transportModesForQuayIdCache,
-    Map<QuayId, StopPlaceCoordinates> coordinatesPerQuayIdCache,
+    Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
     NetexEntityFetcher<Quay, QuayId> quayFetcher,
     NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
     NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher
@@ -119,11 +119,11 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   }
 
   @Override
-  public StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId) {
+  public QuayCoordinates getCoordinatesForQuayId(QuayId quayId) {
     return getDataForQuayId(
       quayId,
       coordinatesPerQuayIdCache,
-      StopPlaceCoordinates::of
+      QuayCoordinates::of
     );
   }
 

@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.model.TransportSubMode;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
@@ -62,7 +62,7 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
   }
 
   @Override
-  public Map<QuayId, StopPlaceCoordinates> getCoordinatesPerQuayId() {
+  public Map<QuayId, QuayCoordinates> getCoordinatesPerQuayId() {
     return getDataPerQuayId(this::getQuayCoordinatesEntries);
   }
 
@@ -93,9 +93,9 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
   ) {
     return makeQuayIdMapEntries(
       stopPlace,
-      quayId ->
+      quay ->
         Map.entry(
-          quayId,
+          QuayId.of(quay),
           new TransportModes(
             stopPlace.getTransportMode(),
             TransportSubMode.of(stopPlace).orElse(null)
@@ -104,17 +104,17 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
     );
   }
 
-  public List<Map.Entry<QuayId, StopPlaceCoordinates>> getQuayCoordinatesEntries(
+  private List<Map.Entry<QuayId, QuayCoordinates>> getQuayCoordinatesEntries(
     StopPlace stopPlace
   ) {
     return makeQuayIdMapEntries(
       stopPlace,
-      quayId -> {
-        StopPlaceCoordinates stopPlaceCoordinates = StopPlaceCoordinates.of(
-          stopPlace
+      quay -> {
+        QuayCoordinates quayCoordinates = QuayCoordinates.of(
+          quay
         );
-        if (stopPlaceCoordinates != null) {
-          return Map.entry(quayId, stopPlaceCoordinates);
+        if (quayCoordinates != null) {
+          return Map.entry(QuayId.of(quay), quayCoordinates);
         }
         return null;
       }
@@ -123,7 +123,7 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
 
   private <D> List<Map.Entry<QuayId, D>> makeQuayIdMapEntries(
     StopPlace stopPlace,
-    Function<QuayId, Map.Entry<QuayId, D>> entryFunction
+    Function<Quay, Map.Entry<QuayId, D>> entryFunction
   ) {
     return stopPlace
       .getQuays()
@@ -132,8 +132,6 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
       .map(JAXBElement::getValue)
       .filter(Quay.class::isInstance)
       .map(Quay.class::cast)
-      .map(Quay::getId)
-      .map(QuayId::new)
       .map(entryFunction)
       .filter(Objects::nonNull)
       .toList();
