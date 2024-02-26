@@ -1,8 +1,8 @@
 package no.entur.antu.validator.id;
 
 import java.util.Set;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.StopPlaceRepository;
@@ -36,7 +36,7 @@ class ReferenceToNsrValidatorTest {
       }
 
       @Override
-      public StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId) {
+      public QuayCoordinates getCoordinatesForQuayId(QuayId quayId) {
         return null;
       }
 

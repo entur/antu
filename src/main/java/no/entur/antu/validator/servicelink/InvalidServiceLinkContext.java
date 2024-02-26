@@ -9,8 +9,8 @@ import java.util.Optional;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 public record InvalidServiceLinkContext(
   ServiceLink serviceLink,
   LineString lineString,
-  StopPlaceCoordinates from,
-  StopPlaceCoordinates to
+  QuayCoordinates from,
+  QuayCoordinates to
 ) {
   public static final class Builder {
 
@@ -66,10 +66,10 @@ public record InvalidServiceLinkContext(
         return null;
       }
 
-      StopPlaceCoordinates from = stopPlaceRepository.getCoordinatesForQuayId(
+      QuayCoordinates from = stopPlaceRepository.getCoordinatesForQuayId(
         fromQuayId
       );
-      StopPlaceCoordinates to = stopPlaceRepository.getCoordinatesForQuayId(
+      QuayCoordinates to = stopPlaceRepository.getCoordinatesForQuayId(
         toQuayId
       );
 

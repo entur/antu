@@ -3,8 +3,8 @@ package no.entur.antu.config;
 import java.util.Collections;
 import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.organisation.OrganisationRepository;
@@ -84,8 +84,8 @@ public class TestConfig {
       }
 
       @Override
-      public StopPlaceCoordinates getCoordinatesForQuayId(QuayId quayId) {
-        return new StopPlaceCoordinates(0, 0);
+      public QuayCoordinates getCoordinatesForQuayId(QuayId quayId) {
+        return new QuayCoordinates(0, 0);
       }
 
       @Override

@@ -3,13 +3,25 @@ package no.entur.antu.model;
 import no.entur.antu.exception.AntuException;
 import org.locationtech.jts.geom.Coordinate;
 import org.rutebanken.netex.model.LocationStructure;
+import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 
-public record StopPlaceCoordinates(double longitude, double latitude) {
-  public static StopPlaceCoordinates of(StopPlace stopPlace) {
+public record QuayCoordinates(double longitude, double latitude) {
+  public static QuayCoordinates of(StopPlace stopPlace) {
     if (stopPlace != null && stopPlace.getCentroid() != null) {
       LocationStructure location = stopPlace.getCentroid().getLocation();
-      return new StopPlaceCoordinates(
+      return new QuayCoordinates(
+        location.getLongitude().doubleValue(),
+        location.getLatitude().doubleValue()
+      );
+    }
+    return null;
+  }
+
+  public static QuayCoordinates of(Quay quay) {
+    if (quay != null && quay.getCentroid() != null) {
+      LocationStructure location = quay.getCentroid().getLocation();
+      return new QuayCoordinates(
         location.getLongitude().doubleValue(),
         location.getLatitude().doubleValue()
       );
@@ -35,17 +47,17 @@ public record StopPlaceCoordinates(double longitude, double latitude) {
    * Used to decode data stored in redis.
    * Caution: Changes in this method can effect data stored in redis.
    */
-  public static StopPlaceCoordinates fromString(String stopPlaceCoordinates) {
-    if (stopPlaceCoordinates != null) {
-      String[] split = stopPlaceCoordinates.split("§");
+  public static QuayCoordinates fromString(String quayCoordinates) {
+    if (quayCoordinates != null) {
+      String[] split = quayCoordinates.split("§");
       if (split.length == 2) {
-        return new StopPlaceCoordinates(
+        return new QuayCoordinates(
           Double.parseDouble(split[0]),
           Double.parseDouble(split[1])
         );
       } else {
         throw new AntuException(
-          "Invalid stopPlaceCoordinates string: " + stopPlaceCoordinates
+          "Invalid quayCoordinates string: " + quayCoordinates
         );
       }
     }

@@ -2,8 +2,8 @@ package no.entur.antu.stop;
 
 import java.util.Map;
 import java.util.Set;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.model.TransportModes;
 
 /**
@@ -36,7 +36,7 @@ public interface StopPlaceResource {
    *
    * @return map of quay ids and coordinates.
    */
-  Map<QuayId, StopPlaceCoordinates> getCoordinatesPerQuayId();
+  Map<QuayId, QuayCoordinates> getCoordinatesPerQuayId();
 
   void loadStopPlacesDataset();
 }
