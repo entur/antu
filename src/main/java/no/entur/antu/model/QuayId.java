@@ -2,6 +2,7 @@ package no.entur.antu.model;
 
 import java.util.Objects;
 import no.entur.antu.exception.AntuException;
+import org.rutebanken.netex.model.Quay;
 
 public record QuayId(String id) {
   public QuayId {
@@ -9,6 +10,10 @@ public record QuayId(String id) {
     if (!isValid(id)) {
       throw new AntuException("Invalid quay id: " + id);
     }
+  }
+
+  public static QuayId of(Quay quay) {
+    return new QuayId(quay.getId());
   }
 
   public static QuayId ofNullable(String id) {

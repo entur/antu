@@ -671,11 +671,7 @@ class MismatchedTransportModeTest {
         .stream()
         .findFirst()
         .map(ValidationReportEntry::getMessage),
-      is(
-        Optional.of(
-          "Invalid transport mode TAXI"
-        )
-      )
+      is(Optional.of("Invalid transport mode TAXI"))
     );
   }
 
@@ -784,11 +780,7 @@ class MismatchedTransportModeTest {
         .stream()
         .findFirst()
         .map(ValidationReportEntry::getMessage),
-      is(
-        Optional.of(
-          "Invalid transport mode METRO"
-        )
-      )
+      is(Optional.of("Invalid transport mode METRO"))
     );
   }
 

@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceCoordinates;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
@@ -25,12 +25,12 @@ class UnexpectedSpeedTest {
 
   @Test
   void normalSpeedShouldNotReturnAnyValidationEntry() {
-    ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+    ValidationReport validationReport = runTestWithQuayCoordinates(
       List.of(
-        new StopPlaceCoordinates(6.621791, 60.424023),
-        new StopPlaceCoordinates(6.612112, 60.471748),
-        new StopPlaceCoordinates(6.622312, 60.481548),
-        new StopPlaceCoordinates(6.632312, 60.491548)
+        new QuayCoordinates(6.621791, 60.424023),
+        new QuayCoordinates(6.612112, 60.471748),
+        new QuayCoordinates(6.622312, 60.481548),
+        new QuayCoordinates(6.632312, 60.491548)
       )
     );
 
@@ -39,12 +39,12 @@ class UnexpectedSpeedTest {
 
   @Test
   void lowSpeedShouldReturnValidationEntryForLowSpeed() {
-    ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+    ValidationReport validationReport = runTestWithQuayCoordinates(
       List.of(
-        new StopPlaceCoordinates(6.621791, 60.424023),
-        new StopPlaceCoordinates(6.612112, 60.471748),
-        new StopPlaceCoordinates(6.612312, 60.471548),
-        new StopPlaceCoordinates(6.632312, 60.491548)
+        new QuayCoordinates(6.621791, 60.424023),
+        new QuayCoordinates(6.612112, 60.471748),
+        new QuayCoordinates(6.612312, 60.471548),
+        new QuayCoordinates(6.632312, 60.491548)
       )
     );
 
@@ -62,12 +62,12 @@ class UnexpectedSpeedTest {
 
   @Test
   void highSpeedShouldReturnValidationEntryForHighSpeed() {
-    ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+    ValidationReport validationReport = runTestWithQuayCoordinates(
       List.of(
-        new StopPlaceCoordinates(6.621791, 60.424023),
-        new StopPlaceCoordinates(6.612112, 60.471748),
-        new StopPlaceCoordinates(6.602312, 60.471548),
-        new StopPlaceCoordinates(6.592312, 61.491548)
+        new QuayCoordinates(6.621791, 60.424023),
+        new QuayCoordinates(6.612112, 60.471748),
+        new QuayCoordinates(6.602312, 60.471548),
+        new QuayCoordinates(6.592312, 61.491548)
       )
     );
 
@@ -85,12 +85,12 @@ class UnexpectedSpeedTest {
 
   @Test
   void warningSpeedShouldReturnValidationEntryForHighSpeed() {
-    ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+    ValidationReport validationReport = runTestWithQuayCoordinates(
       List.of(
-        new StopPlaceCoordinates(6.621791, 60.424023),
-        new StopPlaceCoordinates(6.612112, 60.471748),
-        new StopPlaceCoordinates(6.602312, 60.471548),
-        new StopPlaceCoordinates(6.592312, 60.551548)
+        new QuayCoordinates(6.621791, 60.424023),
+        new QuayCoordinates(6.612112, 60.471748),
+        new QuayCoordinates(6.602312, 60.471548),
+        new QuayCoordinates(6.592312, 60.551548)
       )
     );
 
@@ -108,12 +108,12 @@ class UnexpectedSpeedTest {
 
   @Test
   void multipleSpeedViolationShouldBeDetected() {
-    ValidationReport validationReport = runTestWithStopPlaceCoordinates(
+    ValidationReport validationReport = runTestWithQuayCoordinates(
       List.of(
-        new StopPlaceCoordinates(6.621791, 60.424023),
-        new StopPlaceCoordinates(6.612112, 60.471748),
-        new StopPlaceCoordinates(6.612312, 60.471548),
-        new StopPlaceCoordinates(6.592312, 61.491548)
+        new QuayCoordinates(6.621791, 60.424023),
+        new QuayCoordinates(6.612112, 60.471748),
+        new QuayCoordinates(6.612312, 60.471548),
+        new QuayCoordinates(6.592312, 61.491548)
       )
     );
 
@@ -153,8 +153,8 @@ class UnexpectedSpeedTest {
 
     ValidationReport validationReport = runTestWith(
       List.of(
-        new StopPlaceCoordinates(6.622312, 60.481548),
-        new StopPlaceCoordinates(6.632312, 60.491548)
+        new QuayCoordinates(6.622312, 60.481548),
+        new QuayCoordinates(6.632312, 60.491548)
       ),
       testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
     );
@@ -176,11 +176,11 @@ class UnexpectedSpeedTest {
 
   @Test
   void testPassengerStopAssignmentsInLineFileAndNotOnCommonFileShouldBeOk() {
-    List<StopPlaceCoordinates> stopPlaceCoordinates = List.of(
-      new StopPlaceCoordinates(6.621791, 60.424023),
-      new StopPlaceCoordinates(6.612112, 60.471748),
-      new StopPlaceCoordinates(6.622312, 60.481548),
-      new StopPlaceCoordinates(6.632312, 60.491548)
+    List<QuayCoordinates> quayCoordinates = List.of(
+      new QuayCoordinates(6.621791, 60.424023),
+      new QuayCoordinates(6.612112, 60.471748),
+      new QuayCoordinates(6.622312, 60.481548),
+      new QuayCoordinates(6.632312, 60.491548)
     );
 
     NetexTestFragment testData = new NetexTestFragment();
@@ -200,7 +200,7 @@ class UnexpectedSpeedTest {
       StopPlaceRepository.class
     );
 
-    for (int i = 0; i < stopPlaceCoordinates.size(); i++) {
+    for (int i = 0; i < quayCoordinates.size(); i++) {
       QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
 
       Mockito
@@ -208,7 +208,7 @@ class UnexpectedSpeedTest {
         .thenReturn(false);
       Mockito
         .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
-        .thenReturn(stopPlaceCoordinates.get(i));
+        .thenReturn(quayCoordinates.get(i));
 
       PassengerStopAssignment passengerStopAssignment = testData
         .passengerStopAssignment()
@@ -263,8 +263,8 @@ class UnexpectedSpeedTest {
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
 
-  private static ValidationReport runTestWithStopPlaceCoordinates(
-    List<StopPlaceCoordinates> stopPlaceCoordinates
+  private static ValidationReport runTestWithQuayCoordinates(
+    List<QuayCoordinates> quayCoordinates
   ) {
     NetexTestFragment testData = new NetexTestFragment();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
@@ -274,13 +274,13 @@ class UnexpectedSpeedTest {
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
     return runTestWith(
-      stopPlaceCoordinates,
+      quayCoordinates,
       testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
     );
   }
 
   private static ValidationReport runTestWith(
-    List<StopPlaceCoordinates> stopPlaceCoordinates,
+    List<QuayCoordinates> quayCoordinates,
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     CommonDataRepository commonDataRepository = Mockito.mock(
@@ -290,7 +290,7 @@ class UnexpectedSpeedTest {
       StopPlaceRepository.class
     );
 
-    for (int i = 0; i < stopPlaceCoordinates.size(); i++) {
+    for (int i = 0; i < quayCoordinates.size(); i++) {
       QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
 
       Mockito
@@ -306,7 +306,7 @@ class UnexpectedSpeedTest {
         .thenReturn(true);
       Mockito
         .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
-        .thenReturn(stopPlaceCoordinates.get(i));
+        .thenReturn(quayCoordinates.get(i));
     }
 
     return setupAndRunValidation(
