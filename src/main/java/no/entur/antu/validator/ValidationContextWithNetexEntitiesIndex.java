@@ -1,6 +1,8 @@
 package no.entur.antu.validator;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import net.sf.saxon.s9api.XdmNode;
@@ -20,6 +22,8 @@ public class ValidationContextWithNetexEntitiesIndex extends ValidationContext {
   private final Supplier<NetexEntitiesIndex> getNetexEntitiesIndex;
   private NetexEntitiesIndex netexEntitiesIndex;
 
+  private Map<String, IdVersion> localIdsMap = new HashMap<>();
+
   public ValidationContextWithNetexEntitiesIndex(
     XdmNode document,
     NetexXMLParser netexXMLParser,
@@ -31,6 +35,12 @@ public class ValidationContextWithNetexEntitiesIndex extends ValidationContext {
   ) {
     super(document, netexXMLParser, codespace, fileName, localIds, localRefs);
     this.getNetexEntitiesIndex = getNetexEntitiesIndex;
+    localIds.forEach(idVersion -> localIdsMap.put(idVersion.getId(), idVersion)
+    );
+  }
+
+  public Map<String, IdVersion> getLocalIdsMap() {
+    return localIdsMap;
   }
 
   /**

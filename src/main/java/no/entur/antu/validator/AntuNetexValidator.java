@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.*;
+import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 
 public abstract class AntuNetexValidator extends AbstractNetexValidator {
@@ -35,6 +36,24 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     String entityId
   ) {
     String fileName = validationContext.getFileName();
+
+    if (
+      validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
+    ) {
+      IdVersion idVersion = validationContextWithNetexEntitiesIndex
+        .getLocalIdsMap()
+        .get(entityId);
+
+      return idVersion != null
+        ? new DataLocation(
+          idVersion.getId(),
+          validationContext.getFileName(),
+          idVersion.getLineNumber(),
+          idVersion.getColumnNumber()
+        )
+        : new DataLocation(entityId, fileName, 0, 0);
+    }
+
     return validationContext
       .getLocalIds()
       .stream()
