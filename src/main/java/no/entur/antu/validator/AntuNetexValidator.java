@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.*;
+import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 
 public abstract class AntuNetexValidator extends AbstractNetexValidator {
@@ -35,20 +36,19 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     String entityId
   ) {
     String fileName = validationContext.getFileName();
-    return validationContext
-      .getLocalIds()
-      .stream()
-      .filter(localId -> localId.getId().equals(entityId))
-      .findFirst()
-      .map(idVersion ->
-        new DataLocation(
-          idVersion.getId(),
-          fileName,
-          idVersion.getLineNumber(),
-          idVersion.getColumnNumber()
-        )
-      )
-      .orElse(new DataLocation(entityId, fileName, 0, 0));
+
+    IdVersion idVersion = validationContext
+      .getLocalIdsMap()
+      .get(entityId);
+
+    return idVersion != null
+      ? new DataLocation(
+      idVersion.getId(),
+      validationContext.getFileName(),
+      idVersion.getLineNumber(),
+      idVersion.getColumnNumber()
+    )
+      : new DataLocation(entityId, fileName, 0, 0);
   }
 
   @Override
@@ -56,7 +56,7 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     return Arrays
       .stream(getRuleCodes())
       .map(ruleCode ->
-        createRuleDescription(ruleCode.toString(), ruleCode.getErrorMessage())
+             createRuleDescription(ruleCode.toString(), ruleCode.getErrorMessage())
       )
       .collect(Collectors.toSet());
   }
