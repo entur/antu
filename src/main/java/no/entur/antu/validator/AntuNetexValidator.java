@@ -37,37 +37,18 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
   ) {
     String fileName = validationContext.getFileName();
 
-    if (
-      validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
-    ) {
-      IdVersion idVersion = validationContextWithNetexEntitiesIndex
-        .getLocalIdsMap()
-        .get(entityId);
+    IdVersion idVersion = validationContext
+      .getLocalIdsMap()
+      .get(entityId);
 
-      return idVersion != null
-        ? new DataLocation(
-          idVersion.getId(),
-          validationContext.getFileName(),
-          idVersion.getLineNumber(),
-          idVersion.getColumnNumber()
-        )
-        : new DataLocation(entityId, fileName, 0, 0);
-    }
-
-    return validationContext
-      .getLocalIds()
-      .stream()
-      .filter(localId -> localId.getId().equals(entityId))
-      .findFirst()
-      .map(idVersion ->
-        new DataLocation(
-          idVersion.getId(),
-          fileName,
-          idVersion.getLineNumber(),
-          idVersion.getColumnNumber()
-        )
-      )
-      .orElse(new DataLocation(entityId, fileName, 0, 0));
+    return idVersion != null
+      ? new DataLocation(
+      idVersion.getId(),
+      validationContext.getFileName(),
+      idVersion.getLineNumber(),
+      idVersion.getColumnNumber()
+    )
+      : new DataLocation(entityId, fileName, 0, 0);
   }
 
   @Override
@@ -75,7 +56,7 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     return Arrays
       .stream(getRuleCodes())
       .map(ruleCode ->
-        createRuleDescription(ruleCode.toString(), ruleCode.getErrorMessage())
+             createRuleDescription(ruleCode.toString(), ruleCode.getErrorMessage())
       )
       .collect(Collectors.toSet());
   }
