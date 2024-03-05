@@ -137,7 +137,7 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public SameStopPoints sameStopsInJourneyPatterns(
+  public SameStopPoints sameStopPoints(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory

@@ -74,7 +74,7 @@ public class SameStopPoints extends AntuNetexValidator {
         );
     } else {
       throw new AntuException(
-        "Received invalid validation context in Validating duplicate Stops In Journey Patterns"
+        "Received invalid validation context in Validating same stop points in journey patterns"
       );
     }
   }
