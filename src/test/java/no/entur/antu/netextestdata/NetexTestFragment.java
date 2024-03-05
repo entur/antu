@@ -98,6 +98,10 @@ public class NetexTestFragment {
     return new CreateStopPointInJourneyPattern(journeyPatternId);
   }
 
+  public CreateLinkInJourneyPattern linkInJourneyPattern(int journeyPatternId) {
+    return new CreateLinkInJourneyPattern(journeyPatternId);
+  }
+
   public CreatePassengerStopAssignment passengerStopAssignment() {
     return new CreatePassengerStopAssignment();
   }
@@ -230,7 +234,13 @@ public class NetexTestFragment {
     private int routeId = 1;
     private int id = 1;
     private int numberOfStopPointInJourneyPattern = 4;
-    List<PointInLinkSequence_VersionedChildStructure> pointsInLink =
+
+    private int numberOfServiceLinksInJourneyPattern = 3;
+
+    List<PointInLinkSequence_VersionedChildStructure> pointsInSequence =
+      new ArrayList<>();
+
+    List<LinkInLinkSequence_VersionedChildStructure> linkInSequence =
       new ArrayList<>();
 
     public CreateJourneyPattern withId(int id) {
@@ -251,13 +261,32 @@ public class NetexTestFragment {
       return this;
     }
 
+    public CreateJourneyPattern withNumberOfServiceLinksInJourneyPattern(
+      int numberOfServiceLinksInJourneyPattern
+    ) {
+      this.numberOfServiceLinksInJourneyPattern =
+        numberOfServiceLinksInJourneyPattern;
+      return this;
+    }
+
     public CreateJourneyPattern withStopPointsInJourneyPattern(
       List<StopPointInJourneyPattern> stopPointsInJourneyPattern
     ) {
-      this.pointsInLink =
+      this.pointsInSequence =
         stopPointsInJourneyPattern
           .stream()
           .map(PointInLinkSequence_VersionedChildStructure.class::cast)
+          .toList();
+      return this;
+    }
+
+    public CreateJourneyPattern withServiceLinksInJourneyPattern(
+      List<LinkInJourneyPattern> linksInJourneyPattern
+    ) {
+      this.linkInSequence =
+        linksInJourneyPattern
+          .stream()
+          .map(LinkInLinkSequence_VersionedChildStructure.class::cast)
           .toList();
       return this;
     }
@@ -266,20 +295,35 @@ public class NetexTestFragment {
       RouteRefStructure routeRef = new RouteRefStructure()
         .withRef("TST:Route:" + routeId);
 
-      return new JourneyPattern()
+      JourneyPattern journeyPattern = new JourneyPattern()
         .withId("TST:JourneyPattern:" + id)
         .withRouteRef(routeRef)
         .withPointsInSequence(
           new PointsInJourneyPattern_RelStructure()
             .withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
-              this.pointsInLink.isEmpty()
-                ? createPointsInLink(numberOfStopPointInJourneyPattern)
-                : this.pointsInLink
+              this.pointsInSequence.isEmpty() &&
+                numberOfStopPointInJourneyPattern > 0
+                ? createPointsInLinkSequence(numberOfStopPointInJourneyPattern)
+                : this.pointsInSequence
             )
         );
+
+      if (numberOfServiceLinksInJourneyPattern > 0) {
+        journeyPattern.withLinksInSequence(
+          new LinksInJourneyPattern_RelStructure()
+            .withServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern(
+              this.linkInSequence.isEmpty()
+                ? createLinksInLinkSequence(
+                  numberOfServiceLinksInJourneyPattern
+                )
+                : this.linkInSequence
+            )
+        );
+      }
+      return journeyPattern;
     }
 
-    private List<PointInLinkSequence_VersionedChildStructure> createPointsInLink(
+    private List<PointInLinkSequence_VersionedChildStructure> createPointsInLinkSequence(
       int numberOfStopPointInJourneyPattern
     ) {
       return IntStream
@@ -299,6 +343,24 @@ public class NetexTestFragment {
           return createStopPointInJourneyPattern.create();
         })
         .map(PointInLinkSequence_VersionedChildStructure.class::cast)
+        .toList();
+    }
+
+    private List<LinkInLinkSequence_VersionedChildStructure> createLinksInLinkSequence(
+      int numberOfStopPointInJourneyPattern
+    ) {
+      return IntStream
+        .range(0, numberOfStopPointInJourneyPattern)
+        .mapToObj(index -> {
+          CreateLinkInJourneyPattern createLinkInJourneyPattern =
+            new CreateLinkInJourneyPattern(id)
+              .withId(index + 1)
+              .withOrder(index + 1)
+              .withServiceLinkId(index + 1);
+
+          return createLinkInJourneyPattern.create();
+        })
+        .map(LinkInLinkSequence_VersionedChildStructure.class::cast)
         .toList();
     }
   }
@@ -360,6 +422,43 @@ public class NetexTestFragment {
         );
       }
       return stopPointInJourneyPattern;
+    }
+  }
+
+  public static class CreateLinkInJourneyPattern {
+
+    private final int journeyPatternId;
+    private int id = 1;
+    private int order = 1;
+    private int serviceLinkId;
+
+    public CreateLinkInJourneyPattern(int journeyPatternId) {
+      this.journeyPatternId = journeyPatternId;
+    }
+
+    public CreateLinkInJourneyPattern withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreateLinkInJourneyPattern withOrder(int order) {
+      this.order = order;
+      return this;
+    }
+
+    public CreateLinkInJourneyPattern withServiceLinkId(int serviceLinkId) {
+      this.serviceLinkId = serviceLinkId;
+      return this;
+    }
+
+    public LinkInJourneyPattern create() {
+      return new LinkInJourneyPattern()
+        .withId("TST:LinkInJourneyPattern:" + journeyPatternId + "_" + id)
+        .withOrder(BigInteger.valueOf(order))
+        .withServiceLinkRef(
+          new ServiceLinkRefStructure()
+            .withRef("TST:ServiceLink:" + serviceLinkId)
+        );
     }
   }
 
