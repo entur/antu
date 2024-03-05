@@ -144,6 +144,8 @@ Antu comes with the following rule sets, depending on the validation profile use
 | 21  | VERSION_NON_NUMERIC                                |                                                  Non-numeric NeTEx version                                                  |
 | 22  | JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP   |                                   Last StopPointInJourneyPattern must not allow boarding                                    |
 | 23  | JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP |                                  First StopPointInJourneyPattern must not allow alighting                                   |
+| 23  | SAME_STOP_POINT_IN_JOURNEY_PATTERNS                |                                            JourneyPatterns have same StopPoints                                             |
+| 24  | INVALID_NUMBER_OF_SERVICE_LINKS_IN_JOURNEY_PATTERN |                                      Invalid number of ServiceLinks in JourneyPattern                                       |
 
 ### For validation Profiles `TimetableFlexibleTransport` and `ImportTimetableFlexibleTransport`
 
