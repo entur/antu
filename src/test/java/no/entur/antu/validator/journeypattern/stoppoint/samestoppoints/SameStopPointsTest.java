@@ -1,4 +1,4 @@
-package no.entur.antu.validator.journeypattern.stoppoint;
+package no.entur.antu.validator.journeypattern.stoppoint.samestoppoints;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
-import no.entur.antu.validator.journeypattern.stoppoint.samestoppoints.SameStopPoints;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;

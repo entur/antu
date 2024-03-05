@@ -13,6 +13,10 @@ import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validate that the same stop points are not used
+ * in multiple journey patterns.
+ */
 public class SameStopPoints extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
@@ -74,7 +78,7 @@ public class SameStopPoints extends AntuNetexValidator {
         );
     } else {
       throw new AntuException(
-        "Received invalid validation context in Validating duplicate Stops In Journey Patterns"
+        "Received invalid validation context in Validating same stop points in journey patterns"
       );
     }
   }

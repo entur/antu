@@ -24,7 +24,7 @@ public record SameStopPointsError(
 
   @Override
   public String getEntityId() {
-    return null;
+    return journeyPatternIds.get(0);
   }
 
   enum RuleCode implements no.entur.antu.validator.RuleCode {
