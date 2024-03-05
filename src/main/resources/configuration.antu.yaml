@@ -78,3 +78,6 @@ validationRuleConfigs:
   - code: SAME_STOP_POINT_IN_JOURNEY_PATTERNS
     name: JourneyPatterns have same StopPoints
     severity: ERROR
+  - code: INVALID_NUMBER_OF_SERVICE_LINKS_IN_JOURNEY_PATTERN
+    name: Invalid number of ServiceLinks in JourneyPattern
+    severity: ERROR

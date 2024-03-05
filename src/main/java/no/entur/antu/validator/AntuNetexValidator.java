@@ -37,17 +37,15 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
   ) {
     String fileName = validationContext.getFileName();
 
-    IdVersion idVersion = validationContext
-      .getLocalIdsMap()
-      .get(entityId);
+    IdVersion idVersion = validationContext.getLocalIdsMap().get(entityId);
 
     return idVersion != null
       ? new DataLocation(
-      idVersion.getId(),
-      validationContext.getFileName(),
-      idVersion.getLineNumber(),
-      idVersion.getColumnNumber()
-    )
+        idVersion.getId(),
+        validationContext.getFileName(),
+        idVersion.getLineNumber(),
+        idVersion.getColumnNumber()
+      )
       : new DataLocation(entityId, fileName, 0, 0);
   }
 
@@ -56,7 +54,7 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     return Arrays
       .stream(getRuleCodes())
       .map(ruleCode ->
-             createRuleDescription(ruleCode.toString(), ruleCode.getErrorMessage())
+        createRuleDescription(ruleCode.toString(), ruleCode.getErrorMessage())
       )
       .collect(Collectors.toSet());
   }
