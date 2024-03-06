@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import no.entur.antu.netextestdata.NetexTestData;
+import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validator.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -21,7 +21,7 @@ class FlexibleAreaValidatorTest {
 
   @Test
   void testDataSetWithoutFlexibleStopPlacesShouldBeIgnoredGracefully() {
-    NetexTestData testData = new NetexTestData();
+    NetexTestFragment testData = new NetexTestFragment();
 
     ValidationReport validationReport = setupAndRunValidation(
       testData.netexEntitiesIndex().create()
@@ -166,7 +166,7 @@ class FlexibleAreaValidatorTest {
   private static ValidationReport runTestWithGivenCoordinates(
     List<Double> coordinates
   ) {
-    NetexTestData testData = new NetexTestData();
+    NetexTestFragment testData = new NetexTestFragment();
 
     FlexibleArea flexibleArea = testData
       .flexibleArea()
