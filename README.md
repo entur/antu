@@ -147,22 +147,23 @@ Antu comes with the following rule sets, depending on the validation profile use
 
 ### For validation Profiles `TimetableFlexibleTransport` and `ImportTimetableFlexibleTransport`
 
-| Sr. | Rule Code           |                                                      Rule Description                                                       |
-|-----|---------------------|:---------------------------------------------------------------------------------------------------------------------------:|
-| 1   | NETEX_FILE_NAME_1   |                                                      Invalid filename                                                       |
-| 2   | NETEX_ID_4W         |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 3   | NETEX_ID_2          |                                               Invalid id structure on element                                               |
-| 4   | NETEX_ID_3          |                                           Invalid structure on id %s. Expected %s                                           |
-| 5   | NETEX_ID_4          |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 6   | NETEX_ID_8          |                                   Missing version attribute on elements with id attribute                                   |
-| 7   | NETEX_ID_9          |                                  Missing version attribute on reference to local elements                                   |
-| 8   | NETEX_ID_6          | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements if type XXXX |
-| 9   | NETEX_ID_7          |                                               Invalid id structure on element                                               |
-| 10  | NETEX_ID_5          |                                       Unresolved reference to external reference data                                       |
-| 11  | NETEX_ID_1          |                                         Duplicate element identifiers across files                                          |
-| 12  | NETEX_ID_10         |                                      Duplicate element identifiers across common files                                      |
-| 13  | CODESPACE           |              Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s               |
-| 14  | VERSION_NON_NUMERIC |                                                  Non-numeric NeTEx version                                                  |
+| Sr. | Rule Code             |                                                      Rule Description                                                       |
+|-----|-----------------------|:---------------------------------------------------------------------------------------------------------------------------:|
+| 1   | NETEX_FILE_NAME_1     |                                                      Invalid filename                                                       |
+| 2   | NETEX_ID_4W           |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
+| 3   | NETEX_ID_2            |                                               Invalid id structure on element                                               |
+| 4   | NETEX_ID_3            |                                           Invalid structure on id %s. Expected %s                                           |
+| 5   | NETEX_ID_4            |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
+| 6   | NETEX_ID_8            |                                   Missing version attribute on elements with id attribute                                   |
+| 7   | NETEX_ID_9            |                                  Missing version attribute on reference to local elements                                   |
+| 8   | NETEX_ID_6            | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements if type XXXX |
+| 9   | NETEX_ID_7            |                                               Invalid id structure on element                                               |
+| 10  | NETEX_ID_5            |                                       Unresolved reference to external reference data                                       |
+| 11  | NETEX_ID_1            |                                         Duplicate element identifiers across files                                          |
+| 12  | NETEX_ID_10           |                                      Duplicate element identifiers across common files                                      |
+| 13  | CODESPACE             |              Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s               |
+| 14  | VERSION_NON_NUMERIC   |                                                  Non-numeric NeTEx version                                                  |
+| 15  | INVALID_FLEXIBLE_AREA |                                                    Invalid flexible area                                                    |
 
 ### For validation Profile `TimetableFlexibleTransportMerging`
 
