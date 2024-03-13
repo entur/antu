@@ -1,13 +1,17 @@
 package no.entur.antu.flex.validation.validator.flexibleareavalidator;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.AbstractRingType;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LinearRingType;
+import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.locationtech.jts.geom.Coordinate;
 import org.rutebanken.netex.model.FlexibleArea;
@@ -67,11 +71,7 @@ public class FlexibleAreaContextBuilder {
         .toList();
 
       for (FlexibleArea flexibleArea : flexibleAreas) {
-        AbstractRingType abstractRingType = flexibleArea
-          .getPolygon()
-          .getExterior()
-          .getAbstractRing()
-          .getValue();
+        AbstractRingType abstractRingType = getAbstractRingType(flexibleArea);
 
         if (abstractRingType instanceof LinearRingType linearRingType) {
           flexibleAreaContexts.add(
@@ -86,6 +86,15 @@ public class FlexibleAreaContextBuilder {
     }
     return flexibleAreaContexts;
   }
+
+  private AbstractRingType getAbstractRingType(FlexibleArea flexibleArea) {
+    return Optional.ofNullable(flexibleArea.getPolygon())
+      .map(PolygonType::getExterior)
+      .map(AbstractRingPropertyType::getAbstractRing)
+      .map(JAXBElement::getValue)
+      .orElse(null);
+  }
+
 
   private List<Double> getCoordinates(LinearRingType linearRing) {
     if (linearRing.getPosList() != null) {

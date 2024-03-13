@@ -26,7 +26,7 @@ public class FlexibleAreaValidator extends AntuNetexValidator {
     FlexibleAreaValidator.class
   );
 
-  protected FlexibleAreaValidator(
+  public FlexibleAreaValidator(
     ValidationReportEntryFactory validationReportEntryFactory
   ) {
     super(validationReportEntryFactory);
