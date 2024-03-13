@@ -163,6 +163,44 @@ class FlexibleAreaValidatorTest {
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
   }
 
+  @Test
+  void testMissingCoordinatesShouldIgnoreValidationGracefully() {
+    ValidationReport validationReport = runTestWithGivenCoordinates(List.of());
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
+  @Test
+  void testMissingFlexibleStopAreaShouldIgnoreValidationGracefully() {
+    NetexTestFragment testData = new NetexTestFragment();
+
+    FlexibleStopPlace flexibleStopPlace =
+      new NetexTestFragment.CreateFlexibleStopPlace().create();
+
+    ValidationReport validationReport = setupAndRunValidation(
+      testData.netexEntitiesIndex(flexibleStopPlace).create()
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
+  @Test
+  void testMissingPolygonShouldIgnoreValidationGracefully2() {
+    NetexTestFragment testData = new NetexTestFragment();
+
+    FlexibleArea flexibleArea = testData.flexibleArea().create();
+
+    FlexibleStopPlace flexibleStopPlace = testData
+      .flexibleStopPlace(flexibleArea.withPolygon(null))
+      .create();
+
+    ValidationReport validationReport = setupAndRunValidation(
+      testData.netexEntitiesIndex(flexibleStopPlace).create()
+    );
+
+    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+  }
+
   private static ValidationReport runTestWithGivenCoordinates(
     List<Double> coordinates
   ) {

@@ -17,17 +17,17 @@ import org.junit.jupiter.api.Test;
 class FlexibleAreaValidatorIntegrationTest {
 
   public static final String _ATB_FLEXIBLE_SHARED_DATA =
-    "_ATB_flexible_shared_data_2.xml";
+    "_ATB_flexible_shared_data.xml";
 
   private static final NetexParser NETEX_PARSER = new NetexParser();
 
   @Test
-  void testFlexibleAreaValidator() throws IOException {
+  void testSelfInteractingRingShouldBeReported() throws IOException {
     ValidationReport validationReport = getValidationReport(
       _ATB_FLEXIBLE_SHARED_DATA,
       "ATB"
     );
-    assertEquals(7, validationReport.getValidationReportEntries().size());
+    assertEquals(2, validationReport.getValidationReportEntries().size());
   }
 
   private ValidationReport getValidationReport(
