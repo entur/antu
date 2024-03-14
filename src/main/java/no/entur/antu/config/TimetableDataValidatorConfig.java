@@ -23,6 +23,7 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validator.id.NetexIdValidator;
+import no.entur.antu.validator.journeypattern.stoppoint.samestoppoints.SameStopPoints;
 import no.entur.antu.validator.passengerstopassignment.MissingPassengerStopAssignment;
 import no.entur.antu.validator.servicejourney.passingtime.NonIncreasingPassingTime;
 import no.entur.antu.validator.servicejourney.speed.UnexpectedSpeed;
@@ -136,6 +137,15 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public SameStopPoints sameStopPoints(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new SameStopPoints(validationReportEntryFactory);
+  }
+
+  @Bean
   public NetexValidatorsRunner timetableDataValidatorsRunner(
     NetexSchemaValidator netexSchemaValidator,
     @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
@@ -151,7 +161,8 @@ public class TimetableDataValidatorConfig {
     NonIncreasingPassingTime nonIncreasingPassingTime,
     UnexpectedSpeed unexpectedSpeed,
     MissingPassengerStopAssignment missingPassengerStopAssignment,
-    InvalidServiceLinks invalidServiceLinks
+    InvalidServiceLinks invalidServiceLinks,
+    SameStopPoints sameStopPoints
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -165,7 +176,8 @@ public class TimetableDataValidatorConfig {
       nonIncreasingPassingTime,
       unexpectedSpeed,
       missingPassengerStopAssignment,
-      invalidServiceLinks
+      invalidServiceLinks,
+      sameStopPoints
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(

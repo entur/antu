@@ -103,6 +103,12 @@ public class NetexTestFragment {
     return new CreateFlexibleStopPlace().withFlexibleArea(flexibleArea);
   }
 
+  public CreateStopPointInJourneyPattern stopPointInJourneyPattern(
+    int journeyPatternId
+  ) {
+    return new CreateStopPointInJourneyPattern(journeyPatternId);
+  }
+
   public CreatePassengerStopAssignment passengerStopAssignment() {
     return new CreatePassengerStopAssignment();
   }
@@ -307,6 +313,8 @@ public class NetexTestFragment {
     private int routeId = 1;
     private int id = 1;
     private int numberOfStopPointInJourneyPattern = 4;
+    List<PointInLinkSequence_VersionedChildStructure> pointsInLink =
+      new ArrayList<>();
 
     public CreateJourneyPattern withId(int id) {
       this.id = id;
@@ -326,19 +334,30 @@ public class NetexTestFragment {
       return this;
     }
 
+    public CreateJourneyPattern withStopPointsInJourneyPattern(
+      List<StopPointInJourneyPattern> stopPointsInJourneyPattern
+    ) {
+      this.pointsInLink =
+        stopPointsInJourneyPattern
+          .stream()
+          .map(PointInLinkSequence_VersionedChildStructure.class::cast)
+          .toList();
+      return this;
+    }
+
     public JourneyPattern create() {
       RouteRefStructure routeRef = new RouteRefStructure()
         .withRef("TST:Route:" + routeId);
 
-      List<PointInLinkSequence_VersionedChildStructure> pointsInLink =
-        createPointsInLink(numberOfStopPointInJourneyPattern);
       return new JourneyPattern()
         .withId("TST:JourneyPattern:" + id)
         .withRouteRef(routeRef)
         .withPointsInSequence(
           new PointsInJourneyPattern_RelStructure()
             .withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
-              pointsInLink
+              this.pointsInLink.isEmpty()
+                ? createPointsInLink(numberOfStopPointInJourneyPattern)
+                : this.pointsInLink
             )
         );
     }
@@ -346,67 +365,84 @@ public class NetexTestFragment {
     private List<PointInLinkSequence_VersionedChildStructure> createPointsInLink(
       int numberOfStopPointInJourneyPattern
     ) {
-      String DESTINATION_DISPLAY_ID_1 = "NSR:DestinationDisplay:1";
-      String DESTINATION_DISPLAY_ID_2 = "NSR:DestinationDisplay:2";
-
-      DestinationDisplay destinationBergen = new DestinationDisplay()
-        .withId(DESTINATION_DISPLAY_ID_1)
-        .withVias(
-          new Vias_RelStructure()
-            .withVia(
-              List.of(
-                this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_2)
-              )
-            )
-        )
-        .withFrontText(new MultilingualString().withValue("Bergen"));
-
-      DestinationDisplay destinationStavanger = new DestinationDisplay()
-        .withId(DESTINATION_DISPLAY_ID_2)
-        .withVias(
-          new Vias_RelStructure()
-            .withVia(
-              List.of(
-                this.createViaDestinationDisplayRef(DESTINATION_DISPLAY_ID_1)
-              )
-            )
-        )
-        .withFrontText(new MultilingualString().withValue("Stavanger"));
-
       return IntStream
         .range(0, numberOfStopPointInJourneyPattern)
         .mapToObj(index -> {
-          String stopPointId =
-            "TST:StopPointInJourneyPattern:" + id + "_" + (index + 1);
-          StopPointInJourneyPattern stopPoint = new StopPointInJourneyPattern()
-            .withId(stopPointId)
-            .withOrder(BigInteger.valueOf(index + 1))
-            .withScheduledStopPointRef(
-              createScheduledStopPointRef(
-                "TST:ScheduledStopPoint:" + (index + 1)
-              )
-            );
+          CreateStopPointInJourneyPattern createStopPointInJourneyPattern =
+            new CreateStopPointInJourneyPattern(id)
+              .withId(index + 1)
+              .withOrder(index + 1)
+              .withScheduledStopPointRef(index + 1);
 
-          if (index == 0) stopPoint.setDestinationDisplayRef(
-            createDestinationDisplayRef(destinationBergen.getId()).getValue()
-          );
-          if (index == 2) stopPoint.setDestinationDisplayRef(
-            createDestinationDisplayRef(destinationStavanger.getId()).getValue()
-          );
+          // Setting destination display id for first and last stop point
+          if (index == 0 || index == numberOfStopPointInJourneyPattern - 1) {
+            createStopPointInJourneyPattern.withDestinationDisplayId(index + 1);
+          }
 
-          return stopPoint;
+          return createStopPointInJourneyPattern.create();
         })
         .map(PointInLinkSequence_VersionedChildStructure.class::cast)
         .toList();
     }
+  }
 
-    private Via_VersionedChildStructure createViaDestinationDisplayRef(
-      String destinationDisplayId
+  public static class CreateStopPointInJourneyPattern {
+
+    private final int journeyPatternId;
+    private int id = 1;
+    private int order = 1;
+    private int scheduledStopPointId;
+    private int destinationDisplayId = -1;
+
+    public CreateStopPointInJourneyPattern(int journeyPatternId) {
+      this.journeyPatternId = journeyPatternId;
+    }
+
+    public CreateStopPointInJourneyPattern withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreateStopPointInJourneyPattern withOrder(int order) {
+      this.order = order;
+      return this;
+    }
+
+    public CreateStopPointInJourneyPattern withScheduledStopPointRef(
+      int scheduledStopPointId
     ) {
-      return new Via_VersionedChildStructure()
-        .withDestinationDisplayRef(
-          new DestinationDisplayRefStructure().withRef(destinationDisplayId)
+      this.scheduledStopPointId = scheduledStopPointId;
+      return this;
+    }
+
+    public CreateStopPointInJourneyPattern withDestinationDisplayId(
+      int destinationDisplayId
+    ) {
+      this.destinationDisplayId = destinationDisplayId;
+      return this;
+    }
+
+    public StopPointInJourneyPattern create() {
+      StopPointInJourneyPattern stopPointInJourneyPattern =
+        new StopPointInJourneyPattern()
+          .withId(
+            "TST:StopPointInJourneyPattern:" + journeyPatternId + "_" + id
+          )
+          .withOrder(BigInteger.valueOf(order))
+          .withScheduledStopPointRef(
+            createScheduledStopPointRef(
+              "TST:ScheduledStopPoint:" + scheduledStopPointId
+            )
+          );
+      if (destinationDisplayId > 0) {
+        stopPointInJourneyPattern.setDestinationDisplayRef(
+          createDestinationDisplayRef(
+            "TST:DestinationDisplay:" + destinationDisplayId
+          )
+            .getValue()
         );
+      }
+      return stopPointInJourneyPattern;
     }
   }
 
@@ -558,7 +594,7 @@ public class NetexTestFragment {
     ) {
       this.linkSequenceProjectionVersionStructure =
         new LinkSequenceProjection_VersionStructure()
-          .withId("ServiceLinkProjection:" + id)
+          .withId("TST:ServiceLinkProjection:" + id)
           .withLineString(
             new LineStringType()
               .withPosList(
@@ -573,7 +609,7 @@ public class NetexTestFragment {
     ) {
       this.linkSequenceProjectionVersionStructure =
         new LinkSequenceProjection_VersionStructure()
-          .withId("ServiceLinkProjection:" + id)
+          .withId("TST:ServiceLinkProjection:" + id)
           .withLineString(
             new LineStringType()
               .withPosOrPointProperty(
