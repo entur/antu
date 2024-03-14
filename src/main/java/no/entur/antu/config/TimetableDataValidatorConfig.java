@@ -24,6 +24,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validator.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validator.id.NetexIdValidator;
 import no.entur.antu.validator.journeypattern.stoppoint.samestoppoints.SameStopPoints;
+import no.entur.antu.validator.journeypattern.stoppoint.stoppointscount.StopPointsCount;
 import no.entur.antu.validator.passengerstopassignment.MissingPassengerStopAssignment;
 import no.entur.antu.validator.servicejourney.passingtime.NonIncreasingPassingTime;
 import no.entur.antu.validator.servicejourney.speed.UnexpectedSpeed;
@@ -70,7 +71,7 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public MismatchedTransportMode transportModeValidator(
+  public MismatchedTransportMode mismatchedTransportMode(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
@@ -85,7 +86,7 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public NonIncreasingPassingTime nonIncreasingPassingTimeValidator(
+  public NonIncreasingPassingTime nonIncreasingPassingTime(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory
@@ -94,7 +95,7 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public UnexpectedSpeed speedValidator(
+  public UnexpectedSpeed unexpectedSpeed(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
@@ -109,7 +110,7 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public MissingPassengerStopAssignment stopPointInJourneyPatternValidator(
+  public MissingPassengerStopAssignment missingPassengerStopAssignment(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
@@ -122,7 +123,7 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public InvalidServiceLinks serviceLinksValidator(
+  public InvalidServiceLinks invalidServiceLinks(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
@@ -146,6 +147,15 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public StopPointsCount stopPointsCount(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new StopPointsCount(validationReportEntryFactory);
+  }
+
+  @Bean
   public NetexValidatorsRunner timetableDataValidatorsRunner(
     NetexSchemaValidator netexSchemaValidator,
     @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
@@ -162,7 +172,8 @@ public class TimetableDataValidatorConfig {
     UnexpectedSpeed unexpectedSpeed,
     MissingPassengerStopAssignment missingPassengerStopAssignment,
     InvalidServiceLinks invalidServiceLinks,
-    SameStopPoints sameStopPoints
+    SameStopPoints sameStopPoints,
+    StopPointsCount stopPointsCount
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -177,7 +188,8 @@ public class TimetableDataValidatorConfig {
       unexpectedSpeed,
       missingPassengerStopAssignment,
       invalidServiceLinks,
-      sameStopPoints
+      sameStopPoints,
+      stopPointsCount
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
