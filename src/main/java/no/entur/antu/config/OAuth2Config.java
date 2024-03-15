@@ -18,16 +18,15 @@ package no.entur.antu.config;
 
 import org.entur.oauth2.AuthorizedWebClientBuilder;
 import org.entur.oauth2.JwtRoleAssignmentExtractor;
-import org.entur.oauth2.RoRJwtDecoderBuilder;
+import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolver;
+import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolverBuilder;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.reactive.ClientHttpConnector;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
@@ -38,28 +37,27 @@ public class OAuth2Config {
     return new JwtRoleAssignmentExtractor();
   }
 
-  /**
-   * Build a @{@link JwtDecoder} for RoR Auth0 domain.
-   *
-   * @return a @{@link JwtDecoder} for Auth0.
-   */
   @Bean
   @Profile("!test")
-  public JwtDecoder rorAuth0JwtDecoder(
-    OAuth2ResourceServerProperties properties,
-    @Value(
-      "${antu.oauth2.resourceserver.auth0.ror.jwt.audience}"
-    ) String rorAuth0Audience,
-    @Value(
-      "${antu.oauth2.resourceserver.auth0.ror.claim.namespace}"
-    ) String rorAuth0ClaimNamespace
-  ) {
-    String rorAuth0Issuer = properties.getJwt().getIssuerUri();
-    return new RoRJwtDecoderBuilder()
-      .withIssuer(rorAuth0Issuer)
-      .withAudience(rorAuth0Audience)
-      .withAuth0ClaimNamespace(rorAuth0ClaimNamespace)
-      .build();
+  public MultiIssuerAuthenticationManagerResolver multiIssuerAuthenticationManagerResolver(
+          @Value("${antu.oauth2.resourceserver.auth0.entur.partner.jwt.audience:}")
+          String enturPartnerAuth0Audience,
+          @Value("${antu.oauth2.resourceserver.auth0.entur.partner.jwt.issuer-uri:}")
+          String enturPartnerAuth0Issuer,
+          @Value("${antu.oauth2.resourceserver.auth0.ror.jwt.audience:}")
+          String rorAuth0Audience,
+          @Value("${antu.oauth2.resourceserver.auth0.ror.jwt.issuer-uri:}")
+          String rorAuth0Issuer,
+          @Value("${antu.oauth2.resourceserver.auth0.ror.claim.namespace:}")
+          String rorAuth0ClaimNamespace) {
+
+    return new MultiIssuerAuthenticationManagerResolverBuilder()
+            .withEnturPartnerAuth0Issuer(enturPartnerAuth0Issuer)
+            .withEnturPartnerAuth0Audience(enturPartnerAuth0Audience)
+            .withRorAuth0Issuer(rorAuth0Issuer)
+            .withRorAuth0Audience(rorAuth0Audience)
+            .withRorAuth0ClaimNamespace(rorAuth0ClaimNamespace)
+            .build();
   }
 
   @Bean("orgRegisterWebClient")

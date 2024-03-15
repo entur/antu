@@ -3,7 +3,8 @@ package no.entur.antu.security.oauth2;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import java.util.Arrays;
-import org.entur.oauth2.RorAuthenticationConverter;
+
+import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -53,7 +54,7 @@ public class AntuWebSecurityConfiguration {
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http, MultiIssuerAuthenticationManagerResolver multiIssuerAuthenticationManagerResolver) throws Exception {
     http
       .cors(withDefaults())
       .csrf(AbstractHttpConfigurer::disable)
@@ -86,14 +87,9 @@ public class AntuWebSecurityConfiguration {
           .anyRequest()
           .authenticated()
       )
-      .oauth2ResourceServer(configurer ->
-        configurer.jwt(jwtConfigurer ->
-          jwtConfigurer.jwtAuthenticationConverter(
-            new RorAuthenticationConverter()
-          )
-        )
-      )
-      .oauth2Client(withDefaults());
+            .oauth2ResourceServer(configurer -> configurer.authenticationManagerResolver(multiIssuerAuthenticationManagerResolver))
+
+              .oauth2Client(withDefaults());
     return http.build();
   }
 }
