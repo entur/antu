@@ -65,7 +65,9 @@ public final class SortStopTimesUtil {
           timetabledPassingTime,
           hasFlexibleStopPoint(
             antuNetexData.entitiesIndex(),
-            AntuNetexData.getStopPointRef(timetabledPassingTime)
+            scheduledStopPointIdByStopPointId.get(
+              AntuNetexData.getStopPointRef(timetabledPassingTime)
+            )
           )
         )
       )
@@ -97,10 +99,10 @@ public final class SortStopTimesUtil {
 
   private static boolean hasFlexibleStopPoint(
     NetexEntitiesIndex netexEntitiesIndex,
-    String stopPointInJourneyPatternRef
+    ScheduledStopPointId scheduledStopPointId
   ) {
     return netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .containsKey(stopPointInJourneyPatternRef);
+      .containsKey(scheduledStopPointId.id());
   }
 }

@@ -146,7 +146,7 @@ class UnexpectedSpeedTest {
       .withNumberOfStopPointInJourneyPattern(2)
       .create();
 
-    // Setting departureTimeOffset to 0 to will make the departure time same for both passingTimes.
+    // Setting departureTimeOffset to 0, for making the departure time same for both passingTimes.
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
       .withCreateTimetabledPassingTimes(

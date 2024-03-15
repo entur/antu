@@ -2,6 +2,7 @@ package no.entur.antu.validation;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.entur.antu.commondata.CommonDataRepository;
@@ -15,7 +16,9 @@ import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
+import org.rutebanken.netex.model.Point_VersionStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
@@ -197,11 +200,12 @@ public class AntuNetexData {
   }
 
   public String getStopPointName(ScheduledStopPointId scheduledStopPointId) {
-    return entitiesIndex
-      .getScheduledStopPointIndex()
-      .getLatestVersion(scheduledStopPointId.id())
-      .getName()
-      .getValue();
+    return Optional
+      .ofNullable(entitiesIndex.getScheduledStopPointIndex())
+      .map(index -> index.getLatestVersion(scheduledStopPointId.id()))
+      .map(Point_VersionStructure::getName)
+      .map(MultilingualString::getValue)
+      .orElse("unnamed");
   }
 
   /**
