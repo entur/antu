@@ -64,7 +64,10 @@ public class UnexpectedSpeed extends AntuNetexValidator {
   ) {
     LOGGER.debug("Validating Speed");
 
-    AntuNetexData antuNetexData = createAntuNetexData(validationContext);
+    AntuNetexData antuNetexData = createAntuNetexData(
+      validationReport,
+      validationContext
+    );
 
     UnexpectedSpeedContext.Builder contextBuilder =
       new UnexpectedSpeedContext.Builder(

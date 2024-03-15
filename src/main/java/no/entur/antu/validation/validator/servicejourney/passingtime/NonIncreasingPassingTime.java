@@ -43,7 +43,10 @@ public class NonIncreasingPassingTime extends AntuNetexValidator {
   ) {
     LOGGER.debug("Validating ServiceJourney non-increasing passing time");
 
-    AntuNetexData antuNetexData = createAntuNetexData(validationContext);
+    AntuNetexData antuNetexData = createAntuNetexData(
+      validationReport,
+      validationContext
+    );
 
     antuNetexData
       .serviceJourneys()

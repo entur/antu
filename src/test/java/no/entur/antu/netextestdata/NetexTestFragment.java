@@ -879,7 +879,13 @@ public class NetexTestFragment {
           )
       );
 
+      fillIndexes(netexEntitiesIndex);
+      return netexEntitiesIndex;
+    }
+
+    private void fillIndexes(NetexEntitiesIndex netexEntitiesIndex) {
       passengerStopAssignments.forEach(passengerStopAssignment -> {
+        // PassengerStopAssignmentsByStopPointRefIndex
         netexEntitiesIndex
           .getPassengerStopAssignmentsByStopPointRefIndex()
           .put(
@@ -889,6 +895,8 @@ public class NetexTestFragment {
               .getRef(),
             passengerStopAssignment
           );
+
+        // QuayIdByStopPointRefIndex
         netexEntitiesIndex
           .getQuayIdByStopPointRefIndex()
           .put(
@@ -899,8 +907,6 @@ public class NetexTestFragment {
             passengerStopAssignment.getQuayRef().getValue().getRef()
           );
       });
-
-      return netexEntitiesIndex;
     }
   }
 

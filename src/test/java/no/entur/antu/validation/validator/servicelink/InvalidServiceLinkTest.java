@@ -379,10 +379,10 @@ class InvalidServiceLinkTest {
     QuayCoordinates toQuayCoordinates
   ) {
     ScheduledStopPointId fromStopPointId = new ScheduledStopPointId(
-      "TST:ScheduledStopPointId:1"
+      "TST:ScheduledStopPoint:1"
     );
     ScheduledStopPointId toStopPointId = new ScheduledStopPointId(
-      "TST:ScheduledStopPointId:2"
+      "TST:ScheduledStopPoint:2"
     );
 
     NetexTestFragment testData = new NetexTestFragment();
@@ -439,10 +439,10 @@ class InvalidServiceLinkTest {
     QuayCoordinates toQuayCoordinates
   ) {
     ScheduledStopPointId fromStopPointId = new ScheduledStopPointId(
-      "TST:ScheduledStopPointId:1"
+      "TST:ScheduledStopPoint:1"
     );
     ScheduledStopPointId toStopPointId = new ScheduledStopPointId(
-      "TST:ScheduledStopPointId:2"
+      "TST:ScheduledStopPoint:2"
     );
 
     NetexTestFragment testData = new NetexTestFragment();

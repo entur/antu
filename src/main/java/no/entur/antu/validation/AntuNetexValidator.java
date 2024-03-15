@@ -59,11 +59,12 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
   );
 
   protected AntuNetexData createAntuNetexData(
+    ValidationReport validationReport,
     ValidationContext validationContext
   ) {
     return new AntuNetexData(
       getNetexEntitiesIndex(validationContext),
-      validationContext.getFileName()
+      validationReport.getValidationReportId()
     );
   }
 
