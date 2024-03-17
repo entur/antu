@@ -17,7 +17,9 @@
 
 package no.entur.antu.routes.memorystore;
 
-import static no.entur.antu.Constants.*;
+import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
