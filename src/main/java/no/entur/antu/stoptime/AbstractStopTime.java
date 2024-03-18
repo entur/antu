@@ -2,7 +2,6 @@ package no.entur.antu.stoptime;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
-import no.entur.antu.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
@@ -17,20 +16,15 @@ abstract sealed class AbstractStopTime
   implements StopTime
   permits FlexibleStopTime, RegularStopTime {
 
-  private final ScheduledStopPointId scheduledStopPointId;
   private final TimetabledPassingTime timetabledPassingTime;
 
-  protected AbstractStopTime(
-    ScheduledStopPointId scheduledStopPointId,
-    TimetabledPassingTime timetabledPassingTime
-  ) {
-    this.scheduledStopPointId = scheduledStopPointId;
+  protected AbstractStopTime(TimetabledPassingTime timetabledPassingTime) {
     this.timetabledPassingTime = timetabledPassingTime;
   }
 
   @Override
-  public ScheduledStopPointId scheduledStopPointId() {
-    return scheduledStopPointId;
+  public final String timetabledPassingTimeId() {
+    return timetabledPassingTime.getId();
   }
 
   protected LocalTime arrivalTime() {

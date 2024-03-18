@@ -5,7 +5,6 @@ import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.organisation.OrganisationRepository;
@@ -28,7 +27,7 @@ public class TestConfig {
 
       @Override
       public QuayId findQuayIdForScheduledStopPoint(
-        ScheduledStopPointId scheduledStopPointId,
+        String scheduledStopPoint,
         String validationReportId
       ) {
         return null;

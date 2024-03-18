@@ -1,7 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PublicationDelivery version="1.08:NO-NeTEx-networktimetable:1.1"
-                     p2:schemaLocation="http://www.netex.org.uk/netex C:\NeTex\1.03\xsd\NeTEx_publication.xsd"
-                     xmlns:p2="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.netex.org.uk/netex">
+<PublicationDelivery xmlns:gml="http://www.opengis.net/gml/3.2" version="1.08:NO-NeTEx-networktimetable:1.1" p2:schemaLocation="http://www.netex.org.uk/netex C:\NeTex\1.03\xsd\NeTEx_publication.xsd" xmlns:p2="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.netex.org.uk/netex">
     <PublicationTimestamp>2024-01-31T19:02:34.1306679+00:00</PublicationTimestamp>
     <ParticipantRef>NWY</ParticipantRef>
     <Description>NWY Linje: 8600_</Description>

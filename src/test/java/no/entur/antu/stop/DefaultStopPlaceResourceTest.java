@@ -2,9 +2,7 @@ package no.entur.antu.stop;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
@@ -13,12 +11,7 @@ import java.util.Set;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.ObjectFactory;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.SiteFrame;
-import org.rutebanken.netex.model.Site_VersionStructure;
-import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.StopPlacesInFrame_RelStructure;
+import org.rutebanken.netex.model.*;
 
 class DefaultStopPlaceResourceTest {
 

@@ -24,10 +24,6 @@ public record QuayId(String id) {
     return quayId.contains(":Quay:");
   }
 
-  /*
-   * Used to encode data to store in redis.
-   * Caution: Changes in this method can effect data stored in redis.
-   */
   @Override
   public String toString() {
     return id();

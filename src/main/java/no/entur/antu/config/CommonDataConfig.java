@@ -7,7 +7,6 @@ import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.commondata.CommonDataResource;
 import no.entur.antu.commondata.DefaultCommonDataRepository;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +27,7 @@ public class CommonDataConfig {
     CommonDataResource commonDataResource,
     @Qualifier(
       SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE
-    ) Map<String, Map<ScheduledStopPointId, QuayId>> scheduledStopPointAndQuayIdCache
+    ) Map<String, Map<String, QuayId>> scheduledStopPointAndQuayIdCache
   ) {
     return new DefaultCommonDataRepository(
       commonDataResource,

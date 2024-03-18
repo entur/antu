@@ -1,6 +1,5 @@
 package no.entur.antu.stoptime;
 
-import no.entur.antu.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
@@ -10,11 +9,8 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  */
 final class RegularStopTime extends AbstractStopTime {
 
-  RegularStopTime(
-    ScheduledStopPointId scheduledStopPointId,
-    TimetabledPassingTime timetabledPassingTime
-  ) {
-    super(scheduledStopPointId, timetabledPassingTime);
+  RegularStopTime(TimetabledPassingTime timetabledPassingTime) {
+    super(timetabledPassingTime);
   }
 
   @Override

@@ -3,7 +3,7 @@ package no.entur.antu.sweden.validator;
 import java.util.List;
 import java.util.Set;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
+import no.entur.antu.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;

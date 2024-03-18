@@ -18,10 +18,7 @@
 
 package no.entur.antu.routes.validation;
 
-import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.NETEX_COMMON_FILE_NAME;
-import static no.entur.antu.Constants.NETEX_FILE_NAME;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
+import static no.entur.antu.Constants.*;
 import static no.entur.antu.routes.memorystore.MemoryStoreRoute.MEMORY_STORE_FILE_NAME;
 
 import no.entur.antu.commondata.CommonDataRepository;

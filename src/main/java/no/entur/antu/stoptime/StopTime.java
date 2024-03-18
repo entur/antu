@@ -4,18 +4,16 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Objects;
-import no.entur.antu.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 public sealed interface StopTime permits AbstractStopTime {
   static StopTime of(
-    ScheduledStopPointId scheduledStopPointId,
     TimetabledPassingTime timetabledPassingTime,
     boolean stopIsFlexibleArea
   ) {
     return stopIsFlexibleArea
-      ? new FlexibleStopTime(scheduledStopPointId, timetabledPassingTime)
-      : new RegularStopTime(scheduledStopPointId, timetabledPassingTime);
+      ? new FlexibleStopTime(timetabledPassingTime)
+      : new RegularStopTime(timetabledPassingTime);
   }
 
   /**
@@ -56,7 +54,7 @@ public sealed interface StopTime permits AbstractStopTime {
    */
   int normalizedArrivalTimeOrElseDepartureTime();
 
-  ScheduledStopPointId scheduledStopPointId();
+  String timetabledPassingTimeId();
 
   /**
    * Return {@code true} if this stop-time is before or equal to the given {@code next} stop time.

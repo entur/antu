@@ -4,15 +4,11 @@ import static java.util.Comparator.comparing;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.validation.AntuNetexData;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.rutebanken.netex.model.EntityStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.*;
 
 /**
  * This utility class is used to sort the timetabled passing times of a service journey according to
@@ -30,65 +26,55 @@ public final class SortStopTimesUtil {
   /**
    * Sort the timetabled passing times according to their order in the journey pattern.
    */
-  public static List<StopTime> getSortedStopTimes(
+  public static List<StopTime> createSortedStopTimes(
     ServiceJourney serviceJourney,
-    AntuNetexData antuNetexData
+    NetexEntitiesIndex netexEntitiesIndex
   ) {
-    JourneyPattern journeyPattern = antuNetexData.getJourneyPattern(
+    JourneyPattern journeyPattern = getJourneyPattern(
+      netexEntitiesIndex,
       serviceJourney
+    );
+    Map<TimetabledPassingTime, Boolean> stopFlexibility = findStopFlexibility(
+      serviceJourney,
+      journeyPattern,
+      netexEntitiesIndex
     );
 
     Map<String, Integer> stopPointIdToOrder = getStopPointIdsOrder(
       journeyPattern
     );
-
-    Map<String, ScheduledStopPointId> scheduledStopPointIdByStopPointId =
-      AntuNetexData.scheduledStopPointIdByStopPointId(journeyPattern);
-
     return serviceJourney
       .getPassingTimes()
       .getTimetabledPassingTime()
       .stream()
-      .filter(SortStopTimesUtil::hasStopPointInJourneyPatternRef)
+      .filter(timetabledPassingTime ->
+        timetabledPassingTime
+          .getPointInJourneyPatternRef()
+          .getValue() instanceof StopPointInJourneyPatternRefStructure
+      )
       .sorted(
         comparing(timetabledPassingTime ->
-          stopPointIdToOrder.get(
-            AntuNetexData.getStopPointRef(timetabledPassingTime)
-          )
+          stopPointIdToOrder.get(getStopPointId(timetabledPassingTime))
         )
       )
       .map(timetabledPassingTime ->
         StopTime.of(
-          scheduledStopPointIdByStopPointId.get(
-            AntuNetexData.getStopPointRef(timetabledPassingTime)
-          ),
           timetabledPassingTime,
-          hasFlexibleStopPoint(
-            antuNetexData.entitiesIndex(),
-            scheduledStopPointIdByStopPointId.get(
-              AntuNetexData.getStopPointRef(timetabledPassingTime)
-            )
-          )
+          stopFlexibility.get(timetabledPassingTime)
         )
       )
       .toList();
   }
 
-  private static boolean hasStopPointInJourneyPatternRef(
-    TimetabledPassingTime timetabledPassingTime
-  ) {
-    return (
-      timetabledPassingTime
-        .getPointInJourneyPatternRef()
-        .getValue() instanceof StopPointInJourneyPatternRefStructure
-    );
-  }
-
   private static Map<String, Integer> getStopPointIdsOrder(
     JourneyPattern journeyPattern
   ) {
-    return AntuNetexData
-      .stopPointsInJourneyPattern(journeyPattern)
+    return journeyPattern
+      .getPointsInSequence()
+      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      .stream()
+      .filter(StopPointInJourneyPattern.class::isInstance)
+      .map(StopPointInJourneyPattern.class::cast)
       .collect(
         Collectors.toMap(
           EntityStructure::getId,
@@ -97,12 +83,93 @@ public final class SortStopTimesUtil {
       );
   }
 
-  private static boolean hasFlexibleStopPoint(
+  /**
+   * Map a timetabledPassingTime to true if its stop is a flexible stop area, false otherwise.
+   */
+  private static Map<TimetabledPassingTime, Boolean> findStopFlexibility(
+    ServiceJourney serviceJourney,
+    JourneyPattern journeyPattern,
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    Map<String, String> scheduledStopPointIdByStopPointId =
+      getScheduledStopPointIdByStopPointId(journeyPattern);
+    Predicate<TimetabledPassingTime> hasFlexibleStopPoint =
+      hasFlexibleStopPoint(
+        scheduledStopPointIdByStopPointId,
+        netexEntitiesIndex
+      );
+
+    return serviceJourney
+      .getPassingTimes()
+      .getTimetabledPassingTime()
+      .stream()
+      .filter(timetabledPassingTime ->
+        timetabledPassingTime
+          .getPointInJourneyPatternRef()
+          .getValue() instanceof StopPointInJourneyPatternRefStructure
+      )
+      .collect(
+        Collectors.toMap(Function.identity(), hasFlexibleStopPoint::test)
+      );
+  }
+
+  private static Predicate<TimetabledPassingTime> hasFlexibleStopPoint(
+    Map<String, String> scheduledStopPointIdByStopPointId,
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return timetabledPassingTime ->
+      netexEntitiesIndex
+        .getFlexibleStopPlaceIdByStopPointRefIndex()
+        .containsKey(
+          scheduledStopPointIdByStopPointId.get(
+            getStopPointId(timetabledPassingTime)
+          )
+        );
+  }
+
+  /**
+   * Return the StopPointInJourneyPattern ID of a given TimeTabledPassingTime.
+   */
+  private static String getStopPointId(
+    TimetabledPassingTime timetabledPassingTime
+  ) {
+    return timetabledPassingTime
+      .getPointInJourneyPatternRef()
+      .getValue()
+      .getRef();
+  }
+
+  /**
+   * Return the mapping between stop point id and scheduled stop point id for the journey
+   * pattern.
+   */
+  private static Map<String, String> getScheduledStopPointIdByStopPointId(
+    JourneyPattern journeyPattern
+  ) {
+    return journeyPattern
+      .getPointsInSequence()
+      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      .stream()
+      .filter(StopPointInJourneyPattern.class::isInstance)
+      .map(StopPointInJourneyPattern.class::cast)
+      .collect(
+        Collectors.toMap(
+          StopPointInJourneyPattern::getId,
+          stopPointInJourneyPattern ->
+            stopPointInJourneyPattern
+              .getScheduledStopPointRef()
+              .getValue()
+              .getRef()
+        )
+      );
+  }
+
+  private static JourneyPattern getJourneyPattern(
     NetexEntitiesIndex netexEntitiesIndex,
-    ScheduledStopPointId scheduledStopPointId
+    ServiceJourney serviceJourney
   ) {
     return netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .containsKey(scheduledStopPointId.id());
+      .getJourneyPatternIndex()
+      .get(serviceJourney.getJourneyPatternRef().getValue().getRef());
   }
 }

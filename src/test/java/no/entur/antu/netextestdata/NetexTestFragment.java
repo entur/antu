@@ -21,50 +21,7 @@ import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.DeadRun;
-import org.rutebanken.netex.model.DestinationDisplayRefStructure;
-import org.rutebanken.netex.model.FlexibleArea;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
-import org.rutebanken.netex.model.FlexibleStopPlacesInFrame_RelStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.Journey_VersionStructure;
-import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.LinkInJourneyPattern;
-import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
-import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.PassengerStopAssignment;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.Projections_RelStructure;
-import org.rutebanken.netex.model.QuayRefStructure;
-import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
-import org.rutebanken.netex.model.ServiceFrame;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.ServiceLinkRefStructure;
-import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
-import org.rutebanken.netex.model.SiteFrame;
-import org.rutebanken.netex.model.StopPlaceRefStructure;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.TimetableFrame;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
+import org.rutebanken.netex.model.*;
 
 public class NetexTestFragment {
 
@@ -879,13 +836,7 @@ public class NetexTestFragment {
           )
       );
 
-      fillIndexes(netexEntitiesIndex);
-      return netexEntitiesIndex;
-    }
-
-    private void fillIndexes(NetexEntitiesIndex netexEntitiesIndex) {
       passengerStopAssignments.forEach(passengerStopAssignment -> {
-        // PassengerStopAssignmentsByStopPointRefIndex
         netexEntitiesIndex
           .getPassengerStopAssignmentsByStopPointRefIndex()
           .put(
@@ -895,8 +846,6 @@ public class NetexTestFragment {
               .getRef(),
             passengerStopAssignment
           );
-
-        // QuayIdByStopPointRefIndex
         netexEntitiesIndex
           .getQuayIdByStopPointRefIndex()
           .put(
@@ -907,6 +856,8 @@ public class NetexTestFragment {
             passengerStopAssignment.getQuayRef().getValue().getRef()
           );
       });
+
+      return netexEntitiesIndex;
     }
   }
 

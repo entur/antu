@@ -16,21 +16,16 @@
 
 package no.entur.antu.config;
 
-import static no.entur.antu.Constants.VALIDATION_PROFILE_IMPORT_TIMETABLE_FLEX;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_FLEX;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_FLEX_MERGING;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
+import static no.entur.antu.Constants.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validation.NetexValidationProfile;
-import no.entur.antu.validation.validator.id.NetexIdValidator;
-import no.entur.antu.validation.validator.id.ReferenceToNsrValidator;
-import no.entur.antu.validation.validator.id.TrainElementRegistryIdValidator;
+import no.entur.antu.validator.NetexValidationProfile;
+import no.entur.antu.validator.id.NetexIdValidator;
+import no.entur.antu.validator.id.ReferenceToNsrValidator;
+import no.entur.antu.validator.id.TrainElementRegistryIdValidator;
 import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
 import org.entur.netex.validation.configuration.ValidationConfigLoader;
 import org.entur.netex.validation.validator.DefaultValidationEntryFactory;

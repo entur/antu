@@ -17,8 +17,8 @@
 package no.entur.antu.config;
 
 import java.util.List;
-import no.entur.antu.validation.validator.id.NetexIdValidator;
-import no.entur.antu.validation.validator.xpath.EnturStopPlaceDataValidationTreeFactory;
+import no.entur.antu.validator.id.NetexIdValidator;
+import no.entur.antu.validator.xpath.EnturStopPlaceDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
