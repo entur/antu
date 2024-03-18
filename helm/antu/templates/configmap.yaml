@@ -51,7 +51,7 @@ data:
 
     # OAuth2 Resource Server for Entur Partner tenant
     antu.oauth2.resourceserver.auth0.entur.partner.jwt.issuer-uri={{ .Values.auth0.partner.url }}
-    antu.oauth2.resourceserver.auth0.entur.partner.jwt.audience={{ .Values.auth0.partner.audience }}
+    antu.oauth2.resourceserver.auth0.entur.partner.jwt.audience={{ .Values.auth0.ror.audience }}
 
     # OAuth2 Resource Server for RoR tenant
     antu.oauth2.resourceserver.auth0.ror.jwt.issuer-uri={{ .Values.auth0.ror.url }}

@@ -23,7 +23,6 @@ auth0:
 
   partner:
     url: https://partner.staging.entur.org/
-    audience: https://api.staging.entur.io
 
   client:
     tokenUri: https://partner.staging.entur.org/oauth/token

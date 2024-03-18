@@ -23,7 +23,6 @@ auth0:
 
   partner:
     url: https://partner.entur.org/
-    audience: https://api.entur.io
 
   client:
     tokenUri: https://partner.entur.org/oauth/token
