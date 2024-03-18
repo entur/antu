@@ -22,7 +22,7 @@ auth0:
     audience: https://ror.api.staging.entur.io
 
   partner:
-    url: https://partner.staging.entur.org
+    url: https://partner.staging.entur.org/
     audience: https://api.staging.entur.io
 
   client:
