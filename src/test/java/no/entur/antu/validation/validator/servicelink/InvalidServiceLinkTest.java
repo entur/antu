@@ -401,13 +401,7 @@ class InvalidServiceLinkTest {
     QuayId testQuayId1 = new QuayId("TST:Quay:1");
     QuayId testQuayId2 = new QuayId("TST:Quay:2");
 
-    Mockito
-      .when(
-        commonDataRepository.hasQuayIds(
-          anyString()
-        )
-      )
-      .thenReturn(true);
+    Mockito.when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
     Mockito
       .when(
         commonDataRepository.findQuayIdForScheduledStopPoint(
@@ -468,13 +462,7 @@ class InvalidServiceLinkTest {
     QuayId testQuayId1 = new QuayId("TST:Quay:1");
     QuayId testQuayId2 = new QuayId("TST:Quay:2");
 
-    Mockito
-      .when(
-        commonDataRepository.hasQuayIds(
-          anyString()
-        )
-      )
-      .thenReturn(true);
+    Mockito.when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
     Mockito
       .when(
         commonDataRepository.findQuayIdForScheduledStopPoint(
