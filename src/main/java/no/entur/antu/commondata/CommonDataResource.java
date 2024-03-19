@@ -34,7 +34,7 @@ public class CommonDataResource {
     return netexEntitiesIndex;
   }
 
-  public Map<ScheduledStopPointId, QuayId> getQuayIdsPerScheduledStopPoints() {
+  public Map<String, String> getQuayIdsPerScheduledStopPoints() {
     return getCommonDataIndex()
       .getServiceFrames()
       .stream()
@@ -47,16 +47,12 @@ public class CommonDataResource {
       .collect(
         Collectors.toMap(
           passengerStopAssignment ->
-            new ScheduledStopPointId(
               passengerStopAssignment
                 .getScheduledStopPointRef()
                 .getValue()
-                .getRef()
-            ),
+                .getRef(),
           passengerStopAssignment ->
-            new QuayId(
-              passengerStopAssignment.getQuayRef().getValue().getRef()
-            ),
+              passengerStopAssignment.getQuayRef().getValue().getRef(),
           (v1, v2) -> v2
         )
       );

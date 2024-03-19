@@ -18,11 +18,11 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   );
 
   private final CommonDataResource commonDataResource;
-  private final Map<String, Map<ScheduledStopPointId, QuayId>> scheduledStopPointAndQuayIdCache;
+  private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
 
   public DefaultCommonDataRepository(
     CommonDataResource commonDataResource,
-    Map<String, Map<ScheduledStopPointId, QuayId>> scheduledStopPointAndQuayIdCache
+    Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache
   ) {
     this.commonDataResource = commonDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
@@ -30,7 +30,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
 
   @Override
   public boolean hasQuayIds(String validationReportId) {
-    Map<ScheduledStopPointId, QuayId> idsForReport =
+    Map<String, String> idsForReport =
       scheduledStopPointAndQuayIdCache.get(validationReportId);
     return idsForReport != null && !idsForReport.isEmpty();
   }
@@ -40,7 +40,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
     ScheduledStopPointId scheduledStopPointId,
     String validationReportId
   ) {
-    Map<ScheduledStopPointId, QuayId> idsForReport =
+    Map<String, String> idsForReport =
       scheduledStopPointAndQuayIdCache.get(validationReportId);
     if (idsForReport == null) {
       throw new AntuException(
@@ -48,7 +48,9 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
         validationReportId
       );
     }
-    return idsForReport.get(scheduledStopPointId);
+    return new QuayId(
+      idsForReport.get(scheduledStopPointId.id())
+    );
   }
 
   @Override
