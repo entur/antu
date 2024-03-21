@@ -1,4 +1,4 @@
-package no.entur.antu.validator.journeypattern.stoppoint.distance;
+package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 

@@ -20,7 +20,7 @@ public record UnexpectedSpeedContext(
   ServiceJourney serviceJourney,
   AllVehicleModesOfTransportEnumeration transportMode,
   Map<ScheduledStopPointId, QuayCoordinates> quayCoordinatesPerScheduledStopPointId,
-  DistanceCalculator distanceCalculator
+  Distances distances
 ) {
   public UnexpectedSpeedContext(
     ServiceJourney serviceJourney,
@@ -31,7 +31,7 @@ public record UnexpectedSpeedContext(
       serviceJourney,
       transportMode,
       quayCoordinatesPerQuayId,
-      new DistanceCalculator()
+      new Distances()
     );
   }
 
@@ -44,10 +44,7 @@ public record UnexpectedSpeedContext(
   }
 
   public double calculateDistance(PassingTimes passingTimes) {
-    return distanceCalculator.calculateDistance(
-      passingTimes,
-      this::getCoordinates
-    );
+    return distances.findDistance(passingTimes, this::getCoordinates);
   }
 
   public boolean hasValidCoordinates(PassingTimes passingTimes) {
