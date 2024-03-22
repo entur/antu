@@ -1,4 +1,4 @@
-package no.entur.antu.validation.validator.servicelink;
+package no.entur.antu.validation.utilities;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
@@ -7,12 +7,20 @@ import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.toRadians;
 
+import no.entur.antu.model.QuayCoordinates;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
 
+/**
+ * Utility class for calculating distances between geographical points on the Earth's surface.
+ * The class provides methods for both accurate spherical distance calculations and faster
+ * approximated flat-earth distance calculations.
+ * The logic is copied from OTP (OpenTripPlanner).
+ */
 public final class SphericalDistanceLibrary {
 
-  private SphericalDistanceLibrary() {}
+  private SphericalDistanceLibrary() {
+    // Utility class
+  }
 
   public static final double RADIUS_OF_EARTH_IN_KM = 6371.01;
   public static final double RADIUS_OF_EARTH_IN_M =
@@ -25,6 +33,15 @@ public final class SphericalDistanceLibrary {
   // 1 / Max over-estimation error of approximated distance,
   // for delta lat/lon in given range
   public static final double MAX_ERR_INV = 0.999462;
+
+  public static double distance(QuayCoordinates from, QuayCoordinates to) {
+    return distance(
+      from.longitude(),
+      from.latitude(),
+      to.longitude(),
+      to.latitude()
+    );
+  }
 
   /**
    * Calculates the great-circle distance between two points on a sphere (like the Earth),
@@ -55,27 +72,7 @@ public final class SphericalDistanceLibrary {
     return fastDistance(from.y, from.x, to.y, to.x);
   }
 
-  /**
-   * Compute the length of a polyline
-   *
-   * @param lineString The polyline in (longitude, latitude degrees).
-   * @return The length, in meters, of the linestring.
-   */
-  public static double length(LineString lineString) {
-    double accumulatedMeters = 0;
-
-    for (int i = 1; i < lineString.getNumPoints(); i++) {
-      accumulatedMeters +=
-        distance(
-          lineString.getCoordinateN(i - 1),
-          lineString.getCoordinateN(i)
-        );
-    }
-
-    return accumulatedMeters;
-  }
-
-  public static double distance(
+  private static double distance(
     double lat1,
     double lon1,
     double lat2,
@@ -88,13 +85,22 @@ public final class SphericalDistanceLibrary {
    * Compute an (approximated) distance between two points, with a known cos(lat). Be careful, this
    * is approximated and never check for the validity of input cos(lat).
    */
-  public static double fastDistance(
+  private static double fastDistance(
     double lat1,
     double lon1,
     double lat2,
     double lon2
   ) {
     return fastDistance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
+  }
+
+  public static void main(String[] args) {
+    Coordinate from = new Coordinate(59.908136, 10.621018);
+    Coordinate to = new Coordinate(59.907979, 10.620589);
+    System.out.println(distance(from, to));
+    System.out.println(fastDistance(from, to));
+    //50.69480700671304
+    //50.667533200676786
   }
 
   public static double distance(

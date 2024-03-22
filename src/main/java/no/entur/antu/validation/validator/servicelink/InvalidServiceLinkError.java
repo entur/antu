@@ -1,8 +1,7 @@
 package no.entur.antu.validation.validator.servicelink;
 
 import no.entur.antu.validation.ValidationError;
-import no.entur.antu.validation.validator.Comparison;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
+import no.entur.antu.validation.utilities.Comparison;
 
 public record InvalidServiceLinkError(
   RuleCode ruleCode,

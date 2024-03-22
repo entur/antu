@@ -295,6 +295,8 @@ class UnexpectedSpeedTest {
       StopPlaceRepository.class
     );
 
+    Mockito.when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
+
     for (int i = 0; i < quayCoordinates.size(); i++) {
       QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
 
@@ -306,9 +308,6 @@ class UnexpectedSpeedTest {
           )
         )
         .thenReturn(testQuayId);
-      Mockito
-        .when(commonDataRepository.hasQuayIds(anyString()))
-        .thenReturn(true);
       Mockito
         .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
         .thenReturn(quayCoordinates.get(i));

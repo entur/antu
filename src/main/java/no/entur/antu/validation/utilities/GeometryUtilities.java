@@ -96,7 +96,7 @@ public final class GeometryUtilities {
    * Coordinates in Netex coordinates are in the format [lat, lon, lat, lon, ...]
    * but JTS requires the format [lon, lat, lon, lat, ...]
    */
-  public static Coordinate[] createJTSCoordinates(List<Double> coordinates) {
+  private static Coordinate[] createJTSCoordinates(List<Double> coordinates) {
     Coordinate[] jtsCoordinates = new Coordinate[coordinates.size() / 2];
     for (int i = 0; i < coordinates.size(); i += 2) {
       jtsCoordinates[i / 2] =

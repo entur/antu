@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.DeadRun;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Journey_VersionStructure;
+import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
 
@@ -132,9 +133,10 @@ class MissingPassengerStopAssignmentTest {
   void testMissingSingleStopPlaceAssignmentsUsedInMultipleJourneyPatternsButServiceJourneyExists() {
     NetexTestFragment testData = new NetexTestFragment();
     List<JourneyPattern> journeyPatterns = testData.createJourneyPatterns(4);
+    Line line = testData.line().create();
     List<Journey_VersionStructure> serviceJourneys = journeyPatterns
       .stream()
-      .map(testData::serviceJourney)
+      .map(journeyPattern -> testData.serviceJourney(line, journeyPattern))
       .map(NetexTestFragment.CreateServiceJourney::create)
       .map(Journey_VersionStructure.class::cast)
       .toList();
@@ -219,9 +221,10 @@ class MissingPassengerStopAssignmentTest {
   void testMissingStopPlaceAssignmentsAndBothDeadRunAndServiceJourneyExists() {
     NetexTestFragment testData = new NetexTestFragment();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
-    DeadRun deadRun = testData.deadRun(journeyPattern).create();
+    Line line = testData.line().create();
+    DeadRun deadRun = testData.deadRun(line, journeyPattern).create();
     ServiceJourney serviceJourney = testData
-      .serviceJourney(journeyPattern)
+      .serviceJourney(line, journeyPattern)
       .create();
 
     NetexEntitiesIndex netexEntitiesIndex = testData
