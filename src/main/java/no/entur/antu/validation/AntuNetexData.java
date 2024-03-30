@@ -19,6 +19,7 @@ import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
+import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
@@ -233,17 +234,23 @@ public record AntuNetexData(
   public static Stream<StopPointInJourneyPattern> stopPointsInJourneyPattern(
     JourneyPattern journeyPattern
   ) {
-    return journeyPattern
-      .getPointsInSequence()
-      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-      .stream()
-      .filter(StopPointInJourneyPattern.class::isInstance)
-      .map(StopPointInJourneyPattern.class::cast)
-      .sorted(
-        Comparator.comparing(
-          PointInLinkSequence_VersionedChildStructure::getOrder
-        )
-      );
+    return Optional
+      .ofNullable(journeyPattern.getPointsInSequence())
+      .map(
+        PointsInJourneyPattern_RelStructure::getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern
+      )
+      .map(stopPointsInJourneyPattern ->
+        stopPointsInJourneyPattern
+          .stream()
+          .filter(StopPointInJourneyPattern.class::isInstance)
+          .map(StopPointInJourneyPattern.class::cast)
+          .sorted(
+            Comparator.comparing(
+              PointInLinkSequence_VersionedChildStructure::getOrder
+            )
+          )
+      )
+      .orElse(Stream.empty());
   }
 
   /**
