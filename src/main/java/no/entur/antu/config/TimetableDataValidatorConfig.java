@@ -163,7 +163,7 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public SameQuayRefValidator sameQuayRef(
+  public SameQuayRefValidator sameQuayRefValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
