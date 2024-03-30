@@ -18,7 +18,6 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Route;
 
@@ -174,10 +173,15 @@ class UnexpectedDistanceValidatorTest extends ValidationTest {
 
     Route route = testFragment.route().withLine(line).create();
 
-    JourneyPattern journeyPattern = testFragment
+    NetexTestFragment.CreateJourneyPattern createJourneyPattern = testFragment
       .journeyPattern()
       .withId(123)
-      .withStopPointsInJourneyPattern(
+      .withRoute(route);
+
+    if (coordinates.isEmpty()) {
+      createJourneyPattern.withNumberOfStopPointInJourneyPattern(0);
+    } else {
+      createJourneyPattern.withStopPointsInJourneyPattern(
         IntStream
           .rangeClosed(1, coordinates.size())
           .mapToObj(i ->
@@ -188,13 +192,12 @@ class UnexpectedDistanceValidatorTest extends ValidationTest {
               .create()
           )
           .toList()
-      )
-      .withRoute(route)
-      .create();
+      );
+    }
 
     NetexEntitiesIndex netexEntitiesIndex = testFragment
       .netexEntitiesIndex()
-      .addJourneyPatterns(journeyPattern)
+      .addJourneyPatterns(createJourneyPattern.create())
       .addLine(line)
       .addRoute(route)
       .create();

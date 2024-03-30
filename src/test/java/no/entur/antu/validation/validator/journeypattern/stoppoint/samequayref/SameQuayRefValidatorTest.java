@@ -3,7 +3,6 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import java.util.Collections;
 import java.util.List;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
@@ -32,7 +31,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
     JourneyPattern journeyPattern = testFragment
       .journeyPattern()
       .withId(1)
-      .withStopPointsInJourneyPattern(Collections.emptyList())
+      .withNumberOfStopPointInJourneyPattern(0)
       .create();
 
     ValidationReport validationReport = runValidation(
