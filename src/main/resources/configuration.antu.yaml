@@ -90,3 +90,6 @@ validationRuleConfigs:
   - code: INVALID_NUMBER_OF_SERVICE_LINKS_IN_JOURNEY_PATTERN
     name: Invalid number of ServiceLinks in JourneyPattern
     severity: ERROR
+  - code: SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN
+    name: Same quay refs in consecutive stop points in journey pattern
+    severity: WARNING
