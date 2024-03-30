@@ -23,6 +23,7 @@ import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRef;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoints.SameStopPoints;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount.StopPointsCount;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignment;
@@ -161,6 +162,16 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public SameQuayRef sameQuayRef(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository
+  ) {
+    return new SameQuayRef(validationReportEntryFactory, commonDataRepository);
+  }
+
+  @Bean
   public StopPointsCount stopPointsCount(
     @Qualifier(
       "validationReportEntryFactory"
@@ -193,7 +204,8 @@ public class TimetableDataValidatorConfig {
     MissingPassengerStopAssignment missingPassengerStopAssignment,
     InvalidServiceLinks invalidServiceLinks,
     SameStopPoints sameStopPoints,
-    StopPointsCount stopPointsCount
+    StopPointsCount stopPointsCount,
+    SameQuayRef sameQuayRef
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -209,7 +221,8 @@ public class TimetableDataValidatorConfig {
       missingPassengerStopAssignment,
       invalidServiceLinks,
       sameStopPoints,
-      stopPointsCount
+      stopPointsCount,
+      sameQuayRef
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
