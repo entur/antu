@@ -35,7 +35,7 @@ import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.google.pubsub.GooglePubsubConstants;
 import org.apache.camel.component.google.pubsub.GooglePubsubEndpoint;
-import org.apache.camel.component.google.pubsub.consumer.AcknowledgeAsync;
+import org.apache.camel.component.google.pubsub.consumer.AcknowledgeCompletion;
 import org.apache.camel.support.DefaultExchange;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -170,7 +170,9 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
 
   protected String logDebugShowAll() {
     return (
-      "log:" + getClass().getName() + "?level=DEBUG&showAll=true&multiline=true"
+      "log:" +
+      getClass().getName() +
+      "?level=DEBUG&showAll=true&multiline=true&showCachedStreams=false"
     );
   }
 
@@ -246,7 +248,6 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
    * In case of failure during the routing this would make it impossible to retry the messages.
    * The synchronization is stored temporarily in a header and is applied again after the aggregation is complete
    *
-   * @param e
    * @see #addSynchronizationForAggregatedExchange(Exchange)
    */
   public void removeSynchronizationForAggregatedExchange(Exchange e) {
@@ -255,7 +256,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
       .getUnitOfWork()
       .handoverSynchronization(
         temporaryExchange,
-        AcknowledgeAsync.class::isInstance
+        AcknowledgeCompletion.class::isInstance
       );
     e.getIn().setHeader(SYNCHRONIZATION_HOLDER, temporaryExchange);
   }
