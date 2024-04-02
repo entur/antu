@@ -59,7 +59,7 @@ aliases:
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:17.0.10
+      - image: cimg/openjdk:17.0.10-node
         auth:
           username: $DOCKERHUB_LOGIN
           password: $DOCKERHUB_PASSWORD
@@ -86,7 +86,7 @@ jobs:
       # Cannot use -o because of snapshot dependencies.
       - run:
           name: Run Maven verify
-          command: mvn verify -s .circleci/settings.xml
+          command: mvn verify -s .circleci/settings.xml -PprettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
       - run: *sonar-scan
       - run:
           name: Save test results
