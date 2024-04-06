@@ -3,12 +3,15 @@ package no.entur.antu.validation.validator.servicejourney.passingtime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -65,13 +68,23 @@ class NonIncreasingPassingTimeIntegrationTest {
       when(validationContext.getNetexEntitiesIndex())
         .thenReturn(netexEntitiesIndex);
 
+      CommonDataRepository commonDataRepository = mock(
+        CommonDataRepository.class
+      );
+      when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
+
+      StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);
+
       NonIncreasingPassingTime nonIncreasingPassingTime =
-        new NonIncreasingPassingTime((code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          )
+        new NonIncreasingPassingTime(
+          (code, message, dataLocation) ->
+            new ValidationReportEntry(
+              message,
+              code,
+              ValidationReportEntrySeverity.ERROR
+            ),
+          commonDataRepository,
+          stopPlaceRepository
         );
 
       nonIncreasingPassingTime.validate(

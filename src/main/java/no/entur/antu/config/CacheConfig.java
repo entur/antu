@@ -44,6 +44,8 @@ public class CacheConfig {
     "transportModesForQuayIdCache";
   public static final String COORDINATES_PER_QUAY_ID_CACHE =
     "coordinatesPerQuayIdCache";
+  public static final String STOP_PLACE_NAME_PER_QUAY_ID_CACHE =
+    "stopPlaceNamePerQuayIdCache";
   public static final String COMMON_IDS_CACHE = "commonIdsCache";
   public static final String SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE =
     "scheduledStopPointAndQuayIdCache";
@@ -120,6 +122,17 @@ public class CacheConfig {
     );
   }
 
+  @Bean(name = STOP_PLACE_NAME_PER_QUAY_ID_CACHE)
+  public Map<QuayId, String> stopPlaceNamePerQuayIdCache(
+    RedissonClient redissonClient
+  ) {
+    return redissonClient.getLocalCachedMap(
+      STOP_PLACE_NAME_PER_QUAY_ID_CACHE,
+      new CompositeCodec(new QuayIdCodec(), new StringCodec()),
+      LocalCachedMapOptions.defaults()
+    );
+  }
+
   @Bean(name = COORDINATES_PER_QUAY_ID_CACHE)
   public Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache(
     RedissonClient redissonClient
@@ -131,7 +144,7 @@ public class CacheConfig {
     );
   }
 
-  @Bean
+  @Bean(name = STOP_PLACE_AND_QUAY_CACHE)
   public Map<String, Set<String>> stopPlaceAndQuayCache(
     RedissonClient redissonClient
   ) {

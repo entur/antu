@@ -64,7 +64,7 @@ public final class SortStopTimesUtil {
           ),
           timetabledPassingTime,
           hasFlexibleStopPoint(
-            antuNetexData.entitiesIndex(),
+            antuNetexData.netexEntitiesIndex(),
             scheduledStopPointIdByStopPointId.get(
               AntuNetexData.getStopPointRef(timetabledPassingTime)
             )

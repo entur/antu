@@ -2,6 +2,9 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointsco
 
 import java.util.Objects;
 import java.util.function.Predicate;
+import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -22,9 +25,15 @@ public class StopPointsCount extends AntuNetexValidator {
   );
 
   public StopPointsCount(
-    ValidationReportEntryFactory validationReportEntryFactory
+    ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    super(validationReportEntryFactory);
+    super(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Override
@@ -39,10 +48,13 @@ public class StopPointsCount extends AntuNetexValidator {
   ) {
     LOGGER.debug("Validating Stop points or service links In Journey Patterns");
 
-    getNetexEntitiesIndex(validationContext)
-      .getJourneyPatternIndex()
-      .getAll()
-      .stream()
+    AntuNetexData antuNetexData = createAntuNetexData(
+      validationReport,
+      validationContext
+    );
+
+    antuNetexData
+      .journeyPatterns()
       .map(StopPointsCountContext::of)
       .filter(Objects::nonNull)
       .filter(Predicate.not(StopPointsCountContext::isValid))

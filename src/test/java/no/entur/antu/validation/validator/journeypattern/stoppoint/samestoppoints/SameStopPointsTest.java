@@ -2,21 +2,23 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoin
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.stream.IntStream;
 import no.entur.antu.netextestdata.NetexTestFragment;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
+import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.JourneyPattern;
 
-class SameStopPointsTest {
+class SameStopPointsTest extends ValidationTest {
+
+  private ValidationReport runValidation(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return runValidationOnLineFile(netexEntitiesIndex, SameStopPoints.class);
+  }
 
   @Test
   void testAllJourneyPatternsHaveDifferentStopPoints() {
@@ -41,7 +43,7 @@ class SameStopPointsTest {
         )
       );
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       createNetexEntitiesIndex.create()
     );
 
@@ -75,7 +77,7 @@ class SameStopPointsTest {
         )
       );
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       createNetexEntitiesIndex.create()
     );
 
@@ -140,7 +142,7 @@ class SameStopPointsTest {
       )
       .create();
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       testFragment
         .netexEntitiesIndex()
         .addJourneyPatterns(
@@ -191,7 +193,7 @@ class SameStopPointsTest {
       )
       .create();
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       testFragment
         .netexEntitiesIndex()
         .addJourneyPatterns(journeyPattern1, journeyPattern2)
@@ -259,7 +261,7 @@ class SameStopPointsTest {
       journeyPatternWithSameStopPoints2
     );
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       createNetexEntitiesIndex.create()
     );
 
@@ -307,7 +309,7 @@ class SameStopPointsTest {
       )
       .create();
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       testFragment
         .netexEntitiesIndex()
         .addJourneyPatterns(journeyPattern1, journeyPattern2)
@@ -315,36 +317,5 @@ class SameStopPointsTest {
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
-  }
-
-  private static ValidationReport setupAndRunValidation(
-    NetexEntitiesIndex netexEntitiesIndex
-  ) {
-    SameStopPoints sameStopsInJourneyPatterns = new SameStopPoints(
-        (code, message, dataLocation) ->
-      new ValidationReportEntry(
-        message,
-        code,
-        ValidationReportEntrySeverity.ERROR
-      )
-    );
-
-    ValidationReport testValidationReport = new ValidationReport(
-      "TST",
-      "Test1122"
-    );
-
-    ValidationContextWithNetexEntitiesIndex validationContext = mock(
-      ValidationContextWithNetexEntitiesIndex.class
-    );
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-
-    sameStopsInJourneyPatterns.validate(
-      testValidationReport,
-      validationContext
-    );
-
-    return testValidationReport;
   }
 }

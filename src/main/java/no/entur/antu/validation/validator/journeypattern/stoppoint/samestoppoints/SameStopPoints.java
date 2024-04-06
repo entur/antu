@@ -2,6 +2,9 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoin
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.stop.StopPlaceRepository;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -24,9 +27,15 @@ public class SameStopPoints extends AntuNetexValidator {
   );
 
   public SameStopPoints(
-    ValidationReportEntryFactory validationReportEntryFactory
+    ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    super(validationReportEntryFactory);
+    super(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Override
@@ -41,12 +50,13 @@ public class SameStopPoints extends AntuNetexValidator {
   ) {
     LOGGER.debug("Validating Same Stops In Journey Patterns");
 
-    NetexEntitiesIndex index = getNetexEntitiesIndex(validationContext);
+    AntuNetexData antuNetexData = createAntuNetexData(
+      validationReport,
+      validationContext
+    );
 
-    index
-      .getJourneyPatternIndex()
-      .getAll()
-      .stream()
+    antuNetexData
+      .journeyPatterns()
       .map(SameStopPointsContext::of)
       .collect(
         // Two SameStopPointsContexts are equal if their Stop points are equal

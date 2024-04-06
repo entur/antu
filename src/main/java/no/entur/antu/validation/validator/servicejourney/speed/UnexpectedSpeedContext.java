@@ -66,9 +66,9 @@ public record UnexpectedSpeedContext(
   public static final class Builder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
-    private final AntuNetexData.WithStopPlacesAndCommonData antuNetexData;
+    private final AntuNetexData antuNetexData;
 
-    public Builder(AntuNetexData.WithStopPlacesAndCommonData antuNetexData) {
+    public Builder(AntuNetexData antuNetexData) {
       this.antuNetexData = antuNetexData;
     }
 

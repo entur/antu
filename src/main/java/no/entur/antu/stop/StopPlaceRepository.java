@@ -32,21 +32,27 @@ public interface StopPlaceRepository {
 
   /**
    * Checks if quay id present in the cache or try getting it from Read api.
-   * @return stop place id.
+   * @return quay id.
    */
   boolean hasQuayId(QuayId quayId);
 
   /**
    * Returns the transport modes for quay id present in the cache or try getting it from Read api.
-   * @return transport modes for given stop place id.
+   * @return transport modes for given quay id.
    */
   TransportModes getTransportModesForQuayId(QuayId quayId);
 
   /**
    * Returns the coordinates for quay id present in the cache or try getting it from Read api.
-   * @return coordinates for given stop place id.
+   * @return coordinates for given quay id.
    */
   QuayCoordinates getCoordinatesForQuayId(QuayId quayId);
+
+  /**
+   * Returns the stop place names for quay id present in the cache or try getting it from Read api.
+   * @return coordinates for given quay id.
+   */
+  String getStopPlaceNameForQuayId(QuayId quayId);
 
   /**
    * Refresh the cache with data retrieved from the Stop Place Register.

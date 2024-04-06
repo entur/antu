@@ -90,6 +90,11 @@ public class TestConfig {
       }
 
       @Override
+      public String getStopPlaceNameForQuayId(QuayId quayId) {
+        return null;
+      }
+
+      @Override
       public void refreshCache() {}
     };
   }

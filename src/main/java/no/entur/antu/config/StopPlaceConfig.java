@@ -18,6 +18,8 @@ package no.entur.antu.config;
 
 import static no.entur.antu.config.CacheConfig.COORDINATES_PER_QUAY_ID_CACHE;
 import static no.entur.antu.config.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
+import static no.entur.antu.config.CacheConfig.STOP_PLACE_AND_QUAY_CACHE;
+import static no.entur.antu.config.CacheConfig.STOP_PLACE_NAME_PER_QUAY_ID_CACHE;
 import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE;
 
 import java.util.Map;
@@ -59,7 +61,9 @@ public class StopPlaceConfig {
   @Bean
   @Profile("!test")
   StopPlaceRepository stopPlaceRepository(
-    @Qualifier("stopPlaceAndQuayCache") Map<String, Set<String>> stopPlaceCache,
+    @Qualifier(
+      STOP_PLACE_AND_QUAY_CACHE
+    ) Map<String, Set<String>> stopPlaceCache,
     StopPlaceFetcher stopPlaceFetcher,
     QuayFetcher quayFetcher,
     StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
@@ -71,6 +75,9 @@ public class StopPlaceConfig {
       COORDINATES_PER_QUAY_ID_CACHE
     ) Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
     @Qualifier(
+      STOP_PLACE_NAME_PER_QUAY_ID_CACHE
+    ) Map<QuayId, String> stopPlaceNamePerQuayIdCache,
+    @Qualifier(
       "stopPlaceResource"
     ) DefaultStopPlaceResource defaultStopPlaceResource
   ) {
@@ -80,6 +87,7 @@ public class StopPlaceConfig {
       quayIdNotFoundCache,
       transportModesForQuayIdCache,
       coordinatesPerQuayIdCache,
+      stopPlaceNamePerQuayIdCache,
       quayFetcher,
       stopPlaceFetcher,
       stopPlaceForQuayIdFetcher

@@ -2,17 +2,14 @@ package no.entur.antu.validation.validator.servicejourney.passingtime;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalTime;
+import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.netextestdata.NetexTestFragment;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
+import no.entur.antu.validation.ValidationTest;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeError.RuleCode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
@@ -20,7 +17,16 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
-class NonIncreasingPassingTimeTest {
+class NonIncreasingPassingTimeTest extends ValidationTest {
+
+  private ValidationReport runValidation(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return runValidationOnLineFile(
+      netexEntitiesIndex,
+      NonIncreasingPassingTime.class
+    );
+  }
 
   @Test
   void testValidateServiceJourneyWithRegularStop() {
@@ -30,7 +36,7 @@ class NonIncreasingPassingTimeTest {
       .serviceJourney(journeyPattern)
       .create();
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
     );
 
@@ -51,7 +57,8 @@ class NonIncreasingPassingTimeTest {
     );
     timetabledPassingTime.withArrivalTime(null).withDepartureTime(null);
 
-    ValidationReport validationReport = setupAndRunValidation(
+    mockGetStopName(getFirstScheduledStopPointId(journeyPattern));
+    ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
     );
 
@@ -82,7 +89,8 @@ class NonIncreasingPassingTimeTest {
       timetabledPassingTime.getDepartureTime().plusMinutes(1)
     );
 
-    ValidationReport validationReport = setupAndRunValidation(
+    mockGetStopName(getFirstScheduledStopPointId(journeyPattern));
+    ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
     );
 
@@ -118,11 +126,9 @@ class NonIncreasingPassingTimeTest {
 
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getFirstScheduledStopPointRef(journeyPattern), "");
+      .put(getFirstScheduledStopPointId(journeyPattern).id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
@@ -146,11 +152,10 @@ class NonIncreasingPassingTimeTest {
 
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getFirstScheduledStopPointRef(journeyPattern), "");
+      .put(getFirstScheduledStopPointId(journeyPattern).id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    mockGetStopName(getFirstScheduledStopPointId(journeyPattern));
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
     assertThat(
@@ -182,13 +187,15 @@ class NonIncreasingPassingTimeTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
+    ScheduledStopPointId scheduledStopPointId = getFirstScheduledStopPointId(
+      journeyPattern
+    );
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getFirstScheduledStopPointRef(journeyPattern), "");
+      .put(scheduledStopPointId.id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    mockGetStopName(scheduledStopPointId);
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
     assertThat(
@@ -224,9 +231,8 @@ class NonIncreasingPassingTimeTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    mockGetStopName(getFirstScheduledStopPointId(journeyPattern));
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
     assertThat(
@@ -260,9 +266,8 @@ class NonIncreasingPassingTimeTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    mockGetStopName(getSecondScheduledStopPointId(journeyPattern));
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
     assertThat(
@@ -301,11 +306,9 @@ class NonIncreasingPassingTimeTest {
 
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getSecondScheduledStopPointRef(journeyPattern), "");
+      .put(getSecondScheduledStopPointId(journeyPattern).id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
@@ -336,13 +339,15 @@ class NonIncreasingPassingTimeTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
+    ScheduledStopPointId scheduledStopPointId = getFirstScheduledStopPointId(
+      journeyPattern
+    );
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getFirstScheduledStopPointRef(journeyPattern), "");
+      .put(scheduledStopPointId.id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    mockGetStopName(scheduledStopPointId);
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
     assertThat(
@@ -379,11 +384,9 @@ class NonIncreasingPassingTimeTest {
 
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getFirstScheduledStopPointRef(journeyPattern), "");
+      .put(getFirstScheduledStopPointId(journeyPattern).id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
@@ -423,15 +426,13 @@ class NonIncreasingPassingTimeTest {
 
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getFirstScheduledStopPointRef(journeyPattern), "");
+      .put(getFirstScheduledStopPointId(journeyPattern).id(), "");
 
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getSecondScheduledStopPointRef(journeyPattern), "");
+      .put(getSecondScheduledStopPointId(journeyPattern).id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
@@ -478,13 +479,15 @@ class NonIncreasingPassingTimeTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
+    ScheduledStopPointId scheduledStopPointId = getFirstScheduledStopPointId(
+      journeyPattern
+    );
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getFirstScheduledStopPointRef(journeyPattern), "");
+      .put(scheduledStopPointId.id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    mockGetStopName(scheduledStopPointId);
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
     assertThat(
@@ -527,13 +530,15 @@ class NonIncreasingPassingTimeTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
+    ScheduledStopPointId scheduledStopPointId = getFirstScheduledStopPointId(
+      journeyPattern
+    );
     netexEntitiesIndex
       .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(getFirstScheduledStopPointRef(journeyPattern), "");
+      .put(scheduledStopPointId.id(), "");
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex
-    );
+    mockGetStopName(scheduledStopPointId);
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
     assertThat(
@@ -544,34 +549,6 @@ class NonIncreasingPassingTimeTest {
         ),
       is(true)
     );
-  }
-
-  private static ValidationReport setupAndRunValidation(
-    NetexEntitiesIndex netexEntitiesIndex
-  ) {
-    NonIncreasingPassingTime nonIncreasingPassingTime =
-      new NonIncreasingPassingTime((code, message, dataLocation) ->
-        new ValidationReportEntry(
-          message,
-          code,
-          ValidationReportEntrySeverity.ERROR
-        )
-      );
-
-    ValidationReport testValidationReport = new ValidationReport(
-      "TST",
-      "Test1122"
-    );
-
-    ValidationContextWithNetexEntitiesIndex validationContext = mock(
-      ValidationContextWithNetexEntitiesIndex.class
-    );
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-
-    nonIncreasingPassingTime.validate(testValidationReport, validationContext);
-
-    return testValidationReport;
   }
 
   private static TimetabledPassingTime getPassingTime(
@@ -596,7 +573,7 @@ class NonIncreasingPassingTimeTest {
     return getPassingTime(serviceJourney, 1);
   }
 
-  private static String getScheduledStopPointRef(
+  private static ScheduledStopPointId getScheduledStopPointId(
     JourneyPattern_VersionStructure journeyPattern,
     int order
   ) {
@@ -606,21 +583,18 @@ class NonIncreasingPassingTimeTest {
         .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
         .get(order);
 
-    return stopPointInJourneyPattern
-      .getScheduledStopPointRef()
-      .getValue()
-      .getRef();
+    return ScheduledStopPointId.of(stopPointInJourneyPattern);
   }
 
-  private static String getFirstScheduledStopPointRef(
+  private static ScheduledStopPointId getFirstScheduledStopPointId(
     JourneyPattern_VersionStructure journeyPattern
   ) {
-    return getScheduledStopPointRef(journeyPattern, 0);
+    return getScheduledStopPointId(journeyPattern, 0);
   }
 
-  private static String getSecondScheduledStopPointRef(
+  private static ScheduledStopPointId getSecondScheduledStopPointId(
     JourneyPattern_VersionStructure journeyPattern
   ) {
-    return getScheduledStopPointRef(journeyPattern, 1);
+    return getScheduledStopPointId(journeyPattern, 1);
   }
 }

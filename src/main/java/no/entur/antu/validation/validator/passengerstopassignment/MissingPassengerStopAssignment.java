@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -33,7 +34,6 @@ public class MissingPassengerStopAssignment extends AntuNetexValidator {
   private static final Logger LOGGER = LoggerFactory.getLogger(
     MissingPassengerStopAssignment.class
   );
-  private final CommonDataRepository commonDataRepository;
 
   @Override
   protected RuleCode[] getRuleCodes() {
@@ -42,10 +42,14 @@ public class MissingPassengerStopAssignment extends AntuNetexValidator {
 
   public MissingPassengerStopAssignment(
     ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    super(validationReportEntryFactory);
-    this.commonDataRepository = commonDataRepository;
+    super(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Override
@@ -55,22 +59,16 @@ public class MissingPassengerStopAssignment extends AntuNetexValidator {
   ) {
     LOGGER.debug("Validating Stop place in journey pattern");
 
-    NetexEntitiesIndex index = getNetexEntitiesIndex(validationContext);
-
-    AntuNetexData antuNetexData = new AntuNetexData(
-      index,
-      validationReport.getValidationReportId()
+    AntuNetexData antuNetexData = createAntuNetexData(
+      validationReport,
+      validationContext
     );
 
     MissingPassengerStopAssignmentContext.Builder builder =
-      new MissingPassengerStopAssignmentContext.Builder(
-        antuNetexData.withCommonData(commonDataRepository)
-      );
+      new MissingPassengerStopAssignmentContext.Builder(antuNetexData);
 
-    index
-      .getJourneyPatternIndex()
-      .getAll()
-      .stream()
+    antuNetexData
+      .journeyPatterns()
       .map(builder::build)
       .flatMap(List::stream)
       .filter(
@@ -78,7 +76,9 @@ public class MissingPassengerStopAssignment extends AntuNetexValidator {
           MissingPassengerStopAssignmentContext::hasPassengerStopAssignment
         )
       )
-      .filter(context -> !validateStopPointInJourneyPattern(index, context))
+      .filter(context ->
+        !validateStopPointInJourneyPattern(antuNetexData, context)
+      )
       .forEach(context ->
         addValidationReportEntry(
           validationReport,
@@ -101,11 +101,12 @@ public class MissingPassengerStopAssignment extends AntuNetexValidator {
   }
 
   private boolean validateStopPointInJourneyPattern(
-    NetexEntitiesIndex index,
+    AntuNetexData antuNetexData,
     MissingPassengerStopAssignmentContext missingPassengerStopAssignmentContext
   ) {
     Map<Boolean, List<Journey_VersionStructure>> deadRunsAndRestOfServiceJourneys =
-      index
+      antuNetexData
+        .netexEntitiesIndex()
         .getTimetableFrames()
         .stream()
         .flatMap(timetableFrame ->

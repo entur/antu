@@ -2,6 +2,8 @@ package no.entur.antu.validation.flex.validator.flexiblearea;
 
 import java.util.List;
 import java.util.function.Consumer;
+import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.utilities.GeometryUtilities;
@@ -31,9 +33,15 @@ public class InvalidFlexibleArea extends AntuNetexValidator {
   );
 
   public InvalidFlexibleArea(
-    ValidationReportEntryFactory validationReportEntryFactory
+    ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    super(validationReportEntryFactory);
+    super(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Override

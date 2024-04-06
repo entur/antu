@@ -18,7 +18,9 @@ package no.entur.antu.config.flex;
 
 import java.util.List;
 import java.util.Set;
+import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.flex.validator.EnturFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValidationTreeFactory;
@@ -117,9 +119,15 @@ public class TimetableDataFlexValidatorConfig {
   public InvalidFlexibleArea flexibleAreaValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    return new InvalidFlexibleArea(validationReportEntryFactory);
+    return new InvalidFlexibleArea(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   /**

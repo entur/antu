@@ -89,9 +89,15 @@ public class TimetableDataValidatorConfig {
   public NonIncreasingPassingTime nonIncreasingPassingTime(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    return new NonIncreasingPassingTime(validationReportEntryFactory);
+    return new NonIncreasingPassingTime(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Bean
@@ -114,11 +120,13 @@ public class TimetableDataValidatorConfig {
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
     return new MissingPassengerStopAssignment(
       validationReportEntryFactory,
-      commonDataRepository
+      commonDataRepository,
+      stopPlaceRepository
     );
   }
 
@@ -141,18 +149,30 @@ public class TimetableDataValidatorConfig {
   public SameStopPoints sameStopPoints(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    return new SameStopPoints(validationReportEntryFactory);
+    return new SameStopPoints(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Bean
   public StopPointsCount stopPointsCount(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    return new StopPointsCount(validationReportEntryFactory);
+    return new StopPointsCount(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Bean
