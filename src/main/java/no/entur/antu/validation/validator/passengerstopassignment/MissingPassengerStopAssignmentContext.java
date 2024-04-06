@@ -14,9 +14,9 @@ public record MissingPassengerStopAssignmentContext(
 ) {
   public static final class Builder {
 
-    private final AntuNetexData.WithCommonData antuNetexData;
+    private final AntuNetexData antuNetexData;
 
-    public Builder(AntuNetexData.WithCommonData antuNetexData) {
+    public Builder(AntuNetexData antuNetexData) {
       this.antuNetexData = antuNetexData;
     }
 

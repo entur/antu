@@ -3,7 +3,9 @@ package no.entur.antu.validation;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.AbstractNetexValidator;
 import org.entur.netex.validation.validator.DataLocation;
@@ -15,10 +17,17 @@ import org.entur.netex.validation.validator.xpath.ValidationContext;
 
 public abstract class AntuNetexValidator extends AbstractNetexValidator {
 
+  private final CommonDataRepository commonDataRepository;
+  private final StopPlaceRepository stopPlaceRepository;
+
   protected AntuNetexValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
+    ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
     super(validationReportEntryFactory);
+    this.commonDataRepository = commonDataRepository;
+    this.stopPlaceRepository = stopPlaceRepository;
   }
 
   protected abstract RuleCode[] getRuleCodes();
@@ -63,8 +72,10 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     ValidationContext validationContext
   ) {
     return new AntuNetexData(
+      validationReport.getValidationReportId(),
       getNetexEntitiesIndex(validationContext),
-      validationReport.getValidationReportId()
+      commonDataRepository,
+      stopPlaceRepository
     );
   }
 

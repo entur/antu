@@ -38,5 +38,12 @@ public interface StopPlaceResource {
    */
   Map<QuayId, QuayCoordinates> getCoordinatesPerQuayId();
 
+  /**
+   * Returns stop place names per quay ids.
+   *
+   * @return map of quay ids and stop place names.
+   */
+  Map<QuayId, String> getStopPlaceNamesPerQuayId();
+
   void loadStopPlacesDataset();
 }

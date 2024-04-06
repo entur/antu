@@ -57,12 +57,14 @@ class InvalidFlexibleAreaIntegrationTest {
       when(validationContext.isCommonFile()).thenReturn(true);
 
       InvalidFlexibleArea invalidFlexibleArea = new InvalidFlexibleArea(
-          (code, message, dataLocation) ->
-        new ValidationReportEntry(
-          message,
-          code,
-          ValidationReportEntrySeverity.ERROR
-        )
+        (code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          ),
+        null,
+        null
       );
 
       invalidFlexibleArea.validate(testValidationReport, validationContext);

@@ -4,21 +4,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.stream.IntStream;
 import no.entur.antu.netextestdata.NetexTestFragment;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
+import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.rutebanken.netex.model.JourneyPattern;
 
-class StopPointsCountTest {
+class StopPointsCountTest extends ValidationTest {
+
+  private ValidationReport runValidation(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return runValidationOnLineFile(netexEntitiesIndex, StopPointsCount.class);
+  }
 
   @Test
   void testJourneyPatternWithCorrectStopPointsAndServiceLinksCount() {
@@ -59,7 +62,7 @@ class StopPointsCountTest {
       .withNumberOfServiceLinksInJourneyPattern(0)
       .create();
 
-    ValidationReport validationReport = setupAndRunValidation(
+    ValidationReport validationReport = runValidation(
       testFragment
         .netexEntitiesIndex()
         .addJourneyPatterns(journeyPattern)
@@ -69,9 +72,7 @@ class StopPointsCountTest {
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
   }
 
-  private static ValidationReport runWith10StopPoints(
-    int numberOfServiceLinks
-  ) {
+  private ValidationReport runWith10StopPoints(int numberOfServiceLinks) {
     NetexTestFragment testFragment = new NetexTestFragment();
     int stopPointInJourneyPatternIdOffset = 123;
     int linksInJourneyPatternIdOffset = 234;
@@ -103,39 +104,11 @@ class StopPointsCountTest {
       )
       .create();
 
-    return setupAndRunValidation(
+    return runValidation(
       testFragment
         .netexEntitiesIndex()
         .addJourneyPatterns(journeyPattern)
         .create()
     );
-  }
-
-  private static ValidationReport setupAndRunValidation(
-    NetexEntitiesIndex netexEntitiesIndex
-  ) {
-    StopPointsCount stopPointsCount = new StopPointsCount(
-        (code, message, dataLocation) ->
-      new ValidationReportEntry(
-        message,
-        code,
-        ValidationReportEntrySeverity.ERROR
-      )
-    );
-
-    ValidationReport testValidationReport = new ValidationReport(
-      "TST",
-      "Test1122"
-    );
-
-    ValidationContextWithNetexEntitiesIndex validationContext = mock(
-      ValidationContextWithNetexEntitiesIndex.class
-    );
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-
-    stopPointsCount.validate(testValidationReport, validationContext);
-
-    return testValidationReport;
   }
 }

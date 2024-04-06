@@ -34,17 +34,17 @@ public class UnexpectedSpeed extends AntuNetexValidator {
   private static final Logger LOGGER = LoggerFactory.getLogger(
     UnexpectedSpeed.class
   );
-  private final CommonDataRepository commonDataRepository;
-  private final StopPlaceRepository stopPlaceRepository;
 
   public UnexpectedSpeed(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    super(validationReportEntryFactory);
-    this.commonDataRepository = commonDataRepository;
-    this.stopPlaceRepository = stopPlaceRepository;
+    super(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Override
@@ -71,12 +71,7 @@ public class UnexpectedSpeed extends AntuNetexValidator {
     );
 
     UnexpectedSpeedContext.Builder contextBuilder =
-      new UnexpectedSpeedContext.Builder(
-        antuNetexData.withStopPlacesAndCommonData(
-          commonDataRepository,
-          stopPlaceRepository
-        )
-      );
+      new UnexpectedSpeedContext.Builder(antuNetexData);
 
     antuNetexData
       .serviceJourneys()

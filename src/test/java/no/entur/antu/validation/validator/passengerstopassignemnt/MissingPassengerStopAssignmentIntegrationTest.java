@@ -3,6 +3,7 @@ package no.entur.antu.validation.validator.passengerstopassignemnt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignment;
 import org.entur.netex.NetexParser;
@@ -105,6 +107,13 @@ class MissingPassengerStopAssignmentIntegrationTest {
         .thenReturn(netexEntitiesIndex);
       when(validationContext.isCommonFile()).thenReturn(false);
 
+      StopPlaceRepository stopPlaceRepository = Mockito.mock(
+        StopPlaceRepository.class
+      );
+
+      when(stopPlaceRepository.getStopPlaceNameForQuayId(any()))
+        .thenReturn("TestName");
+
       MissingPassengerStopAssignment missingPassengerStopAssignment =
         new MissingPassengerStopAssignment(
           (code, message, dataLocation) ->
@@ -113,7 +122,8 @@ class MissingPassengerStopAssignmentIntegrationTest {
               code,
               ValidationReportEntrySeverity.ERROR
             ),
-          commonDataRepository
+          commonDataRepository,
+          stopPlaceRepository
         );
 
       missingPassengerStopAssignment.validate(

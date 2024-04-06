@@ -32,17 +32,16 @@ public class InvalidServiceLinks extends AntuNetexValidator {
   private static final double DISTANCE_WARNING = 20;
   private static final double DISTANCE_MAX = 100;
 
-  private final CommonDataRepository commonDataRepository;
-  private final StopPlaceRepository stopPlaceRepository;
-
   public InvalidServiceLinks(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    super(validationReportEntryFactory);
-    this.commonDataRepository = commonDataRepository;
-    this.stopPlaceRepository = stopPlaceRepository;
+    super(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Override
@@ -57,20 +56,13 @@ public class InvalidServiceLinks extends AntuNetexValidator {
   ) {
     LOGGER.debug("Validating ServiceLinks");
 
-    NetexEntitiesIndex index = getNetexEntitiesIndex(validationContext);
-
-    AntuNetexData antuNetexData = new AntuNetexData(
-      index,
-      validationReport.getValidationReportId()
+    AntuNetexData antuNetexData = createAntuNetexData(
+      validationReport,
+      validationContext
     );
 
     InvalidServiceLinkContext.Builder contextBuilder =
-      new InvalidServiceLinkContext.Builder(
-        antuNetexData.withStopPlacesAndCommonData(
-          commonDataRepository,
-          stopPlaceRepository
-        )
-      );
+      new InvalidServiceLinkContext.Builder(antuNetexData);
 
     antuNetexData
       .serviceLinks()

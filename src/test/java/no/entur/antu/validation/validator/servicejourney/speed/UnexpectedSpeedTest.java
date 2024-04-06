@@ -2,31 +2,29 @@ package no.entur.antu.validation.validator.servicejourney.speed;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.netextestdata.NetexTestFragment;
-import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
+import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
 
-class UnexpectedSpeedTest {
+class UnexpectedSpeedTest extends ValidationTest {
+
+  private ValidationReport runValidation(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return runValidationOnLineFile(netexEntitiesIndex, UnexpectedSpeed.class);
+  }
 
   @Test
   void normalSpeedShouldNotReturnAnyValidationEntry() {
@@ -198,22 +196,13 @@ class UnexpectedSpeedTest {
     NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
 
-    CommonDataRepository commonDataRepository = Mockito.mock(
-      CommonDataRepository.class
-    );
-    StopPlaceRepository stopPlaceRepository = Mockito.mock(
-      StopPlaceRepository.class
-    );
+    mockNoQuayIdsInCommonDataRepository();
 
     for (int i = 0; i < quayCoordinates.size(); i++) {
-      QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
-
-      Mockito
-        .when(commonDataRepository.hasQuayIds(anyString()))
-        .thenReturn(false);
-      Mockito
-        .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
-        .thenReturn(quayCoordinates.get(i));
+      mockGetCoordinates(
+        new QuayId("TST:Quay:" + (i + 1)),
+        quayCoordinates.get(i)
+      );
 
       PassengerStopAssignment passengerStopAssignment = testData
         .passengerStopAssignment()
@@ -227,10 +216,8 @@ class UnexpectedSpeedTest {
       );
     }
 
-    ValidationReport validationReport = setupAndRunValidation(
-      createNetexEntitiesIndex.create(),
-      commonDataRepository,
-      stopPlaceRepository
+    ValidationReport validationReport = runValidation(
+      createNetexEntitiesIndex.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -248,27 +235,16 @@ class UnexpectedSpeedTest {
     NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
 
-    CommonDataRepository commonDataRepository = Mockito.mock(
-      CommonDataRepository.class
-    );
-    StopPlaceRepository stopPlaceRepository = Mockito.mock(
-      StopPlaceRepository.class
-    );
+    mockNoQuayIdsInCommonDataRepository();
 
-    Mockito
-      .when(commonDataRepository.hasQuayIds(anyString()))
-      .thenReturn(false);
-
-    ValidationReport validationReport = setupAndRunValidation(
-      createNetexEntitiesIndex.create(),
-      commonDataRepository,
-      stopPlaceRepository
+    ValidationReport validationReport = runValidation(
+      createNetexEntitiesIndex.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
 
-  private static ValidationReport runTestWithQuayCoordinates(
+  private ValidationReport runTestWithQuayCoordinates(
     List<QuayCoordinates> quayCoordinates
   ) {
     NetexTestFragment testData = new NetexTestFragment();
@@ -284,72 +260,18 @@ class UnexpectedSpeedTest {
     );
   }
 
-  private static ValidationReport runTestWith(
+  private ValidationReport runTestWith(
     List<QuayCoordinates> quayCoordinates,
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    CommonDataRepository commonDataRepository = Mockito.mock(
-      CommonDataRepository.class
-    );
-    StopPlaceRepository stopPlaceRepository = Mockito.mock(
-      StopPlaceRepository.class
-    );
-
     for (int i = 0; i < quayCoordinates.size(); i++) {
-      QuayId testQuayId = new QuayId("TST:Quay:" + (i + 1));
-
-      Mockito
-        .when(
-          commonDataRepository.findQuayIdForScheduledStopPoint(
-            eq(new ScheduledStopPointId("TST:ScheduledStopPoint:" + (i + 1))),
-            anyString()
-          )
-        )
-        .thenReturn(testQuayId);
-      Mockito
-        .when(commonDataRepository.hasQuayIds(anyString()))
-        .thenReturn(true);
-      Mockito
-        .when(stopPlaceRepository.getCoordinatesForQuayId(testQuayId))
-        .thenReturn(quayCoordinates.get(i));
+      mockGetCoordinates(
+        new ScheduledStopPointId("TST:ScheduledStopPoint:" + (i + 1)),
+        new QuayId("TST:Quay:" + (i + 1)),
+        quayCoordinates.get(i)
+      );
     }
 
-    return setupAndRunValidation(
-      netexEntitiesIndex,
-      commonDataRepository,
-      stopPlaceRepository
-    );
-  }
-
-  private static ValidationReport setupAndRunValidation(
-    NetexEntitiesIndex netexEntitiesIndex,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
-  ) {
-    UnexpectedSpeed unexpectedSpeed = new UnexpectedSpeed(
-      (code, message, dataLocation) ->
-        new ValidationReportEntry(
-          message,
-          code,
-          ValidationReportEntrySeverity.ERROR
-        ),
-      commonDataRepository,
-      stopPlaceRepository
-    );
-
-    ValidationReport testValidationReport = new ValidationReport(
-      "TST",
-      "Test1122"
-    );
-
-    ValidationContextWithNetexEntitiesIndex validationContext = mock(
-      ValidationContextWithNetexEntitiesIndex.class
-    );
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-
-    unexpectedSpeed.validate(testValidationReport, validationContext);
-
-    return testValidationReport;
+    return runValidation(netexEntitiesIndex);
   }
 }

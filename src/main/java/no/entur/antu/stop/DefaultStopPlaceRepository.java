@@ -16,6 +16,7 @@
 package no.entur.antu.stop;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import no.entur.antu.exception.AntuException;
@@ -24,6 +25,8 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
+import org.rutebanken.netex.model.LocationStructure;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
@@ -45,6 +48,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   private final Set<QuayId> quayIdNotFoundCache;
   private final Map<QuayId, TransportModes> transportModesForQuayIdCache;
   private final Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache;
+  private final Map<QuayId, String> stopPlaceNamePerQuayIdCache;
   private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
   private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
   private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
@@ -55,6 +59,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     Set<QuayId> quayIdNotFoundCache,
     Map<QuayId, TransportModes> transportModesForQuayIdCache,
     Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
+    Map<QuayId, String> stopPlaceNamePerQuayIdCache,
     NetexEntityFetcher<Quay, QuayId> quayFetcher,
     NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
     NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher
@@ -64,6 +69,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     this.transportModesForQuayIdCache = transportModesForQuayIdCache;
     this.quayIdNotFoundCache = quayIdNotFoundCache;
     this.coordinatesPerQuayIdCache = coordinatesPerQuayIdCache;
+    this.stopPlaceNamePerQuayIdCache = stopPlaceNamePerQuayIdCache;
     this.quayFetcher = quayFetcher;
     this.stopPlaceFetcher = stopPlaceFetcher;
     this.stopPlaceForQuayIdFetcher = stopPlaceForQuayIdFetcher;
@@ -127,6 +133,19 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     );
   }
 
+  @Override
+  public String getStopPlaceNameForQuayId(QuayId quayId) {
+    return getDataForQuayId(
+      quayId,
+      stopPlaceNamePerQuayIdCache,
+      stopPlace ->
+        Optional
+          .of(stopPlace.getName())
+          .map(MultilingualString::getValue)
+          .orElse(null)
+    );
+  }
+
   public <D> D getDataForQuayId(
     QuayId quayId,
     Map<QuayId, D> cache,
@@ -160,6 +179,9 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
     transportModesForQuayIdCache.putAll(
       stopPlaceResource.getTransportModesPerQuayId()
+    );
+    coordinatesPerQuayIdCache.putAll(
+      stopPlaceResource.getCoordinatesPerQuayId()
     );
     coordinatesPerQuayIdCache.putAll(
       stopPlaceResource.getCoordinatesPerQuayId()

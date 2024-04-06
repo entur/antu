@@ -66,6 +66,11 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
     return getDataPerQuayId(this::getQuayCoordinatesEntries);
   }
 
+  @Override
+  public Map<QuayId, String> getStopPlaceNamesPerQuayId() {
+    return getDataPerQuayId(this::getStopPlaceNameEntries);
+  }
+
   private <D> Map<QuayId, D> getDataPerQuayId(
     Function<StopPlace, List<Map.Entry<QuayId, D>>> dataEntriesFunction
   ) {
@@ -113,6 +118,21 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
         QuayCoordinates quayCoordinates = QuayCoordinates.of(quay);
         if (quayCoordinates != null) {
           return Map.entry(QuayId.of(quay), quayCoordinates);
+        }
+        return null;
+      }
+    );
+  }
+
+  private List<Map.Entry<QuayId, String>> getStopPlaceNameEntries(
+    StopPlace stopPlace
+  ) {
+    return makeQuayIdMapEntries(
+      stopPlace,
+      quay -> {
+        String stopPlaceName = stopPlace.getName().getValue();
+        if (stopPlaceName != null) {
+          return Map.entry(QuayId.of(quay), stopPlaceName);
         }
         return null;
       }

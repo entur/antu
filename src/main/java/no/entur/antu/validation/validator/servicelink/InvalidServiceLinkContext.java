@@ -31,9 +31,9 @@ public record InvalidServiceLinkContext(
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
-    private final AntuNetexData.WithStopPlacesAndCommonData antuNetexData;
+    private final AntuNetexData antuNetexData;
 
-    public Builder(AntuNetexData.WithStopPlacesAndCommonData antuNetexData) {
+    public Builder(AntuNetexData antuNetexData) {
       this.antuNetexData = antuNetexData;
     }
 
@@ -59,12 +59,8 @@ public record InvalidServiceLinkContext(
         return null;
       }
 
-      QuayCoordinates from = antuNetexData
-        .stopPlaceRepository()
-        .getCoordinatesForQuayId(fromQuayId);
-      QuayCoordinates to = antuNetexData
-        .stopPlaceRepository()
-        .getCoordinatesForQuayId(toQuayId);
+      QuayCoordinates from = antuNetexData.getCoordinatesForQuayId(fromQuayId);
+      QuayCoordinates to = antuNetexData.getCoordinatesForQuayId(toQuayId);
 
       if (from == null || to == null) {
         LOGGER.warn(
