@@ -11,15 +11,19 @@ public record SameQuayRefContext(
   ScheduledStopPointId scheduledStopPointId,
   QuayId quayId
 ) {
-  public static Builder builder(AntuNetexData.WithCommonData antuNetexData) {
+  public boolean isValid() {
+    return scheduledStopPointId != null && quayId != null;
+  }
+
+  public static Builder builder(AntuNetexData antuNetexData) {
     return new Builder(antuNetexData);
   }
 
   public static class Builder {
 
-    private final AntuNetexData.WithCommonData antuNetexData;
+    private final AntuNetexData antuNetexData;
 
-    private Builder(AntuNetexData.WithCommonData antuNetexData) {
+    private Builder(AntuNetexData antuNetexData) {
       this.antuNetexData = antuNetexData;
     }
 

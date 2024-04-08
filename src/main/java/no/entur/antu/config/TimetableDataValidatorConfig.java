@@ -166,9 +166,14 @@ public class TimetableDataValidatorConfig {
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    return new SameQuayRef(validationReportEntryFactory, commonDataRepository);
+    return new SameQuayRef(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Bean

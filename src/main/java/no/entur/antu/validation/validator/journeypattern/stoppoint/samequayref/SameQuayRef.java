@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -24,14 +24,17 @@ public class SameQuayRef extends AntuNetexValidator {
   private static final Logger LOGGER = LoggerFactory.getLogger(
     SameQuayRef.class
   );
-  private final CommonDataRepository commonDataRepository;
 
   public SameQuayRef(
     ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    super(validationReportEntryFactory);
-    this.commonDataRepository = commonDataRepository;
+    super(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
   }
 
   @Override
@@ -48,21 +51,17 @@ public class SameQuayRef extends AntuNetexValidator {
       "Validating Same quayRefs in two consecutive Stop points In Journey Patterns"
     );
 
-    NetexEntitiesIndex index = getNetexEntitiesIndex(validationContext);
-
-    AntuNetexData antuNetexData = new AntuNetexData(
-      index,
-      validationReport.getValidationReportId()
+    AntuNetexData antuNetexData = createAntuNetexData(
+      validationReport,
+      validationContext
     );
 
     SameQuayRefContext.Builder builder = SameQuayRefContext.builder(
-      antuNetexData.withCommonData(commonDataRepository)
+      antuNetexData
     );
 
-    index
-      .getJourneyPatternIndex()
-      .getAll()
-      .stream()
+    antuNetexData
+      .journeyPatterns()
       .map(builder::build)
       .forEach(sameQuayRefContexts ->
         validateSameQuayRefs(
@@ -94,6 +93,13 @@ public class SameQuayRef extends AntuNetexValidator {
         SameQuayRefContext previousContext = contextForJourneyPattern.get(
           i - 1
         );
+
+        if (!currentContext.isValid() || !previousContext.isValid()) {
+          LOGGER.debug(
+            "Either scheduled stop point id or quay id missing. Ignoring the validation"
+          );
+          return;
+        }
 
         if (currentContext.quayId().equals(previousContext.quayId())) {
           reportError.accept(
