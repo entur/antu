@@ -95,6 +95,13 @@ public class SameQuayRef extends AntuNetexValidator {
           i - 1
         );
 
+        if (!currentContext.isValid() || !previousContext.isValid()) {
+          LOGGER.debug(
+            "Either scheduled stop point id or quay id missing. Ignoring the validation"
+          );
+          return;
+        }
+
         if (currentContext.quayId().equals(previousContext.quayId())) {
           reportError.accept(
             new SameQuayRefError(
