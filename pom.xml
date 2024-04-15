@@ -33,7 +33,7 @@
         <redisson.version>3.28.0</redisson.version>
         <kryo.version>5.6.0</kryo.version>
         <embedded-redis.version>0.9.0</embedded-redis.version>
-        <netex-parser-java.version>3.1.13</netex-parser-java.version>
+        <netex-parser-java.version>3.1.14</netex-parser-java.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <prettier-java.version>2.1.0</prettier-java.version>
         <prettier-maven-plugin.version>0.22</prettier-maven-plugin.version>
