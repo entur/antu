@@ -2,24 +2,20 @@ package no.entur.antu.validation.validator.passengerstopassignemnt;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.stream.IntStream;
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.netextestdata.NetexTestFragment;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
+import no.entur.antu.validation.ValidationTest;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignment;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.DeadRun;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -27,7 +23,16 @@ import org.rutebanken.netex.model.Journey_VersionStructure;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
 
-class MissingPassengerStopAssignmentTest {
+class MissingPassengerStopAssignmentTest extends ValidationTest {
+
+  private ValidationReport runValidation(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return runValidationOnLineFile(
+      netexEntitiesIndex,
+      MissingPassengerStopAssignment.class
+    );
+  }
 
   @Test
   void testAllStopPlaceAssignmentsExists() {
@@ -41,11 +46,6 @@ class MissingPassengerStopAssignmentTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
-    CommonDataRepository commonDataRepository = mock(
-      CommonDataRepository.class
-    );
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-
     IntStream
       .range(
         0,
@@ -55,23 +55,13 @@ class MissingPassengerStopAssignmentTest {
           .size()
       )
       .forEach(index -> {
-        QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
-        when(
-          commonDataRepository.findQuayIdForScheduledStopPoint(
-            eq(
-              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1))
-            ),
-            anyString()
-          )
-        )
-          .thenReturn(testQuayId);
+        mockGetQuayId(
+          new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1)),
+          new QuayId("TST:Quay:" + (index + 1))
+        );
       });
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex,
-      commonDataRepository
-    );
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
@@ -88,12 +78,6 @@ class MissingPassengerStopAssignmentTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
-    CommonDataRepository commonDataRepository = mock(
-      CommonDataRepository.class
-    );
-
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-
     IntStream
       .range(
         0,
@@ -104,23 +88,13 @@ class MissingPassengerStopAssignmentTest {
         1
       )
       .forEach(index -> {
-        QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
-        when(
-          commonDataRepository.findQuayIdForScheduledStopPoint(
-            eq(
-              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1))
-            ),
-            anyString()
-          )
-        )
-          .thenReturn(testQuayId);
+        mockGetQuayId(
+          new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1)),
+          new QuayId("TST:Quay:" + (index + 1))
+        );
       });
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex,
-      commonDataRepository
-    );
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
   }
@@ -147,15 +121,7 @@ class MissingPassengerStopAssignmentTest {
       )
       .create();
 
-    CommonDataRepository commonDataRepository = mock(
-      CommonDataRepository.class
-    );
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex,
-      commonDataRepository
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(16));
   }
@@ -173,15 +139,7 @@ class MissingPassengerStopAssignmentTest {
       .getJourneyPatternIndex()
       .put(journeyPattern.getId(), journeyPattern);
 
-    CommonDataRepository commonDataRepository = mock(
-      CommonDataRepository.class
-    );
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex,
-      commonDataRepository
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(4));
   }
@@ -199,15 +157,7 @@ class MissingPassengerStopAssignmentTest {
       .netexEntitiesIndex(journeyPattern, deadRun)
       .create();
 
-    CommonDataRepository commonDataRepository = mock(
-      CommonDataRepository.class
-    );
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex,
-      commonDataRepository
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
@@ -230,16 +180,7 @@ class MissingPassengerStopAssignmentTest {
       .addServiceJourneys(deadRun, serviceJourney)
       .create();
 
-    CommonDataRepository commonDataRepository = mock(
-      CommonDataRepository.class
-    );
-
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex,
-      commonDataRepository
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(4));
   }
@@ -256,12 +197,6 @@ class MissingPassengerStopAssignmentTest {
       .netexEntitiesIndex(journeyPattern, serviceJourney)
       .create();
 
-    CommonDataRepository commonDataRepository = mock(
-      CommonDataRepository.class
-    );
-
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
-
     IntStream
       .range(
         0,
@@ -271,23 +206,14 @@ class MissingPassengerStopAssignmentTest {
           .size() -
         2
       )
-      .forEach(index -> {
-        QuayId testQuayId = new QuayId("TST:Quay:" + (index + 1));
-        when(
-          commonDataRepository.findQuayIdForScheduledStopPoint(
-            eq(
-              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1))
-            ),
-            anyString()
-          )
+      .forEach(index ->
+        mockGetQuayId(
+          new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1)),
+          new QuayId("TST:Quay:" + (index + 1))
         )
-          .thenReturn(testQuayId);
-      });
+      );
 
-    ValidationReport validationReport = setupAndRunValidation(
-      netexEntitiesIndex,
-      commonDataRepository
-    );
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(2));
   }
@@ -324,51 +250,12 @@ class MissingPassengerStopAssignmentTest {
         );
       });
 
-    CommonDataRepository commonDataRepository = mock(
-      CommonDataRepository.class
-    );
-    when(commonDataRepository.hasQuayIds(anyString())).thenReturn(false);
+    mockNoQuayIdsInCommonDataRepository();
 
-    ValidationReport validationReport = setupAndRunValidation(
-      createNetexEntitiesIndex.create(),
-      commonDataRepository
+    ValidationReport validationReport = runValidation(
+      createNetexEntitiesIndex.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
-  }
-
-  private static ValidationReport setupAndRunValidation(
-    NetexEntitiesIndex netexEntitiesIndex,
-    CommonDataRepository commonDataRepository
-  ) {
-    MissingPassengerStopAssignment missingPassengerStopAssignment =
-      new MissingPassengerStopAssignment(
-        (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          ),
-        commonDataRepository
-      );
-
-    ValidationReport testValidationReport = new ValidationReport(
-      "TST",
-      "Test1122"
-    );
-
-    ValidationContextWithNetexEntitiesIndex validationContext = mock(
-      ValidationContextWithNetexEntitiesIndex.class
-    );
-
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-
-    missingPassengerStopAssignment.validate(
-      testValidationReport,
-      validationContext
-    );
-
-    return testValidationReport;
   }
 }

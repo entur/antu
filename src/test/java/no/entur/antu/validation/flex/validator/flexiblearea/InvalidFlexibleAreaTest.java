@@ -224,12 +224,14 @@ class InvalidFlexibleAreaTest {
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     InvalidFlexibleArea invalidFlexibleArea = new InvalidFlexibleArea(
-        (code, message, dataLocation) ->
-      new ValidationReportEntry(
-        message,
-        code,
-        ValidationReportEntrySeverity.ERROR
-      )
+      (code, message, dataLocation) ->
+        new ValidationReportEntry(
+          message,
+          code,
+          ValidationReportEntrySeverity.ERROR
+        ),
+      null,
+      null
     );
 
     ValidationReport testValidationReport = new ValidationReport(

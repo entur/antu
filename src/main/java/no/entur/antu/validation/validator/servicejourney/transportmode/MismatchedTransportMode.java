@@ -3,7 +3,6 @@ package no.entur.antu.validation.validator.servicejourney.transportmode;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
@@ -37,9 +36,13 @@ public class MismatchedTransportMode extends AntuNetexValidator {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    super(validationReportEntryFactory);
-    this.commonDataRepository = commonDataRepository;
+    super(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
     this.stopPlaceRepository = stopPlaceRepository;
+    this.commonDataRepository = commonDataRepository;
   }
 
   @Override

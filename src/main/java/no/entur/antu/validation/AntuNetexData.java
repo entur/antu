@@ -2,7 +2,6 @@ package no.entur.antu.validation;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,9 +18,7 @@ import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.Point_VersionStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
@@ -29,137 +26,90 @@ import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
 import org.rutebanken.netex.model.Service_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class AntuNetexData {
+public record AntuNetexData(
+  String validationReportId,
+  NetexEntitiesIndex netexEntitiesIndex,
+  CommonDataRepository commonDataRepository,
+  StopPlaceRepository stopPlaceRepository
+) {
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    AntuNetexData.class
+  );
 
-  private final NetexEntitiesIndex entitiesIndex;
-  private final String validationReportId;
+  public QuayCoordinates getCoordinatesForQuayId(QuayId quayid) {
+    return stopPlaceRepository.getCoordinatesForQuayId(quayid);
+  }
 
-  public AntuNetexData(
-    NetexEntitiesIndex entitiesIndex,
-    String validationReportId
+  public Stream<JourneyPattern> journeyPatterns() {
+    return netexEntitiesIndex.getJourneyPatternIndex().getAll().stream();
+  }
+
+  /**
+   * Find the quay id for the given scheduled stop point.
+   * If the quay id is not found in the common data repository,
+   * it will be looked up from the netex entities index.
+   * <br>
+   * Which basically means that if the PassengerStopAssignment is
+   * not in Common file, it will be looked up from the line file.
+   */
+  public QuayId findQuayIdForScheduledStopPoint(
+    ScheduledStopPointId scheduledStopPointId
   ) {
-    this.entitiesIndex = entitiesIndex;
-    this.validationReportId = validationReportId;
-  }
-
-  public NetexEntitiesIndex entitiesIndex() {
-    return entitiesIndex;
-  }
-
-  public String validationReportId() {
-    return validationReportId;
-  }
-
-  public WithCommonData withCommonData(
-    CommonDataRepository commonDataRepository
-  ) {
-    return new AntuNetexData.WithCommonData(
-      entitiesIndex,
-      validationReportId,
-      commonDataRepository
-    );
-  }
-
-  public WithStopPlacesAndCommonData withStopPlacesAndCommonData(
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
-  ) {
-    return new WithStopPlacesAndCommonData(
-      entitiesIndex,
-      validationReportId,
-      commonDataRepository,
-      stopPlaceRepository
-    );
-  }
-
-  public static class WithCommonData extends AntuNetexData {
-
-    protected final CommonDataRepository commonDataRepository;
-
-    private WithCommonData(
-      NetexEntitiesIndex index,
-      String validationReportId,
-      CommonDataRepository commonDataRepository
-    ) {
-      super(index, validationReportId);
-      this.commonDataRepository = commonDataRepository;
-    }
-
-    public CommonDataRepository commonDataRepository() {
-      return commonDataRepository;
-    }
-
-    /**
-     * Find the quay id for the given scheduled stop point.
-     * If the quay id is not found in the common data repository,
-     * it will be looked up from the netex entities index.
-     * <br>
-     * Which basically means that if the PassengerStopAssignment is
-     * not in Common file, it will be looked up from the line file.
-     */
-    public QuayId findQuayIdForScheduledStopPoint(
-      ScheduledStopPointId scheduledStopPointId
-    ) {
-      return commonDataRepository.hasQuayIds(validationReportId())
-        ? commonDataRepository.findQuayIdForScheduledStopPoint(
-          scheduledStopPointId,
-          validationReportId()
-        )
-        : QuayId.ofNullable(
-          entitiesIndex()
-            .getQuayIdByStopPointRefIndex()
-            .get(scheduledStopPointId.id())
-        );
-    }
-  }
-
-  public static class WithStopPlacesAndCommonData extends WithCommonData {
-
-    private final StopPlaceRepository stopPlaceRepository;
-
-    private WithStopPlacesAndCommonData(
-      NetexEntitiesIndex index,
-      String validationReportId,
-      CommonDataRepository commonDataRepository,
-      StopPlaceRepository stopPlaceRepository
-    ) {
-      super(index, validationReportId, commonDataRepository);
-      this.stopPlaceRepository = stopPlaceRepository;
-    }
-
-    public StopPlaceRepository stopPlaceRepository() {
-      return stopPlaceRepository;
-    }
-
-    public Map.Entry<ScheduledStopPointId, QuayCoordinates> findCoordinatesPerQuayId(
-      StopPointInJourneyPattern stopPointInJourneyPattern
-    ) {
-      String scheduledStopPointRef = stopPointInJourneyPattern
-        .getScheduledStopPointRef()
-        .getValue()
-        .getRef();
-
-      if (scheduledStopPointRef == null) {
-        return null;
-      }
-
-      ScheduledStopPointId scheduledStopPointId = new ScheduledStopPointId(
-        scheduledStopPointRef
+    return commonDataRepository.hasQuayIds(validationReportId())
+      ? commonDataRepository.findQuayIdForScheduledStopPoint(
+        scheduledStopPointId,
+        validationReportId()
+      )
+      : QuayId.ofNullable(
+        netexEntitiesIndex()
+          .getQuayIdByStopPointRefIndex()
+          .get(scheduledStopPointId.id())
       );
+  }
 
-      QuayId quayId = findQuayIdForScheduledStopPoint(scheduledStopPointId);
+  public Map.Entry<ScheduledStopPointId, QuayCoordinates> findCoordinatesPerQuayId(
+    StopPointInJourneyPattern stopPointInJourneyPattern
+  ) {
+    String scheduledStopPointRef = stopPointInJourneyPattern
+      .getScheduledStopPointRef()
+      .getValue()
+      .getRef();
 
-      if (quayId == null) {
-        return null;
-      }
-
-      QuayCoordinates coordinatesForQuayId =
-        stopPlaceRepository.getCoordinatesForQuayId(quayId);
-      return coordinatesForQuayId == null
-        ? null
-        : Map.entry(scheduledStopPointId, coordinatesForQuayId);
+    if (scheduledStopPointRef == null) {
+      return null;
     }
+
+    ScheduledStopPointId scheduledStopPointId = new ScheduledStopPointId(
+      scheduledStopPointRef
+    );
+
+    QuayId quayId = findQuayIdForScheduledStopPoint(scheduledStopPointId);
+
+    if (quayId == null) {
+      return null;
+    }
+
+    QuayCoordinates coordinatesForQuayId =
+      stopPlaceRepository.getCoordinatesForQuayId(quayId);
+    return coordinatesForQuayId == null
+      ? null
+      : Map.entry(scheduledStopPointId, coordinatesForQuayId);
+  }
+
+  public String getStopPointName(ScheduledStopPointId scheduledStopPointId) {
+    QuayId quayId = findQuayIdForScheduledStopPoint(scheduledStopPointId);
+    if (quayId == null) {
+      LOGGER.debug(
+        "Stop place name cannot be found due to missing stop point assignment."
+      );
+      return scheduledStopPointId.id();
+    }
+    return Optional
+      .ofNullable(stopPlaceRepository.getStopPlaceNameForQuayId(quayId))
+      .orElse(quayId.id());
   }
 
   /**
@@ -173,7 +123,7 @@ public class AntuNetexData {
     AllVehicleModesOfTransportEnumeration transportMode =
       serviceJourney.getTransportMode();
     if (transportMode == null) {
-      JourneyPattern journeyPattern = entitiesIndex
+      JourneyPattern journeyPattern = netexEntitiesIndex
         .getJourneyPatternIndex()
         .get(serviceJourney.getJourneyPatternRef().getValue().getRef());
 
@@ -189,10 +139,10 @@ public class AntuNetexData {
   public AllVehicleModesOfTransportEnumeration findTransportMode(
     JourneyPattern journeyPattern
   ) {
-    Route route = entitiesIndex
+    Route route = netexEntitiesIndex
       .getRouteIndex()
       .get(journeyPattern.getRouteRef().getRef());
-    Line line = entitiesIndex
+    Line line = netexEntitiesIndex
       .getLineIndex()
       .get(route.getLineRef().getValue().getRef());
 
@@ -200,7 +150,7 @@ public class AntuNetexData {
       return line.getTransportMode();
     }
 
-    FlexibleLine flexibleLine = entitiesIndex
+    FlexibleLine flexibleLine = netexEntitiesIndex
       .getFlexibleLineIndex()
       .get(route.getLineRef().getValue().getRef());
 
@@ -213,17 +163,8 @@ public class AntuNetexData {
     return null;
   }
 
-  public String getStopPointName(ScheduledStopPointId scheduledStopPointId) {
-    return Optional
-      .ofNullable(entitiesIndex.getScheduledStopPointIndex())
-      .map(index -> index.getLatestVersion(scheduledStopPointId.id()))
-      .map(Point_VersionStructure::getName)
-      .map(MultilingualString::getValue)
-      .orElse(scheduledStopPointId.id());
-  }
-
   public Stream<ServiceLink> serviceLinks() {
-    return entitiesIndex
+    return netexEntitiesIndex
       .getServiceFrames()
       .stream()
       .map(Service_VersionFrameStructure::getServiceLinks)
@@ -236,7 +177,7 @@ public class AntuNetexData {
    * Returns the Stream of all ServiceJourneys in all the TimeTableFrames.
    */
   public Stream<ServiceJourney> serviceJourneys() {
-    return entitiesIndex
+    return netexEntitiesIndex
       .getTimetableFrames()
       .stream()
       .flatMap(timetableFrame ->
@@ -253,7 +194,7 @@ public class AntuNetexData {
    * Return the JourneyPattern for the given ServiceJourney.
    */
   public JourneyPattern getJourneyPattern(ServiceJourney serviceJourney) {
-    return entitiesIndex
+    return netexEntitiesIndex
       .getJourneyPatternIndex()
       .get(serviceJourney.getJourneyPatternRef().getValue().getRef());
   }
