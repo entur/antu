@@ -59,7 +59,7 @@ aliases:
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:17.0.10-node
+      - image: cimg/openjdk:17.0.11-node
         auth:
           username: $DOCKERHUB_LOGIN
           password: $DOCKERHUB_PASSWORD
