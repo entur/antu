@@ -24,6 +24,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceValidator;
+import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRefValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoints.SameStopPoints;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount.StopPointsCount;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignment;
@@ -162,6 +163,21 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public SameQuayRefValidator sameQuayRef(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    return new SameQuayRefValidator(
+      validationReportEntryFactory,
+      commonDataRepository,
+      stopPlaceRepository
+    );
+  }
+
+  @Bean
   public StopPointsCount stopPointsCount(
     @Qualifier(
       "validationReportEntryFactory"
@@ -210,7 +226,8 @@ public class TimetableDataValidatorConfig {
     InvalidServiceLinks invalidServiceLinks,
     SameStopPoints sameStopPoints,
     StopPointsCount stopPointsCount,
-    UnexpectedDistanceValidator unexpectedDistanceValidator
+    UnexpectedDistanceValidator unexpectedDistanceValidator,
+    SameQuayRefValidator sameQuayRefValidator
   ) {
     List<NetexValidator> netexValidators = List.of(
       xpathValidator,
@@ -227,7 +244,8 @@ public class TimetableDataValidatorConfig {
       invalidServiceLinks,
       sameStopPoints,
       stopPointsCount,
-      unexpectedDistanceValidator
+      unexpectedDistanceValidator,
+      sameQuayRefValidator
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
