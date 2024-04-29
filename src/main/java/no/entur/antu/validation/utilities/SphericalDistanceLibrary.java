@@ -36,10 +36,10 @@ public final class SphericalDistanceLibrary {
 
   public static double distance(QuayCoordinates from, QuayCoordinates to) {
     return distance(
-      from.longitude(),
       from.latitude(),
-      to.longitude(),
-      to.latitude()
+      from.longitude(),
+      to.latitude(),
+      to.longitude()
     );
   }
 
@@ -95,8 +95,10 @@ public final class SphericalDistanceLibrary {
   }
 
   public static void main(String[] args) {
-    Coordinate from = new Coordinate(59.908136, 10.621018);
-    Coordinate to = new Coordinate(59.907979, 10.620589);
+    //    Coordinate from = new Coordinate(9.256717, 61.984575);
+    //    Coordinate to = new Coordinate(9.536109, 61.772692);
+    Coordinate from = new Coordinate(61.984575, 9.256717);
+    Coordinate to = new Coordinate(61.772692, 9.536109);
     System.out.println(distance(from, to));
     System.out.println(fastDistance(from, to));
     //50.69480700671304
