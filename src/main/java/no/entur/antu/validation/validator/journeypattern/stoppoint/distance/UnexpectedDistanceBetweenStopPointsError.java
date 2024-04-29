@@ -3,7 +3,7 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 import no.entur.antu.validation.ValidationError;
 import no.entur.antu.validation.utilities.Comparison;
 
-public record UnexpectedDistanceError(
+public record UnexpectedDistanceBetweenStopPointsError(
   RuleCode ruleCode,
   String journeyPatternId,
   String fromStopPointName,

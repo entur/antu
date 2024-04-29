@@ -9,7 +9,7 @@ import no.entur.antu.validation.AntuNetexData;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 
-public record UnexpectedDistanceContext(
+public record UnexpectedDistanceBetweenStopPointsContext(
   String journeyPatternRef,
   AllVehicleModesOfTransportEnumeration transportMode,
   List<ScheduledStopPointCoordinates> scheduledStopPointCoordinates
@@ -40,8 +40,10 @@ public record UnexpectedDistanceContext(
       this.antuNetexData = antuNetexData;
     }
 
-    public UnexpectedDistanceContext build(JourneyPattern journeyPattern) {
-      return new UnexpectedDistanceContext(
+    public UnexpectedDistanceBetweenStopPointsContext build(
+      JourneyPattern journeyPattern
+    ) {
+      return new UnexpectedDistanceBetweenStopPointsContext(
         journeyPattern.getId(),
         antuNetexData.findTransportMode(journeyPattern),
         AntuNetexData
