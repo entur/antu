@@ -52,18 +52,22 @@ class UnexpectedDistanceValidatorIntegrationTest {
         .thenReturn(netexEntitiesIndex);
       when(validationContext.isCommonFile()).thenReturn(true);
 
-      UnexpectedDistanceValidator unexpectedDistanceValidator = new UnexpectedDistanceValidator(
-        (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          ),
-        null,
-        null
-      );
+      UnexpectedDistanceValidator unexpectedDistanceValidator =
+        new UnexpectedDistanceValidator(
+          (code, message, dataLocation) ->
+            new ValidationReportEntry(
+              message,
+              code,
+              ValidationReportEntrySeverity.ERROR
+            ),
+          null,
+          null
+        );
 
-      unexpectedDistanceValidator.validate(testValidationReport, validationContext);
+      unexpectedDistanceValidator.validate(
+        testValidationReport,
+        validationContext
+      );
     }
 
     return testValidationReport;

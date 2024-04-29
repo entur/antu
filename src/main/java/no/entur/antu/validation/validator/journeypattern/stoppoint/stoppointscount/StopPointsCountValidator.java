@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
  * Validates that the number of stop points in a journey pattern
  * should and should only be 1 more than the service links in
  * the journey pattern.
+ * Chouette reference: 3-JourneyPattern-2
  */
 public class StopPointsCountValidator extends AntuNetexValidator {
 
@@ -63,8 +64,10 @@ public class StopPointsCountValidator extends AntuNetexValidator {
           validationReport,
           validationContext,
           new StopPointsCountError(
-            StopPointsCountError.RuleCode.INVALID_NUMBER_OF_STOP_POINTS_IN_JOURNEY_PATTERN,
-            stopPointsCountContext.journeyPatternId()
+            StopPointsCountError.RuleCode.INVALID_NUMBER_OF_STOP_POINTS_OR_LINKS_IN_JOURNEY_PATTERN,
+            stopPointsCountContext.journeyPatternId(),
+            stopPointsCountContext.stopPointsCount(),
+            stopPointsCountContext.serviceLinksCount()
           )
         )
       );

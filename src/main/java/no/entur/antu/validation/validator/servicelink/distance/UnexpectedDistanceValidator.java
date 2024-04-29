@@ -19,9 +19,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Validates ServiceLinks, by checking the distance between the stop points and the line string.
- * Stop points are the start and end points of the service link, and the line string is the geometry of the service link.
+ * Stop points are the start and end point of the service link, and the line string is the geometry of the service link.
  * The distance is expected to be within a configured 'WARNING' and 'MAX' limits, and if it exceeds the limit,
  * a warning or an error is added to the validation report.
+ * Chouette references: 3-RouteSection-2-1, 3-RouteSection-2-11, 3-RouteSection-2-2, 3-RouteSection-2-22
  */
 public class UnexpectedDistanceValidator extends AntuNetexValidator {
 

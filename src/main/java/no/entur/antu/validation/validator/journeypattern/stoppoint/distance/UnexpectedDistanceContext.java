@@ -33,6 +33,7 @@ public record UnexpectedDistanceContext(
   }
 
   public static class Builder {
+
     private final AntuNetexData antuNetexData;
 
     public Builder(AntuNetexData antuNetexData) {
