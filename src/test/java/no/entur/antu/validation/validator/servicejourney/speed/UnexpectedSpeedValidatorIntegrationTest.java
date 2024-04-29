@@ -68,18 +68,22 @@ class UnexpectedSpeedValidatorIntegrationTest {
         .when(commonDataRepository.hasQuayIds(anyString()))
         .thenReturn(false);
 
-      UnexpectedSpeedValidator unexpectedSpeedValidator = new UnexpectedSpeedValidator(
-        (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          ),
-        commonDataRepository,
-        stopPlaceRepository
-      );
+      UnexpectedSpeedValidator unexpectedSpeedValidator =
+        new UnexpectedSpeedValidator(
+          (code, message, dataLocation) ->
+            new ValidationReportEntry(
+              message,
+              code,
+              ValidationReportEntrySeverity.ERROR
+            ),
+          commonDataRepository,
+          stopPlaceRepository
+        );
 
-      unexpectedSpeedValidator.validate(testValidationReport, validationContext);
+      unexpectedSpeedValidator.validate(
+        testValidationReport,
+        validationContext
+      );
     }
 
     return testValidationReport;

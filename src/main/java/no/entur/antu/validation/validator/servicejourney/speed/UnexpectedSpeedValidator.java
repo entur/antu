@@ -28,7 +28,12 @@ import org.slf4j.LoggerFactory;
  * The expected speed is based on the transport mode of the service journey.
  * The speed is calculated based on the distance between two stops
  * and the time it takes to travel between them.
- * Chouette reference: 3-VehicleJourney-2
+ * Chouette references:
+ *  3-VehicleJourney-2-1 (Chronologically reverse),
+ *  3-VehicleJourney-2-2 (Min speed),
+ *  3-VehicleJourney-2-3 (Warning speed)
+ * 	3-VehicleJourney-2-4 (Same departure/arrival time)
+ * 	3-VehicleJourney-2-5 (Max speed)
  */
 public class UnexpectedSpeedValidator extends AntuNetexValidator {
 
@@ -115,8 +120,12 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
           sortedTimetabledPassingTime.get(i)
         )
       )
+      // Chouette reference: 3-VehicleJourney-2-1
+      // Ignoring the validation if there exists the case where the time is chronologically reverse
+      // Is this already validated and reported previously?? TODO: This is reported as Error in Chouette
       .takeWhile(PassingTimes::isValid)
       .filter(passingTimes ->
+        // TODO: This will never reached due to the takeWhile above. Reported as WARNING in Chouette
         filterAndReportInValidTimeDifference(
           context.serviceJourney(),
           antuNetexData,

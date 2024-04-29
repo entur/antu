@@ -31,6 +31,8 @@ public record UnexpectedSpeedContext(
       serviceJourney,
       transportMode,
       quayCoordinatesPerQuayId,
+      // TODO: Creating the new Distance for each ServiceJourney, is this correct?
+      //  Is this even helpful, even if we fix it. Needs profiling.
       new Distances()
     );
   }

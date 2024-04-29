@@ -26,13 +26,13 @@ import org.slf4j.LoggerFactory;
  *    Incomplete coordinates.
  *    etc.
  */
-public class InvalidFlexibleArea extends AntuNetexValidator {
+public class InvalidFlexibleAreaValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    InvalidFlexibleArea.class
+    InvalidFlexibleAreaValidator.class
   );
 
-  public InvalidFlexibleArea(
+  public InvalidFlexibleAreaValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
