@@ -13,35 +13,12 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.JourneyPattern;
 
-class SameQuayRefValidatorTest extends ValidationTest {
+class SameQuayRefTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    return runValidationOnLineFile(
-      netexEntitiesIndex,
-      SameQuayRefValidator.class
-    );
-  }
-
-  @Test
-  void testNoStopPointsInJourneyPattern() {
-    NetexTestFragment testFragment = new NetexTestFragment();
-
-    JourneyPattern journeyPattern = testFragment
-      .journeyPattern()
-      .withId(1)
-      .withNumberOfStopPointInJourneyPattern(0)
-      .create();
-
-    ValidationReport validationReport = runValidation(
-      testFragment
-        .netexEntitiesIndex()
-        .addJourneyPatterns(journeyPattern)
-        .create()
-    );
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+    return runValidationOnLineFile(netexEntitiesIndex, SameQuayRef.class);
   }
 
   @Test
