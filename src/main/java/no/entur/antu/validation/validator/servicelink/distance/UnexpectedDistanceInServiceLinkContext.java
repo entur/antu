@@ -19,7 +19,7 @@ import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public record UnexpectedDistanceContext(
+public record UnexpectedDistanceInServiceLinkContext(
   String serviceLinkId,
   ScheduledStopPointId fromScheduledStopPointId,
   ScheduledStopPointId toScheduledStopPointId,
@@ -37,7 +37,9 @@ public record UnexpectedDistanceContext(
       this.antuNetexData = antuNetexData;
     }
 
-    public UnexpectedDistanceContext build(ServiceLink serviceLink) {
+    public UnexpectedDistanceInServiceLinkContext build(
+      ServiceLink serviceLink
+    ) {
       QuayId fromQuayId = getQuayId(serviceLink.getFromPointRef());
       QuayId toQuayId = getQuayId(serviceLink.getToPointRef());
 
@@ -70,7 +72,7 @@ public record UnexpectedDistanceContext(
         return null;
       }
 
-      return new UnexpectedDistanceContext(
+      return new UnexpectedDistanceInServiceLinkContext(
         serviceLink.getId(),
         new ScheduledStopPointId(serviceLink.getFromPointRef().getRef()),
         new ScheduledStopPointId(serviceLink.getToPointRef().getRef()),

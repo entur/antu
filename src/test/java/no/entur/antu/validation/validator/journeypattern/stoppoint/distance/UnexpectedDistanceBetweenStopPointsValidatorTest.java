@@ -21,14 +21,14 @@ import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Route;
 
-class UnexpectedDistanceValidatorTest extends ValidationTest {
+class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnLineFile(
       netexEntitiesIndex,
-      UnexpectedDistanceValidator.class
+      UnexpectedDistanceBetweenStopPointsValidator.class
     );
   }
 
@@ -88,7 +88,7 @@ class UnexpectedDistanceValidatorTest extends ValidationTest {
       assertThat(
         entry.getName(),
         is(
-          UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED.name()
+          UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED.name()
         )
       )
     );
@@ -111,7 +111,7 @@ class UnexpectedDistanceValidatorTest extends ValidationTest {
       assertThat(
         entry.getName(),
         is(
-          UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED.name()
+          UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED.name()
         )
       )
     );
@@ -138,7 +138,7 @@ class UnexpectedDistanceValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName)
         .anyMatch(name ->
           name.equals(
-            UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED.name()
+            UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED.name()
           )
         )
     );
@@ -148,7 +148,7 @@ class UnexpectedDistanceValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName)
         .anyMatch(name ->
           name.equals(
-            UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED.name()
+            UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED.name()
           )
         )
     );
