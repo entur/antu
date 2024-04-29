@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
  *                   | --> From --> StopPoint1
  * ServiceLink(1) -- |
  *                   | --> To --> StopPoint2
+ * <p>
+ * Chouette refrerence: 3-RouteSection-2-3
  */
 public class MismatchedStopPointsValidator extends AntuNetexValidator {
 

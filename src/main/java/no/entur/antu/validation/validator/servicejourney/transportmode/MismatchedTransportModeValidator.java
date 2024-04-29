@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Validates that the transport mode of a service journey matches the quays it visits.
  * The transport mode of a service journey must be matched for the quays it visits.
+ * Chouette reference: 4-VehicleJourney-3
  */
 public class MismatchedTransportModeValidator extends AntuNetexValidator {
 

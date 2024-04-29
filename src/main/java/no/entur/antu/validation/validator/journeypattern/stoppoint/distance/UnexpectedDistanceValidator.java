@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Validate that the distance between stops in journey patterns is as expected.
+ * The distance between stops in a journey pattern should be within a configured 'MIN' and 'MAX' limits.
+ * If the distance is less than the 'MIN' limit, a warning is added to the validation report.
+ * If the distance is more than the 'MAX' limit, an error is added to the validation report.
  * Chouette Reference: 3-JourneyPattern-rutebanken-1
  */
 public class UnexpectedDistanceValidator extends AntuNetexValidator {
@@ -39,7 +42,7 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return new RuleCode[0];
+    return UnexpectedDistanceError.RuleCode.values();
   }
 
   @Override
@@ -92,9 +95,8 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
       distanceContext.transportMode()
     );
 
-    UnexpectedDistanceContext.ScheduledStopPointCoordinates previous = distanceContext
-      .scheduledStopPointCoordinates()
-      .get(0);
+    UnexpectedDistanceContext.ScheduledStopPointCoordinates previous =
+      distanceContext.scheduledStopPointCoordinates().get(0);
 
     for (
       int i = 1;
