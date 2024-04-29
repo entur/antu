@@ -27,8 +27,11 @@ import org.slf4j.LoggerFactory;
  * Missing SPA -> No DeadRun -> Yes SJ -> Error
  * Missing SPA -> Yes DeadRun -> Yes SJ -> Error
  * Missing SPA -> Yes DeadRun -> No SJ -> OK
+ *
+ * Chouette reference: rutebanken_3-StopPoint-1
  */
-public class MissingPassengerStopAssignmentValidator extends AntuNetexValidator {
+public class MissingPassengerStopAssignmentValidator
+  extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     MissingPassengerStopAssignmentValidator.class

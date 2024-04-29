@@ -955,16 +955,17 @@ class MismatchedTransportModeValidatorTest {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    MismatchedTransportModeValidator validator = new MismatchedTransportModeValidator(
-      (code, message, dataLocation) ->
-        new ValidationReportEntry(
-          message,
-          code,
-          ValidationReportEntrySeverity.ERROR
-        ),
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    MismatchedTransportModeValidator validator =
+      new MismatchedTransportModeValidator(
+        (code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          ),
+        commonDataRepository,
+        stopPlaceRepository
+      );
 
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
       testData.getData()

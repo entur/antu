@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
  * in multiple journey patterns.
  * If the same stop points are used in multiple journey patterns,
  * it is an error.
+ * Chouette reference: 3-JourneyPattern-1
  */
 public class SameStopPointsValidator extends AntuNetexValidator {
 

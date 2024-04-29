@@ -25,7 +25,7 @@ import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.flex.validator.EnturFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.flex.validator.FileNameValidator;
-import no.entur.antu.validation.flex.validator.flexiblearea.InvalidFlexibleArea;
+import no.entur.antu.validation.flex.validator.flexiblearea.InvalidFlexibleAreaValidator;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
@@ -116,14 +116,14 @@ public class TimetableDataFlexValidatorConfig {
   }
 
   @Bean
-  public InvalidFlexibleArea flexibleAreaValidator(
+  public InvalidFlexibleAreaValidator flexibleAreaValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    return new InvalidFlexibleArea(
+    return new InvalidFlexibleAreaValidator(
       validationReportEntryFactory,
       commonDataRepository,
       stopPlaceRepository
@@ -148,7 +148,7 @@ public class TimetableDataFlexValidatorConfig {
     ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
-    InvalidFlexibleArea invalidFlexibleArea
+    InvalidFlexibleAreaValidator invalidFlexibleAreaValidator
   ) {
     List<NetexValidator> netexValidators = List.of(
       fileNameValidator,
@@ -159,7 +159,7 @@ public class TimetableDataFlexValidatorConfig {
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
       netexIdUniquenessValidator,
-      invalidFlexibleArea
+      invalidFlexibleAreaValidator
     );
     // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
@@ -188,7 +188,7 @@ public class TimetableDataFlexValidatorConfig {
     ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
-    InvalidFlexibleArea invalidFlexibleArea
+    InvalidFlexibleAreaValidator invalidFlexibleAreaValidator
   ) {
     List<NetexValidator> netexValidators = List.of(
       fileNameValidator,
@@ -199,7 +199,7 @@ public class TimetableDataFlexValidatorConfig {
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
       netexIdUniquenessValidator,
-      invalidFlexibleArea
+      invalidFlexibleAreaValidator
     );
     // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());

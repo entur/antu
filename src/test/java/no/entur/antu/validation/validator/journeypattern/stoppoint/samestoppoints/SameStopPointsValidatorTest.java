@@ -17,7 +17,10 @@ class SameStopPointsValidatorTest extends ValidationTest {
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    return runValidationOnLineFile(netexEntitiesIndex, SameStopPointsValidator.class);
+    return runValidationOnLineFile(
+      netexEntitiesIndex,
+      SameStopPointsValidator.class
+    );
   }
 
   @Test
