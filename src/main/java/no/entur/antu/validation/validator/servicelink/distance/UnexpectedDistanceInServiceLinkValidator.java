@@ -24,16 +24,17 @@ import org.slf4j.LoggerFactory;
  * a warning or an error is added to the validation report.
  * Chouette references: 3-RouteSection-2-1, 3-RouteSection-2-11, 3-RouteSection-2-2, 3-RouteSection-2-22
  */
-public class UnexpectedDistanceValidator extends AntuNetexValidator {
+public class UnexpectedDistanceInServiceLinkValidator
+  extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    UnexpectedDistanceValidator.class
+    UnexpectedDistanceInServiceLinkValidator.class
   );
 
   private static final double DISTANCE_WARNING = 20;
   private static final double DISTANCE_MAX = 100;
 
-  public UnexpectedDistanceValidator(
+  public UnexpectedDistanceInServiceLinkValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -47,7 +48,7 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return UnexpectedDistanceError.RuleCode.values();
+    return UnexpectedDistanceInServiceLinkError.RuleCode.values();
   }
 
   @Override
@@ -62,17 +63,17 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
       validationContext
     );
 
-    UnexpectedDistanceContext.Builder contextBuilder =
-      new UnexpectedDistanceContext.Builder(antuNetexData);
+    UnexpectedDistanceInServiceLinkContext.Builder contextBuilder =
+      new UnexpectedDistanceInServiceLinkContext.Builder(antuNetexData);
 
     antuNetexData
       .serviceLinks()
       .map(contextBuilder::build)
       .filter(Objects::nonNull)
-      .forEach(unexpectedDistanceContext ->
+      .forEach(unexpectedDistanceInServiceLinkContext ->
         validateServiceLink(
           antuNetexData,
-          unexpectedDistanceContext,
+          unexpectedDistanceInServiceLinkContext,
           error ->
             addValidationReportEntry(validationReport, validationContext, error)
         )
@@ -107,7 +108,7 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
    */
   private void validateServiceLink(
     AntuNetexData antuNetexData,
-    UnexpectedDistanceContext context,
+    UnexpectedDistanceInServiceLinkContext context,
     Consumer<ValidationError> reportError
   ) {
     Coordinate startCoordinate = context
@@ -153,15 +154,15 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
     AntuNetexData antuNetexData,
     double distance,
     boolean isStart,
-    UnexpectedDistanceContext context,
+    UnexpectedDistanceInServiceLinkContext context,
     Consumer<ValidationError> reportError
   ) {
     if (distance > DISTANCE_MAX) {
       reportError.accept(
-        new UnexpectedDistanceError(
+        new UnexpectedDistanceInServiceLinkError(
           isStart
-            ? UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
-            : UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
+            ? UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
+            : UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
           Comparison.of(DISTANCE_MAX, distance),
           isStart
             ? antuNetexData.getStopPointName(context.fromScheduledStopPointId())
@@ -173,10 +174,10 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
     }
     if (distance > DISTANCE_WARNING) {
       reportError.accept(
-        new UnexpectedDistanceError(
+        new UnexpectedDistanceInServiceLinkError(
           isStart
-            ? UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
-            : UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
+            ? UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
+            : UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
           Comparison.of(DISTANCE_WARNING, distance),
           isStart
             ? antuNetexData.getStopPointName(context.fromScheduledStopPointId())

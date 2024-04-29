@@ -14,7 +14,7 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 
-class UnexpectedDistanceValidatorIntegrationTest {
+class UnexpectedDistanceInServiceLinkValidatorIntegrationTest {
 
   public static final String TEST_CODESPACE = "AVI";
   public static final String TEST_FILE_WITH_NO_SERVICE_LINKS =
@@ -52,8 +52,8 @@ class UnexpectedDistanceValidatorIntegrationTest {
         .thenReturn(netexEntitiesIndex);
       when(validationContext.isCommonFile()).thenReturn(true);
 
-      UnexpectedDistanceValidator unexpectedDistanceValidator =
-        new UnexpectedDistanceValidator(
+      UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator =
+        new UnexpectedDistanceInServiceLinkValidator(
           (code, message, dataLocation) ->
             new ValidationReportEntry(
               message,
@@ -64,7 +64,7 @@ class UnexpectedDistanceValidatorIntegrationTest {
           null
         );
 
-      unexpectedDistanceValidator.validate(
+      unexpectedDistanceInServiceLinkValidator.validate(
         testValidationReport,
         validationContext
       );

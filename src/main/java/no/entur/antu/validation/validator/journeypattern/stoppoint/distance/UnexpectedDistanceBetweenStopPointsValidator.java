@@ -22,13 +22,14 @@ import org.slf4j.LoggerFactory;
  * If the distance is more than the 'MAX' limit, an error is added to the validation report.
  * Chouette Reference: 3-JourneyPattern-rutebanken-1
  */
-public class UnexpectedDistanceValidator extends AntuNetexValidator {
+public class UnexpectedDistanceBetweenStopPointsValidator
+  extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    UnexpectedDistanceValidator.class
+    UnexpectedDistanceBetweenStopPointsValidator.class
   );
 
-  public UnexpectedDistanceValidator(
+  public UnexpectedDistanceBetweenStopPointsValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -42,7 +43,7 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return UnexpectedDistanceError.RuleCode.values();
+    return UnexpectedDistanceBetweenStopPointsError.RuleCode.values();
   }
 
   @Override
@@ -57,13 +58,13 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
       validationContext
     );
 
-    UnexpectedDistanceContext.Builder builder =
-      new UnexpectedDistanceContext.Builder(antuNetexData);
+    UnexpectedDistanceBetweenStopPointsContext.Builder builder =
+      new UnexpectedDistanceBetweenStopPointsContext.Builder(antuNetexData);
 
     antuNetexData
       .journeyPatterns()
       .map(builder::build)
-      .filter(UnexpectedDistanceContext::isValid)
+      .filter(UnexpectedDistanceBetweenStopPointsContext::isValid)
       .forEach(context ->
         validateDistance(
           antuNetexData,
@@ -88,14 +89,14 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
 
   private void validateDistance(
     AntuNetexData antuNetexData,
-    UnexpectedDistanceContext distanceContext,
+    UnexpectedDistanceBetweenStopPointsContext distanceContext,
     Consumer<ValidationError> reportError
   ) {
     ExpectedDistance expectedDistance = ExpectedDistance.of(
       distanceContext.transportMode()
     );
 
-    UnexpectedDistanceContext.ScheduledStopPointCoordinates previous =
+    UnexpectedDistanceBetweenStopPointsContext.ScheduledStopPointCoordinates previous =
       distanceContext.scheduledStopPointCoordinates().get(0);
 
     for (
@@ -112,8 +113,8 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
 
       if (distance < expectedDistance.minDistance()) {
         reportError.accept(
-          new UnexpectedDistanceError(
-            UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED,
+          new UnexpectedDistanceBetweenStopPointsError(
+            UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED,
             distanceContext.journeyPatternRef(),
             antuNetexData.getStopPointName(previous.scheduledStopPointId()),
             antuNetexData.getStopPointName(current.scheduledStopPointId()),
@@ -122,8 +123,8 @@ public class UnexpectedDistanceValidator extends AntuNetexValidator {
         );
       } else if (distance > expectedDistance.maxDistance()) {
         reportError.accept(
-          new UnexpectedDistanceError(
-            UnexpectedDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED,
+          new UnexpectedDistanceBetweenStopPointsError(
+            UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED,
             distanceContext.journeyPatternRef(),
             antuNetexData.getStopPointName(previous.scheduledStopPointId()),
             antuNetexData.getStopPointName(current.scheduledStopPointId()),
