@@ -32,7 +32,6 @@ import no.entur.antu.validation.validator.passengerstopassignment.MissingPasseng
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeValidator;
 import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeedValidator;
 import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportModeValidator;
-import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceValidator;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
