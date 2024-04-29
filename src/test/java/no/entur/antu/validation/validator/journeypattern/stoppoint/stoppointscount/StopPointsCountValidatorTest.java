@@ -20,7 +20,10 @@ class StopPointsCountValidatorTest extends ValidationTest {
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    return runValidationOnLineFile(netexEntitiesIndex, StopPointsCountValidator.class);
+    return runValidationOnLineFile(
+      netexEntitiesIndex,
+      StopPointsCountValidator.class
+    );
   }
 
   @Test

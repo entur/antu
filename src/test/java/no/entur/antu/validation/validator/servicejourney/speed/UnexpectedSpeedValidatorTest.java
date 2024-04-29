@@ -23,7 +23,10 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    return runValidationOnLineFile(netexEntitiesIndex, UnexpectedSpeedValidator.class);
+    return runValidationOnLineFile(
+      netexEntitiesIndex,
+      UnexpectedSpeedValidator.class
+    );
   }
 
   @Test

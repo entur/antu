@@ -14,7 +14,7 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 
-class InvalidFlexibleAreaIntegrationTest {
+class InvalidFlexibleAreaValidatorIntegrationTest {
 
   public static final String _ATB_FLEXIBLE_SHARED_DATA =
     "_ATB_flexible_shared_data.xml";
@@ -56,18 +56,22 @@ class InvalidFlexibleAreaIntegrationTest {
 
       when(validationContext.isCommonFile()).thenReturn(true);
 
-      InvalidFlexibleArea invalidFlexibleArea = new InvalidFlexibleArea(
-        (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          ),
-        null,
-        null
-      );
+      InvalidFlexibleAreaValidator invalidFlexibleAreaValidator =
+        new InvalidFlexibleAreaValidator(
+          (code, message, dataLocation) ->
+            new ValidationReportEntry(
+              message,
+              code,
+              ValidationReportEntrySeverity.ERROR
+            ),
+          null,
+          null
+        );
 
-      invalidFlexibleArea.validate(testValidationReport, validationContext);
+      invalidFlexibleAreaValidator.validate(
+        testValidationReport,
+        validationContext
+      );
     }
 
     return testValidationReport;

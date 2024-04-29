@@ -115,7 +115,10 @@ class MismatchedTransportModeValidatorIntegrationTest {
           stopPlaceRepository
         );
 
-      mismatchedTransportModeValidator.validate(testValidationReport, validationContext);
+      mismatchedTransportModeValidator.validate(
+        testValidationReport,
+        validationContext
+      );
     }
 
     return testValidationReport;

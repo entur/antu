@@ -2,7 +2,12 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointsco
 
 import no.entur.antu.validation.ValidationError;
 
-public record StopPointsCountError(RuleCode ruleCode, String journeyPatternId)
+public record StopPointsCountError(
+  RuleCode ruleCode,
+  String journeyPatternId,
+  int numberOfStopPoints,
+  int numberOfLinks
+)
   implements ValidationError {
   @Override
   public String getRuleCode() {
@@ -11,7 +16,13 @@ public record StopPointsCountError(RuleCode ruleCode, String journeyPatternId)
 
   @Override
   public String validationReportEntryMessage() {
-    return ruleCode.getErrorMessage();
+    return (
+      ruleCode.getErrorMessage() +
+      ", Number of stop points = " +
+      numberOfStopPoints +
+      ", Number of links = " +
+      numberOfLinks
+    );
   }
 
   @Override
@@ -20,8 +31,8 @@ public record StopPointsCountError(RuleCode ruleCode, String journeyPatternId)
   }
 
   enum RuleCode implements no.entur.antu.validation.RuleCode {
-    INVALID_NUMBER_OF_STOP_POINTS_IN_JOURNEY_PATTERN(
-      "Invalid number of Stop points or service links in JourneyPattern"
+    INVALID_NUMBER_OF_STOP_POINTS_OR_LINKS_IN_JOURNEY_PATTERN(
+      "Invalid number of Stop points or links in JourneyPattern"
     );
 
     private final String errorMessage;
