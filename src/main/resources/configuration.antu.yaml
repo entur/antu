@@ -47,7 +47,7 @@ validationRuleConfigs:
     severity: WARNING
   - code: HIGH_SPEED
     name: Too fast travel in ServiceJourney
-    severity: WARNING
+    severity: ERROR
   - code: WARNING_SPEED
     name: Fast travel in ServiceJourney
     severity: WARNING
