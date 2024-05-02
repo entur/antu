@@ -102,3 +102,6 @@ validationRuleConfigs:
   - code: STOP_POINTS_IN_SERVICE_LINK_DOES_NOT_MATCH_THE_JOURNEY_PATTERN
     name: Stop points in service link does not match the journey pattern
     severity: WARNING
+  - code: MISSING_MANDATORY_FIELDS_IN_INTERCHANGE
+    name: Missing mandatory fields in Interchange
+    severity: ERROR
