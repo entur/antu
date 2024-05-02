@@ -27,11 +27,13 @@ import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
 import org.rutebanken.netex.model.Service_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +66,9 @@ public record AntuNetexData(
   public QuayId findQuayIdForScheduledStopPoint(
     ScheduledStopPointId scheduledStopPointId
   ) {
+    if (scheduledStopPointId == null) {
+      return null;
+    }
     return commonDataRepository.hasQuayIds(validationReportId())
       ? commonDataRepository.findQuayIdForScheduledStopPoint(
         scheduledStopPointId,
@@ -209,6 +214,37 @@ public record AntuNetexData(
       )
       .filter(ServiceJourney.class::isInstance)
       .map(ServiceJourney.class::cast);
+  }
+
+  public ServiceJourney serviceJourney(
+    VehicleJourneyRefStructure vehicleJourneyRefStructure
+  ) {
+    return Optional
+      .ofNullable(vehicleJourneyRefStructure)
+      .map(VehicleJourneyRefStructure::getRef)
+      .map(serviceJourneyRef ->
+        netexEntitiesIndex
+          .getServiceJourneyIndex()
+          .get(vehicleJourneyRefStructure.getRef())
+      )
+      .orElse(null);
+  }
+
+  /**
+   * Returns the Stream of all ServiceJourneyInterchanges in all the TimeTableFrames.
+   */
+  public Stream<ServiceJourneyInterchange> serviceJourneyInterchanges() {
+    return netexEntitiesIndex
+      .getTimetableFrames()
+      .stream()
+      .flatMap(timetableFrame ->
+        timetableFrame
+          .getJourneyInterchanges()
+          .getServiceJourneyPatternInterchangeOrServiceJourneyInterchange()
+          .stream()
+      )
+      .filter(ServiceJourneyInterchange.class::isInstance)
+      .map(ServiceJourneyInterchange.class::cast);
   }
 
   /**
