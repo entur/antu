@@ -40,3 +40,8 @@ horizontalPodAutoscaler:
   project: ent-antu-prd
 
 stopplaceRegistryUrl: https://api.entur.io/stop-places/v1/read
+
+resources:
+  cpuRequest: "2"
+  memRequest: 6000Mi
+  xmx: 5000m
