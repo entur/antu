@@ -1,6 +1,7 @@
 package no.entur.antu.model;
 
 import no.entur.antu.exception.AntuException;
+import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 
 public record ScheduledStopPointId(String id) {
@@ -13,9 +14,13 @@ public record ScheduledStopPointId(String id) {
   public static ScheduledStopPointId of(
     StopPointInJourneyPattern stopPointInJourneyPattern
   ) {
-    return new ScheduledStopPointId(
-      stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef()
-    );
+    return of(stopPointInJourneyPattern.getScheduledStopPointRef().getValue());
+  }
+
+  public static ScheduledStopPointId of(
+    ScheduledStopPointRefStructure scheduledStopPointRef
+  ) {
+    return new ScheduledStopPointId(scheduledStopPointRef.getRef());
   }
 
   public static boolean isValid(String id) {

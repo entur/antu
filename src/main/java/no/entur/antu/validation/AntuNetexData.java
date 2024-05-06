@@ -11,6 +11,8 @@ import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
@@ -18,6 +20,9 @@ import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.LinkInJourneyPattern;
+import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
+import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Route;
@@ -69,6 +74,17 @@ public record AntuNetexData(
           .getQuayIdByStopPointRefIndex()
           .get(scheduledStopPointId.id())
       );
+  }
+
+  public ScheduledStopPointIds findScheduledStopPointsForServiceLinkId(
+    ServiceLinkId serviceLinkId
+  ) {
+    // Should extend this function to check line file if we don't find the
+    // service links in common file. Same as findQuayIdForScheduledStopPoint.
+    return commonDataRepository.findScheduledStopPointIdsForServiceLink(
+      serviceLinkId,
+      validationReportId()
+    );
   }
 
   public Map.Entry<ScheduledStopPointId, QuayCoordinates> findCoordinatesPerQuayId(
@@ -165,7 +181,11 @@ public record AntuNetexData(
   }
 
   public Stream<ServiceLink> serviceLinks() {
-    return netexEntitiesIndex
+    return serviceLinks(netexEntitiesIndex);
+  }
+
+  public static Stream<ServiceLink> serviceLinks(NetexEntitiesIndex index) {
+    return index
       .getServiceFrames()
       .stream()
       .map(Service_VersionFrameStructure::getServiceLinks)
@@ -247,6 +267,32 @@ public record AntuNetexData(
           .sorted(
             Comparator.comparing(
               PointInLinkSequence_VersionedChildStructure::getOrder
+            )
+          )
+      )
+      .orElse(Stream.empty());
+  }
+
+  /**
+   * Find the links in journey pattern for the given journey pattern, sorted by order.
+   */
+
+  public static Stream<LinkInJourneyPattern> linksInJourneyPattern(
+    JourneyPattern journeyPattern
+  ) {
+    return Optional
+      .ofNullable(journeyPattern.getLinksInSequence())
+      .map(
+        LinksInJourneyPattern_RelStructure::getServiceLinkInJourneyPatternOrTimingLinkInJourneyPattern
+      )
+      .map(serviceLinksInJourneyPattern ->
+        serviceLinksInJourneyPattern
+          .stream()
+          .filter(LinkInJourneyPattern.class::isInstance)
+          .map(LinkInJourneyPattern.class::cast)
+          .sorted(
+            Comparator.comparing(
+              LinkInLinkSequence_VersionedChildStructure::getOrder
             )
           )
       )
