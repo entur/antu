@@ -18,7 +18,7 @@ import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-class UnexpectedSpeedIntegrationTest {
+class UnexpectedSpeedValidatorIntegrationTest {
 
   public static final String TEST_CODESPACE = "ENT";
   public static final String TEST_FILE_WITH_NO_COMPOSITE_FRAME =
@@ -68,18 +68,22 @@ class UnexpectedSpeedIntegrationTest {
         .when(commonDataRepository.hasQuayIds(anyString()))
         .thenReturn(false);
 
-      UnexpectedSpeed unexpectedSpeed = new UnexpectedSpeed(
-        (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          ),
-        commonDataRepository,
-        stopPlaceRepository
-      );
+      UnexpectedSpeedValidator unexpectedSpeedValidator =
+        new UnexpectedSpeedValidator(
+          (code, message, dataLocation) ->
+            new ValidationReportEntry(
+              message,
+              code,
+              ValidationReportEntrySeverity.ERROR
+            ),
+          commonDataRepository,
+          stopPlaceRepository
+        );
 
-      unexpectedSpeed.validate(testValidationReport, validationContext);
+      unexpectedSpeedValidator.validate(
+        testValidationReport,
+        validationContext
+      );
     }
 
     return testValidationReport;

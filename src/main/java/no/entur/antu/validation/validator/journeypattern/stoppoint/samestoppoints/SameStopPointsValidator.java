@@ -7,7 +7,6 @@ import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -19,14 +18,15 @@ import org.slf4j.LoggerFactory;
  * in multiple journey patterns.
  * If the same stop points are used in multiple journey patterns,
  * it is an error.
+ * Chouette reference: 3-JourneyPattern-1
  */
-public class SameStopPoints extends AntuNetexValidator {
+public class SameStopPointsValidator extends AntuNetexValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    SameStopPoints.class
+    SameStopPointsValidator.class
   );
 
-  public SameStopPoints(
+  public SameStopPointsValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository

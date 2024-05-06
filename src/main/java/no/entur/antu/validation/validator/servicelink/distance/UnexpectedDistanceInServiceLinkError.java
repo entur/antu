@@ -3,7 +3,7 @@ package no.entur.antu.validation.validator.servicelink.distance;
 import no.entur.antu.validation.ValidationError;
 import no.entur.antu.validation.utilities.Comparison;
 
-public record UnexpectedDistanceError(
+public record UnexpectedDistanceInServiceLinkError(
   RuleCode ruleCode,
   Comparison<Double> distanceComparison,
   String scheduledStopPointName,

@@ -1,6 +1,6 @@
-package no.entur.antu.validation.validator.servicelink.distance;
+package no.entur.antu.validation.flex.validator.flexiblearea;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -14,25 +14,28 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 
-class UnexpectedDistanceIntegrationTest {
+class InvalidFlexibleAreaValidatorIntegrationTest {
 
-  public static final String TEST_CODESPACE = "AVI";
-  public static final String TEST_FILE_WITH_NO_SERVICE_LINKS =
-    "_avinor_common_elements.xml";
+  public static final String _ATB_FLEXIBLE_SHARED_DATA =
+    "_ATB_flexible_shared_data.xml";
+
   private static final NetexParser NETEX_PARSER = new NetexParser();
 
   @Test
-  void testValidIncreasingPassingTime() throws IOException {
+  void testSelfInteractingRingShouldBeReported() throws IOException {
     ValidationReport validationReport = getValidationReport(
-      TEST_FILE_WITH_NO_SERVICE_LINKS
+      _ATB_FLEXIBLE_SHARED_DATA,
+      "ATB"
     );
-    assertTrue(validationReport.getValidationReportEntries().isEmpty());
+    assertEquals(2, validationReport.getValidationReportEntries().size());
   }
 
-  private ValidationReport getValidationReport(String testFile)
-    throws IOException {
+  private ValidationReport getValidationReport(
+    String testFile,
+    String codeSpace
+  ) throws IOException {
     ValidationReport testValidationReport = new ValidationReport(
-      TEST_CODESPACE,
+      codeSpace,
       "Test1122"
     );
 
@@ -41,29 +44,34 @@ class UnexpectedDistanceIntegrationTest {
         .getResourceAsStream('/' + testFile)
     ) {
       assert testDatasetAsStream != null;
+
       NetexEntitiesIndex netexEntitiesIndex = NETEX_PARSER.parse(
         testDatasetAsStream
       );
-
       ValidationContextWithNetexEntitiesIndex validationContext = mock(
         ValidationContextWithNetexEntitiesIndex.class
       );
       when(validationContext.getNetexEntitiesIndex())
         .thenReturn(netexEntitiesIndex);
+
       when(validationContext.isCommonFile()).thenReturn(true);
 
-      UnexpectedDistance unexpectedDistance = new UnexpectedDistance(
-        (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          ),
-        null,
-        null
-      );
+      InvalidFlexibleAreaValidator invalidFlexibleAreaValidator =
+        new InvalidFlexibleAreaValidator(
+          (code, message, dataLocation) ->
+            new ValidationReportEntry(
+              message,
+              code,
+              ValidationReportEntrySeverity.ERROR
+            ),
+          null,
+          null
+        );
 
-      unexpectedDistance.validate(testValidationReport, validationContext);
+      invalidFlexibleAreaValidator.validate(
+        testValidationReport,
+        validationContext
+      );
     }
 
     return testValidationReport;

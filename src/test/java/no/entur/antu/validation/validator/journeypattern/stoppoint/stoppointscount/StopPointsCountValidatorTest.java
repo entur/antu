@@ -15,12 +15,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.rutebanken.netex.model.JourneyPattern;
 
-class StopPointsCountTest extends ValidationTest {
+class StopPointsCountValidatorTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
-    return runValidationOnLineFile(netexEntitiesIndex, StopPointsCount.class);
+    return runValidationOnLineFile(
+      netexEntitiesIndex,
+      StopPointsCountValidator.class
+    );
   }
 
   @Test

@@ -13,14 +13,14 @@ import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 
-class InvalidFlexibleAreaTest extends ValidationTest {
+class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnCommonFile(
       netexEntitiesIndex,
-      InvalidFlexibleArea.class
+      InvalidFlexibleAreaValidator.class
     );
   }
 

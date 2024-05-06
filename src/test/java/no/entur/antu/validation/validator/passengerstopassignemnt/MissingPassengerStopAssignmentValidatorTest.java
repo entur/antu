@@ -9,7 +9,7 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
-import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignment;
+import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -21,14 +21,14 @@ import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
 
-class MissingPassengerStopAssignmentTest extends ValidationTest {
+class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnLineFile(
       netexEntitiesIndex,
-      MissingPassengerStopAssignment.class
+      MissingPassengerStopAssignmentValidator.class
     );
   }
 
