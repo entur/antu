@@ -32,6 +32,7 @@ import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
 import org.rutebanken.netex.model.Service_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.rutebanken.netex.model.Timetable_VersionFrameStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 import org.slf4j.Logger;
@@ -237,9 +238,10 @@ public record AntuNetexData(
     return netexEntitiesIndex
       .getTimetableFrames()
       .stream()
-      .flatMap(timetableFrame ->
-        timetableFrame
-          .getJourneyInterchanges()
+      .map(Timetable_VersionFrameStructure::getJourneyInterchanges)
+      .filter(Objects::nonNull)
+      .flatMap(journeyInterchangesInFrame ->
+        journeyInterchangesInFrame
           .getServiceJourneyPatternInterchangeOrServiceJourneyInterchange()
           .stream()
       )
