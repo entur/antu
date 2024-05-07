@@ -35,8 +35,8 @@ import org.rutebanken.netex.model.Service_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.Timetable_VersionFrameStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 import org.slf4j.Logger;
@@ -253,38 +253,6 @@ public record AntuNetexData(
       .map(ServiceJourneyInterchange.class::cast);
   }
 
-  public ServiceJourney serviceJourney(
-    VehicleJourneyRefStructure vehicleJourneyRefStructure
-  ) {
-    return Optional
-      .ofNullable(vehicleJourneyRefStructure)
-      .map(VehicleJourneyRefStructure::getRef)
-      .map(serviceJourneyRef ->
-        netexEntitiesIndex
-          .getServiceJourneyIndex()
-          .get(vehicleJourneyRefStructure.getRef())
-      )
-      .orElse(null);
-  }
-
-  /**
-   * Returns the Stream of all ServiceJourneyInterchanges in all the TimeTableFrames.
-   */
-  public Stream<ServiceJourneyInterchange> serviceJourneyInterchanges() {
-    return netexEntitiesIndex
-      .getTimetableFrames()
-      .stream()
-      .map(Timetable_VersionFrameStructure::getJourneyInterchanges)
-      .filter(Objects::nonNull)
-      .flatMap(journeyInterchangesInFrame ->
-        journeyInterchangesInFrame
-          .getServiceJourneyPatternInterchangeOrServiceJourneyInterchange()
-          .stream()
-      )
-      .filter(ServiceJourneyInterchange.class::isInstance)
-      .map(ServiceJourneyInterchange.class::cast);
-  }
-
   /**
    * Returns the Stream of all the valid ServiceJourneys in all the TimeTableFrames.
    * The valid serviceJourneys are those that have number of timetabledPassingTime equals to number of StopPointsInJourneyPattern.
@@ -387,7 +355,6 @@ public record AntuNetexData(
   /**
    * Find the links in journey pattern for the given journey pattern, sorted by order.
    */
-
   public static Stream<LinkInJourneyPattern> linksInJourneyPattern(
     JourneyPattern journeyPattern
   ) {
