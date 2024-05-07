@@ -2,10 +2,10 @@ package no.entur.antu.validation.validator.interchange.duplicate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import no.entur.antu.netextestdata.NetexTestFragment;
@@ -49,7 +49,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
   @Test
   void testAllDuplicate() {
     List<ServiceJourneyInterchange> serviceJourneyInterchanges =
-      createServiceJourneyInterchanges(5, 1, 0, 1, 2, 3, 4);
+      createServiceJourneyInterchanges(5, 0, 0, 1, 2, 3, 4);
 
     NetexTestFragment testData = new NetexTestFragment();
     ValidationReport validationReport = runValidation(
@@ -70,7 +70,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        "Duplicate interchanges found at TST:ServiceJourneyInterchange:2, TST:ServiceJourneyInterchange:3, TST:ServiceJourneyInterchange:4, TST:ServiceJourneyInterchange:5"
+        "Duplicate interchanges found at TST:ServiceJourneyInterchange:1, TST:ServiceJourneyInterchange:2, TST:ServiceJourneyInterchange:3, TST:ServiceJourneyInterchange:4"
       )
     );
   }
@@ -99,7 +99,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        "Duplicate interchanges found at TST:ServiceJourneyInterchange:3, TST:ServiceJourneyInterchange:4"
+        "Duplicate interchanges found at TST:ServiceJourneyInterchange:2, TST:ServiceJourneyInterchange:3"
       )
     );
   }
@@ -109,7 +109,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     List<ServiceJourneyInterchange> serviceJourneyInterchanges1 =
       createServiceJourneyInterchanges(5, 1, 2, 3);
     List<ServiceJourneyInterchange> serviceJourneyInterchanges2 =
-      createServiceJourneyInterchanges(5, 5, 7, 8);
+      createServiceJourneyInterchanges(5, 6, 7, 8);
 
     NetexTestFragment testData = new NetexTestFragment();
     ValidationReport validationReport = runValidation(
@@ -126,17 +126,20 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
         .create()
     );
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
+    assertThat(validationReport.getValidationReportEntries().size(), is(2));
+    assertTrue(
       validationReport
         .getValidationReportEntries()
         .stream()
-        .findFirst()
         .map(ValidationReportEntry::getMessage)
-        .orElse(null),
-      is(
-        "Duplicate interchanges found at TST:ServiceJourneyInterchange:3, TST:ServiceJourneyInterchange:4"
-      )
+        .allMatch(message ->
+          List
+            .of(
+              "Duplicate interchanges found at TST:ServiceJourneyInterchange:2, TST:ServiceJourneyInterchange:3",
+              "Duplicate interchanges found at TST:ServiceJourneyInterchange:7, TST:ServiceJourneyInterchange:8"
+            )
+            .contains(message)
+        )
     );
   }
 
@@ -149,16 +152,18 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     );
   }
 
-  public List<ServiceJourneyInterchange> createServiceJourneyInterchanges(
+  private List<ServiceJourneyInterchange> createServiceJourneyInterchanges(
     int numberOfServiceJourneyInterchanges,
     int startIndex,
     int... duplicateIndexes
   ) {
     NetexTestFragment fragment = new NetexTestFragment();
 
+    int maxStartIndex = Math.max(startIndex, 0);
+
     List<ServiceJourney> serviceJourneys = fragment.createServiceJourneys(
       fragment.journeyPattern().create(),
-      numberOfServiceJourneyInterchanges * 2
+      (numberOfServiceJourneyInterchanges + maxStartIndex) * 2
     );
 
     List<Integer> duplicateIndexesList = Arrays
@@ -166,11 +171,12 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
       .boxed()
       .toList();
 
-    int maxStartIndex = Math.max(startIndex, 0);
-
     List<NetexTestFragment.CreateServiceJourneyInterchange> createServiceJourneyInterchanges =
       IntStream
-        .range(maxStartIndex, numberOfServiceJourneyInterchanges)
+        .range(
+          maxStartIndex,
+          numberOfServiceJourneyInterchanges + maxStartIndex
+        )
         .map(index ->
           duplicateIndexesList.contains(index) ? maxStartIndex : index
         )
@@ -184,9 +190,12 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
         .toList();
 
     return IntStream
-      .range(maxStartIndex, numberOfServiceJourneyInterchanges)
+      .range(0, createServiceJourneyInterchanges.size())
       .mapToObj(index ->
-        createServiceJourneyInterchanges.get(index).withId(index + 1).create()
+        createServiceJourneyInterchanges
+          .get(index)
+          .withId(maxStartIndex + index)
+          .create()
       )
       .toList();
   }
