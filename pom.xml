@@ -30,7 +30,7 @@
         <netex-validator-java.version>2.0.14</netex-validator-java.version>
         <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.17</zt-zip.version>
-        <redisson.version>3.29.0</redisson.version>
+        <redisson.version>3.30.0</redisson.version>
         <kryo.version>5.6.0</kryo.version>
         <embedded-redis.version>0.9.0</embedded-redis.version>
         <netex-parser-java.version>3.1.15</netex-parser-java.version>
