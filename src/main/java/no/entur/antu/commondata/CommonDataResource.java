@@ -65,7 +65,8 @@ public class CommonDataResource {
       .collect(
         Collectors.toMap(
           serviceLink -> ServiceLinkId.of(serviceLink).toString(),
-          serviceLink -> ScheduledStopPointIds.of(serviceLink).toString()
+          serviceLink -> ScheduledStopPointIds.of(serviceLink).toString(),
+          (v1, v2) -> v2
         )
       );
   }
