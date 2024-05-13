@@ -42,6 +42,8 @@ horizontalPodAutoscaler:
 stopplaceRegistryUrl: https://api.entur.io/stop-places/v1/read
 
 resources:
+  cpuLimit: "3"
+  memLimit: 6000Mi
   cpuRequest: "2"
-  memRequest: 6000Mi
+  memRequest: 5000Mi
   xmx: 5000m
