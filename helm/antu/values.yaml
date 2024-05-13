@@ -8,6 +8,7 @@ service:
     internalPort: 8080
 
 resources:
+  cpuLimit: "2"
   memLimit: 4000Mi
   cpuRequest: "1"
   memRequest: 4000Mi
