@@ -1,5 +1,6 @@
 package no.entur.antu.validation;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -32,6 +33,8 @@ import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
 import org.rutebanken.netex.model.Service_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -212,12 +215,49 @@ public record AntuNetexData(
   }
 
   /**
+   * Returns the Stream of all the valid ServiceJourneys in all the TimeTableFrames.
+   * The valid serviceJourneys are those that have number of timetabledPassingTime equals to number of StopPointsInJourneyPattern.
+   * This is validated with SERVICE_JOURNEY_10.
+   */
+  public Stream<ServiceJourney> validServiceJourneys() {
+    return serviceJourneys()
+      .filter(serviceJourney -> {
+        JourneyPattern journeyPattern = getJourneyPattern(serviceJourney);
+        if (journeyPattern == null) {
+          return false;
+        }
+        return (
+          stopPointsInJourneyPattern(journeyPattern).toList().size() ==
+          timetabledPassingTimes(serviceJourney).toList().size()
+        );
+      });
+  }
+
+  /**
+   * Returns the Stream of TimetabledPassingTimes for the given ServiceJourney.
+   * Missing TimetabledPassingTimes is validated with SERVICE_JOURNEY_3
+   */
+  public Stream<TimetabledPassingTime> timetabledPassingTimes(
+    ServiceJourney serviceJourney
+  ) {
+    return Optional
+      .ofNullable(serviceJourney.getPassingTimes())
+      .map(TimetabledPassingTimes_RelStructure::getTimetabledPassingTime)
+      .stream()
+      .flatMap(Collection::stream);
+  }
+
+  /**
    * Return the JourneyPattern for the given ServiceJourney.
+   * Missing JourneyPatternRef on ServiceJourney is validated with SERVICE_JOURNEY_10
    */
   public JourneyPattern getJourneyPattern(ServiceJourney serviceJourney) {
-    return netexEntitiesIndex
-      .getJourneyPatternIndex()
-      .get(serviceJourney.getJourneyPatternRef().getValue().getRef());
+    return Optional
+      .ofNullable(serviceJourney.getJourneyPatternRef())
+      .map(JAXBElement::getValue)
+      .map(VersionOfObjectRefStructure::getRef)
+      .map(ref -> netexEntitiesIndex.getJourneyPatternIndex().get(ref))
+      .orElse(null);
   }
 
   /**
