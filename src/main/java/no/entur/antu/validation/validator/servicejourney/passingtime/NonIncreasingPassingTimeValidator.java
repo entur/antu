@@ -58,7 +58,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
     );
 
     antuNetexData
-      .serviceJourneys()
+      .validServiceJourneys()
       .forEach(serviceJourney ->
         validateServiceJourney(
           serviceJourney,

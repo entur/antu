@@ -25,12 +25,12 @@ public record UnexpectedSpeedContext(
   public UnexpectedSpeedContext(
     ServiceJourney serviceJourney,
     AllVehicleModesOfTransportEnumeration transportMode,
-    Map<ScheduledStopPointId, QuayCoordinates> quayCoordinatesPerQuayId
+    Map<ScheduledStopPointId, QuayCoordinates> quayCoordinatesPerScheduledStopPointId
   ) {
     this(
       serviceJourney,
       transportMode,
-      quayCoordinatesPerQuayId,
+      quayCoordinatesPerScheduledStopPointId,
       // TODO: Creating the new Distance for each ServiceJourney, is this correct?
       //  Is this even helpful, even if we fix it. Needs profiling.
       new Distances()
@@ -75,13 +75,20 @@ public record UnexpectedSpeedContext(
       JourneyPattern journeyPattern = antuNetexData.getJourneyPattern(
         serviceJourney
       );
+
+      if (journeyPattern == null) {
+        LOGGER.warn(
+          "No journey pattern ref found on service journey with id: {}",
+          serviceJourney.getId()
+        );
+        return new UnexpectedSpeedContext(serviceJourney, null, Map.of());
+      }
+
       return new UnexpectedSpeedContext(
         serviceJourney,
         antuNetexData.findTransportMode(serviceJourney),
-        serviceJourney
-          .getPassingTimes()
-          .getTimetabledPassingTime()
-          .stream()
+        antuNetexData
+          .timetabledPassingTimes(serviceJourney)
           .map(timetabledPassingTime ->
             findQuayCoordinates(timetabledPassingTime, journeyPattern)
           )
