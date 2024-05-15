@@ -13,6 +13,8 @@ import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This utility class is used to sort the timetabled passing times of a service journey according to
@@ -21,6 +23,10 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  * The passing times are sorted by their order in the journey pattern, and warped in a StopTime object.
  */
 public final class SortStopTimesUtil {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    SortStopTimesUtil.class
+  );
 
   /**
    * Prevent instantiation of this utility class.
@@ -37,6 +43,14 @@ public final class SortStopTimesUtil {
     JourneyPattern journeyPattern = antuNetexData.getJourneyPattern(
       serviceJourney
     );
+
+    if (journeyPattern == null) {
+      LOGGER.debug(
+        "No journey pattern ref found on service journey {}",
+        serviceJourney.getId()
+      );
+      return List.of();
+    }
 
     Map<String, Integer> stopPointIdToOrder = getStopPointIdsOrder(
       journeyPattern

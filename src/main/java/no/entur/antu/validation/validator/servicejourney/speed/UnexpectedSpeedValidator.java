@@ -80,7 +80,7 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       new UnexpectedSpeedContext.Builder(antuNetexData);
 
     antuNetexData
-      .serviceJourneys()
+      .validServiceJourneys()
       .map(contextBuilder::build)
       .filter(UnexpectedSpeedContext::isValid)
       .forEach(context ->
