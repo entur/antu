@@ -121,10 +121,10 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .findFirst()
-        .map(ValidationReportEntry::getName)
+        .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE.toString()
+        MandatoryFieldsError.RuleCode.MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE.getErrorMessage()
       )
     );
   }
@@ -176,10 +176,10 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .findFirst()
-        .map(ValidationReportEntry::getName)
+        .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE.toString()
+        MandatoryFieldsError.RuleCode.MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE.getErrorMessage()
       )
     );
   }
@@ -223,10 +223,10 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .findFirst()
-        .map(ValidationReportEntry::getName)
+        .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_FROM_STOP_POINT_IN_INTERCHANGE.toString()
+        MandatoryFieldsError.RuleCode.MISSING_FROM_STOP_POINT_IN_INTERCHANGE.getErrorMessage()
       )
     );
   }
@@ -270,10 +270,10 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .findFirst()
-        .map(ValidationReportEntry::getName)
+        .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_TO_STOP_POINT_IN_INTERCHANGE.toString()
+        MandatoryFieldsError.RuleCode.MISSING_TO_STOP_POINT_IN_INTERCHANGE.getErrorMessage()
       )
     );
   }
@@ -323,10 +323,10 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .findFirst()
-        .map(ValidationReportEntry::getName)
+        .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_FROM_STOP_POINT_IN_INTERCHANGE.toString()
+        MandatoryFieldsError.RuleCode.MISSING_FROM_STOP_POINT_IN_INTERCHANGE.getErrorMessage()
       )
     );
   }
@@ -376,10 +376,10 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .findFirst()
-        .map(ValidationReportEntry::getName)
+        .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_TO_STOP_POINT_IN_INTERCHANGE.toString()
+        MandatoryFieldsError.RuleCode.MISSING_TO_STOP_POINT_IN_INTERCHANGE.getErrorMessage()
       )
     );
   }
