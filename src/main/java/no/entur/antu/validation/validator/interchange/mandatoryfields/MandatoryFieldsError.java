@@ -6,7 +6,7 @@ public record MandatoryFieldsError(RuleCode ruleCode, String interchangeId)
   implements ValidationError {
   @Override
   public String getRuleCode() {
-    return ruleCode.toString();
+    return "MISSING_MANDATORY_FIELDS_IN_INTERCHANGE";
   }
 
   @Override
