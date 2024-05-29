@@ -21,16 +21,14 @@ public record MandatoryFieldsError(RuleCode ruleCode, String interchangeId)
 
   enum RuleCode implements no.entur.antu.validation.RuleCode {
     MISSING_FROM_STOP_POINT_IN_INTERCHANGE(
-      "From stop point is missing in interchange."
+      "FromPointRef or stop point is missing"
     ),
-    MISSING_TO_STOP_POINT_IN_INTERCHANGE(
-      "To stop point is missing in interchange."
-    ),
+    MISSING_TO_STOP_POINT_IN_INTERCHANGE("ToPointRef or stop point is missing"),
     MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE(
-      "From service journey is missing in interchange."
+      "FromJourneyRef or service journey is missing"
     ),
     MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE(
-      "To service journey is missing in interchange."
+      "ToJourneyRef or service journey is missing"
     );
 
     private final String errorMessage;
