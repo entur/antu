@@ -1,52 +1,26 @@
 package no.entur.antu.validation.validator.interchange.mandatoryfields;
 
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.validation.AntuNetexData;
-import org.rutebanken.netex.model.ServiceJourney;
+import java.util.Optional;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
+import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
 public record MandatoryFieldsContext(
   String interchangeId,
-  QuayId fromQuayId,
-  QuayId toQuayId,
-  ServiceJourney fromServiceJourney,
-  ServiceJourney toServiceJourney
+  String fromPointRef,
+  String toPointRef,
+  String fromJourneyRef,
+  String toJourneyRef
 ) {
-  public static Builder builder(AntuNetexData antuNetexData) {
-    return new Builder(antuNetexData);
-  }
 
-  public static class Builder {
-
-    private final AntuNetexData antuNetexData;
-
-    public Builder(AntuNetexData antuNetexData) {
-      this.antuNetexData = antuNetexData;
-    }
-
-    public MandatoryFieldsContext build(
-      ServiceJourneyInterchange serviceJourneyInterchange
-    ) {
-      return new MandatoryFieldsContext(
-        serviceJourneyInterchange.getId(),
-        antuNetexData.findQuayIdForScheduledStopPoint(
-          ScheduledStopPointId.ofNullable(
-            serviceJourneyInterchange.getFromPointRef()
-          )
-        ),
-        antuNetexData.findQuayIdForScheduledStopPoint(
-          ScheduledStopPointId.ofNullable(
-            serviceJourneyInterchange.getToPointRef()
-          )
-        ),
-        antuNetexData.serviceJourney(
-          serviceJourneyInterchange.getFromJourneyRef()
-        ),
-        antuNetexData.serviceJourney(
-          serviceJourneyInterchange.getToJourneyRef()
-        )
-      );
-    }
+  public static MandatoryFieldsContext of(
+    ServiceJourneyInterchange serviceJourneyInterchange
+  ) {
+    return new MandatoryFieldsContext(
+      serviceJourneyInterchange.getId(),
+      Optional.ofNullable(serviceJourneyInterchange.getFromPointRef()).map(VersionOfObjectRefStructure::getRef).orElse(null),
+      Optional.ofNullable(serviceJourneyInterchange.getToPointRef()).map(VersionOfObjectRefStructure::getRef).orElse(null),
+      Optional.ofNullable(serviceJourneyInterchange.getFromJourneyRef()).map(VersionOfObjectRefStructure::getRef).orElse(null),
+      Optional.ofNullable(serviceJourneyInterchange.getToJourneyRef()).map(VersionOfObjectRefStructure::getRef).orElse(null)
+    );
   }
 }

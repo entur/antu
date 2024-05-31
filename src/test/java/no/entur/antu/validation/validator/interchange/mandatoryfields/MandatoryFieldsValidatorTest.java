@@ -278,6 +278,8 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     );
   }
 
+  /**
+   * Keeping these tests in comments for using them later in other validation rules.
   @Test
   void testFromPointRefHasNoAssignment() {
     ScheduledStopPointId scheduledStopPointId1 = new ScheduledStopPointId(
@@ -383,4 +385,5 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       )
     );
   }
+  **/
 }

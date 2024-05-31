@@ -56,13 +56,10 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
       validationReport,
       validationContext
     );
-    MandatoryFieldsContext.Builder builder = new MandatoryFieldsContext.Builder(
-      antuNetexData
-    );
 
     antuNetexData
       .serviceJourneyInterchanges()
-      .map(builder::build)
+      .map(MandatoryFieldsContext::of)
       .forEach(serviceJourneyInterchange ->
         validateMandatoryFields(
           serviceJourneyInterchange,
@@ -81,7 +78,7 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
     Consumer<ValidationError> reportError
   ) {
     // 3-Interchange-1
-    if (context.fromQuayId() == null) {
+    if (context.fromPointRef() == null) {
       reportError.accept(
         new MandatoryFieldsError(
           MandatoryFieldsError.RuleCode.MISSING_FROM_STOP_POINT_IN_INTERCHANGE,
@@ -91,7 +88,7 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
     }
 
     // 3-Interchange-2
-    if (context.toQuayId() == null) {
+    if (context.toPointRef() == null) {
       reportError.accept(
         new MandatoryFieldsError(
           MandatoryFieldsError.RuleCode.MISSING_TO_STOP_POINT_IN_INTERCHANGE,
@@ -101,7 +98,7 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
     }
 
     // 3-Interchange-3
-    if (context.fromServiceJourney() == null) {
+    if (context.fromJourneyRef() == null) {
       reportError.accept(
         new MandatoryFieldsError(
           MandatoryFieldsError.RuleCode.MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE,
@@ -111,7 +108,7 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
     }
 
     // 3-Interchange-4
-    if (context.toServiceJourney() == null) {
+    if (context.toJourneyRef() == null) {
       reportError.accept(
         new MandatoryFieldsError(
           MandatoryFieldsError.RuleCode.MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE,
