@@ -152,8 +152,7 @@ public class ValidationTest {
 
     AntuNetexData antuNetexData = mock(AntuNetexData.class);
     when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
-    when(validationContext.getAntuNetexData(anyString(), any(), any()))
-      .thenReturn(antuNetexData);
+    when(validationContext.getAntuNetexData()).thenReturn(antuNetexData);
 
     try {
       V validator = validatorClass

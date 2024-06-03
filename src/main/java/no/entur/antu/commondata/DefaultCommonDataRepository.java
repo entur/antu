@@ -1,13 +1,14 @@
 package no.entur.antu.commondata;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
 import no.entur.antu.model.ServiceLinkId;
-import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,16 +25,19 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   private final CommonDataResource commonDataResource;
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
   private final Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache;
+  private final Map<String, List<String>> lineInfoCache;
 
   public DefaultCommonDataRepository(
     CommonDataResource commonDataResource,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
-    Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache
+    Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache,
+    Map<String, List<String>> lineInfoCache
   ) {
     this.commonDataResource = commonDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     this.serviceLinksAndScheduledStopPointIdsCache =
       serviceLinksAndScheduledStopPointIdsCache;
+    this.lineInfoCache = lineInfoCache;
   }
 
   @Override
@@ -79,29 +83,17 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
     );
   }
 
-/*
   @Override
-  public Map<String, LineInfo> getLineNames(String validationReportId) {
-    Map<String, String> lineNamesForReportId = lineNamesCache.get(
-      validationReportId
-    );
-    if (lineNamesForReportId == null) {
+  public List<LineInfo> getLineNames(String validationReportId) {
+    List<String> lineInfoForReportId = lineInfoCache.get(validationReportId);
+    if (lineInfoForReportId == null) {
       throw new AntuException(
         "Line names not found for validation report with id: " +
         validationReportId
       );
     }
-    return lineNamesForReportId
-      .entrySet()
-      .stream()
-      .collect(
-        Collectors.toMap(
-          Map.Entry::getKey,
-          entry -> LineInfo.fromString(entry.getValue())
-        )
-      );
+    return lineInfoForReportId.stream().map(LineInfo::fromString).toList();
   }
-*/
 
   @Override
   public void loadCommonDataCache(

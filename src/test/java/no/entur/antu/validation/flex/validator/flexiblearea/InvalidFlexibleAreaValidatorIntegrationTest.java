@@ -1,8 +1,6 @@
 package no.entur.antu.validation.flex.validator.flexiblearea;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -58,19 +56,15 @@ class InvalidFlexibleAreaValidatorIntegrationTest {
       AntuNetexData antuNetexData = mock(AntuNetexData.class);
       when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
       when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getAntuNetexData(anyString(), any(), any()))
-        .thenReturn(antuNetexData);
+      when(validationContext.getAntuNetexData()).thenReturn(antuNetexData);
 
       InvalidFlexibleAreaValidator invalidFlexibleAreaValidator =
-        new InvalidFlexibleAreaValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          null,
-          null
+        new InvalidFlexibleAreaValidator((code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       invalidFlexibleAreaValidator.validate(

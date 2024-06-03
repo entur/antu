@@ -1,5 +1,6 @@
 package no.entur.antu.commondata;
 
+import java.util.List;
 import java.util.Map;
 import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayId;
@@ -23,6 +24,8 @@ public interface CommonDataRepository {
     ServiceLinkId serviceLinkId,
     String validationReportId
   );
+
+  List<LineInfo> getLineNames(String validationReportId);
 
   void loadCommonDataCache(byte[] fileContent, String validationReportId);
 

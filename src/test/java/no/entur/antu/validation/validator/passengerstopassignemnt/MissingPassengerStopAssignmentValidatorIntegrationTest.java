@@ -87,9 +87,10 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
     String testFile,
     CommonDataRepository commonDataRepository
   ) throws IOException {
+    String validationReportId = "Test1122";
     ValidationReport testValidationReport = new ValidationReport(
       TEST_CODESPACE,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -105,12 +106,6 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
         ValidationContextWithNetexEntitiesIndex.class
       );
 
-      AntuNetexData antuNetexData = mock(AntuNetexData.class);
-      when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
-      when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getAntuNetexData(anyString(), any(), any()))
-        .thenReturn(antuNetexData);
-
       StopPlaceRepository stopPlaceRepository = Mockito.mock(
         StopPlaceRepository.class
       );
@@ -118,16 +113,25 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       when(stopPlaceRepository.getStopPlaceNameForQuayId(any()))
         .thenReturn("TestName");
 
+      when(validationContext.isCommonFile()).thenReturn(false);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(
+            validationReportId,
+            netexEntitiesIndex,
+            commonDataRepository,
+            stopPlaceRepository
+          )
+        );
+
       MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator =
         new MissingPassengerStopAssignmentValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          commonDataRepository,
-          stopPlaceRepository
+            (code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       missingPassengerStopAssignmentValidator.validate(

@@ -9,7 +9,9 @@ import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LineInfoScraper implements CommonDataScraper {
 
   private final RedissonClient redissonClient;
@@ -24,37 +26,33 @@ public class LineInfoScraper implements CommonDataScraper {
   }
 
   @Override
-  public void scrapeCommonData(ValidationContext validationContext) {
-    if (validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex) {
-      AntuNetexData antuNetexData = validationContextWithNetexEntitiesIndex.getAntuNetexData();
+  public void scrapeData(ValidationContext validationContext) {
+    if (
+      validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
+    ) {
+      AntuNetexData antuNetexData =
+        validationContextWithNetexEntitiesIndex.getAntuNetexData();
       addLineName(
-        validationContextWithNetexEntitiesIndex.getAntuNetexData().validationReportId(),
-        antuNetexData.getLineInfo()
+        validationContextWithNetexEntitiesIndex
+          .getAntuNetexData()
+          .validationReportId(),
+        antuNetexData.getLineInfo(validationContext.getFileName())
       );
     } else {
-      throw new IllegalArgumentException("ValidationContext must be of type ValidationContextWithNetexEntitiesIndex");
+      throw new IllegalArgumentException(
+        "ValidationContext must be of type ValidationContextWithNetexEntitiesIndex"
+      );
     }
   }
 
-  public void addLineName(
-    String validationReportId,
-    LineInfo lineInfo
-  ) {
+  public void addLineName(String validationReportId, LineInfo lineInfo) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {
       lock.lock();
-      List<String> existingLinesInfo = lineInfoCache.get(
-        validationReportId
-      );
-      if (existingLinesInfo == null) {
-        existingLinesInfo = new ArrayList<>();
-      }
-
-      existingLinesInfo.add(lineInfo.toString());
 
       lineInfoCache.merge(
         validationReportId,
-        existingLinesInfo,
+        new ArrayList<>(List.of(lineInfo.toString())),
         (existingList, newList) -> {
           existingList.addAll(newList);
           return existingList;

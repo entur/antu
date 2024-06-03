@@ -22,15 +22,9 @@ import org.entur.netex.validation.validator.xpath.ValidationContext;
 public class MandatoryFieldsValidator extends AntuNetexValidator {
 
   public MandatoryFieldsValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -54,7 +48,6 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
     ValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
-
     antuNetexData
       .serviceJourneyInterchanges()
       .map(MandatoryFieldsContext::of)

@@ -50,9 +50,11 @@ class NonIncreasingPassingTimeValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(String testFile)
     throws IOException {
+    String validationReportId = "Test1122";
+
     ValidationReport testValidationReport = new ValidationReport(
       TEST_CODESPACE,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -68,28 +70,28 @@ class NonIncreasingPassingTimeValidatorIntegrationTest {
         ValidationContextWithNetexEntitiesIndex.class
       );
 
-      AntuNetexData antuNetexData = mock(AntuNetexData.class);
-      when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
-      when(validationContext.getAntuNetexData(anyString(), any(), any()))
-        .thenReturn(antuNetexData);
-
       CommonDataRepository commonDataRepository = mock(
         CommonDataRepository.class
       );
       when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
-      StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(
+            validationReportId,
+            netexEntitiesIndex,
+            commonDataRepository,
+            mock(StopPlaceRepository.class)
+          )
+        );
 
       NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator =
-        new NonIncreasingPassingTimeValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          commonDataRepository,
-          stopPlaceRepository
+        new NonIncreasingPassingTimeValidator((code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       nonIncreasingPassingTimeValidator.validate(

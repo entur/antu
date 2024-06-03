@@ -35,15 +35,9 @@ public class UnexpectedDistanceInServiceLinkValidator
   private static final double DISTANCE_MAX = 100;
 
   public UnexpectedDistanceInServiceLinkValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override

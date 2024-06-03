@@ -84,14 +84,10 @@ public class TimetableDataValidatorConfig {
   public UnexpectedDistanceBetweenStopPointsValidator unexpectedDistanceBetweenStopPointsValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
     return new UnexpectedDistanceBetweenStopPointsValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
+      validationReportEntryFactory
     );
   }
 
@@ -99,74 +95,46 @@ public class TimetableDataValidatorConfig {
   public IdenticalStopPointsValidator identicalStopPointsValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new IdenticalStopPointsValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new IdenticalStopPointsValidator(validationReportEntryFactory);
   }
 
   @Bean
   public SameQuayRefValidator sameQuayRefValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new SameQuayRefValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new SameQuayRefValidator(validationReportEntryFactory);
   }
 
   @Bean
   public SameStopPointsValidator sameStopPointsValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new SameStopPointsValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new SameStopPointsValidator(validationReportEntryFactory);
   }
 
   @Bean
   public StopPointsCountValidator stopPointsCountValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new StopPointsCountValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new StopPointsCountValidator(validationReportEntryFactory);
   }
 
   @Bean
   public MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
     return new MissingPassengerStopAssignmentValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
+      validationReportEntryFactory
     );
   }
 
@@ -174,30 +142,18 @@ public class TimetableDataValidatorConfig {
   public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new NonIncreasingPassingTimeValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new NonIncreasingPassingTimeValidator(validationReportEntryFactory);
   }
 
   @Bean
   public UnexpectedSpeedValidator unexpectedSpeedValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new UnexpectedSpeedValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new UnexpectedSpeedValidator(validationReportEntryFactory);
   }
 
   @Bean
@@ -219,14 +175,10 @@ public class TimetableDataValidatorConfig {
   public UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
     return new UnexpectedDistanceInServiceLinkValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
+      validationReportEntryFactory
     );
   }
 
@@ -234,45 +186,27 @@ public class TimetableDataValidatorConfig {
   public MismatchedStopPointsValidator mismatchedStopPointsValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new MismatchedStopPointsValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new MismatchedStopPointsValidator(validationReportEntryFactory);
   }
 
   @Bean
   public MandatoryFieldsValidator mandatoryFieldsValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new MandatoryFieldsValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new MandatoryFieldsValidator(validationReportEntryFactory);
   }
 
   @Bean
   public DuplicateInterchangesValidator duplicateInterchangesValidator(
     @Qualifier(
       "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new DuplicateInterchangesValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    return new DuplicateInterchangesValidator(validationReportEntryFactory);
   }
 
   @Bean
@@ -312,7 +246,7 @@ public class TimetableDataValidatorConfig {
     MismatchedStopPointsValidator mismatchedStopPointsValidator,
     MandatoryFieldsValidator mandatoryFieldsValidator,
     DuplicateInterchangesValidator duplicateInterchangesValidator
-    ) {
+  ) {
     return List.of(
       xpathValidator,
       netexIdValidator,
@@ -341,18 +275,14 @@ public class TimetableDataValidatorConfig {
   public List<NetexDatasetValidator> netexDatasetValidators(
     DuplicateLineNameValidator duplicateLineNameValidator
   ) {
-    return List.of(
-      duplicateLineNameValidator
-    );
+    return List.of(duplicateLineNameValidator);
   }
 
   @Bean
   public List<CommonDataScraper> commonDataScrapers(
     LineInfoScraper lineInfoScraper
   ) {
-    return List.of(
-      lineInfoScraper
-    );
+    return List.of(lineInfoScraper);
   }
 
   @Bean

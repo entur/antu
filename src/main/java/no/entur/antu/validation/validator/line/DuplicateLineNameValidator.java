@@ -25,42 +25,14 @@ public class DuplicateLineNameValidator extends NetexDatasetValidator {
     this.commonDataRepository = commonDataRepository;
   }
 
-  private record DuplicateLineContext(
-    String lineId,
-    String lineName,
-    String fileName
-  ) {
-    public static DuplicateLineContext of(String fileName, LineInfo lineInfo) {
-      return new DuplicateLineContext(
-        lineInfo.lineId(),
-        lineInfo.lineName(),
-        fileName
-      );
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (!(o instanceof DuplicateLineContext that)) return false;
-      return Objects.equals(lineName, that.lineName);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hashCode(lineName);
-    }
-  }
-
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
-    Map<String, LineInfo> lineNames = commonDataRepository.getLineNames(
+    List<LineInfo> lineNames = commonDataRepository.getLineNames(
       validationReport.getValidationReportId()
     );
 
     List<ValidationReportEntry> duplicateEntries = lineNames
-      .entrySet()
       .stream()
-      .map(entry -> DuplicateLineContext.of(entry.getKey(), entry.getValue()))
       .collect(Collectors.groupingBy(Function.identity(), Collectors.toList()))
       .entrySet()
       .stream()
@@ -79,7 +51,7 @@ public class DuplicateLineNameValidator extends NetexDatasetValidator {
           entry
             .getValue()
             .stream()
-            .map(DuplicateLineContext::fileName)
+            .map(LineInfo::fileName)
             .filter(filename -> !filename.equals(entry.getKey().fileName()))
             .map(filename -> "'" + filename + "'")
             .collect(Collectors.joining(", "))

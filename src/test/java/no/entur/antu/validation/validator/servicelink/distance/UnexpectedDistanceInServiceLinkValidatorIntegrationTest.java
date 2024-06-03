@@ -1,8 +1,6 @@
 package no.entur.antu.validation.validator.servicelink.distance;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,9 +32,11 @@ class UnexpectedDistanceInServiceLinkValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(String testFile)
     throws IOException {
+    String validationReportId = "Test1122";
+
     ValidationReport testValidationReport = new ValidationReport(
       TEST_CODESPACE,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -52,22 +52,20 @@ class UnexpectedDistanceInServiceLinkValidatorIntegrationTest {
         ValidationContextWithNetexEntitiesIndex.class
       );
 
-      AntuNetexData antuNetexData = mock(AntuNetexData.class);
-      when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
       when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getAntuNetexData(anyString(), any(), any()))
-        .thenReturn(antuNetexData);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(validationReportId, netexEntitiesIndex, null, null)
+        );
 
       UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator =
         new UnexpectedDistanceInServiceLinkValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          null,
-          null
+            (code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       unexpectedDistanceInServiceLinkValidator.validate(

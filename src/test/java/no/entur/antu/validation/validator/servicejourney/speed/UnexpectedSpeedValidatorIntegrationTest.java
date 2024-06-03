@@ -38,9 +38,10 @@ class UnexpectedSpeedValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(String testFile)
     throws IOException {
+    String validationReportId = "Test1122";
     ValidationReport testValidationReport = new ValidationReport(
       TEST_CODESPACE,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -56,33 +57,32 @@ class UnexpectedSpeedValidatorIntegrationTest {
         ValidationContextWithNetexEntitiesIndex.class
       );
 
-      AntuNetexData antuNetexData = mock(AntuNetexData.class);
-      when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
-      when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getAntuNetexData(anyString(), any(), any()))
-        .thenReturn(antuNetexData);
-
       CommonDataRepository commonDataRepository = Mockito.mock(
         CommonDataRepository.class
-      );
-      StopPlaceRepository stopPlaceRepository = Mockito.mock(
-        StopPlaceRepository.class
       );
 
       Mockito
         .when(commonDataRepository.hasQuayIds(anyString()))
         .thenReturn(false);
 
+      when(validationContext.isCommonFile()).thenReturn(false);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(
+            validationReportId,
+            netexEntitiesIndex,
+            commonDataRepository,
+            Mockito.mock(StopPlaceRepository.class)
+          )
+        );
+
       UnexpectedSpeedValidator unexpectedSpeedValidator =
-        new UnexpectedSpeedValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          commonDataRepository,
-          stopPlaceRepository
+        new UnexpectedSpeedValidator((code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       unexpectedSpeedValidator.validate(

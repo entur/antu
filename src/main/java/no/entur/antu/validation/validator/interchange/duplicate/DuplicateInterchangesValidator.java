@@ -21,15 +21,9 @@ import org.entur.netex.validation.validator.xpath.ValidationContext;
 public class DuplicateInterchangesValidator extends AntuNetexValidator {
 
   public DuplicateInterchangesValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override

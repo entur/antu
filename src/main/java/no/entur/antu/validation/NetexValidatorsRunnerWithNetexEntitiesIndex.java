@@ -91,7 +91,9 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
     );
 
     NetexParser netexParser = new NetexParser();
-    NetexEntitiesIndex netexEntitiesIndex = netexParser.parse(new ByteArrayInputStream(fileContent));
+    NetexEntitiesIndex netexEntitiesIndex = netexParser.parse(
+      new ByteArrayInputStream(fileContent)
+    );
 
     AntuNetexData antuNetexData = new AntuNetexData(
       validationReportId,
@@ -112,12 +114,12 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
   }
 
   @Override
-  protected void postPreparedValidationContext(ValidationContext validationContext) {
+  protected void postPreparedValidationContext(
+    ValidationContext validationContext
+  ) {
     if (!validationContext.isCommonFile()) {
-      commonDataScrapers.forEach(
-        commonDataScraper -> commonDataScraper.scrapeCommonData(
-          validationContext
-        )
+      commonDataScrapers.forEach(commonDataScraper ->
+        commonDataScraper.scrapeData(validationContext)
       );
     }
   }

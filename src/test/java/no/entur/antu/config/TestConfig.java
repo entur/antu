@@ -48,17 +48,8 @@ public class TestConfig {
       }
 
       @Override
-      public Map<String, LineInfo> getLineNames(String validationReportId) {
-        return Map.of();
-      }
-
-      @Override
-      public void addLineName(
-        String validationReportId,
-        String fileName,
-        LineInfo lineInfo
-      ) {
-        /* Nothing here */
+      public List<LineInfo> getLineNames(String validationReportId) {
+        return List.of();
       }
 
       @Override

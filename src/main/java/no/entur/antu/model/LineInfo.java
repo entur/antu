@@ -43,9 +43,21 @@ public record LineInfo(String lineId, String lineName, String fileName) {
       if (split.length == 3) {
         return new LineInfo(split[0], split[1], split[2]);
       } else {
-        throw new AntuException("Invalid linnInfo string: " + lineInfo);
+        throw new AntuException("Invalid lineInfo string: " + lineInfo);
       }
     }
     return null;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof LineInfo lineInfo)) return false;
+    return Objects.equals(lineName, lineInfo.lineName);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(lineName);
   }
 }

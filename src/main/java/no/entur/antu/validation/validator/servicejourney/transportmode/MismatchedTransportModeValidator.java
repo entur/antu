@@ -38,11 +38,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
     this.stopPlaceRepository = stopPlaceRepository;
     this.commonDataRepository = commonDataRepository;
   }
@@ -218,8 +214,6 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
             )
           );
         }
-      } else {
-        return;
       }
     } else {
       validationError.accept(

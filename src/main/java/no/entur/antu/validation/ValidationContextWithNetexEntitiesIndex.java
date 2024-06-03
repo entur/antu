@@ -38,8 +38,7 @@ public class ValidationContextWithNetexEntitiesIndex extends ValidationContext {
    * Gets the NetexEntitiesIndex.
    * @return the NetexEntitiesIndex
    */
-  public AntuNetexData getAntuNetexData(
-  ) {
+  public AntuNetexData getAntuNetexData() {
     return antuNetexData;
   }
 }

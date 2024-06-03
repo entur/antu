@@ -200,13 +200,13 @@ public record AntuNetexData(
     return null;
   }
 
-  public LineInfo getLineInfo() {
+  public LineInfo getLineInfo(String fileName) {
     return netexEntitiesIndex
       .getLineIndex()
       .getAll()
       .stream()
       .findFirst()
-      .map(LineInfo::of)
+      .map(line -> LineInfo.of(line, fileName))
       .orElse(null);
   }
 
