@@ -17,10 +17,8 @@
 package no.entur.antu.config;
 
 import org.entur.oauth2.AuthorizedWebClientBuilder;
-import org.entur.oauth2.JwtRoleAssignmentExtractor;
 import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolver;
 import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolverBuilder;
-import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,11 +29,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class OAuth2Config {
-
-  @Bean
-  public RoleAssignmentExtractor roleAssignmentExtractor() {
-    return new JwtRoleAssignmentExtractor();
-  }
 
   @Bean
   @Profile("!test")
