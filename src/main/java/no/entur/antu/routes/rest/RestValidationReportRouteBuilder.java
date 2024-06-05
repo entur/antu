@@ -24,7 +24,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import no.entur.antu.Constants;
 import no.entur.antu.routes.BaseRouteBuilder;
-import no.entur.antu.security.AuthorizationService;
+import no.entur.antu.security.AntuAuthorizationService;
 import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.model.rest.RestBindingMode;
@@ -43,16 +43,16 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
   private static final String CODESPACE_PARAM = "codespace";
   private static final String VALIDATION_REPORT_ID_PARAM = "id";
 
-  private final AuthorizationService authorizationService;
+  private final AntuAuthorizationService antuAuthorizationService;
   private final String host;
   private final String port;
 
   public RestValidationReportRouteBuilder(
-    AuthorizationService authorizationService,
+    AntuAuthorizationService antuAuthorizationService,
     @Value("${server.host:0.0.0.0}") String host,
     @Value("${server.port:8080}") String port
   ) {
-    this.authorizationService = authorizationService;
+    this.antuAuthorizationService = antuAuthorizationService;
     this.host = host;
     this.port = port;
   }
@@ -230,14 +230,14 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .validate(header(CODESPACE_PARAM).isNotNull())
       .doTry()
       .bean(
-        authorizationService,
+        antuAuthorizationService,
         "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})"
       )
       .routeId("admin-authorize-editor-request");
 
     from("direct:authorizeAdminRequest")
       .doTry()
-      .process(e -> authorizationService.verifyAdministratorPrivileges())
+      .process(e -> antuAuthorizationService.verifyAdministratorPrivileges())
       .routeId("admin-authorize-admin-request");
   }
 }
