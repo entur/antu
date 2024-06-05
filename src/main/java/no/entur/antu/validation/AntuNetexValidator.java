@@ -43,7 +43,7 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     ) {
       return validationContextWithNetexEntitiesIndex.getAntuNetexData();
     } else {
-      throw new AntuException("Netex entities index not available in context");
+      throw new AntuException("Netex data not available in context");
     }
   }
 

@@ -79,7 +79,6 @@ public class NetexValidationProfile {
   public ValidationReport validateDataset(
     ValidationReport validationReport,
     String validationProfile,
-    String filename,
     NetexValidationProgressCallBack netexValidationProgressCallBack
   ) {
     if (validationReport == null) {
@@ -98,7 +97,6 @@ public class NetexValidationProfile {
     } else {
       return netexValidatorsRunner.runNetexDatasetValidators(
         validationReport,
-        filename,
         netexValidationProgressCallBack
       );
     }

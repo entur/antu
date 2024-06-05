@@ -23,8 +23,10 @@ import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.JOB_TYPE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
+import static no.entur.antu.Constants.JOB_TYPE_COMPLETE_VALIDATION;
 import static no.entur.antu.Constants.JOB_TYPE_SPLIT;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
+import static no.entur.antu.Constants.JOB_TYPE_VALIDATE_DATASET;
 import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 
 import java.time.LocalDateTime;
@@ -87,6 +89,10 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .to("direct:splitDataset")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE))
       .to("direct:validateNetex")
+      .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE_DATASET))
+      .to("direct:validateDataset")
+      .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_COMPLETE_VALIDATION))
+      .to("direct:completeValidation")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_COMMON_FILES))
       .to("direct:createLineFilesValidationJobs")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_REPORTS))

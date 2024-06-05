@@ -35,7 +35,6 @@ import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validation.AntuNetexValidationProgressCallback;
 import no.entur.antu.validation.ValidationReportTransformer;
-import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
@@ -195,42 +194,6 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .bean(new ValidationReportTransformer(50))
       .log(LoggingLevel.DEBUG, correlation() + "Truncated validation report")
       .routeId("truncate-validation-report");
-
-    from("direct:saveValidationReport")
-      .log(LoggingLevel.DEBUG, correlation() + "Saving validation report")
-      .marshal()
-      .json(JsonLibrary.Jackson)
-      .to("direct:uploadValidationReport")
-      .log(LoggingLevel.DEBUG, correlation() + "Saved validation report")
-      .routeId("save-validation-report");
-
-    from("direct:uploadValidationReport")
-      .setHeader(
-        TEMPORARY_FILE_NAME,
-        constant(BLOBSTORE_PATH_ANTU_WORK)
-          .append(header(DATASET_REFERENTIAL))
-          .append("/")
-          .append(header(VALIDATION_REPORT_ID_HEADER))
-          .append("/")
-          .append(header(NETEX_FILE_NAME))
-          .append(VALIDATION_REPORT_SUFFIX)
-      )
-      .log(
-        LoggingLevel.DEBUG,
-        correlation() +
-        "Uploading Validation Report  to GCS file ${header." +
-        TEMPORARY_FILE_NAME +
-        "}"
-      )
-      .to("direct:uploadBlobToMemoryStore")
-      .log(
-        LoggingLevel.DEBUG,
-        correlation() +
-        "Uploaded Validation Report to GCS file ${header." +
-        TEMPORARY_FILE_NAME +
-        "}"
-      )
-      .routeId("upload-validation-report");
 
     from("direct:notifyValidationReportAggregator")
       .log(

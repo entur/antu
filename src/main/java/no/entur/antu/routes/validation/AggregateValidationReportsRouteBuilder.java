@@ -25,6 +25,7 @@ import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
+import static no.entur.antu.Constants.JOB_TYPE_VALIDATE_DATASET;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
@@ -52,7 +53,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
-import org.apache.camel.Processor;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.apache.camel.util.StopWatch;
@@ -106,10 +106,16 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       )
       .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
       .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_REPORTS))
+      .process(exchange -> {
+        Message in = exchange.getIn();
+      })
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
       .routeId("aggregate-reports-pubsub");
 
     from("direct:aggregateReports")
+      .process(exchange -> {
+        Message in = exchange.getIn();
+      })
       .log(LoggingLevel.INFO, correlation() + "Merging individual reports")
       .setProperty(PROP_STOP_WATCH, StopWatch::new)
       .convertBodyTo(String.class)
@@ -130,7 +136,60 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         PROP_STOP_WATCH +
         ".taken()} ms"
       )
-      .to("direct:validateDataset")
+      .marshal()
+      .json(JsonLibrary.Jackson)
+      .to("direct:uploadValidationReport")
+      .setBody(header(NETEX_FILE_NAME))
+      .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE_DATASET))
+      .process(exchange -> {
+        Message in = exchange.getIn();
+      })
+      .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
+      .routeId("aggregate-reports");
+
+    from("direct:validateDataset")
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() + "Downloading the aggregated validation report"
+      )
+      .convertBodyTo(String.class)
+      .setHeader(NETEX_FILE_NAME, body())
+      .process(exchange -> {
+        Message in = exchange.getIn();
+      })
+      .to("direct:downloadValidationReport")
+      .unmarshal()
+      .json(JsonLibrary.Jackson, ValidationReport.class)
+      .process(exchange ->
+        exchange.setProperty(
+          PROP_NETEX_VALIDATION_CALLBACK,
+          new AntuNetexValidationProgressCallback(this, exchange)
+        )
+      )
+      .bean(
+        "netexValidationProfile",
+        "validateDataset(" +
+        "${body}, " +
+        "${header." +
+        VALIDATION_PROFILE_HEADER +
+        "},${exchangeProperty." +
+        PROP_NETEX_VALIDATION_CALLBACK +
+        "})"
+      )
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() + "Completed all NeTEx dataset validators"
+      )
+      .process(exchange -> {
+        Message in = exchange.getIn();
+      })
+      .to("direct:completeValidation")
+      .routeId("validate-dataset");
+
+    from("direct:completeValidation")
+      .process(exchange -> {
+        Message in = exchange.getIn();
+      })
       .choice()
       .when(simple("${body.hasError()}"))
       .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
@@ -147,36 +206,16 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .to("direct:notifyStatus")
       .to("direct:createValidationReportStatusFile")
       .to("direct:cleanUpCache")
-      .routeId("aggregate-reports");
-
-    from("direct:validateDataset")
-      .process(exchange ->
-        exchange.setProperty(
-          PROP_NETEX_VALIDATION_CALLBACK,
-          new AntuNetexValidationProgressCallback(this, exchange)
-        )
-      )
-      .bean(
-        "netexValidationProfile",
-        "validateDataset(" +
-        "${body}, " +
-        "${header." +
-        VALIDATION_PROFILE_HEADER +
-        "},${header.RutebankenFileName" + // TODO: Hva med file navn?
-        "},${exchangeProperty." +
-        PROP_NETEX_VALIDATION_CALLBACK +
-        "})"
-      )
-      .log(
-        LoggingLevel.DEBUG,
-        correlation() + "Completed all NeTEx dataset validators"
-      );
+      .routeId("complete-validation");
 
     from("direct:uploadValidationReportMetrics")
       .bean(antuPrometheusMetricsService)
       .routeId("upload-validation-report-metrics");
 
     from("direct:downloadValidationReport")
+      .process(exchange -> {
+        Message in = exchange.getIn();
+      })
       .setHeader(
         TEMPORARY_FILE_NAME,
         constant(Constants.BLOBSTORE_PATH_ANTU_WORK)

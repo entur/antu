@@ -42,7 +42,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
     this.netexXMLParser = netexXMLParser;
     this.commonDataRepository = commonDataRepository;
     this.stopPlaceRepository = stopPlaceRepository;
-    commonDataScrapers = List.of();
+    this.commonDataScrapers = List.of();
   }
 
   public NetexValidatorsRunnerWithNetexEntitiesIndex(
