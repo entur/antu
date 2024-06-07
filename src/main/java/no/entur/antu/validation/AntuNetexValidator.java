@@ -47,17 +47,21 @@ public abstract class AntuNetexValidator extends AbstractNetexValidator {
     }
   }
 
-  protected abstract void validateCommonFile(
+  protected void validateCommonFile(
     ValidationReport validationReport,
     ValidationContext validationContext,
     AntuNetexData antuNetexData
-  );
+  ) {
+    // Nothing here
+  }
 
-  protected abstract void validateLineFile(
+  protected void validateLineFile(
     ValidationReport validationReport,
     ValidationContext validationContext,
     AntuNetexData antuNetexData
-  );
+  ) {
+    // Nothing here
+  }
 
   protected void addValidationReportEntry(
     ValidationReport validationReport,

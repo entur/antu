@@ -114,7 +114,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
   }
 
   @Override
-  protected void postPreparedValidationContext(
+  protected void postPrepareValidationContext(
     ValidationContext validationContext
   ) {
     if (!validationContext.isCommonFile()) {

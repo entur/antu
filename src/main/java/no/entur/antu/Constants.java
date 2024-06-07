@@ -58,6 +58,8 @@ public final class Constants {
   public static final String VALIDATION_REPORT_ID_HEADER =
     "EnturValidationReportId";
 
+  public static final String REPORT_CREATION_DATE = "reportCreationDate";
+
   public static final String BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED =
     "inbound/received/";
   public static final String BLOBSTORE_PATH_ANTU_REPORTS = "reports/";

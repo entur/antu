@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import no.entur.antu.commondata.CommonDataRepository;
+import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.NetexParser;
@@ -14,6 +16,7 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class InvalidFlexibleAreaValidatorIntegrationTest {
 
@@ -35,9 +38,10 @@ class InvalidFlexibleAreaValidatorIntegrationTest {
     String testFile,
     String codeSpace
   ) throws IOException {
+    String validationReportId = "Test1122";
     ValidationReport testValidationReport = new ValidationReport(
       codeSpace,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -53,10 +57,16 @@ class InvalidFlexibleAreaValidatorIntegrationTest {
         ValidationContextWithNetexEntitiesIndex.class
       );
 
-      AntuNetexData antuNetexData = mock(AntuNetexData.class);
-      when(antuNetexData.netexEntitiesIndex()).thenReturn(netexEntitiesIndex);
-      when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getAntuNetexData()).thenReturn(antuNetexData);
+      when(validationContext.isCommonFile()).thenReturn(true);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(
+            validationReportId,
+            netexEntitiesIndex,
+            Mockito.mock(CommonDataRepository.class),
+            Mockito.mock(StopPlaceRepository.class)
+          )
+        );
 
       InvalidFlexibleAreaValidator invalidFlexibleAreaValidator =
         new InvalidFlexibleAreaValidator((code, message, dataLocation) ->

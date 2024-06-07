@@ -2,8 +2,6 @@ package no.entur.antu.validation.flex.validator.flexiblearea;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;

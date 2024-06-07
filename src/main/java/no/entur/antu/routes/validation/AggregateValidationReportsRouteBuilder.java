@@ -27,6 +27,7 @@ import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE_DATASET;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.REPORT_CREATION_DATE;
 import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
 import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
 import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
@@ -68,7 +69,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
-  public static final String REPORT_CREATION_DATE = "reportCreationDate";
   private static final String PROP_DATASET_NETEX_FILE_NAMES =
     "EnturDatasetNetexFileNames";
   private static final String PROP_NETEX_VALIDATION_CALLBACK =
@@ -106,16 +106,10 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       )
       .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
       .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_REPORTS))
-      .process(exchange -> {
-        Message in = exchange.getIn();
-      })
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
       .routeId("aggregate-reports-pubsub");
 
     from("direct:aggregateReports")
-      .process(exchange -> {
-        Message in = exchange.getIn();
-      })
       .log(LoggingLevel.INFO, correlation() + "Merging individual reports")
       .setProperty(PROP_STOP_WATCH, StopWatch::new)
       .convertBodyTo(String.class)
@@ -180,16 +174,10 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.DEBUG,
         correlation() + "Completed all NeTEx dataset validators"
       )
-      .process(exchange -> {
-        Message in = exchange.getIn();
-      })
       .to("direct:completeValidation")
       .routeId("validate-dataset");
 
     from("direct:completeValidation")
-      .process(exchange -> {
-        Message in = exchange.getIn();
-      })
       .choice()
       .when(simple("${body.hasError()}"))
       .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
@@ -209,13 +197,21 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .routeId("complete-validation");
 
     from("direct:uploadValidationReportMetrics")
+      .process(exchange -> {
+        String reportCreationDate = exchange
+          .getIn()
+          .getHeader(REPORT_CREATION_DATE, String.class);
+        exchange
+          .getIn()
+          .setHeader(
+            REPORT_CREATION_DATE,
+            LocalDateTime.parse(reportCreationDate)
+          );
+      })
       .bean(antuPrometheusMetricsService)
       .routeId("upload-validation-report-metrics");
 
     from("direct:downloadValidationReport")
-      .process(exchange -> {
-        Message in = exchange.getIn();
-      })
       .setHeader(
         TEMPORARY_FILE_NAME,
         constant(Constants.BLOBSTORE_PATH_ANTU_WORK)

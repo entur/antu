@@ -96,7 +96,7 @@ public class MemoryStoreRoute extends BaseRouteBuilder {
       )
       .routeId("memory-store-download");
 
-    from("  direct:uploadBlobToMemoryStore")
+    from("direct:uploadBlobToMemoryStore")
       .bean(
         "temporaryFileRepository",
         "upload(${header." +
