@@ -1,6 +1,7 @@
 package no.entur.antu.validation.validator.servicejourney.transportmode;
 
 import java.util.List;
+import java.util.Optional;
 import net.sf.saxon.s9api.Axis;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XPathSelector;
@@ -44,19 +45,16 @@ public record MismatchedTransportModeContext(
         .load();
       selector.setContextItem(validationContext.getXmlNode());
 
-      XdmItem passengerStopAssignmentItem = selector.evaluateSingle();
-      if (passengerStopAssignmentItem == null) {
+      XdmItem scheduledStopPointRefItem = selector.evaluateSingle();
+      if (scheduledStopPointRefItem == null) {
         Builder.LOGGER.debug(
           "PassengerStopAssignment not found in line file, for scheduledStopPoint {}",
           scheduledStopPointId.id()
         );
         return null;
       }
-      XdmNode scheduledStopPointRef = passengerStopAssignmentItem
-        .stream()
-        .asNode();
       XdmNode passengerStopAssignment = Builder.getParent(
-        scheduledStopPointRef,
+        scheduledStopPointRefItem.stream().asNode(),
         new QName("n", Constants.NETEX_NAMESPACE, "PassengerStopAssignment")
       );
       if (passengerStopAssignment != null) {
@@ -64,9 +62,11 @@ public record MismatchedTransportModeContext(
           passengerStopAssignment,
           new QName("n", Constants.NETEX_NAMESPACE, "QuayRef")
         );
-        if (quayRef != null) {
-          return new QuayId(quayRef.attribute("ref"));
-        }
+        return Optional
+          .ofNullable(quayRef)
+          .map(qRef -> qRef.attribute("ref"))
+          .map(QuayId::ofValidId)
+          .orElse(null);
       }
       return null;
     } catch (Exception ex) {

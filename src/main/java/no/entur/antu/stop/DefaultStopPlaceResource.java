@@ -4,6 +4,7 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import no.entur.antu.model.TransportModes;
 import no.entur.antu.model.TransportSubMode;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 
@@ -99,13 +101,19 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
     return makeQuayIdMapEntries(
       stopPlace,
       quay ->
-        Map.entry(
-          QuayId.of(quay),
-          new TransportModes(
-            stopPlace.getTransportMode(),
-            TransportSubMode.of(stopPlace).orElse(null)
+        Optional
+          .ofNullable(quay)
+          .map(QuayId::ofValidId)
+          .map(quayId ->
+            Map.entry(
+              quayId,
+              new TransportModes(
+                stopPlace.getTransportMode(),
+                TransportSubMode.of(stopPlace).orElse(null)
+              )
+            )
           )
-        )
+          .orElse(null)
     );
   }
 
@@ -114,13 +122,16 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
   ) {
     return makeQuayIdMapEntries(
       stopPlace,
-      quay -> {
-        QuayCoordinates quayCoordinates = QuayCoordinates.of(quay);
-        if (quayCoordinates != null) {
-          return Map.entry(QuayId.of(quay), quayCoordinates);
-        }
-        return null;
-      }
+      quay ->
+        Optional
+          .ofNullable(quay)
+          .map(QuayId::ofValidId)
+          .flatMap(quayId ->
+            Optional
+              .ofNullable(QuayCoordinates.of(quay))
+              .map(quayCoordinates -> Map.entry(quayId, quayCoordinates))
+          )
+          .orElse(null)
     );
   }
 
@@ -129,13 +140,17 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
   ) {
     return makeQuayIdMapEntries(
       stopPlace,
-      quay -> {
-        String stopPlaceName = stopPlace.getName().getValue();
-        if (stopPlaceName != null) {
-          return Map.entry(QuayId.of(quay), stopPlaceName);
-        }
-        return null;
-      }
+      quay ->
+        Optional
+          .ofNullable(quay)
+          .map(QuayId::ofValidId)
+          .flatMap(quayId ->
+            Optional
+              .ofNullable(stopPlace.getName())
+              .map(MultilingualString::getValue)
+              .map(stopPlaceName -> Map.entry(quayId, stopPlaceName))
+          )
+          .orElse(null)
     );
   }
 

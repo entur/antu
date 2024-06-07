@@ -1,6 +1,7 @@
 package no.entur.antu.model;
 
 import java.util.Objects;
+import java.util.Optional;
 import no.entur.antu.exception.AntuException;
 import org.rutebanken.netex.model.Quay;
 
@@ -12,8 +13,16 @@ public record QuayId(String id) {
     }
   }
 
-  public static QuayId of(Quay quay) {
-    return new QuayId(quay.getId());
+  public static QuayId ofValidId(Quay quay) {
+    return Optional
+      .of(quay)
+      .map(Quay::getId)
+      .map(QuayId::ofValidId)
+      .orElse(null);
+  }
+
+  public static QuayId ofValidId(String id) {
+    return id != null && isValid(id) ? new QuayId(id) : null;
   }
 
   public static QuayId ofNullable(String id) {

@@ -78,7 +78,7 @@ public record AntuNetexData(
         scheduledStopPointId,
         validationReportId()
       )
-      : QuayId.ofNullable(
+      : QuayId.ofValidId(
         netexEntitiesIndex()
           .getQuayIdByStopPointRefIndex()
           .get(scheduledStopPointId.id())

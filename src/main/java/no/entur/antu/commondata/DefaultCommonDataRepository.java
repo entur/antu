@@ -57,7 +57,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
         validationReportId
       );
     }
-    return QuayId.ofNullable(idsForReport.get(scheduledStopPointId.id()));
+    return QuayId.ofValidId(idsForReport.get(scheduledStopPointId.id()));
   }
 
   @Override
