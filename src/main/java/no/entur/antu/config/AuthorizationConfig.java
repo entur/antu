@@ -16,7 +16,7 @@
 
 package no.entur.antu.config;
 
-import java.util.function.Function;
+import java.util.Locale;
 import no.entur.antu.security.AntuAuthorizationService;
 import no.entur.antu.security.DefaultAntuAuthorizationService;
 import org.entur.oauth2.JwtRoleAssignmentExtractor;
@@ -48,7 +48,10 @@ public class AuthorizationConfig {
     RoleAssignmentExtractor roleAssignmentExtractor
   ) {
     return new DefaultAuthorizationService<>(
-      Function.identity(),
+      providerCodespace ->
+        providerCodespace == null
+          ? null
+          : providerCodespace.toUpperCase(Locale.ROOT),
       roleAssignmentExtractor
     );
   }
