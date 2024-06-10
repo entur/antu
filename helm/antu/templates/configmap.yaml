@@ -63,6 +63,9 @@ data:
     spring.security.oauth2.client.registration.orgregister.authorization-grant-type=client_credentials
     orgregister.oauth2.client.audience={{ .Values.auth0.client.orgregister.audience }}
 
+    # Authorization
+    antu.security.authorization-service=token-based
+
     # Blobstore
     blobstore.gcs.project.id={{ .Values.gcp.blobstoreProjectId }}
     blobstore.gcs.marduk.container.name={{ .Values.gcp.marduk.bucketName }}
