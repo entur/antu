@@ -21,10 +21,12 @@ import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.commondata.CommonDataScraper;
 import no.entur.antu.commondata.LineInfoScraper;
+import no.entur.antu.commondata.ScheduledStopPointsScraper;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterchangeDistanceValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
@@ -210,6 +212,17 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new UnexpectedInterchangeDistanceValidator(
+      validationReportEntryFactory
+    );
+  }
+
+  @Bean
   public DuplicateLineNameValidator duplicateLineNameValidator(
     @Qualifier(
       "validationReportEntryFactory"
@@ -280,9 +293,10 @@ public class TimetableDataValidatorConfig {
 
   @Bean
   public List<CommonDataScraper> commonDataScrapers(
-    LineInfoScraper lineInfoScraper
+    LineInfoScraper lineInfoScraper,
+    ScheduledStopPointsScraper scheduledStopPointsScraper
   ) {
-    return List.of(lineInfoScraper);
+    return List.of(lineInfoScraper, scheduledStopPointsScraper);
   }
 
   @Bean

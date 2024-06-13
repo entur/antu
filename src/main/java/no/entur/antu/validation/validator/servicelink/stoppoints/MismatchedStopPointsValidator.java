@@ -4,10 +4,8 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -99,7 +97,7 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
         Optional
           .ofNullable(scheduledStopPointIds)
           .map(getStopPointId)
-          .map(antuNetexData::getStopPointName)
+          .map(antuNetexData::stopPointName)
           .orElse("unknown");
 
     context

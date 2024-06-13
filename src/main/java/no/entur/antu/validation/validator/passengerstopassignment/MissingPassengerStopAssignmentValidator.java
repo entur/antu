@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -77,7 +75,7 @@ public class MissingPassengerStopAssignmentValidator
           validationContext,
           new MissingPassengerStopAssignmentError(
             context.stopPointInJourneyPatternRef(),
-            antuNetexData.getStopPointName(context.scheduledStopPointId()),
+            antuNetexData.stopPointName(context.scheduledStopPointId()),
             MissingPassengerStopAssignmentError.RuleCode.MISSING_SCHEDULED_STOP_ASSIGNMENT
           )
         )

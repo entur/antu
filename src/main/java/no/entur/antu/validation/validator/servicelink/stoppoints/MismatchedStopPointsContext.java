@@ -62,9 +62,7 @@ public record MismatchedStopPointsContext(
           .map(serviceLinkId ->
             new AbstractMap.SimpleEntry<>(
               serviceLinkId,
-              antuNetexData.findScheduledStopPointsForServiceLinkId(
-                serviceLinkId
-              )
+              antuNetexData.scheduledStopPointsForServiceLinkId(serviceLinkId)
             )
           )
           .filter(entry -> entry.getValue() != null)

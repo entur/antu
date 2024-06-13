@@ -2,8 +2,6 @@ package no.entur.antu.validation.validator.servicelink.distance;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -156,8 +154,8 @@ public class UnexpectedDistanceInServiceLinkValidator
             : UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
           Comparison.of(DISTANCE_MAX, distance),
           isStart
-            ? antuNetexData.getStopPointName(context.fromScheduledStopPointId())
-            : antuNetexData.getStopPointName(context.toScheduledStopPointId()),
+            ? antuNetexData.stopPointName(context.fromScheduledStopPointId())
+            : antuNetexData.stopPointName(context.toScheduledStopPointId()),
           context.serviceLinkId()
         )
       );
@@ -171,8 +169,8 @@ public class UnexpectedDistanceInServiceLinkValidator
             : UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
           Comparison.of(DISTANCE_WARNING, distance),
           isStart
-            ? antuNetexData.getStopPointName(context.fromScheduledStopPointId())
-            : antuNetexData.getStopPointName(context.toScheduledStopPointId()),
+            ? antuNetexData.stopPointName(context.fromScheduledStopPointId())
+            : antuNetexData.stopPointName(context.toScheduledStopPointId()),
           context.serviceLinkId()
         )
       );

@@ -2,7 +2,6 @@ package no.entur.antu.config;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.LineInfo;
@@ -49,6 +48,14 @@ public class TestConfig {
 
       @Override
       public List<LineInfo> getLineNames(String validationReportId) {
+        return List.of();
+      }
+
+      @Override
+      public List<ScheduledStopPointId> getScheduledStopPointsForServiceJourney(
+        String validationReportId,
+        String serviceJourneyId
+      ) {
         return List.of();
       }
 

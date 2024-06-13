@@ -2,6 +2,7 @@ package no.entur.antu.commondata;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.LineInfo;
@@ -26,18 +27,22 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
   private final Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache;
   private final Map<String, List<String>> lineInfoCache;
+  private final Map<String, Map<String, List<String>>> serviceJourneyToScheduledStopPointsCache;
 
   public DefaultCommonDataRepository(
     CommonDataResource commonDataResource,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache,
-    Map<String, List<String>> lineInfoCache
+    Map<String, List<String>> lineInfoCache,
+    Map<String, Map<String, List<String>>> serviceJourneyToScheduledStopPointsCache
   ) {
     this.commonDataResource = commonDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     this.serviceLinksAndScheduledStopPointIdsCache =
       serviceLinksAndScheduledStopPointIdsCache;
     this.lineInfoCache = lineInfoCache;
+    this.serviceJourneyToScheduledStopPointsCache =
+      serviceJourneyToScheduledStopPointsCache;
   }
 
   @Override
@@ -93,6 +98,27 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
       );
     }
     return lineInfoForReportId.stream().map(LineInfo::fromString).toList();
+  }
+
+  @Override
+  public List<ScheduledStopPointId> getScheduledStopPointsForServiceJourney(
+    String validationReportId,
+    String serviceJourneyId
+  ) {
+    Map<String, List<String>> idsForReport =
+      serviceJourneyToScheduledStopPointsCache.get(validationReportId);
+    if (idsForReport == null) {
+      throw new AntuException(
+        "ScheduledStopPoints cache not found for validation report with id: " +
+        validationReportId
+      );
+    }
+    return Optional
+      .ofNullable(idsForReport.get(serviceJourneyId))
+      .map(scheduledStopPoints ->
+        scheduledStopPoints.stream().map(ScheduledStopPointId::new).toList()
+      )
+      .orElse(List.of());
   }
 
   @Override

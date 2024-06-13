@@ -2,6 +2,7 @@ package no.entur.antu.config;
 
 import static no.entur.antu.config.cache.CacheConfig.LINE_INFO_CACHE;
 import static no.entur.antu.config.cache.CacheConfig.SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_TO_SCHEDULED_STOP_POINTS_CACHE;
 import static no.entur.antu.config.cache.CacheConfig.SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE;
 
 import java.util.List;
@@ -33,13 +34,17 @@ public class CommonDataConfig {
     @Qualifier(
       SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE
     ) Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache,
-    @Qualifier(LINE_INFO_CACHE) Map<String, List<String>> lineInfoCache
+    @Qualifier(LINE_INFO_CACHE) Map<String, List<String>> lineInfoCache,
+    @Qualifier(
+      SERVICE_JOURNEY_TO_SCHEDULED_STOP_POINTS_CACHE
+    ) Map<String, Map<String, List<String>>> serviceJourneyToScheduledStopPointsCache
   ) {
     return new DefaultCommonDataRepository(
       commonDataResource,
       scheduledStopPointAndQuayIdCache,
       serviceLinksAndScheduledStopPointIdsCache,
-      lineInfoCache
+      lineInfoCache,
+      serviceJourneyToScheduledStopPointsCache
     );
   }
 }
