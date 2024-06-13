@@ -27,6 +27,11 @@ public interface CommonDataRepository {
 
   List<LineInfo> getLineNames(String validationReportId);
 
+  List<ScheduledStopPointId> getScheduledStopPointsForServiceJourney(
+    String validationReportId,
+    String serviceJourneyId
+  );
+
   void loadCommonDataCache(byte[] fileContent, String validationReportId);
 
   /**

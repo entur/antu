@@ -111,3 +111,9 @@ validationRuleConfigs:
   - code: DUPLICATE_LINE_NAME
     name: Duplicate line names found
     severity: WARNING
+  - code: DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_MAX_LIMIT
+    name: Distance between stop points in interchange is more than maximum limit
+    severity: WARNING
+  - code: DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_WARNING_LIMIT
+    name: Distance between stop points in interchange is more than warning limit
+    severity: WARNING

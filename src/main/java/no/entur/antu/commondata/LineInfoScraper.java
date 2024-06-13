@@ -9,9 +9,7 @@ import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.stereotype.Component;
 
-@Component
 public class LineInfoScraper implements CommonDataScraper {
 
   private final RedissonClient redissonClient;
@@ -32,11 +30,11 @@ public class LineInfoScraper implements CommonDataScraper {
     ) {
       AntuNetexData antuNetexData =
         validationContextWithNetexEntitiesIndex.getAntuNetexData();
-      addLineName(
+      addLineInfo(
         validationContextWithNetexEntitiesIndex
           .getAntuNetexData()
           .validationReportId(),
-        antuNetexData.getLineInfo(validationContext.getFileName())
+        antuNetexData.lineInfo(validationContext.getFileName())
       );
     } else {
       throw new IllegalArgumentException(
@@ -45,7 +43,7 @@ public class LineInfoScraper implements CommonDataScraper {
     }
   }
 
-  public void addLineName(String validationReportId, LineInfo lineInfo) {
+  public void addLineInfo(String validationReportId, LineInfo lineInfo) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {
       lock.lock();

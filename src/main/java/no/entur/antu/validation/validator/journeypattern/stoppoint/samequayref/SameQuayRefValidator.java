@@ -3,8 +3,6 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -98,12 +96,10 @@ public class SameQuayRefValidator extends AntuNetexValidator {
             new SameQuayRefError(
               SameQuayRefError.RuleCode.SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN,
               currentContext.journeyPatternId(),
-              antuNetexData.getStopPointName(
+              antuNetexData.stopPointName(
                 previousContext.scheduledStopPointId()
               ),
-              antuNetexData.getStopPointName(
-                currentContext.scheduledStopPointId()
-              )
+              antuNetexData.stopPointName(currentContext.scheduledStopPointId())
             )
           );
         }

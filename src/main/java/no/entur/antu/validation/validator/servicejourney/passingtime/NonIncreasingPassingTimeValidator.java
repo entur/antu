@@ -2,8 +2,6 @@ package no.entur.antu.validation.validator.servicejourney.passingtime;
 
 import java.util.List;
 import java.util.function.Consumer;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
 import no.entur.antu.validation.AntuNetexData;
@@ -106,7 +104,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
         reportError.accept(
           new NonIncreasingPassingTimeError(
             NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME,
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               previousPassingTime.scheduledStopPointId()
             ),
             serviceJourney.getId()
@@ -129,7 +127,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
       reportError.accept(
         new NonIncreasingPassingTimeError(
           NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
-          antuNetexData.getStopPointName(stopTime.scheduledStopPointId()),
+          antuNetexData.stopPointName(stopTime.scheduledStopPointId()),
           serviceJourney.getId()
         )
       );
@@ -139,7 +137,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
       reportError.accept(
         new NonIncreasingPassingTimeError(
           NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
-          antuNetexData.getStopPointName(stopTime.scheduledStopPointId()),
+          antuNetexData.stopPointName(stopTime.scheduledStopPointId()),
           serviceJourney.getId()
         )
       );

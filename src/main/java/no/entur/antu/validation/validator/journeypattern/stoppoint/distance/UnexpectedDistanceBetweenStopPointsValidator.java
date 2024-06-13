@@ -1,8 +1,6 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 
 import java.util.function.Consumer;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -107,8 +105,8 @@ public class UnexpectedDistanceBetweenStopPointsValidator
           new UnexpectedDistanceBetweenStopPointsError(
             UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED,
             distanceContext.journeyPatternRef(),
-            antuNetexData.getStopPointName(previous.scheduledStopPointId()),
-            antuNetexData.getStopPointName(current.scheduledStopPointId()),
+            antuNetexData.stopPointName(previous.scheduledStopPointId()),
+            antuNetexData.stopPointName(current.scheduledStopPointId()),
             Comparison.of(expectedDistance.minDistance(), distance)
           )
         );
@@ -117,8 +115,8 @@ public class UnexpectedDistanceBetweenStopPointsValidator
           new UnexpectedDistanceBetweenStopPointsError(
             UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED,
             distanceContext.journeyPatternRef(),
-            antuNetexData.getStopPointName(previous.scheduledStopPointId()),
-            antuNetexData.getStopPointName(current.scheduledStopPointId()),
+            antuNetexData.stopPointName(previous.scheduledStopPointId()),
+            antuNetexData.stopPointName(current.scheduledStopPointId()),
             Comparison.of(expectedDistance.maxDistance(), distance)
           )
         );
