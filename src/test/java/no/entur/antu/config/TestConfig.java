@@ -31,7 +31,7 @@ public class TestConfig {
       }
 
       @Override
-      public QuayId findQuayIdForScheduledStopPoint(
+      public QuayId quayIdForScheduledStopPoint(
         ScheduledStopPointId scheduledStopPointId,
         String validationReportId
       ) {
@@ -39,7 +39,7 @@ public class TestConfig {
       }
 
       @Override
-      public ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+      public ScheduledStopPointIds scheduledStopPointIdsForServiceLink(
         ServiceLinkId serviceLinkId,
         String validationReportId
       ) {
@@ -47,12 +47,12 @@ public class TestConfig {
       }
 
       @Override
-      public List<LineInfo> getLineNames(String validationReportId) {
+      public List<LineInfo> lineNames(String validationReportId) {
         return List.of();
       }
 
       @Override
-      public List<ScheduledStopPointId> getScheduledStopPointsForServiceJourney(
+      public List<ScheduledStopPointId> scheduledStopPointsForServiceJourney(
         String validationReportId,
         String serviceJourneyId
       ) {

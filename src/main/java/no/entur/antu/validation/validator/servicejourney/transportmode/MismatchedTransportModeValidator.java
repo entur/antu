@@ -8,7 +8,6 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -96,7 +95,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
     Function<ScheduledStopPointId, QuayId> findQuayIdForScheduledStopPoint =
       commonDataRepository.hasQuayIds(validationReportId)
         ? scheduledStopPoint ->
-          commonDataRepository.findQuayIdForScheduledStopPoint(
+          commonDataRepository.quayIdForScheduledStopPoint(
             scheduledStopPoint,
             validationReportId
           )

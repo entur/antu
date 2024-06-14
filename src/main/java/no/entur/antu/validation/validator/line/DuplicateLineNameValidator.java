@@ -1,8 +1,6 @@
 package no.entur.antu.validation.validator.line;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import no.entur.antu.commondata.CommonDataRepository;
@@ -27,7 +25,7 @@ public class DuplicateLineNameValidator extends NetexDatasetValidator {
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
-    List<LineInfo> lineNames = commonDataRepository.getLineNames(
+    List<LineInfo> lineNames = commonDataRepository.lineNames(
       validationReport.getValidationReportId()
     );
 

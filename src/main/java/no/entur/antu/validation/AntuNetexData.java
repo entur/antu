@@ -80,7 +80,7 @@ public record AntuNetexData(
       return null;
     }
     return commonDataRepository.hasQuayIds(validationReportId())
-      ? commonDataRepository.findQuayIdForScheduledStopPoint(
+      ? commonDataRepository.quayIdForScheduledStopPoint(
         scheduledStopPointId,
         validationReportId()
       )
@@ -96,7 +96,7 @@ public record AntuNetexData(
   ) {
     // Should extend this function to check line file if we don't find the
     // service links in common file. Same as findQuayIdForScheduledStopPoint.
-    return commonDataRepository.findScheduledStopPointIdsForServiceLink(
+    return commonDataRepository.scheduledStopPointIdsForServiceLink(
       serviceLinkId,
       validationReportId()
     );
@@ -261,6 +261,16 @@ public record AntuNetexData(
           .get(vehicleJourneyRefStructure.getRef())
       )
       .orElse(null);
+  }
+
+  public List<ScheduledStopPointId> scheduledStopPoints(
+    VehicleJourneyRefStructure vehicleJourneyRefStructure
+  ) {
+    return commonDataRepository()
+      .scheduledStopPointsForServiceJourney(
+        vehicleJourneyRefStructure.getRef(),
+        validationReportId()
+      );
   }
 
   /**

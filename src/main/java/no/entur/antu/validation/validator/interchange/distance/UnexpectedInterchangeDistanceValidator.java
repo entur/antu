@@ -11,6 +11,9 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 
+/**
+ * Validates that the distance between stop points in interchange is within the expected range.
+ */
 public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
 
   private static final double INTERCHANGE_EXPECTED_DISTANCE = 1000;
@@ -23,7 +26,7 @@ public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
 
   @Override
   protected RuleCode[] getRuleCodes() {
-    return new RuleCode[0];
+    return UnexpectedInterchangeDistanceError.RuleCode.values();
   }
 
   @Override

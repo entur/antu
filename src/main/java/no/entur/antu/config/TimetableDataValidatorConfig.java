@@ -29,6 +29,7 @@ import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterchangeDistanceValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
+import no.entur.antu.validation.validator.interchange.stoppoints.StopPointsInVehicleJourneyValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.identicalstoppoints.IdenticalStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRefValidator;
@@ -223,6 +224,17 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new StopPointsInVehicleJourneyValidator(
+      validationReportEntryFactory
+    );
+  }
+
+  @Bean
   public DuplicateLineNameValidator duplicateLineNameValidator(
     @Qualifier(
       "validationReportEntryFactory"
@@ -258,7 +270,9 @@ public class TimetableDataValidatorConfig {
     UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator,
     MismatchedStopPointsValidator mismatchedStopPointsValidator,
     MandatoryFieldsValidator mandatoryFieldsValidator,
-    DuplicateInterchangesValidator duplicateInterchangesValidator
+    DuplicateInterchangesValidator duplicateInterchangesValidator,
+    UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator,
+    StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator
   ) {
     return List.of(
       xpathValidator,
@@ -280,7 +294,9 @@ public class TimetableDataValidatorConfig {
       unexpectedDistanceInServiceLinkValidator,
       mismatchedStopPointsValidator,
       mandatoryFieldsValidator,
-      duplicateInterchangesValidator
+      duplicateInterchangesValidator,
+      unexpectedInterchangeDistanceValidator,
+      stopPointsInVehicleJourneyValidator
     );
   }
 

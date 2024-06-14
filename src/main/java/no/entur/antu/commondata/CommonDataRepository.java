@@ -1,7 +1,6 @@
 package no.entur.antu.commondata;
 
 import java.util.List;
-import java.util.Map;
 import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
@@ -15,19 +14,19 @@ import no.entur.antu.model.ServiceLinkId;
 public interface CommonDataRepository {
   boolean hasQuayIds(String validationReportId);
 
-  QuayId findQuayIdForScheduledStopPoint(
+  QuayId quayIdForScheduledStopPoint(
     ScheduledStopPointId scheduledStopPointId,
     String validationReportId
   );
 
-  ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+  ScheduledStopPointIds scheduledStopPointIdsForServiceLink(
     ServiceLinkId serviceLinkId,
     String validationReportId
   );
 
-  List<LineInfo> getLineNames(String validationReportId);
+  List<LineInfo> lineNames(String validationReportId);
 
-  List<ScheduledStopPointId> getScheduledStopPointsForServiceJourney(
+  List<ScheduledStopPointId> scheduledStopPointsForServiceJourney(
     String validationReportId,
     String serviceJourneyId
   );
