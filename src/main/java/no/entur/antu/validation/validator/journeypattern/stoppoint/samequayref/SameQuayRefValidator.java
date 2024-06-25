@@ -3,8 +3,6 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -27,15 +25,9 @@ public class SameQuayRefValidator extends AntuNetexValidator {
   );
 
   public SameQuayRefValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -46,15 +38,11 @@ public class SameQuayRefValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug(
       "Validating Same quayRefs in two consecutive Stop points In Journey Patterns"
-    );
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
     );
 
     SameQuayRefContext.Builder builder = SameQuayRefContext.builder(
@@ -77,7 +65,8 @@ public class SameQuayRefValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // JourneyPatterns only appear in the Line file.
   }

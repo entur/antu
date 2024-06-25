@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -27,7 +25,6 @@ import org.slf4j.LoggerFactory;
  * Missing SPA -> No DeadRun -> Yes SJ -> Error
  * Missing SPA -> Yes DeadRun -> Yes SJ -> Error
  * Missing SPA -> Yes DeadRun -> No SJ -> OK
- *
  * Chouette reference: rutebanken_3-StopPoint-1
  */
 public class MissingPassengerStopAssignmentValidator
@@ -43,28 +40,18 @@ public class MissingPassengerStopAssignmentValidator
   }
 
   public MissingPassengerStopAssignmentValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating Stop place in journey pattern");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     MissingPassengerStopAssignmentContext.Builder builder =
       new MissingPassengerStopAssignmentContext.Builder(antuNetexData);
@@ -97,7 +84,8 @@ public class MissingPassengerStopAssignmentValidator
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     // StopPoints and JourneyPatterns only appear in the Line file.
   }

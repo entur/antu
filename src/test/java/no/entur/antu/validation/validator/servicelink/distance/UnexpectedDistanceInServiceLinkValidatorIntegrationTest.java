@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -31,9 +32,11 @@ class UnexpectedDistanceInServiceLinkValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(String testFile)
     throws IOException {
+    String validationReportId = "Test1122";
+
     ValidationReport testValidationReport = new ValidationReport(
       TEST_CODESPACE,
-      "Test1122"
+      validationReportId
     );
 
     try (
@@ -48,20 +51,21 @@ class UnexpectedDistanceInServiceLinkValidatorIntegrationTest {
       ValidationContextWithNetexEntitiesIndex validationContext = mock(
         ValidationContextWithNetexEntitiesIndex.class
       );
-      when(validationContext.getNetexEntitiesIndex())
-        .thenReturn(netexEntitiesIndex);
-      when(validationContext.isCommonFile()).thenReturn(true);
+
+      when(validationContext.isCommonFile()).thenReturn(false);
+      when(validationContext.getAntuNetexData())
+        .thenReturn(
+          new AntuNetexData(validationReportId, netexEntitiesIndex, null, null)
+        );
 
       UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator =
         new UnexpectedDistanceInServiceLinkValidator(
-          (code, message, dataLocation) ->
-            new ValidationReportEntry(
-              message,
-              code,
-              ValidationReportEntrySeverity.ERROR
-            ),
-          null,
-          null
+            (code, message, dataLocation) ->
+          new ValidationReportEntry(
+            message,
+            code,
+            ValidationReportEntrySeverity.ERROR
+          )
         );
 
       unexpectedDistanceInServiceLinkValidator.validate(

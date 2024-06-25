@@ -16,11 +16,11 @@
 
 package no.entur.antu.config;
 
-import static no.entur.antu.config.CacheConfig.COORDINATES_PER_QUAY_ID_CACHE;
-import static no.entur.antu.config.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
-import static no.entur.antu.config.CacheConfig.STOP_PLACE_AND_QUAY_CACHE;
-import static no.entur.antu.config.CacheConfig.STOP_PLACE_NAME_PER_QUAY_ID_CACHE;
-import static no.entur.antu.config.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.COORDINATES_PER_QUAY_ID_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.STOP_PLACE_AND_QUAY_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.STOP_PLACE_NAME_PER_QUAY_ID_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE;
 
 import java.util.Map;
 import java.util.Set;

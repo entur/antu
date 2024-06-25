@@ -147,23 +147,20 @@ public class ValidationTest {
     ValidationContextWithNetexEntitiesIndex validationContext = mock(
       ValidationContextWithNetexEntitiesIndex.class
     );
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-
     when(validationContext.isCommonFile()).thenReturn(mockAsCommonFile);
+
+    AntuNetexData antuNetexData = new AntuNetexData(
+      VALIDATION_REPORT_ID,
+      netexEntitiesIndex,
+      commonDataRepositoryMock,
+      stopPlaceRepositoryMock
+    );
+    when(validationContext.getAntuNetexData()).thenReturn(antuNetexData);
 
     try {
       V validator = validatorClass
-        .getDeclaredConstructor(
-          ValidationReportEntryFactory.class,
-          CommonDataRepository.class,
-          StopPlaceRepository.class
-        )
-        .newInstance(
-          validationReportEntryFactory,
-          commonDataRepositoryMock,
-          stopPlaceRepositoryMock
-        );
+        .getDeclaredConstructor(ValidationReportEntryFactory.class)
+        .newInstance(validationReportEntryFactory);
       validator.validate(testValidationReport, validationContext);
 
       return testValidationReport;

@@ -2,8 +2,6 @@ package no.entur.antu.validation.validator.servicelink.distance;
 
 import java.util.Objects;
 import java.util.function.Consumer;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -35,15 +33,9 @@ public class UnexpectedDistanceInServiceLinkValidator
   private static final double DISTANCE_MAX = 100;
 
   public UnexpectedDistanceInServiceLinkValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    super(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
+    super(validationReportEntryFactory);
   }
 
   @Override
@@ -54,14 +46,10 @@ public class UnexpectedDistanceInServiceLinkValidator
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating ServiceLinks");
-
-    AntuNetexData antuNetexData = createAntuNetexData(
-      validationReport,
-      validationContext
-    );
 
     UnexpectedDistanceInServiceLinkContext.Builder contextBuilder =
       new UnexpectedDistanceInServiceLinkContext.Builder(antuNetexData);
@@ -83,7 +71,8 @@ public class UnexpectedDistanceInServiceLinkValidator
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    ValidationContext validationContext,
+    AntuNetexData antuNetexData
   ) {
     /*
     No validation needed for line file

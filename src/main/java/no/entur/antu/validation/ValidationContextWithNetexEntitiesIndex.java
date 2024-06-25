@@ -2,9 +2,7 @@ package no.entur.antu.validation;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 import net.sf.saxon.s9api.XdmNode;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
@@ -17,30 +15,26 @@ public class ValidationContextWithNetexEntitiesIndex extends ValidationContext {
   /**
    * The supplier of the NetexEntitiesIndex.
    */
-  private final Supplier<NetexEntitiesIndex> getNetexEntitiesIndex;
-  private NetexEntitiesIndex netexEntitiesIndex;
+  private final AntuNetexData antuNetexData;
 
   public ValidationContextWithNetexEntitiesIndex(
     XdmNode document,
     NetexXMLParser netexXMLParser,
-    Supplier<NetexEntitiesIndex> getNetexEntitiesIndex,
+    AntuNetexData antuNetexData,
     String codespace,
     String fileName,
     Set<IdVersion> localIds,
     List<IdVersion> localRefs
   ) {
     super(document, netexXMLParser, codespace, fileName, localIds, localRefs);
-    this.getNetexEntitiesIndex = getNetexEntitiesIndex;
+    this.antuNetexData = antuNetexData;
   }
 
   /**
-   * Gets the NetexEntitiesIndex.
-   * @return the NetexEntitiesIndex
+   * Gets the AntuNetexData.
+   * @return the AntuNetexData
    */
-  public NetexEntitiesIndex getNetexEntitiesIndex() {
-    if (netexEntitiesIndex == null) {
-      netexEntitiesIndex = this.getNetexEntitiesIndex.get();
-    }
-    return netexEntitiesIndex;
+  public AntuNetexData getAntuNetexData() {
+    return antuNetexData;
   }
 }
