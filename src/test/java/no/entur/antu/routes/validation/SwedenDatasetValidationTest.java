@@ -87,6 +87,9 @@ class SwedenDatasetValidationTest extends AntuRouteBuilderIntegrationTestBase {
   @EndpointInject("mock:notifyStatus")
   protected MockEndpoint notifyStatus;
 
+  @EndpointInject("mock:uploadValidationReportMetrics")
+  protected MockEndpoint uploadValidationReportMetrics;
+
   @Test
   void testValidateDataset() throws Exception {
     AdviceWith.adviceWith(
@@ -100,12 +103,21 @@ class SwedenDatasetValidationTest extends AntuRouteBuilderIntegrationTestBase {
     );
     AdviceWith.adviceWith(
       context,
-      "aggregate-reports",
+      "complete-validation",
       a ->
         a
           .interceptSendToEndpoint("direct:notifyStatus")
           .skipSendToOriginalEndpoint()
           .to("mock:notifyStatus")
+    );
+    AdviceWith.adviceWith(
+      context,
+      "complete-validation",
+      a ->
+        a
+          .interceptSendToEndpoint("direct:uploadValidationReportMetrics")
+          .skipSendToOriginalEndpoint()
+          .to("mock:uploadValidationReportMetrics")
     );
 
     notifyStatus.expectedMessageCount(2);

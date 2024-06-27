@@ -240,7 +240,7 @@ class InitValidationRouteBuilderTest
     );
     AdviceWith.adviceWith(
       context,
-      "aggregate-reports",
+      "complete-validation",
       a ->
         a
           .interceptSendToEndpoint("direct:notifyStatus")

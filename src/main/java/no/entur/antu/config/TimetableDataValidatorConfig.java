@@ -223,7 +223,8 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public List<NetexValidator> netexValidators(
+  public NetexValidatorsRunner timetableDataValidatorsRunner(
+    NetexSchemaValidator netexSchemaValidator,
     @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
     NetexIdValidator netexIdValidator,
     VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
@@ -245,9 +246,15 @@ public class TimetableDataValidatorConfig {
     UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator,
     MismatchedStopPointsValidator mismatchedStopPointsValidator,
     MandatoryFieldsValidator mandatoryFieldsValidator,
-    DuplicateInterchangesValidator duplicateInterchangesValidator
+    DuplicateInterchangesValidator duplicateInterchangesValidator,
+    DuplicateLineNameValidator duplicateLineNameValidator,
+    LineInfoScraper lineInfoScraper,
+    CommonDataRepository commonDataRepository,
+    StopPlaceRepository stopPlaceRepository
   ) {
-    return List.of(
+    NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
+
+    List<NetexValidator> netexTimetableDataValidators = List.of(
       xpathValidator,
       netexIdValidator,
       versionOnLocalNetexIdValidator,
@@ -269,37 +276,18 @@ public class TimetableDataValidatorConfig {
       mandatoryFieldsValidator,
       duplicateInterchangesValidator
     );
-  }
 
-  @Bean
-  public List<NetexDatasetValidator> netexDatasetValidators(
-    DuplicateLineNameValidator duplicateLineNameValidator
-  ) {
-    return List.of(duplicateLineNameValidator);
-  }
+    List<NetexDatasetValidator> netexTimetableDatasetValidators = List.of(
+      duplicateLineNameValidator
+    );
 
-  @Bean
-  public List<CommonDataScraper> commonDataScrapers(
-    LineInfoScraper lineInfoScraper
-  ) {
-    return List.of(lineInfoScraper);
-  }
+    List<CommonDataScraper> commonDataScrapers = List.of(lineInfoScraper);
 
-  @Bean
-  public NetexValidatorsRunner timetableDataValidatorsRunner(
-    NetexSchemaValidator netexSchemaValidator,
-    List<NetexValidator> netexValidators,
-    List<NetexDatasetValidator> netexDatasetValidators,
-    List<CommonDataScraper> commonDataScrapers,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
-  ) {
-    NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
       netexXMLParser,
       netexSchemaValidator,
-      netexValidators,
-      netexDatasetValidators,
+      netexTimetableDataValidators,
+      netexTimetableDatasetValidators,
       commonDataScrapers,
       commonDataRepository,
       stopPlaceRepository

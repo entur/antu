@@ -135,6 +135,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .to("direct:uploadValidationReport")
       .setBody(header(NETEX_FILE_NAME))
       .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE_DATASET))
+      .convertHeaderTo(REPORT_CREATION_DATE, String.class)
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
       .routeId("aggregate-reports");
 
@@ -191,17 +192,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .routeId("complete-validation");
 
     from("direct:uploadValidationReportMetrics")
-      .process(exchange -> {
-        String reportCreationDate = exchange
-          .getIn()
-          .getHeader(REPORT_CREATION_DATE, String.class);
-        exchange
-          .getIn()
-          .setHeader(
-            REPORT_CREATION_DATE,
-            LocalDateTime.parse(reportCreationDate)
-          );
-      })
+      .convertHeaderTo(REPORT_CREATION_DATE, LocalDateTime.class)
       .bean(antuPrometheusMetricsService)
       .routeId("upload-validation-report-metrics");
 
