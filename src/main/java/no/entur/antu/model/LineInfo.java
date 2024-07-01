@@ -3,6 +3,7 @@ package no.entur.antu.model;
 import java.util.Objects;
 import java.util.Optional;
 import no.entur.antu.exception.AntuException;
+import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.MultilingualString;
 
@@ -18,6 +19,17 @@ public record LineInfo(String lineId, String lineName, String fileName) {
       line.getId(),
       Optional
         .ofNullable(line.getName())
+        .map(MultilingualString::getValue)
+        .orElse(null),
+      fileName
+    );
+  }
+
+  public static LineInfo of(FlexibleLine flexibleLine, String fileName) {
+    return new LineInfo(
+      flexibleLine.getId(),
+      Optional
+        .ofNullable(flexibleLine.getName())
         .map(MultilingualString::getValue)
         .orElse(null),
       fileName

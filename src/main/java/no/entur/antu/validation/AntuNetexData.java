@@ -188,13 +188,16 @@ public record AntuNetexData(
       .getFlexibleLineIndex()
       .get(route.getLineRef().getValue().getRef());
 
-    if (
+    return isFixedFlexibleLine(flexibleLine)
+      ? flexibleLine.getTransportMode()
+      : null;
+  }
+
+  private static boolean isFixedFlexibleLine(FlexibleLine flexibleLine) {
+    return (
       flexibleLine != null &&
       flexibleLine.getFlexibleLineType() == FlexibleLineTypeEnumeration.FIXED
-    ) {
-      return flexibleLine.getTransportMode();
-    }
-    return null;
+    );
   }
 
   public LineInfo getLineInfo(String fileName) {
@@ -204,7 +207,16 @@ public record AntuNetexData(
       .stream()
       .findFirst()
       .map(line -> LineInfo.of(line, fileName))
-      .orElse(null);
+      .orElse(
+        netexEntitiesIndex
+          .getFlexibleLineIndex()
+          .getAll()
+          .stream()
+          .filter(AntuNetexData::isFixedFlexibleLine)
+          .findFirst()
+          .map(line -> LineInfo.of(line, fileName))
+          .orElse(null)
+      );
   }
 
   public Stream<FlexibleStopPlace> flexibleStopPlaces() {
