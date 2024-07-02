@@ -17,7 +17,7 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
-class NonIncreasingPassingTimeValidatorTest extends ValidationTest {
+class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex

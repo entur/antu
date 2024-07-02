@@ -9,6 +9,7 @@ import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
@@ -31,7 +32,7 @@ public class TestConfig {
       }
 
       @Override
-      public QuayId findQuayIdForScheduledStopPoint(
+      public QuayId quayIdForScheduledStopPoint(
         ScheduledStopPointId scheduledStopPointId,
         String validationReportId
       ) {
@@ -39,7 +40,7 @@ public class TestConfig {
       }
 
       @Override
-      public ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+      public ScheduledStopPointIds scheduledStopPointIdsForServiceLink(
         ServiceLinkId serviceLinkId,
         String validationReportId
       ) {
@@ -47,7 +48,15 @@ public class TestConfig {
       }
 
       @Override
-      public List<LineInfo> getLineNames(String validationReportId) {
+      public List<LineInfo> lineNames(String validationReportId) {
+        return List.of();
+      }
+
+      @Override
+      public List<ServiceJourneyStop> serviceJourneyStops(
+        String validationReportId,
+        String serviceJourneyId
+      ) {
         return List.of();
       }
 

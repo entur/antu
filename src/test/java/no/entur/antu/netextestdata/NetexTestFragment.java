@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
@@ -20,6 +21,7 @@ import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
+import no.entur.antu.model.ScheduledStopPointId;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
@@ -763,8 +765,8 @@ public class NetexTestFragment {
     private int id = 1;
     private boolean guaranteed = true;
     private Duration maximumWaitTime;
-    private String fromPointRef;
-    private String toPointRef;
+    private ScheduledStopPointId fromPointRef;
+    private ScheduledStopPointId toPointRef;
     private String fromJourneyRef;
     private String toJourneyRef;
 
@@ -786,13 +788,15 @@ public class NetexTestFragment {
     }
 
     public CreateServiceJourneyInterchange withFromPointRef(
-      String fromPointRef
+      ScheduledStopPointId fromPointRef
     ) {
       this.fromPointRef = fromPointRef;
       return this;
     }
 
-    public CreateServiceJourneyInterchange withToPointRef(String toPointRef) {
+    public CreateServiceJourneyInterchange withToPointRef(
+      ScheduledStopPointId toPointRef
+    ) {
       this.toPointRef = toPointRef;
       return this;
     }
@@ -817,10 +821,22 @@ public class NetexTestFragment {
         .withGuaranteed(guaranteed)
         .withMaximumWaitTime(maximumWaitTime)
         .withFromPointRef(
-          new ScheduledStopPointRefStructure().withRef(fromPointRef)
+          new ScheduledStopPointRefStructure()
+            .withRef(
+              Optional
+                .ofNullable(fromPointRef)
+                .map(ScheduledStopPointId::id)
+                .orElse(null)
+            )
         )
         .withToPointRef(
-          new ScheduledStopPointRefStructure().withRef(toPointRef)
+          new ScheduledStopPointRefStructure()
+            .withRef(
+              Optional
+                .ofNullable(toPointRef)
+                .map(ScheduledStopPointId::id)
+                .orElse(null)
+            )
         )
         .withFromJourneyRef(
           new VehicleJourneyRefStructure().withRef(fromJourneyRef)

@@ -95,7 +95,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
     Function<ScheduledStopPointId, QuayId> findQuayIdForScheduledStopPoint =
       commonDataRepository.hasQuayIds(validationReportId)
         ? scheduledStopPoint ->
-          commonDataRepository.findQuayIdForScheduledStopPoint(
+          commonDataRepository.quayIdForScheduledStopPoint(
             scheduledStopPoint,
             validationReportId
           )
