@@ -1,5 +1,6 @@
 package no.entur.antu.validation;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -12,6 +13,7 @@ import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.stop.StopPlaceRepository;
@@ -108,14 +110,14 @@ public class ValidationTest {
   }
 
   protected void mockGetServiceJourneyStops(
-    String serviceJourneyId,
+    ServiceJourneyId serviceJourneyId,
     List<ServiceJourneyStop> serviceJourneyStops
   ) {
     Mockito
       .when(
         commonDataRepositoryMock.serviceJourneyStops(
-          eq(serviceJourneyId),
-          anyString()
+          anyString(),
+          eq(serviceJourneyId)
         )
       )
       .thenReturn(serviceJourneyStops);

@@ -2,10 +2,12 @@ package no.entur.antu.validation.validator.servicejourney.speed;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
@@ -137,7 +139,7 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
     if (passingTimes.getTimeDifference() == 0) {
       reportError.accept(
         new SameDepartureArrivalTimeError(
-          serviceJourney.getId(),
+          ServiceJourneyId.ofValidId(serviceJourney),
           antuNetexData.stopPointName(
             passingTimes.from().scheduledStopPointId()
           ),
@@ -221,7 +223,7 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       // too slow
       reportError.accept(
         new UnexpectedSpeedError(
-          context.serviceJourney().getId(),
+          ServiceJourneyId.ofValidId(context.serviceJourney()),
           antuNetexData.stopPointName(
             passingTimes.from().scheduledStopPointId()
           ),
@@ -238,7 +240,7 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       if (pessimisticSpeed > expectedSpeed.maxSpeed()) {
         reportError.accept(
           new UnexpectedSpeedError(
-            context.serviceJourney().getId(),
+            ServiceJourneyId.ofValidId(context.serviceJourney()),
             antuNetexData.stopPointName(
               passingTimes.from().scheduledStopPointId()
             ),
@@ -255,7 +257,7 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       } else {
         reportError.accept(
           new UnexpectedSpeedError(
-            context.serviceJourney().getId(),
+            ServiceJourneyId.ofValidId(context.serviceJourney()),
             antuNetexData.stopPointName(
               passingTimes.from().scheduledStopPointId()
             ),

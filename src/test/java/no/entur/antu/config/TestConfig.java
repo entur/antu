@@ -9,6 +9,7 @@ import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.model.StopPlaceId;
@@ -55,7 +56,7 @@ public class TestConfig {
       @Override
       public List<ServiceJourneyStop> serviceJourneyStops(
         String validationReportId,
-        String serviceJourneyId
+        ServiceJourneyId serviceJourneyId
       ) {
         return List.of();
       }

@@ -17,6 +17,7 @@ import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.stop.StopPlaceRepository;
@@ -300,8 +301,8 @@ public record AntuNetexData(
     return Optional
       .ofNullable(
         commonDataRepository.serviceJourneyStops(
-          vehicleJourneyRefStructure.getRef(),
-          validationReportId()
+          validationReportId(),
+          ServiceJourneyId.ofValidId(vehicleJourneyRefStructure)
         )
       )
       .orElse(List.of());
@@ -399,21 +400,26 @@ public record AntuNetexData(
       );
   }
 
-  public Map.Entry<String, List<ScheduledStopPointId>> scheduledStopPointIdsByServiceJourneyId(
+  public Map.Entry<ServiceJourneyId, List<ScheduledStopPointId>> scheduledStopPointIdsByServiceJourneyId(
     ServiceJourney serviceJourney
   ) {
-    return new AbstractMap.SimpleEntry<>(
-      serviceJourney.getId(),
-      stopPointsInJourneyPattern(journeyPattern(serviceJourney))
-        .map(stopPointInJourneyPattern ->
-          stopPointInJourneyPattern
-            .getScheduledStopPointRef()
-            .getValue()
-            .getRef()
+    return Optional
+      .ofNullable(ServiceJourneyId.ofValidId(serviceJourney))
+      .map(serviceJourneyId ->
+        new AbstractMap.SimpleEntry<>(
+          serviceJourneyId,
+          stopPointsInJourneyPattern(journeyPattern(serviceJourney))
+            .map(stopPointInJourneyPattern ->
+              stopPointInJourneyPattern
+                .getScheduledStopPointRef()
+                .getValue()
+                .getRef()
+            )
+            .map(ScheduledStopPointId::new)
+            .toList()
         )
-        .map(ScheduledStopPointId::new)
-        .toList()
-    );
+      )
+      .orElse(null);
   }
 
   public List<DayTypeAssignment> getAvailableDayTypeAssignments(

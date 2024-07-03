@@ -5,6 +5,7 @@ import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 
@@ -29,7 +30,7 @@ public interface CommonDataRepository {
 
   List<ServiceJourneyStop> serviceJourneyStops(
     String validationReportId,
-    String serviceJourneyId
+    ServiceJourneyId serviceJourneyId
   );
 
   void loadCommonDataCache(byte[] fileContent, String validationReportId);

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.List;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -45,8 +46,8 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withFromJourneyRef(serviceJourneys.get(0).getId())
-      .withToJourneyRef(serviceJourneys.get(1).getId())
+      .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourneys.get(0)))
+      .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourneys.get(1)))
       .withFromPointRef(scheduledStopPointId1)
       .withToPointRef(scheduledStopPointId2)
       .create();
@@ -89,7 +90,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withToJourneyRef(serviceJourney.getId())
+      .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
       .withFromPointRef(scheduledStopPointId1)
       .withToPointRef(scheduledStopPointId2)
       .create();
@@ -138,7 +139,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withFromJourneyRef(serviceJourney.getId())
+      .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
       .withFromPointRef(scheduledStopPointId1)
       .withToPointRef(scheduledStopPointId2)
       .create();
@@ -187,8 +188,8 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withFromJourneyRef(serviceJourney.getId())
-      .withToJourneyRef(serviceJourney.getId())
+      .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
+      .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
       .withToPointRef(scheduledStopPointId)
       .create();
 
@@ -231,8 +232,8 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withFromJourneyRef(serviceJourney.getId())
-      .withToJourneyRef(serviceJourney.getId())
+      .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
+      .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
       .withFromPointRef(scheduledStopPointId)
       .create();
 

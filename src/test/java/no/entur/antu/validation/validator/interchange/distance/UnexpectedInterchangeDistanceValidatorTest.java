@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -201,8 +202,12 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
           .serviceJourneyInterchange()
           .withFromPointRef(fromPointRef)
           .withToPointRef(toPointRef)
-          .withFromJourneyRef("TST:ServiceJourney:" + idx1)
-          .withToJourneyRef("TST:ServiceJourney:" + idx2)
+          .withFromJourneyRef(
+            ServiceJourneyId.ofValidId("TST:ServiceJourney:" + idx1)
+          )
+          .withToJourneyRef(
+            ServiceJourneyId.ofValidId("TST:ServiceJourney:" + idx2)
+          )
           .create();
       })
       .toList();

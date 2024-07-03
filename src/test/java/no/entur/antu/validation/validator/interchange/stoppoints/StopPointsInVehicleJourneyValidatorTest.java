@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.Collection;
 import java.util.List;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
@@ -33,7 +34,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
     // Mocking both the fromPointRef and toPointRef,
     // to test that both fromPointRef and toPointRef are part of the vehicle journey.
     mockGetServiceJourneyStops(
-      "TST:ServiceJourney:1",
+      ServiceJourneyId.ofValidId("TST:ServiceJourney:1"),
       List.of(
         new ServiceJourneyStop(
           new ScheduledStopPointId("TST:ScheduledStopPoint:1"),
@@ -45,7 +46,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       )
     );
     mockGetServiceJourneyStops(
-      "TST:ServiceJourney:2",
+      ServiceJourneyId.ofValidId("TST:ServiceJourney:2"),
       List.of(
         new ServiceJourneyStop(
           new ScheduledStopPointId("TST:ScheduledStopPoint:2"),
@@ -66,7 +67,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
   void interchangeFromStopPointIsNotAPartOfVehicleJourneys() {
     // Mocking only the toPointRef, to test that the fromPointRef is not part of the vehicle journey
     mockGetServiceJourneyStops(
-      "TST:ServiceJourney:2",
+      ServiceJourneyId.ofValidId("TST:ServiceJourney:2"),
       List.of(
         new ServiceJourneyStop(
           new ScheduledStopPointId("TST:ScheduledStopPoint:2"),
@@ -124,7 +125,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
   void interchangeToStopPointIsNotAPartOfVehicleJourneys() {
     // Mocking only the fromPointRef, to test that the toPointRef is not part of the vehicle journey
     mockGetServiceJourneyStops(
-      "TST:ServiceJourney:1",
+      ServiceJourneyId.ofValidId("TST:ServiceJourney:1"),
       List.of(
         new ServiceJourneyStop(
           new ScheduledStopPointId("TST:ScheduledStopPoint:1"),
@@ -169,8 +170,12 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:" + toPointRefId
     );
 
-    String fromServiceJourneyRef = "TST:ServiceJourney:" + fromServiceJourneyId;
-    String toServiceJourneyRef = "TST:ServiceJourney:" + toServiceJourneyId;
+    ServiceJourneyId fromServiceJourneyRef = new ServiceJourneyId(
+      "TST:ServiceJourney:" + fromServiceJourneyId
+    );
+    ServiceJourneyId toServiceJourneyRef = new ServiceJourneyId(
+      "TST:ServiceJourney:" + toServiceJourneyId
+    );
 
     JourneyPattern journeyPattern = fragment
       .journeyPattern()

@@ -9,6 +9,7 @@ import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 import org.slf4j.Logger;
@@ -103,7 +104,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   @Override
   public List<ServiceJourneyStop> serviceJourneyStops(
     String validationReportId,
-    String serviceJourneyId
+    ServiceJourneyId serviceJourneyId
   ) {
     Map<String, List<String>> serviceJourneyStopsForReport =
       serviceJourneyStopsCache.get(validationReportId);
@@ -114,7 +115,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
       );
     }
     return Optional
-      .ofNullable(serviceJourneyStopsForReport.get(serviceJourneyId))
+      .ofNullable(serviceJourneyStopsForReport.get(serviceJourneyId.id()))
       .map(serviceJourneyStops ->
         serviceJourneyStops
           .stream()

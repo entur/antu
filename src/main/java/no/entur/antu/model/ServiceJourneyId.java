@@ -2,8 +2,11 @@ package no.entur.antu.model;
 
 import java.util.Objects;
 import java.util.Optional;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.streams.XdmStream;
 import no.entur.antu.exception.AntuException;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 public record ServiceJourneyId(String id) {
   public ServiceJourneyId {
@@ -21,8 +24,22 @@ public record ServiceJourneyId(String id) {
       .orElse(null);
   }
 
+  public static ServiceJourneyId ofValidId(
+    VehicleJourneyRefStructure vehicleJourneyRefStructure
+  ) {
+    return Optional
+      .of(vehicleJourneyRefStructure)
+      .map(VehicleJourneyRefStructure::getRef)
+      .map(ServiceJourneyId::ofValidId)
+      .orElse(null);
+  }
+
   public static ServiceJourneyId ofValidId(String id) {
-    return id != null && isValid(id) ? new ServiceJourneyId(id) : null;
+    return Optional
+      .ofNullable(id)
+      .filter(ServiceJourneyId::isValid)
+      .map(ServiceJourneyId::new)
+      .orElse(null);
   }
 
   public static ServiceJourneyId ofNullable(String id) {
@@ -31,6 +48,16 @@ public record ServiceJourneyId(String id) {
 
   public static boolean isValid(String serviceJourneyId) {
     return serviceJourneyId.contains(":ServiceJourney:");
+  }
+
+  public static ServiceJourneyId ofValidId(XdmItem serviceJourneyItem) {
+    return Optional
+      .ofNullable(serviceJourneyItem)
+      .map(XdmItem::stream)
+      .map(XdmStream::asNode)
+      .map(node -> node.attribute("id"))
+      .map(ServiceJourneyId::ofValidId)
+      .orElse(null);
   }
 
   /*
