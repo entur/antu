@@ -39,6 +39,7 @@ import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.ServiceCalendarFrame;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
@@ -518,5 +519,13 @@ public record AntuNetexData(
       )
       .findFirst()
       .orElse(null);
+  }
+
+  public boolean hasServiceCalenderFrames() {
+    return !netexEntitiesIndex.getServiceCalendarFrames().isEmpty();
+  }
+
+  public Stream<ServiceCalendarFrame> serviceCalendarFrames() {
+    return netexEntitiesIndex.getServiceCalendarFrames().stream();
   }
 }
