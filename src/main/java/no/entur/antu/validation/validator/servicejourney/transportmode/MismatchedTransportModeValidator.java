@@ -6,6 +6,7 @@ import java.util.function.Function;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexValidator;
@@ -95,7 +96,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
     Function<ScheduledStopPointId, QuayId> findQuayIdForScheduledStopPoint =
       commonDataRepository.hasQuayIds(validationReportId)
         ? scheduledStopPoint ->
-          commonDataRepository.findQuayIdForScheduledStopPoint(
+          commonDataRepository.quayIdForScheduledStopPoint(
             scheduledStopPoint,
             validationReportId
           )
@@ -123,7 +124,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
   private void validateTransportMode(
     TransportModes datasetTransportModes,
     TransportModes expectedTransportModes,
-    String serviceJourneyId,
+    ServiceJourneyId serviceJourneyId,
     Consumer<MismatchedTransportModeError> validationError
   ) {
     if (

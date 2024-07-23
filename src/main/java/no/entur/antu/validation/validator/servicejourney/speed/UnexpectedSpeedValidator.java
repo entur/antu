@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
@@ -137,13 +138,11 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
     if (passingTimes.getTimeDifference() == 0) {
       reportError.accept(
         new SameDepartureArrivalTimeError(
-          serviceJourney.getId(),
-          antuNetexData.getStopPointName(
+          ServiceJourneyId.ofValidId(serviceJourney),
+          antuNetexData.stopPointName(
             passingTimes.from().scheduledStopPointId()
           ),
-          antuNetexData.getStopPointName(
-            passingTimes.to().scheduledStopPointId()
-          ),
+          antuNetexData.stopPointName(passingTimes.to().scheduledStopPointId()),
           SameDepartureArrivalTimeError.RuleCode.SAME_DEPARTURE_ARRIVAL_TIME
         )
       );
@@ -223,13 +222,11 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       // too slow
       reportError.accept(
         new UnexpectedSpeedError(
-          context.serviceJourney().getId(),
-          antuNetexData.getStopPointName(
+          ServiceJourneyId.ofValidId(context.serviceJourney()),
+          antuNetexData.stopPointName(
             passingTimes.from().scheduledStopPointId()
           ),
-          antuNetexData.getStopPointName(
-            passingTimes.to().scheduledStopPointId()
-          ),
+          antuNetexData.stopPointName(passingTimes.to().scheduledStopPointId()),
           UnexpectedSpeedError.RuleCode.LOW_SPEED,
           Comparison.of(
             Long.toString(expectedSpeed.minSpeed()),
@@ -242,11 +239,11 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       if (pessimisticSpeed > expectedSpeed.maxSpeed()) {
         reportError.accept(
           new UnexpectedSpeedError(
-            context.serviceJourney().getId(),
-            antuNetexData.getStopPointName(
+            ServiceJourneyId.ofValidId(context.serviceJourney()),
+            antuNetexData.stopPointName(
               passingTimes.from().scheduledStopPointId()
             ),
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               passingTimes.to().scheduledStopPointId()
             ),
             UnexpectedSpeedError.RuleCode.HIGH_SPEED,
@@ -259,11 +256,11 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       } else {
         reportError.accept(
           new UnexpectedSpeedError(
-            context.serviceJourney().getId(),
-            antuNetexData.getStopPointName(
+            ServiceJourneyId.ofValidId(context.serviceJourney()),
+            antuNetexData.stopPointName(
               passingTimes.from().scheduledStopPointId()
             ),
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               passingTimes.to().scheduledStopPointId()
             ),
             UnexpectedSpeedError.RuleCode.WARNING_SPEED,

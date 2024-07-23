@@ -25,7 +25,7 @@ public class DuplicateLineNameValidator extends NetexDatasetValidator {
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
-    List<LineInfo> lineNames = commonDataRepository.getLineNames(
+    List<LineInfo> lineNames = commonDataRepository.lineNames(
       validationReport.getValidationReportId()
     );
 
