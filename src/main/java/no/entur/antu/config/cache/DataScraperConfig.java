@@ -24,7 +24,7 @@ public class DataScraperConfig {
   }
 
   @Bean
-  public ServiceJourneyStopsScraper scheduledStopPointsScraper(
+  public ServiceJourneyStopsScraper serviceJourneyStopsScraper(
     @Qualifier(
       SERVICE_JOURNEY_STOPS_CACHE
     ) Map<String, Map<String, List<String>>> serviceJourneyStopsCache
