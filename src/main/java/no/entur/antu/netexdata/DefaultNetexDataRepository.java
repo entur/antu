@@ -1,4 +1,4 @@
-package no.entur.antu.commondata;
+package no.entur.antu.netexdata;
 
 import java.util.List;
 import java.util.Map;
@@ -25,13 +25,15 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   private final Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache;
   private final Map<String, List<String>> lineInfoCache;
   private final Map<String, Map<String, List<String>>> serviceJourneyStopsCache;
+  private final Map<String, List<String>> serviceJourneyInterchangeInfoCache;
 
   public DefaultNetexDataRepository(
     NetexDataResource netexDataResource,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
     Map<String, List<String>> lineInfoCache,
-    Map<String, Map<String, List<String>>> serviceJourneyStopsCache
+    Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
+    Map<String, List<String>> serviceJourneyInterchangeInfoCache
   ) {
     this.netexDataResource = netexDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
@@ -39,6 +41,8 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
       serviceLinksAndFromToScheduledStopPointIdCache;
     this.lineInfoCache = lineInfoCache;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
+    this.serviceJourneyInterchangeInfoCache =
+      serviceJourneyInterchangeInfoCache;
   }
 
   @Override
@@ -122,6 +126,25 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   }
 
   @Override
+  public List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos(
+    String validationReportId
+  ) {
+    List<String> serviceJourneyInterchangeInfosForReport =
+      serviceJourneyInterchangeInfoCache.get(validationReportId);
+    if (serviceJourneyInterchangeInfosForReport == null) {
+      throw new AntuException(
+        "ServiceJourneyInterchangeInfoCache not found for validation report with id: " +
+        validationReportId
+      );
+    }
+
+    return serviceJourneyInterchangeInfosForReport
+      .stream()
+      .map(ServiceJourneyInterchangeInfo::fromString)
+      .toList();
+  }
+
+  @Override
   public void fillNetexDataCache(
     byte[] fileContent,
     String validationReportId
@@ -163,12 +186,10 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
 
   @Override
   public void cleanUp(String validationReportId) {
-    LOGGER.info(
-      "Cleaning up common data cache for validation report with id: {}",
-      validationReportId
-    );
     scheduledStopPointAndQuayIdCache.remove(validationReportId);
     serviceLinksAndFromToScheduledStopPointIdCache.remove(validationReportId);
     lineInfoCache.remove(validationReportId);
+    serviceJourneyStopsCache.remove(validationReportId);
+    serviceJourneyInterchangeInfoCache.remove(validationReportId);
   }
 }

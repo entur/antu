@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.validation.validator.DatasetValidator;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
@@ -115,6 +116,14 @@ public class ValidationTest {
       .thenReturn(serviceJourneyStops);
   }
 
+  protected void mockGetServiceJourneyInterchangeInfo(
+    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos
+  ) {
+    Mockito
+      .when(netexDataRepositoryMock.serviceJourneyInterchangeInfos(anyString()))
+      .thenReturn(serviceJourneyInterchangeInfos);
+  }
+
   protected <
     V extends AntuNetexValidator
   > ValidationReport runValidationOnCommonFile(
@@ -122,6 +131,40 @@ public class ValidationTest {
     Class<V> validatorClass
   ) {
     return runValidation(netexEntitiesIndex, validatorClass, true);
+  }
+
+  protected <V extends DatasetValidator> ValidationReport runDatasetValidation(
+    Class<V> validatorClass
+  ) {
+    ValidationReportEntryFactory validationReportEntryFactory = (
+        code,
+        message,
+        dataLocation
+      ) ->
+      new ValidationReportEntry(
+        message,
+        code,
+        ValidationReportEntrySeverity.ERROR
+      );
+
+    ValidationReport testValidationReport = new ValidationReport(
+      VALIDATION_REPORT_CODEBASE,
+      VALIDATION_REPORT_ID
+    );
+
+    try {
+      V validator = validatorClass
+        .getDeclaredConstructor(
+          ValidationReportEntryFactory.class,
+          NetexDataRepository.class
+        )
+        .newInstance(validationReportEntryFactory, netexDataRepositoryMock);
+      validator.validate(testValidationReport);
+
+      return testValidationReport;
+    } catch (Exception ex) {
+      throw new AntuException("Failed to initialize validator", ex);
+    }
   }
 
   protected <
