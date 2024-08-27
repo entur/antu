@@ -21,7 +21,6 @@ import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.commondata.scraper.CommonDataScraper;
 import no.entur.antu.commondata.scraper.LineInfoScraper;
-import no.entur.antu.commondata.scraper.ServiceJourneyStopsScraper;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
@@ -276,7 +275,6 @@ public class TimetableDataValidatorConfig {
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
     LineInfoScraper lineInfoScraper,
-    ServiceJourneyStopsScraper serviceJourneyStopsScraper,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
@@ -311,10 +309,7 @@ public class TimetableDataValidatorConfig {
       duplicateLineNameValidator
     );
 
-    List<CommonDataScraper> commonDataScrapers = List.of(
-      lineInfoScraper,
-      serviceJourneyStopsScraper
-    );
+    List<CommonDataScraper> commonDataScrapers = List.of(lineInfoScraper);
 
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
       netexXMLParser,
