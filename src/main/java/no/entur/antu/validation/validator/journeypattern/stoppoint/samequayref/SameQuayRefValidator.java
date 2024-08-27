@@ -96,10 +96,12 @@ public class SameQuayRefValidator extends AntuNetexValidator {
             new SameQuayRefError(
               SameQuayRefError.RuleCode.SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN,
               currentContext.journeyPatternId(),
-              antuNetexData.stopPointName(
+              antuNetexData.getStopPointName(
                 previousContext.scheduledStopPointId()
               ),
-              antuNetexData.stopPointName(currentContext.scheduledStopPointId())
+              antuNetexData.getStopPointName(
+                currentContext.scheduledStopPointId()
+              )
             )
           );
         }

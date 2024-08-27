@@ -40,7 +40,7 @@ public final class SortStopTimesUtil {
     ServiceJourney serviceJourney,
     AntuNetexData antuNetexData
   ) {
-    JourneyPattern journeyPattern = antuNetexData.journeyPattern(
+    JourneyPattern journeyPattern = antuNetexData.getJourneyPattern(
       serviceJourney
     );
 
@@ -65,20 +65,20 @@ public final class SortStopTimesUtil {
       .sorted(
         comparing(timetabledPassingTime ->
           stopPointIdToOrder.get(
-            AntuNetexData.stopPointRef(timetabledPassingTime)
+            AntuNetexData.getStopPointRef(timetabledPassingTime)
           )
         )
       )
       .map(timetabledPassingTime ->
         StopTime.of(
           scheduledStopPointIdByStopPointId.get(
-            AntuNetexData.stopPointRef(timetabledPassingTime)
+            AntuNetexData.getStopPointRef(timetabledPassingTime)
           ),
           timetabledPassingTime,
           hasFlexibleStopPoint(
             antuNetexData.netexEntitiesIndex(),
             scheduledStopPointIdByStopPointId.get(
-              AntuNetexData.stopPointRef(timetabledPassingTime)
+              AntuNetexData.getStopPointRef(timetabledPassingTime)
             )
           )
         )

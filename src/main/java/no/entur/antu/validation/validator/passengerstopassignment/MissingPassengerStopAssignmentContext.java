@@ -25,7 +25,7 @@ public record MissingPassengerStopAssignmentContext(
     ) {
       Predicate<ScheduledStopPointId> hasPassengerStopAssignment =
         scheduledStopPointId ->
-          antuNetexData.quayIdForScheduledStopPoint(scheduledStopPointId) !=
+          antuNetexData.findQuayIdForScheduledStopPoint(scheduledStopPointId) !=
           null;
 
       return AntuNetexData

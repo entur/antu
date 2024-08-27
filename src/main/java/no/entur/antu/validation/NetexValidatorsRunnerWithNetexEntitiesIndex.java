@@ -7,7 +7,7 @@ import java.util.Set;
 import net.sf.saxon.s9api.XPathCompiler;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.commondata.scraper.CommonDataScraper;
+import no.entur.antu.commondata.CommonDataScraper;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -117,8 +117,10 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
   protected void postPrepareValidationContext(
     ValidationContext validationContext
   ) {
-    commonDataScrapers.forEach(commonDataScraper ->
-      commonDataScraper.scrapeData(validationContext)
-    );
+    if (!validationContext.isCommonFile()) {
+      commonDataScrapers.forEach(commonDataScraper ->
+        commonDataScraper.scrapeData(validationContext)
+      );
+    }
   }
 }

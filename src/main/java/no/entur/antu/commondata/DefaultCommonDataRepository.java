@@ -2,15 +2,12 @@ package no.entur.antu.commondata;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.LineInfo;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceJourneyId;
-import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,21 +26,18 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
   private final Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache;
   private final Map<String, List<String>> lineInfoCache;
-  private final Map<String, Map<String, List<String>>> serviceJourneyStopsCache;
 
   public DefaultCommonDataRepository(
     CommonDataResource commonDataResource,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache,
-    Map<String, List<String>> lineInfoCache,
-    Map<String, Map<String, List<String>>> serviceJourneyStopsCache
+    Map<String, List<String>> lineInfoCache
   ) {
     this.commonDataResource = commonDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     this.serviceLinksAndScheduledStopPointIdsCache =
       serviceLinksAndScheduledStopPointIdsCache;
     this.lineInfoCache = lineInfoCache;
-    this.serviceJourneyStopsCache = serviceJourneyStopsCache;
   }
 
   @Override
@@ -55,7 +49,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   }
 
   @Override
-  public QuayId quayIdForScheduledStopPoint(
+  public QuayId findQuayIdForScheduledStopPoint(
     ScheduledStopPointId scheduledStopPointId,
     String validationReportId
   ) {
@@ -72,7 +66,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   }
 
   @Override
-  public ScheduledStopPointIds scheduledStopPointIdsForServiceLink(
+  public ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
     ServiceLinkId serviceLinkId,
     String validationReportId
   ) {
@@ -90,7 +84,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   }
 
   @Override
-  public List<LineInfo> lineNames(String validationReportId) {
+  public List<LineInfo> getLineNames(String validationReportId) {
     List<String> lineInfoForReportId = lineInfoCache.get(validationReportId);
     if (lineInfoForReportId == null) {
       throw new AntuException(
@@ -99,31 +93,6 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
       );
     }
     return lineInfoForReportId.stream().map(LineInfo::fromString).toList();
-  }
-
-  @Override
-  public List<ServiceJourneyStop> serviceJourneyStops(
-    String validationReportId,
-    ServiceJourneyId serviceJourneyId
-  ) {
-    Map<String, List<String>> serviceJourneyStopsForReport =
-      serviceJourneyStopsCache.get(validationReportId);
-    if (serviceJourneyStopsForReport == null) {
-      throw new AntuException(
-        "ServiceJourneyStops cache not found for validation report with id: " +
-        validationReportId
-      );
-    }
-    return Optional
-      .ofNullable(serviceJourneyStopsForReport.get(serviceJourneyId.id()))
-      .map(serviceJourneyStops ->
-        serviceJourneyStops
-          .stream()
-          .map(ServiceJourneyStop::fromString)
-          .filter(ServiceJourneyStop::isValid)
-          .toList()
-      )
-      .orElse(List.of());
   }
 
   @Override

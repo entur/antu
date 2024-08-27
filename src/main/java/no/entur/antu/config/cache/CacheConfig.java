@@ -53,8 +53,6 @@ public class CacheConfig {
   public static final String SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE =
     "serviceLinksAndScheduledStopPointIdsCache";
   public static final String LINE_INFO_CACHE = "linesInfoCache";
-  public static final String SERVICE_JOURNEY_STOPS_CACHE =
-    "serviceJourneyStopsCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
   private static final Logger LOGGER = LoggerFactory.getLogger(
     CacheConfig.class
@@ -156,17 +154,6 @@ public class CacheConfig {
   ) {
     return redissonClient.getLocalCachedMap(
       LINE_INFO_CACHE,
-      new CompositeCodec(new StringCodec(), new JsonJacksonCodec()),
-      LocalCachedMapOptions.defaults()
-    );
-  }
-
-  @Bean(name = SERVICE_JOURNEY_STOPS_CACHE)
-  public Map<String, Map<String, List<String>>> serviceJourneyStopsCache(
-    RedissonClient redissonClient
-  ) {
-    return redissonClient.getLocalCachedMap(
-      SERVICE_JOURNEY_STOPS_CACHE,
       new CompositeCodec(new StringCodec(), new JsonJacksonCodec()),
       LocalCachedMapOptions.defaults()
     );

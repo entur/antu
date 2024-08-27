@@ -20,8 +20,6 @@ import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ServiceJourneyId;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
@@ -765,10 +763,10 @@ public class NetexTestFragment {
     private int id = 1;
     private boolean guaranteed = true;
     private Duration maximumWaitTime;
-    private ScheduledStopPointId fromPointRef;
-    private ScheduledStopPointId toPointRef;
-    private ServiceJourneyId fromJourneyRef;
-    private ServiceJourneyId toJourneyRef;
+    private String fromPointRef;
+    private String toPointRef;
+    private String fromJourneyRef;
+    private String toJourneyRef;
 
     public CreateServiceJourneyInterchange withId(int id) {
       this.id = id;
@@ -788,65 +786,48 @@ public class NetexTestFragment {
     }
 
     public CreateServiceJourneyInterchange withFromPointRef(
-      ScheduledStopPointId fromPointRef
+      String fromPointRef
     ) {
       this.fromPointRef = fromPointRef;
       return this;
     }
 
-    public CreateServiceJourneyInterchange withToPointRef(
-      ScheduledStopPointId toPointRef
-    ) {
+    public CreateServiceJourneyInterchange withToPointRef(String toPointRef) {
       this.toPointRef = toPointRef;
       return this;
     }
 
     public CreateServiceJourneyInterchange withFromJourneyRef(
-      ServiceJourneyId fromJourneyRef
+      String fromJourneyRef
     ) {
       this.fromJourneyRef = fromJourneyRef;
       return this;
     }
 
     public CreateServiceJourneyInterchange withToJourneyRef(
-      ServiceJourneyId toJourneyRef
+      String toJourneyRef
     ) {
       this.toJourneyRef = toJourneyRef;
       return this;
     }
 
     public ServiceJourneyInterchange create() {
-      ServiceJourneyInterchange serviceJourneyInterchange =
-        new ServiceJourneyInterchange()
-          .withId("TST:ServiceJourneyInterchange:" + id)
-          .withGuaranteed(guaranteed)
-          .withMaximumWaitTime(maximumWaitTime);
-
-      if (fromPointRef != null) {
-        serviceJourneyInterchange.withFromPointRef(
-          new ScheduledStopPointRefStructure().withRef(fromPointRef.id())
+      return new ServiceJourneyInterchange()
+        .withId("TST:ServiceJourneyInterchange:" + id)
+        .withGuaranteed(guaranteed)
+        .withMaximumWaitTime(maximumWaitTime)
+        .withFromPointRef(
+          new ScheduledStopPointRefStructure().withRef(fromPointRef)
+        )
+        .withToPointRef(
+          new ScheduledStopPointRefStructure().withRef(toPointRef)
+        )
+        .withFromJourneyRef(
+          new VehicleJourneyRefStructure().withRef(fromJourneyRef)
+        )
+        .withToJourneyRef(
+          new VehicleJourneyRefStructure().withRef(toJourneyRef)
         );
-      }
-
-      if (toPointRef != null) {
-        serviceJourneyInterchange.withToPointRef(
-          new ScheduledStopPointRefStructure().withRef(toPointRef.id())
-        );
-      }
-
-      if (fromJourneyRef != null) {
-        serviceJourneyInterchange.withFromJourneyRef(
-          new VehicleJourneyRefStructure().withRef(fromJourneyRef.id())
-        );
-      }
-
-      if (toJourneyRef != null) {
-        serviceJourneyInterchange.withToJourneyRef(
-          new VehicleJourneyRefStructure().withRef(toJourneyRef.id())
-        );
-      }
-
-      return serviceJourneyInterchange;
     }
   }
 

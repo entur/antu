@@ -34,17 +34,6 @@ public record ScheduledStopPointId(String id) {
       .orElse(null);
   }
 
-  public static ScheduledStopPointId ofValidId(
-    ScheduledStopPointRefStructure scheduledStopPointRef
-  ) {
-    return Optional
-      .ofNullable(scheduledStopPointRef)
-      .map(ScheduledStopPointRefStructure::getRef)
-      .filter(ScheduledStopPointId::isValid)
-      .map(ScheduledStopPointId::new)
-      .orElse(null);
-  }
-
   public static boolean isValid(String id) {
     return id != null && id.contains(":ScheduledStopPoint:");
   }

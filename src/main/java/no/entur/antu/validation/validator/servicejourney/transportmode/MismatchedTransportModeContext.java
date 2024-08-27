@@ -11,7 +11,6 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.model.TransportSubMode;
 import org.entur.netex.validation.Constants;
@@ -24,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public record MismatchedTransportModeContext(
   ValidationContext validationContext,
   XdmItem serviceJourneyItem,
-  ServiceJourneyId serviceJourneyId,
+  String serviceJourneyId,
   TransportModes transportModes,
   List<ScheduledStopPointId> scheduledStopPointIds,
   String pathToFrames
@@ -119,7 +118,7 @@ public record MismatchedTransportModeContext(
       return new MismatchedTransportModeContext(
         validationContext,
         serviceJourneyItem,
-        ServiceJourneyId.ofValidId(serviceJourneyItem),
+        serviceJourneyItem.stream().asNode().attribute("id"),
         findTransportModesForServiceJourney(serviceJourneyItem),
         getScheduledStopPointsForServiceJourney(serviceJourneyItem),
         pathToFrames

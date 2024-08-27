@@ -88,7 +88,9 @@ class MismatchedTransportModeValidatorIntegrationTest {
       when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
       QuayId testQuayId = new QuayId(codeSpace + ":Quay:1234");
 
-      when(commonDataRepository.quayIdForScheduledStopPoint(any(), anyString()))
+      when(
+        commonDataRepository.findQuayIdForScheduledStopPoint(any(), anyString())
+      )
         .thenReturn(testQuayId);
 
       StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);

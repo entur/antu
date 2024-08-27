@@ -21,7 +21,7 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Test;
 
-class NonIncreasingTimetabledPassingTimeValidatorIntegrationTest {
+class NonIncreasingPassingTimeValidatorIntegrationTest {
 
   public static final String TEST_CODESPACE = "FLB";
   public static final String TEST_FILE_VALID =

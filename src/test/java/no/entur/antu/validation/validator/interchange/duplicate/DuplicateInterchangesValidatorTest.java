@@ -8,8 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -184,18 +182,10 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
         )
         .mapToObj(index ->
           new NetexTestFragment.CreateServiceJourneyInterchange()
-            .withFromJourneyRef(
-              ServiceJourneyId.ofValidId(serviceJourneys.get(index * 2))
-            )
-            .withToJourneyRef(
-              ServiceJourneyId.ofValidId(serviceJourneys.get((index * 2) + 1))
-            )
-            .withFromPointRef(
-              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1))
-            )
-            .withToPointRef(
-              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 2))
-            )
+            .withFromJourneyRef(serviceJourneys.get(index * 2).getId())
+            .withToJourneyRef(serviceJourneys.get((index * 2) + 1).getId())
+            .withFromPointRef("TST:ScheduledStopPoint:" + (index + 1))
+            .withToPointRef("TST:ScheduledStopPoint:" + (index + 2))
         )
         .toList();
 

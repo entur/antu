@@ -35,7 +35,7 @@ public record SameQuayRefContext(
           new SameQuayRefContext(
             journeyPattern.getId(),
             stopPointId,
-            antuNetexData.quayIdForScheduledStopPoint(stopPointId)
+            antuNetexData.findQuayIdForScheduledStopPoint(stopPointId)
           )
         )
         .toList();

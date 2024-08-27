@@ -45,10 +45,10 @@ public record UnexpectedDistanceBetweenStopPointsContext(
     ) {
       return new UnexpectedDistanceBetweenStopPointsContext(
         journeyPattern.getId(),
-        antuNetexData.transportMode(journeyPattern),
+        antuNetexData.findTransportMode(journeyPattern),
         AntuNetexData
           .stopPointsInJourneyPattern(journeyPattern)
-          .map(antuNetexData::coordinatesPerQuayId)
+          .map(antuNetexData::findCoordinatesPerQuayId)
           .filter(Objects::nonNull)
           .map(ScheduledStopPointCoordinates::of)
           .toList()

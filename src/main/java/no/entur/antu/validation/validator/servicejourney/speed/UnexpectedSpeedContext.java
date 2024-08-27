@@ -72,7 +72,7 @@ public record UnexpectedSpeedContext(
     }
 
     public UnexpectedSpeedContext build(ServiceJourney serviceJourney) {
-      JourneyPattern journeyPattern = antuNetexData.journeyPattern(
+      JourneyPattern journeyPattern = antuNetexData.getJourneyPattern(
         serviceJourney
       );
 
@@ -86,7 +86,7 @@ public record UnexpectedSpeedContext(
 
       return new UnexpectedSpeedContext(
         serviceJourney,
-        antuNetexData.transportMode(serviceJourney),
+        antuNetexData.findTransportMode(serviceJourney),
         antuNetexData
           .timetabledPassingTimes(serviceJourney)
           .map(timetabledPassingTime ->
@@ -107,11 +107,11 @@ public record UnexpectedSpeedContext(
       TimetabledPassingTime timetabledPassingTime,
       JourneyPattern journeyPattern
     ) {
-      String stopPointInJourneyPatternRef = AntuNetexData.stopPointRef(
+      String stopPointInJourneyPatternRef = AntuNetexData.getStopPointRef(
         timetabledPassingTime
       );
       StopPointInJourneyPattern stopPointInJourneyPattern =
-        AntuNetexData.stopPointInJourneyPattern(
+        AntuNetexData.findStopPointInJourneyPattern(
           stopPointInJourneyPatternRef,
           journeyPattern
         );
@@ -124,7 +124,7 @@ public record UnexpectedSpeedContext(
       }
 
       Map.Entry<ScheduledStopPointId, QuayCoordinates> coordinatesPerQuayId =
-        antuNetexData.coordinatesPerQuayId(stopPointInJourneyPattern);
+        antuNetexData.findCoordinatesPerQuayId(stopPointInJourneyPattern);
 
       if (coordinatesPerQuayId == null) {
         LOGGER.warn(

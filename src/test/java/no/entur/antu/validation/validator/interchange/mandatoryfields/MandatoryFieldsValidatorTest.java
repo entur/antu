@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.is;
 import java.util.List;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -46,10 +45,10 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourneys.get(0)))
-      .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourneys.get(1)))
-      .withFromPointRef(scheduledStopPointId1)
-      .withToPointRef(scheduledStopPointId2)
+      .withFromJourneyRef(serviceJourneys.get(0).getId())
+      .withToJourneyRef(serviceJourneys.get(1).getId())
+      .withFromPointRef(scheduledStopPointId1.id())
+      .withToPointRef(scheduledStopPointId2.id())
       .create();
 
     mockGetQuayId(
@@ -57,7 +56,10 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       new QuayId("TST:Quay:1")
     );
 
-    mockGetQuayId(scheduledStopPointId2, new QuayId("TST:Quay:2"));
+    mockGetQuayId(
+      new ScheduledStopPointId(scheduledStopPointId2.id()),
+      new QuayId("TST:Quay:2")
+    );
 
     ValidationReport validationReport = runValidation(
       netexFragment
@@ -90,14 +92,20 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
-      .withFromPointRef(scheduledStopPointId1)
-      .withToPointRef(scheduledStopPointId2)
+      .withToJourneyRef(serviceJourney.getId())
+      .withFromPointRef(scheduledStopPointId1.id())
+      .withToPointRef(scheduledStopPointId2.id())
       .create();
 
-    mockGetQuayId(scheduledStopPointId1, new QuayId("TST:Quay:1"));
+    mockGetQuayId(
+      new ScheduledStopPointId(scheduledStopPointId1.id()),
+      new QuayId("TST:Quay:1")
+    );
 
-    mockGetQuayId(scheduledStopPointId2, new QuayId("TST:Quay:2"));
+    mockGetQuayId(
+      new ScheduledStopPointId(scheduledStopPointId2.id()),
+      new QuayId("TST:Quay:2")
+    );
 
     ValidationReport validationReport = runValidation(
       netexFragment
@@ -139,12 +147,15 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
-      .withFromPointRef(scheduledStopPointId1)
-      .withToPointRef(scheduledStopPointId2)
+      .withFromJourneyRef(serviceJourney.getId())
+      .withFromPointRef(scheduledStopPointId1.id())
+      .withToPointRef(scheduledStopPointId2.id())
       .create();
 
-    mockGetQuayId(scheduledStopPointId1, new QuayId("TST:Quay:1"));
+    mockGetQuayId(
+      new ScheduledStopPointId(scheduledStopPointId1.id()),
+      new QuayId("TST:Quay:1")
+    );
 
     mockGetQuayId(
       new ScheduledStopPointId(scheduledStopPointId2.id()),
@@ -188,12 +199,15 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
-      .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
-      .withToPointRef(scheduledStopPointId)
+      .withFromJourneyRef(serviceJourney.getId())
+      .withToJourneyRef(serviceJourney.getId())
+      .withToPointRef(scheduledStopPointId.id())
       .create();
 
-    mockGetQuayId(scheduledStopPointId, new QuayId("TST:Quay:1"));
+    mockGetQuayId(
+      new ScheduledStopPointId(scheduledStopPointId.id()),
+      new QuayId("TST:Quay:1")
+    );
 
     ValidationReport validationReport = runValidation(
       netexFragment
@@ -232,12 +246,15 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
       .serviceJourneyInterchange()
       .withId(1)
-      .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
-      .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
-      .withFromPointRef(scheduledStopPointId)
+      .withFromJourneyRef(serviceJourney.getId())
+      .withToJourneyRef(serviceJourney.getId())
+      .withFromPointRef(scheduledStopPointId.id())
       .create();
 
-    mockGetQuayId(scheduledStopPointId, new QuayId("TST:Quay:1"));
+    mockGetQuayId(
+      new ScheduledStopPointId(scheduledStopPointId.id()),
+      new QuayId("TST:Quay:1")
+    );
 
     ValidationReport validationReport = runValidation(
       netexFragment

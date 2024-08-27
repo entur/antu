@@ -1,10 +1,9 @@
 package no.entur.antu.validation.validator.servicejourney.speed;
 
-import no.entur.antu.model.ServiceJourneyId;
 import no.entur.antu.validation.ValidationError;
 
 public record SameDepartureArrivalTimeError(
-  ServiceJourneyId serviceJourneyId,
+  String serviceJourneyId,
   String fromStopPointName,
   String toStopPointName,
   RuleCode ruleCode
@@ -34,7 +33,7 @@ public record SameDepartureArrivalTimeError(
 
   @Override
   public String getEntityId() {
-    return serviceJourneyId.id();
+    return serviceJourneyId;
   }
 
   @Override

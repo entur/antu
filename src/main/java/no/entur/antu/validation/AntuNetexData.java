@@ -1,8 +1,6 @@
 package no.entur.antu.validation;
 
-import com.google.common.collect.Multimap;
 import jakarta.xml.bind.JAXBElement;
-import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -17,15 +15,10 @@ import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceJourneyId;
-import no.entur.antu.model.ServiceJourneyStop;
 import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.DayTypeAssignment_VersionStructure;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.rutebanken.netex.model.FlexibleStopPlace;
@@ -38,7 +31,6 @@ import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
@@ -64,7 +56,7 @@ public record AntuNetexData(
     AntuNetexData.class
   );
 
-  public QuayCoordinates coordinatesForQuayId(QuayId quayid) {
+  public QuayCoordinates getCoordinatesForQuayId(QuayId quayid) {
     return stopPlaceRepository.getCoordinatesForQuayId(quayid);
   }
 
@@ -80,14 +72,14 @@ public record AntuNetexData(
    * Which basically means that if the PassengerStopAssignment is
    * not in Common file, it will be looked up from the line file.
    */
-  public QuayId quayIdForScheduledStopPoint(
+  public QuayId findQuayIdForScheduledStopPoint(
     ScheduledStopPointId scheduledStopPointId
   ) {
     if (scheduledStopPointId == null) {
       return null;
     }
     return commonDataRepository.hasQuayIds(validationReportId())
-      ? commonDataRepository.quayIdForScheduledStopPoint(
+      ? commonDataRepository.findQuayIdForScheduledStopPoint(
         scheduledStopPointId,
         validationReportId()
       )
@@ -98,18 +90,18 @@ public record AntuNetexData(
       );
   }
 
-  public ScheduledStopPointIds scheduledStopPointsForServiceLinkId(
+  public ScheduledStopPointIds findScheduledStopPointsForServiceLinkId(
     ServiceLinkId serviceLinkId
   ) {
     // Should extend this function to check line file if we don't find the
     // service links in common file. Same as findQuayIdForScheduledStopPoint.
-    return commonDataRepository.scheduledStopPointIdsForServiceLink(
+    return commonDataRepository.findScheduledStopPointIdsForServiceLink(
       serviceLinkId,
       validationReportId()
     );
   }
 
-  public Map.Entry<ScheduledStopPointId, QuayCoordinates> coordinatesPerQuayId(
+  public Map.Entry<ScheduledStopPointId, QuayCoordinates> findCoordinatesPerQuayId(
     StopPointInJourneyPattern stopPointInJourneyPattern
   ) {
     String scheduledStopPointRef = stopPointInJourneyPattern
@@ -125,7 +117,7 @@ public record AntuNetexData(
       scheduledStopPointRef
     );
 
-    QuayId quayId = quayIdForScheduledStopPoint(scheduledStopPointId);
+    QuayId quayId = findQuayIdForScheduledStopPoint(scheduledStopPointId);
 
     if (quayId == null) {
       return null;
@@ -138,8 +130,8 @@ public record AntuNetexData(
       : Map.entry(scheduledStopPointId, coordinatesForQuayId);
   }
 
-  public String stopPointName(ScheduledStopPointId scheduledStopPointId) {
-    QuayId quayId = quayIdForScheduledStopPoint(scheduledStopPointId);
+  public String getStopPointName(ScheduledStopPointId scheduledStopPointId) {
+    QuayId quayId = findQuayIdForScheduledStopPoint(scheduledStopPointId);
     if (quayId == null) {
       LOGGER.debug(
         "Stop place name cannot be found due to missing stop point assignment."
@@ -159,7 +151,7 @@ public record AntuNetexData(
    * If the transport mode is not set on the service journey,
    * it will be looked up from the line or flexible line.
    */
-  public AllVehicleModesOfTransportEnumeration transportMode(
+  public AllVehicleModesOfTransportEnumeration findTransportMode(
     ServiceJourney serviceJourney
   ) {
     AllVehicleModesOfTransportEnumeration transportMode =
@@ -169,7 +161,7 @@ public record AntuNetexData(
         .getJourneyPatternIndex()
         .get(serviceJourney.getJourneyPatternRef().getValue().getRef());
 
-      return transportMode(journeyPattern);
+      return findTransportMode(journeyPattern);
     }
     return transportMode;
   }
@@ -178,7 +170,7 @@ public record AntuNetexData(
    * Find the transport mode for the given journey pattern.
    * it will be looked up from the line or flexible line with FIXED Type
    */
-  public AllVehicleModesOfTransportEnumeration transportMode(
+  public AllVehicleModesOfTransportEnumeration findTransportMode(
     JourneyPattern journeyPattern
   ) {
     Route route = netexEntitiesIndex
@@ -208,7 +200,7 @@ public record AntuNetexData(
     );
   }
 
-  public LineInfo lineInfo(String fileName) {
+  public LineInfo getLineInfo(String fileName) {
     return netexEntitiesIndex
       .getLineIndex()
       .getAll()
@@ -282,32 +274,6 @@ public record AntuNetexData(
       .orElse(null);
   }
 
-  public ServiceJourneyStop serviceJourneyStopAtScheduleStopPoint(
-    VehicleJourneyRefStructure vehicleJourneyRefStructure,
-    ScheduledStopPointId scheduledStopPointId
-  ) {
-    return serviceJourneyStops(vehicleJourneyRefStructure)
-      .stream()
-      .filter(serviceJourneyStop ->
-        serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)
-      )
-      .findFirst()
-      .orElse(null);
-  }
-
-  public List<ServiceJourneyStop> serviceJourneyStops(
-    VehicleJourneyRefStructure vehicleJourneyRefStructure
-  ) {
-    return Optional
-      .ofNullable(
-        commonDataRepository.serviceJourneyStops(
-          validationReportId(),
-          ServiceJourneyId.ofValidId(vehicleJourneyRefStructure)
-        )
-      )
-      .orElse(List.of());
-  }
-
   /**
    * Returns the Stream of all ServiceJourneyInterchanges in all the TimeTableFrames.
    */
@@ -334,7 +300,7 @@ public record AntuNetexData(
   public Stream<ServiceJourney> validServiceJourneys() {
     return serviceJourneys()
       .filter(serviceJourney -> {
-        JourneyPattern journeyPattern = journeyPattern(serviceJourney);
+        JourneyPattern journeyPattern = getJourneyPattern(serviceJourney);
         if (journeyPattern == null) {
           return false;
         }
@@ -363,7 +329,7 @@ public record AntuNetexData(
    * Return the JourneyPattern for the given ServiceJourney.
    * Missing JourneyPatternRef on ServiceJourney is validated with SERVICE_JOURNEY_10
    */
-  public JourneyPattern journeyPattern(ServiceJourney serviceJourney) {
+  public JourneyPattern getJourneyPattern(ServiceJourney serviceJourney) {
     return Optional
       .ofNullable(serviceJourney.getJourneyPatternRef())
       .map(JAXBElement::getValue)
@@ -375,7 +341,7 @@ public record AntuNetexData(
   /**
    * Return the StopPointInJourneyPattern ID of a given TimeTabledPassingTime.
    */
-  public static String stopPointRef(
+  public static String getStopPointRef(
     TimetabledPassingTime timetabledPassingTime
   ) {
     return timetabledPassingTime
@@ -398,59 +364,6 @@ public record AntuNetexData(
           ScheduledStopPointId::of
         )
       );
-  }
-
-  public Map.Entry<ServiceJourneyId, List<ScheduledStopPointId>> scheduledStopPointIdsByServiceJourneyId(
-    ServiceJourney serviceJourney
-  ) {
-    return Optional
-      .ofNullable(ServiceJourneyId.ofValidId(serviceJourney))
-      .map(serviceJourneyId ->
-        new AbstractMap.SimpleEntry<>(
-          serviceJourneyId,
-          stopPointsInJourneyPattern(journeyPattern(serviceJourney))
-            .map(stopPointInJourneyPattern ->
-              stopPointInJourneyPattern
-                .getScheduledStopPointRef()
-                .getValue()
-                .getRef()
-            )
-            .map(ScheduledStopPointId::new)
-            .toList()
-        )
-      )
-      .orElse(null);
-  }
-
-  public List<DayTypeAssignment> getAvailableDayTypeAssignments(
-    ServiceJourney serviceJourney
-  ) {
-    Multimap<String, DayTypeAssignment> dayTypeAssignmentsByDayTypeIdIndex =
-      netexEntitiesIndex().getDayTypeAssignmentsByDayTypeIdIndex();
-
-    return serviceJourney
-      .getDayTypes()
-      .getDayTypeRef()
-      .stream()
-      .map(jaxbElement -> jaxbElement.getValue().getRef())
-      .map(dayTypeAssignmentsByDayTypeIdIndex::get)
-      .flatMap(Collection::stream)
-      .filter(DayTypeAssignment_VersionStructure::isIsAvailable)
-      .toList();
-  }
-
-  public List<DatedServiceJourney> datedServiceJourneys(
-    ServiceJourney serviceJourney
-  ) {
-    return netexEntitiesIndex()
-      .getDatedServiceJourneyIndex()
-      .getAll()
-      .stream()
-      .filter(dsj ->
-        dsj.getServiceAlteration() != ServiceAlterationEnumeration.REPLACED &&
-        dsj.getServiceAlteration() != ServiceAlterationEnumeration.CANCELLATION
-      )
-      .toList();
   }
 
   /**
@@ -507,7 +420,7 @@ public record AntuNetexData(
    * Find the stop point in journey pattern for the
    * given stop point in journey pattern reference.
    */
-  public static StopPointInJourneyPattern stopPointInJourneyPattern(
+  public static StopPointInJourneyPattern findStopPointInJourneyPattern(
     String stopPointInJourneyPatternRef,
     JourneyPattern journeyPattern
   ) {
