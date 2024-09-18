@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 
 /**
  * A resource to query the National Stop Place Register.
@@ -29,7 +29,7 @@ public interface StopPlaceResource {
    *
    * @return map of quay ids and transport mode.
    */
-  Map<QuayId, TransportModes> getTransportModesPerQuayId();
+  Map<QuayId, TransportModeAndSubMode> getTransportModesPerQuayId();
 
   /**
    * Returns coordinates per quay ids.

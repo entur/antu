@@ -11,7 +11,7 @@ import net.sf.saxon.s9api.XdmSequenceIterator;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.model.TransportSubMode;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
@@ -24,7 +24,7 @@ public record MismatchedTransportModeContext(
   ValidationContext validationContext,
   XdmItem serviceJourneyItem,
   String serviceJourneyId,
-  TransportModes transportModes,
+  TransportModeAndSubMode transportModeAndSubMode,
   List<ScheduledStopPointId> scheduledStopPointIds,
   String pathToFrames
 ) {
@@ -79,7 +79,7 @@ public record MismatchedTransportModeContext(
     private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
     private final ValidationContext validationContext;
-    private final TransportModes transportModesForLine;
+    private final TransportModeAndSubMode transportModeAndSubModeForLine;
     private final String pathToFrames;
 
     public Builder(ValidationContext validationContext) {
@@ -96,9 +96,9 @@ public record MismatchedTransportModeContext(
         }
       }
       if (lineItem != null) {
-        transportModesForLine = findTransportModes(lineItem);
+        transportModeAndSubModeForLine = findTransportModes(lineItem);
       } else {
-        transportModesForLine = null;
+        transportModeAndSubModeForLine = null;
         LOGGER.debug(
           "Failed to find the Line or FlexibleLine in {}",
           validationContext.getFileName()
@@ -107,7 +107,7 @@ public record MismatchedTransportModeContext(
     }
 
     public boolean foundTransportModesForLine() {
-      return transportModesForLine != null;
+      return transportModeAndSubModeForLine != null;
     }
 
     public List<MismatchedTransportModeContext> buildAll() {
@@ -125,17 +125,19 @@ public record MismatchedTransportModeContext(
       );
     }
 
-    private TransportModes findTransportModesForServiceJourney(
+    private TransportModeAndSubMode findTransportModesForServiceJourney(
       XdmItem serviceJourneyItem
     ) {
-      TransportModes transportModes = findTransportModes(serviceJourneyItem);
-      if (transportModes == null) {
-        return transportModesForLine;
+      TransportModeAndSubMode transportModeAndSubMode = findTransportModes(
+        serviceJourneyItem
+      );
+      if (transportModeAndSubMode == null) {
+        return transportModeAndSubModeForLine;
       }
-      return transportModes;
+      return transportModeAndSubMode;
     }
 
-    private TransportModes findTransportModes(XdmItem item) {
+    private TransportModeAndSubMode findTransportModes(XdmItem item) {
       XdmNode transportModeNode = getChild(
         item.stream().asNode(),
         new QName("n", Constants.NETEX_NAMESPACE, "TransportMode")
@@ -150,7 +152,7 @@ public record MismatchedTransportModeContext(
           transportModeNode.getStringValue()
         );
 
-      return new TransportModes(
+      return new TransportModeAndSubMode(
         transportMode,
         transportMode == AllVehicleModesOfTransportEnumeration.BUS
           ? findBusSubModeForServiceJourney(item)

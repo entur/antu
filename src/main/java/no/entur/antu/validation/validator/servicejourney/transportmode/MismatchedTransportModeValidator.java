@@ -6,7 +6,7 @@ import java.util.function.Function;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -112,7 +112,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
       .filter(Objects::nonNull)
       .forEach(quayId ->
         validateTransportMode(
-          mismatchedTransportModeContext.transportModes(),
+          mismatchedTransportModeContext.transportModeAndSubMode(),
           stopPlaceRepository.getTransportModesForQuayId(quayId),
           mismatchedTransportModeContext.serviceJourneyId(),
           validationError
@@ -121,16 +121,16 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
   }
 
   private void validateTransportMode(
-    TransportModes datasetTransportModes,
-    TransportModes expectedTransportModes,
+    TransportModeAndSubMode datasetTransportModeAndSubMode,
+    TransportModeAndSubMode expectedTransportModeAndSubMode,
     String serviceJourneyId,
     Consumer<MismatchedTransportModeError> validationError
   ) {
     if (
-      expectedTransportModes == null ||
-      expectedTransportModes.mode() == null ||
-      datasetTransportModes == null ||
-      datasetTransportModes.mode() == null
+      expectedTransportModeAndSubMode == null ||
+      expectedTransportModeAndSubMode.mode() == null ||
+      datasetTransportModeAndSubMode == null ||
+      datasetTransportModeAndSubMode.mode() == null
     ) {
       // TransportMode on Line is mandatory. At this point, the validation entry for the Missing transport mode,
       // will already be created. So we will simply ignore it, if there is no transportModeForServiceJourney exists.
@@ -145,18 +145,18 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
     // Coach and bus are interchangeable
     if (
       (
-        datasetTransportModes
+        datasetTransportModeAndSubMode
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.COACH) &&
-        expectedTransportModes
+        expectedTransportModeAndSubMode
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.BUS)
       ) ||
       (
-        datasetTransportModes
+        datasetTransportModeAndSubMode
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.BUS) &&
-        expectedTransportModes
+        expectedTransportModeAndSubMode
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.COACH)
       )
@@ -166,14 +166,14 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
 
     // Taxi can stop on bus and coach stops
     if (
-      datasetTransportModes
+      datasetTransportModeAndSubMode
         .mode()
         .equals(AllVehicleModesOfTransportEnumeration.TAXI) &&
       (
-        expectedTransportModes
+        expectedTransportModeAndSubMode
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.BUS) ||
-        expectedTransportModes
+        expectedTransportModeAndSubMode
           .mode()
           .equals(AllVehicleModesOfTransportEnumeration.COACH)
       )
@@ -181,11 +181,15 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
       return;
     }
 
-    if (datasetTransportModes.mode().equals(expectedTransportModes.mode())) {
+    if (
+      datasetTransportModeAndSubMode
+        .mode()
+        .equals(expectedTransportModeAndSubMode.mode())
+    ) {
       // Only rail replacement bus service can visit rail replacement bus stops
       if (
-        expectedTransportModes.subMode() != null &&
-        expectedTransportModes
+        expectedTransportModeAndSubMode.subMode() != null &&
+        expectedTransportModeAndSubMode
           .subMode()
           .name()
           .equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())
@@ -194,7 +198,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
         // then busSubModeForServiceJourney should be RAIL_REPLACEMENT_BUS
 
         if (
-          !datasetTransportModes
+          !datasetTransportModeAndSubMode
             .subMode()
             .name()
             .equals(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value())
@@ -202,8 +206,8 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
           validationError.accept(
             new MismatchedTransportModeError(
               MismatchedTransportModeError.RuleCode.INVALID_TRANSPORT_SUB_MODE,
-              datasetTransportModes.subMode().name(),
-              expectedTransportModes.subMode().name(),
+              datasetTransportModeAndSubMode.subMode().name(),
+              expectedTransportModeAndSubMode.subMode().name(),
               serviceJourneyId
             )
           );
@@ -213,8 +217,8 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
       validationError.accept(
         new MismatchedTransportModeError(
           MismatchedTransportModeError.RuleCode.INVALID_TRANSPORT_MODE,
-          datasetTransportModes.mode().value(),
-          expectedTransportModes.mode().value(),
+          datasetTransportModeAndSubMode.mode().value(),
+          expectedTransportModeAndSubMode.mode().value(),
           serviceJourneyId
         )
       );

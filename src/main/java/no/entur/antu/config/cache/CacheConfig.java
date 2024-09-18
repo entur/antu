@@ -11,7 +11,7 @@ import no.entur.antu.cache.codec.QuayIdCodec;
 import no.entur.antu.cache.codec.TransportModesCodec;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.api.LocalCachedMapOptions;
@@ -69,7 +69,7 @@ public class CacheConfig {
    * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
    */
   @Bean(name = TRANSPORT_MODES_FOR_QUAY_ID_CACHE)
-  public Map<QuayId, TransportModes> transportModesForQuayIdCache(
+  public Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache(
     RedissonClient redissonClient
   ) {
     return getOrCreateApplicationScopedCache(

@@ -23,7 +23,7 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
@@ -45,7 +45,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   private final StopPlaceResource stopPlaceResource;
   private final Map<String, Set<String>> stopPlaceCache;
   private final Set<QuayId> quayIdNotFoundCache;
-  private final Map<QuayId, TransportModes> transportModesForQuayIdCache;
+  private final Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache;
   private final Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache;
   private final Map<QuayId, String> stopPlaceNamePerQuayIdCache;
   private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
@@ -56,7 +56,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     StopPlaceResource stopPlaceResource,
     Map<String, Set<String>> stopPlaceCache,
     Set<QuayId> quayIdNotFoundCache,
-    Map<QuayId, TransportModes> transportModesForQuayIdCache,
+    Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache,
     Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
     Map<QuayId, String> stopPlaceNamePerQuayIdCache,
     NetexEntityFetcher<Quay, QuayId> quayFetcher,
@@ -115,11 +115,11 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   }
 
   @Override
-  public TransportModes getTransportModesForQuayId(QuayId quayId) {
+  public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
     return getDataForQuayId(
       quayId,
       transportModesForQuayIdCache,
-      TransportModes::of
+      TransportModeAndSubMode::of
     );
   }
 
@@ -178,10 +178,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     if (stopPlaceIds == null || stopPlaceIds.isEmpty()) {
       LOGGER.warn("Unable to refresh cache, no stop place ids found");
     } else {
-      stopPlaceCache.put(
-        STOP_PLACE_CACHE_KEY,
-        stopPlaceIds
-      );
+      stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceIds);
     }
 
     Set<String> quayIds = stopPlaceResource.getQuayIds();
@@ -191,23 +188,20 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
       stopPlaceCache.put(QUAY_CACHE_KEY, quayIds);
     }
 
-
-    Map<QuayId, TransportModes> transportModesPerQuayId = stopPlaceResource.getTransportModesPerQuayId();
+    Map<QuayId, TransportModeAndSubMode> transportModesPerQuayId =
+      stopPlaceResource.getTransportModesPerQuayId();
     if (transportModesPerQuayId == null || transportModesPerQuayId.isEmpty()) {
       LOGGER.warn("Unable to refresh cache, no transport modes found");
     } else {
-      transportModesForQuayIdCache.putAll(
-        transportModesPerQuayId
-      );
+      transportModesForQuayIdCache.putAll(transportModesPerQuayId);
     }
 
-    Map<QuayId, QuayCoordinates> coordinatesPerQuayId = stopPlaceResource.getCoordinatesPerQuayId();
+    Map<QuayId, QuayCoordinates> coordinatesPerQuayId =
+      stopPlaceResource.getCoordinatesPerQuayId();
     if (coordinatesPerQuayId == null || coordinatesPerQuayId.isEmpty()) {
       LOGGER.warn("Unable to refresh cache, no coordinates found");
     } else {
-      coordinatesPerQuayIdCache.putAll(
-        coordinatesPerQuayId
-      );
+      coordinatesPerQuayIdCache.putAll(coordinatesPerQuayId);
     }
 
     quayIdNotFoundCache.clear();
