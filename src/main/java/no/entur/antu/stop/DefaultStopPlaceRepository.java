@@ -25,7 +25,6 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModes;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
-import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
@@ -172,20 +171,45 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   @Override
   public void refreshCache() {
     stopPlaceResource.loadStopPlacesDataset();
-    stopPlaceCache.put(
-      STOP_PLACE_CACHE_KEY,
-      stopPlaceResource.getStopPlaceIds()
-    );
-    stopPlaceCache.put(QUAY_CACHE_KEY, stopPlaceResource.getQuayIds());
-    transportModesForQuayIdCache.putAll(
-      stopPlaceResource.getTransportModesPerQuayId()
-    );
-    coordinatesPerQuayIdCache.putAll(
-      stopPlaceResource.getCoordinatesPerQuayId()
-    );
-    coordinatesPerQuayIdCache.putAll(
-      stopPlaceResource.getCoordinatesPerQuayId()
-    );
+
+    Set<String> stopPlaceIds = stopPlaceResource.getStopPlaceIds();
+
+    // TODO: Keep warning logs for testing, remove them later
+    if (stopPlaceIds == null || stopPlaceIds.isEmpty()) {
+      LOGGER.warn("Unable to refresh cache, no stop place ids found");
+    } else {
+      stopPlaceCache.put(
+        STOP_PLACE_CACHE_KEY,
+        stopPlaceIds
+      );
+    }
+
+    Set<String> quayIds = stopPlaceResource.getQuayIds();
+    if (quayIds == null || quayIds.isEmpty()) {
+      LOGGER.warn("Unable to refresh cache, no quay ids found");
+    } else {
+      stopPlaceCache.put(QUAY_CACHE_KEY, quayIds);
+    }
+
+
+    Map<QuayId, TransportModes> transportModesPerQuayId = stopPlaceResource.getTransportModesPerQuayId();
+    if (transportModesPerQuayId == null || transportModesPerQuayId.isEmpty()) {
+      LOGGER.warn("Unable to refresh cache, no transport modes found");
+    } else {
+      transportModesForQuayIdCache.putAll(
+        transportModesPerQuayId
+      );
+    }
+
+    Map<QuayId, QuayCoordinates> coordinatesPerQuayId = stopPlaceResource.getCoordinatesPerQuayId();
+    if (coordinatesPerQuayId == null || coordinatesPerQuayId.isEmpty()) {
+      LOGGER.warn("Unable to refresh cache, no coordinates found");
+    } else {
+      coordinatesPerQuayIdCache.putAll(
+        coordinatesPerQuayId
+      );
+    }
+
     quayIdNotFoundCache.clear();
 
     LOGGER.info(
