@@ -1,9 +1,9 @@
 package no.entur.antu.config.cache;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.cache.codec.QuayCoordinatesCodec;
@@ -14,9 +14,9 @@ import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
-import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RedissonClient;
+import org.redisson.api.options.LocalCachedMapOptions;
 import org.redisson.client.codec.Codec;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.CompositeCodec;
@@ -211,17 +211,16 @@ public class CacheConfig {
     return new RedissonCacheAdmin(redissonClient);
   }
 
-  private static <V> RLocalCachedMap<String, V> getOrCreateReportScopedCache(
+  private static <K, V> RLocalCachedMap<K, V> getOrCreateReportScopedCache(
     RedissonClient redissonClient,
     String cacheKey,
     Codec codec
   ) {
-    return getOrCreateRedisCache(
-      redissonClient,
-      cacheKey,
-      codec,
-      LocalCachedMapOptions.defaults().timeToLive(1, TimeUnit.HOURS)
-    );
+    LocalCachedMapOptions<K, V> options = LocalCachedMapOptions
+      .<K, V>name(cacheKey)
+      .codec(codec)
+      .timeToLive(Duration.ofHours(1));
+    return redissonClient.getLocalCachedMap(options);
   }
 
   private static <K, V> RLocalCachedMap<K, V> getOrCreateApplicationScopedCache(
@@ -229,20 +228,9 @@ public class CacheConfig {
     String cacheKey,
     Codec codec
   ) {
-    return getOrCreateRedisCache(
-      redissonClient,
-      cacheKey,
-      codec,
-      LocalCachedMapOptions.defaults()
-    );
-  }
-
-  private static <K, V> RLocalCachedMap<K, V> getOrCreateRedisCache(
-    RedissonClient redissonClient,
-    String cacheKey,
-    Codec codec,
-    LocalCachedMapOptions options
-  ) {
-    return redissonClient.getLocalCachedMap(cacheKey, codec, options);
+    LocalCachedMapOptions<K, V> options = LocalCachedMapOptions
+      .<K, V>name(cacheKey)
+      .codec(codec);
+    return redissonClient.getLocalCachedMap(options);
   }
 }

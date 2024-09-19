@@ -1,7 +1,7 @@
 package no.entur.antu.sweden.stop;
 
+import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.exception.RetryableAntuException;
 import org.redisson.api.RSemaphore;
@@ -36,7 +36,7 @@ public class RedisSwedenStopPlaceNetexIdRepository
     semaphore.trySetPermits(1);
     boolean cacheEntryAvailable;
     try {
-      cacheEntryAvailable = semaphore.tryAcquire(1, TimeUnit.MINUTES);
+      cacheEntryAvailable = semaphore.tryAcquire(Duration.ofMinutes(1));
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new RetryableAntuException(e);
