@@ -1,7 +1,5 @@
 package no.entur.antu.config.cache;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,10 +11,9 @@ import no.entur.antu.cache.codec.QuayIdCodec;
 import no.entur.antu.cache.codec.TransportModesCodec;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
-import org.redisson.Redisson;
 import org.redisson.api.LocalCachedMapOptions;
 import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RedissonClient;
@@ -25,15 +22,9 @@ import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.CompositeCodec;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.codec.Kryo5Codec;
-import org.redisson.config.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class CacheConfig {
@@ -54,157 +45,154 @@ public class CacheConfig {
     "serviceLinksAndScheduledStopPointIdsCache";
   public static final String LINE_INFO_CACHE = "linesInfoCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    CacheConfig.class
-  );
 
-  @Bean
-  public Config redissonConfig(
-    RedisProperties redisProperties,
-    @Value("${antu.redis.server.trust.store.file:}") String trustStoreFile,
-    @Value(
-      "${antu.redis.server.trust.store.password:}"
-    ) String trustStorePassword,
-    @Value("${antu.redis.authentication.string:}") String authenticationString
-  ) throws MalformedURLException {
-    Config redissonConfig = new Config();
+  private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
-    Codec codec = new Kryo5Codec(this.getClass().getClassLoader());
-    redissonConfig.setCodec(codec);
-
-    if (trustStoreFile.isEmpty()) {
-      LOGGER.info("Configuring non-encrypted Redis connection");
-      String address = String.format(
-        "redis://%s:%s",
-        redisProperties.getHost(),
-        redisProperties.getPort()
-      );
-      redissonConfig.useSingleServer().setAddress(address);
-      return redissonConfig;
-    } else {
-      LOGGER.info("Configuring encrypted Redis connection");
-      String address = String.format(
-        "rediss://%s:%s",
-        redisProperties.getHost(),
-        redisProperties.getPort()
-      );
-      redissonConfig
-        .useSingleServer()
-        .setAddress(address)
-        .setSslTruststore(new File(trustStoreFile).toURI().toURL())
-        .setSslTruststorePassword(trustStorePassword)
-        .setPassword(authenticationString);
-      return redissonConfig;
-    }
-  }
-
-  @Bean(destroyMethod = "shutdown")
-  @Profile("!test")
-  public RedissonClient redissonClient(Config redissonConfig) {
-    return Redisson.create(redissonConfig);
-  }
-
-  @Bean(name = TRANSPORT_MODES_FOR_QUAY_ID_CACHE)
-  public Map<QuayId, TransportModes> transportModesForQuayIdCache(
-    RedissonClient redissonClient
-  ) {
-    return redissonClient.getLocalCachedMap(
-      TRANSPORT_MODES_FOR_QUAY_ID_CACHE,
-      new CompositeCodec(new QuayIdCodec(), new TransportModesCodec()),
-      LocalCachedMapOptions.defaults()
-    );
-  }
-
-  @Bean(name = SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE)
-  public Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache(
-    RedissonClient redissonClient
-  ) {
-    return redissonClient.getLocalCachedMap(
-      SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE,
-      new CompositeCodec(new StringCodec(), new JsonJacksonCodec()),
-      LocalCachedMapOptions.defaults()
-    );
-  }
-
-  @Bean(name = STOP_PLACE_NAME_PER_QUAY_ID_CACHE)
-  public Map<QuayId, String> stopPlaceNamePerQuayIdCache(
-    RedissonClient redissonClient
-  ) {
-    return redissonClient.getLocalCachedMap(
-      STOP_PLACE_NAME_PER_QUAY_ID_CACHE,
-      new CompositeCodec(new QuayIdCodec(), new StringCodec()),
-      LocalCachedMapOptions.defaults()
-    );
-  }
-
-  @Bean(name = SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE)
-  public Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache(
-    RedissonClient redissonClient
-  ) {
-    return redissonClient.getLocalCachedMap(
-      SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE,
-      new CompositeCodec(new StringCodec(), new JsonJacksonCodec()),
-      LocalCachedMapOptions.defaults()
-    );
-  }
-
-  @Bean(name = LINE_INFO_CACHE)
-  public Map<String, List<String>> lineNamesCache(
-    RedissonClient redissonClient
-  ) {
-    return redissonClient.getLocalCachedMap(
-      LINE_INFO_CACHE,
-      new CompositeCodec(new StringCodec(), new JsonJacksonCodec()),
-      LocalCachedMapOptions.defaults()
-    );
-  }
-
-  @Bean(name = COORDINATES_PER_QUAY_ID_CACHE)
-  public Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache(
-    RedissonClient redissonClient
-  ) {
-    return redissonClient.getLocalCachedMap(
-      COORDINATES_PER_QUAY_ID_CACHE,
-      new CompositeCodec(new QuayIdCodec(), new QuayCoordinatesCodec()),
-      LocalCachedMapOptions.defaults()
-    );
-  }
-
+  /**
+   * The set of StopPlace ids and Quay ids present in the National Stop Register,
+   * stored under the keys STOP_PLACE_CACHE_KEY and QUAY_CACHE_KEY respectively.
+   * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
+   */
   @Bean(name = STOP_PLACE_AND_QUAY_CACHE)
   public Map<String, Set<String>> stopPlaceAndQuayCache(
     RedissonClient redissonClient
   ) {
-    return redissonClient.getLocalCachedMap(
+    return getOrCreateApplicationScopedCache(
+      redissonClient,
       STOP_PLACE_AND_QUAY_CACHE,
-      LocalCachedMapOptions.defaults()
+      DEFAULT_CODEC
     );
   }
 
+  /**
+   * Maps a quay to its transport mode and submode.
+   * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
+   */
+  @Bean(name = TRANSPORT_MODES_FOR_QUAY_ID_CACHE)
+  public Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateApplicationScopedCache(
+      redissonClient,
+      TRANSPORT_MODES_FOR_QUAY_ID_CACHE,
+      new CompositeCodec(new QuayIdCodec(), new TransportModesCodec())
+    );
+  }
+
+  /**
+   * Maps a quay to the name of its stop place.
+   * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
+   */
+  @Bean(name = STOP_PLACE_NAME_PER_QUAY_ID_CACHE)
+  public Map<QuayId, String> stopPlaceNamePerQuayIdCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateApplicationScopedCache(
+      redissonClient,
+      STOP_PLACE_NAME_PER_QUAY_ID_CACHE,
+      new CompositeCodec(new QuayIdCodec(), new StringCodec())
+    );
+  }
+
+  /**
+   * Maps a quay to its coordinates.
+   * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
+   */
+  @Bean(name = COORDINATES_PER_QUAY_ID_CACHE)
+  public Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateApplicationScopedCache(
+      redissonClient,
+      COORDINATES_PER_QUAY_ID_CACHE,
+      new CompositeCodec(new QuayIdCodec(), new QuayCoordinatesCodec())
+    );
+  }
+
+  /**
+   * Maps an organisation codespace to the list of Authorities it can refer to in a NeTEx dataset.
+   * The cache is refreshed  periodically by querying the organisation register.
+   */
   @Bean
   public Map<String, Set<String>> organisationCache(
     RedissonClient redissonClient
   ) {
-    return redissonClient.getLocalCachedMap(
+    return getOrCreateApplicationScopedCache(
+      redissonClient,
       ORGANISATION_CACHE,
-      LocalCachedMapOptions.defaults()
+      DEFAULT_CODEC
     );
   }
 
+  /**
+   * Keep track of quays not found when querying the stop place REST API.
+   */
   @Bean(name = QUAY_ID_NOT_FOUND_CACHE)
   public Set<QuayId> quayIdNotFoundCache(RedissonClient redissonClient) {
     return redissonClient.getSet(QUAY_ID_NOT_FOUND_CACHE);
   }
 
+  /**
+   * The set of NeTEx ids referenced in a NeTEx dataset.
+   * The cache is report-scoped.
+   * The cache key is the current validation report.
+   */
   @Bean
   public RLocalCachedMap<String, Set<String>> commonIdsCache(
     RedissonClient redissonClient
   ) {
-    LocalCachedMapOptions<String, Set<String>> localCacheOptions =
-      LocalCachedMapOptions.defaults();
-    localCacheOptions.timeToLive(1, TimeUnit.HOURS);
-    return redissonClient.getLocalCachedMap(
+    return getOrCreateReportScopedCache(
+      redissonClient,
       COMMON_IDS_CACHE,
-      localCacheOptions
+      DEFAULT_CODEC
+    );
+  }
+
+  /**
+   * The mapping between schedule stop points and quays.
+   * The cache is report-scoped.
+   * The cache key is the current validation report.
+   */
+  @Bean(name = SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE)
+  public Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+    );
+  }
+
+  /**
+   * The mapping between service links and schedule stop points.
+   * The cache is report-scoped.
+   * The cache key is the current validation report.
+   */
+  @Bean(name = SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE)
+  public Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+    );
+  }
+
+  /**
+   * The list of line id/line name present in the current dataset.
+   * The cache is report-scoped.
+   * The cache key is the current validation report.
+   */
+  @Bean(name = LINE_INFO_CACHE)
+  public Map<String, List<String>> lineNamesCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      LINE_INFO_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
     );
   }
 
@@ -221,5 +209,40 @@ public class CacheConfig {
   @Bean
   public CacheAdmin cacheAdmin(RedissonClient redissonClient) {
     return new RedissonCacheAdmin(redissonClient);
+  }
+
+  private static <V> RLocalCachedMap<String, V> getOrCreateReportScopedCache(
+    RedissonClient redissonClient,
+    String cacheKey,
+    Codec codec
+  ) {
+    return getOrCreateRedisCache(
+      redissonClient,
+      cacheKey,
+      codec,
+      LocalCachedMapOptions.defaults().timeToLive(1, TimeUnit.HOURS)
+    );
+  }
+
+  private static <K, V> RLocalCachedMap<K, V> getOrCreateApplicationScopedCache(
+    RedissonClient redissonClient,
+    String cacheKey,
+    Codec codec
+  ) {
+    return getOrCreateRedisCache(
+      redissonClient,
+      cacheKey,
+      codec,
+      LocalCachedMapOptions.defaults()
+    );
+  }
+
+  private static <K, V> RLocalCachedMap<K, V> getOrCreateRedisCache(
+    RedissonClient redissonClient,
+    String cacheKey,
+    Codec codec,
+    LocalCachedMapOptions options
+  ) {
+    return redissonClient.getLocalCachedMap(cacheKey, codec, options);
   }
 }

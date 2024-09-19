@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.model.TransportSubMode;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -97,7 +97,7 @@ class MismatchedTransportModeValidatorIntegrationTest {
 
       when(stopPlaceRepository.getTransportModesForQuayId(testQuayId))
         .thenReturn(
-          new TransportModes(
+          new TransportModeAndSubMode(
             AllVehicleModesOfTransportEnumeration.COACH,
             new TransportSubMode("someCoachSubMode")
           )

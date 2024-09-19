@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.model.TransportSubMode;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -59,7 +59,7 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
   }
 
   @Override
-  public Map<QuayId, TransportModes> getTransportModesPerQuayId() {
+  public Map<QuayId, TransportModeAndSubMode> getTransportModesPerQuayId() {
     return getDataPerQuayId(this::getQuayTransportModesEntries);
   }
 
@@ -95,7 +95,7 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
       );
   }
 
-  public List<Map.Entry<QuayId, TransportModes>> getQuayTransportModesEntries(
+  public List<Map.Entry<QuayId, TransportModeAndSubMode>> getQuayTransportModesEntries(
     StopPlace stopPlace
   ) {
     return makeQuayIdMapEntries(
@@ -107,7 +107,7 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
           .map(quayId ->
             Map.entry(
               quayId,
-              new TransportModes(
+              new TransportModeAndSubMode(
                 stopPlace.getTransportMode(),
                 TransportSubMode.of(stopPlace).orElse(null)
               )

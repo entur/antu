@@ -11,7 +11,7 @@ import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.ScheduledStopPointIds;
 import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.model.StopPlaceId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -97,7 +97,7 @@ public class TestConfig {
       }
 
       @Override
-      public TransportModes getTransportModesForQuayId(QuayId quayId) {
+      public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
         return null;
       }
 

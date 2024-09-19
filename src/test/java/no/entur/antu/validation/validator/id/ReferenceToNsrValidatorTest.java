@@ -4,7 +4,7 @@ import java.util.Set;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.junit.jupiter.api.Assertions;
@@ -31,7 +31,7 @@ class ReferenceToNsrValidatorTest {
       }
 
       @Override
-      public TransportModes getTransportModesForQuayId(QuayId quayId) {
+      public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
         return null;
       }
 

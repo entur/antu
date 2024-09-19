@@ -25,8 +25,7 @@ public class RedisTemporaryFileRepository implements TemporaryFileRepository {
     RBucket<Object> temporaryFile = redissonClient.getBucket(
       getTemporaryFileKey(validationReportId, fileName)
     );
-    temporaryFile.expire(Duration.ofHours(1));
-    temporaryFile.set(content);
+    temporaryFile.set(content, Duration.ofHours(1));
   }
 
   @Override

@@ -12,7 +12,7 @@ import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.TransportModes;
+import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.model.TransportSubMode;
 import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -234,7 +234,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.BUS, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.BUS,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -279,7 +282,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.BUS, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.BUS,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -326,7 +332,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.METRO, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.METRO,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -369,7 +378,7 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(
+        new TransportModeAndSubMode(
           AllVehicleModesOfTransportEnumeration.BUS,
           new TransportSubMode(
             BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value()
@@ -420,7 +429,7 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(
+        new TransportModeAndSubMode(
           AllVehicleModesOfTransportEnumeration.BUS,
           new TransportSubMode(
             BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value()
@@ -491,7 +500,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.COACH, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.COACH,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -537,7 +549,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.BUS, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.BUS,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -583,7 +598,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.BUS, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.BUS,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -629,7 +647,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.COACH, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.COACH,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -675,7 +696,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.METRO, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.METRO,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -781,7 +805,7 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(
+        new TransportModeAndSubMode(
           AllVehicleModesOfTransportEnumeration.RAIL,
           new TransportSubMode(RailSubmodeEnumeration.LONG_DISTANCE.value())
         )
@@ -845,7 +869,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.BUS, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.BUS,
+          null
+        )
       );
 
     ValidationReport validationReport = runValidation(
@@ -890,7 +917,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.BUS, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.BUS,
+          null
+        )
       );
 
     Exception exception = assertThrows(
@@ -936,7 +966,10 @@ class MismatchedTransportModeValidatorTest {
     Mockito
       .when(stopPlaceRepository.getTransportModesForQuayId(TestData.QUAY_ID))
       .thenReturn(
-        new TransportModes(AllVehicleModesOfTransportEnumeration.BUS, null)
+        new TransportModeAndSubMode(
+          AllVehicleModesOfTransportEnumeration.BUS,
+          null
+        )
       );
 
     Exception exception = assertThrows(
