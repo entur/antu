@@ -49,12 +49,16 @@ public class RedissonCacheAdmin implements CacheAdmin {
     if (type == RType.MAP) {
       details.append("[");
       details.append(redissonClient.getMap(key).size());
-      details.append("]");
+      details.append(" entries, ");
+      details.append(redissonClient.getMap(key).sizeInMemory() / 1000);
+      details.append(" kb]");
     }
     if (type == RType.SET) {
       details.append("[");
       details.append(redissonClient.getSet(key).size());
-      details.append("]");
+      details.append(" entries, ");
+      details.append(redissonClient.getSet(key).sizeInMemory() / 1000);
+      details.append(" kb]");
     }
     return details.toString();
   }
