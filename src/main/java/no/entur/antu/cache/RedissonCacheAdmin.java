@@ -1,6 +1,7 @@
 package no.entur.antu.cache;
 
 import java.util.stream.Collectors;
+import org.redisson.api.RType;
 import org.redisson.api.RedissonClient;
 
 /**
@@ -32,13 +33,25 @@ public class RedissonCacheAdmin implements CacheAdmin {
       .map(key ->
         key +
         " (" +
-        redissonClient.getKeys().getType(key).name() +
+        formatKeyDetails(key) +
         ", TTL: " +
         formatTtl(redissonClient.getKeys().remainTimeToLive(key)) +
         ")"
       )
       .sorted()
       .collect(Collectors.joining("\n"));
+  }
+
+  private String formatKeyDetails(String key) {
+    RType type = redissonClient.getKeys().getType(key);
+    StringBuilder details = new StringBuilder();
+    details.append(type.name());
+    if (type == RType.MAP) {
+      details.append("[");
+      details.append(redissonClient.getMap(key).size());
+      details.append("]");
+    }
+    return details.toString();
   }
 
   private String formatTtl(long ttl) {
