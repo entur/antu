@@ -10,9 +10,12 @@ public interface CacheAdmin {
   void clear();
 
   /**
+   * Delete keys by pattern and return the number of deleted keys
+   */
+  long deleteKeysByPattern(String pattern);
+
+  /**
    * Return the list of keys present in the cache.
-   *
-   * @return the list of keys present in the cache.
    */
   String dumpKeys();
 }

@@ -42,6 +42,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
   private static final String SWAGGER_DATA_TYPE_STRING = "string";
   private static final String CODESPACE_PARAM = "codespace";
   private static final String VALIDATION_REPORT_ID_PARAM = "id";
+  private static final String PATTERN_PARAM = "PATTERN";
 
   private final AntuAuthorizationService antuAuthorizationService;
   private final String host;
@@ -157,6 +158,22 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .message("Command accepted")
       .endResponseMessage()
       .to("direct:adminCacheClear")
+      .post("/delete-by-pattern/{" + PATTERN_PARAM + "}")
+      .description("Delete keys by pattern")
+      .param()
+      .name(PATTERN_PARAM)
+      .type(RestParamType.path)
+      .description("Key pattern")
+      .dataType(SWAGGER_DATA_TYPE_STRING)
+      .required(true)
+      .endParam()
+      .consumes(PLAIN)
+      .produces(PLAIN)
+      .responseMessage()
+      .code(200)
+      .message("Command accepted")
+      .endResponseMessage()
+      .to("direct:adminCacheDeleteByPattern")
       .get("/dump-keys")
       .description("Clear the cache")
       .consumes(PLAIN)
@@ -217,6 +234,17 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .bean("cacheAdmin", "clear")
       .log(LoggingLevel.INFO, correlation() + "Cleared cache")
       .routeId("admin-cache-clear");
+
+    from("direct:adminCacheDeleteByPattern")
+      .to("direct:authorizeAdminRequest")
+      .log(LoggingLevel.INFO, correlation() + "Deleting key by pattern")
+      .process(this::removeAllCamelHttpHeaders)
+      .bean(
+        "cacheAdmin",
+        "deleteKeysByPattern(${header." + PATTERN_PARAM + "})"
+      )
+      .log(LoggingLevel.INFO, correlation() + "Deleted key by pattern")
+      .routeId("admin-delete-key-by-pattern");
 
     from("direct:adminCacheDumpKeys")
       .to("direct:authorizeAdminRequest")
