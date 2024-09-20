@@ -5,6 +5,9 @@ import java.util.Optional;
 import no.entur.antu.exception.AntuException;
 import org.rutebanken.netex.model.Quay;
 
+/**
+ * The id of a NeTEx quay.
+ */
 public record QuayId(String id) {
   public QuayId {
     Objects.requireNonNull(id, "Quay id should not be null");

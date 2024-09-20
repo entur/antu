@@ -3,7 +3,6 @@ package no.entur.antu.validation.validator.id;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.stop.StopPlaceRepository;

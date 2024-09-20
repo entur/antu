@@ -1,7 +1,6 @@
 package no.entur.antu.config.cache;
 
-import static no.entur.antu.stop.DefaultStopPlaceRepository.QUAY_ID_CACHE;
-import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_ID_CACHE;
+import static no.entur.antu.stop.DefaultStopPlaceRepository.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -9,14 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
-import no.entur.antu.cache.codec.QuayCoordinatesCodec;
 import no.entur.antu.cache.codec.QuayIdCodec;
 import no.entur.antu.cache.codec.StopPlaceIdCodec;
-import no.entur.antu.cache.codec.TransportModesCodec;
-import no.entur.antu.model.QuayCoordinates;
+import no.entur.antu.model.NetexQuay;
+import no.entur.antu.model.NetexStopPlace;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
-import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.api.RLocalCachedMap;
@@ -35,13 +32,6 @@ import org.springframework.context.annotation.Configuration;
 public class CacheConfig {
 
   public static final String ORGANISATION_CACHE = "organisationCache";
-
-  public static final String TRANSPORT_MODES_FOR_QUAY_ID_CACHE =
-    "transportModesForQuayIdCache";
-  public static final String COORDINATES_PER_QUAY_ID_CACHE =
-    "coordinatesPerQuayIdCache";
-  public static final String STOP_PLACE_NAME_PER_QUAY_ID_CACHE =
-    "stopPlaceNamePerQuayIdCache";
   public static final String COMMON_IDS_CACHE = "commonIdsCache";
   public static final String SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE =
     "scheduledStopPointAndQuayIdCache";
@@ -53,65 +43,30 @@ public class CacheConfig {
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
   /**
-   * The set of StopPlace ids present in the National Stop Register,
-   * The set is refreshed periodically by reading a new NeTEx stop dataset.
-   */
-  @Bean(name = STOP_PLACE_ID_CACHE)
-  public Set<StopPlaceId> stopPlaceIdCache(RedissonClient redissonClient) {
-    return redissonClient.getSet(STOP_PLACE_ID_CACHE, new StopPlaceIdCodec());
-  }
-
-  /**
-   * The set of Quay ids present in the National Stop Register,
-   * The set is refreshed periodically by reading a new NeTEx stop dataset.
-   */
-  @Bean(name = QUAY_ID_CACHE)
-  public Set<QuayId> quayIdCache(RedissonClient redissonClient) {
-    return redissonClient.getSet(QUAY_ID_CACHE, new QuayIdCodec());
-  }
-
-  /**
-   * Maps a quay to its transport mode and submode.
+   * Distributed cache for StopPlaces.
    * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
    */
-  @Bean(name = TRANSPORT_MODES_FOR_QUAY_ID_CACHE)
-  public Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache(
+  @Bean(name = STOP_PLACE_CACHE)
+  public Map<StopPlaceId, NetexStopPlace> stopPlaceCache(
     RedissonClient redissonClient
   ) {
     return getOrCreateApplicationScopedCache(
       redissonClient,
-      TRANSPORT_MODES_FOR_QUAY_ID_CACHE,
-      new CompositeCodec(new QuayIdCodec(), new TransportModesCodec())
+      STOP_PLACE_CACHE,
+      new CompositeCodec(new StopPlaceIdCodec(), DEFAULT_CODEC)
     );
   }
 
   /**
-   * Maps a quay to the name of its stop place.
+   * Distributed cache for Quays.
    * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
    */
-  @Bean(name = STOP_PLACE_NAME_PER_QUAY_ID_CACHE)
-  public Map<QuayId, String> stopPlaceNamePerQuayIdCache(
-    RedissonClient redissonClient
-  ) {
+  @Bean(name = QUAY_CACHE)
+  public Map<QuayId, NetexQuay> quayCache(RedissonClient redissonClient) {
     return getOrCreateApplicationScopedCache(
       redissonClient,
-      STOP_PLACE_NAME_PER_QUAY_ID_CACHE,
-      new CompositeCodec(new QuayIdCodec(), new StringCodec())
-    );
-  }
-
-  /**
-   * Maps a quay to its coordinates.
-   * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
-   */
-  @Bean(name = COORDINATES_PER_QUAY_ID_CACHE)
-  public Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache(
-    RedissonClient redissonClient
-  ) {
-    return getOrCreateApplicationScopedCache(
-      redissonClient,
-      COORDINATES_PER_QUAY_ID_CACHE,
-      new CompositeCodec(new QuayIdCodec(), new QuayCoordinatesCodec())
+      QUAY_CACHE,
+      new CompositeCodec(new QuayIdCodec(), DEFAULT_CODEC)
     );
   }
 

@@ -16,19 +16,16 @@
 
 package no.entur.antu.config;
 
-import static no.entur.antu.config.cache.CacheConfig.COORDINATES_PER_QUAY_ID_CACHE;
 import static no.entur.antu.config.cache.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
-import static no.entur.antu.config.cache.CacheConfig.STOP_PLACE_NAME_PER_QUAY_ID_CACHE;
-import static no.entur.antu.config.cache.CacheConfig.TRANSPORT_MODES_FOR_QUAY_ID_CACHE;
-import static no.entur.antu.stop.DefaultStopPlaceRepository.QUAY_ID_CACHE;
-import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_ID_CACHE;
+import static no.entur.antu.stop.DefaultStopPlaceRepository.QUAY_CACHE;
+import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_CACHE;
 
 import java.util.Map;
 import java.util.Set;
-import no.entur.antu.model.QuayCoordinates;
+import no.entur.antu.model.NetexQuay;
+import no.entur.antu.model.NetexStopPlace;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
-import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.DefaultStopPlaceResource;
 import no.entur.antu.stop.StopPlaceRepository;
@@ -63,35 +60,26 @@ public class StopPlaceConfig {
   @Bean
   @Profile("!test")
   StopPlaceRepository stopPlaceRepository(
-    @Qualifier(STOP_PLACE_ID_CACHE) Set<StopPlaceId> stopPlaceIdCache,
-    @Qualifier(QUAY_ID_CACHE) Set<QuayId> quayIdCache,
+    @Qualifier(
+      STOP_PLACE_CACHE
+    ) Map<StopPlaceId, NetexStopPlace> stopPlaceCache,
+    @Qualifier(QUAY_CACHE) Map<QuayId, NetexQuay> quayCache,
+    @Qualifier(QUAY_ID_NOT_FOUND_CACHE) Set<QuayId> quayIdNotFoundCache,
     StopPlaceFetcher stopPlaceFetcher,
     QuayFetcher quayFetcher,
     StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
     @Qualifier(
-      TRANSPORT_MODES_FOR_QUAY_ID_CACHE
-    ) Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache,
-    @Qualifier(QUAY_ID_NOT_FOUND_CACHE) Set<QuayId> quayIdNotFoundCache,
-    @Qualifier(
-      COORDINATES_PER_QUAY_ID_CACHE
-    ) Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
-    @Qualifier(
-      STOP_PLACE_NAME_PER_QUAY_ID_CACHE
-    ) Map<QuayId, String> stopPlaceNamePerQuayIdCache,
-    @Qualifier(
       "stopPlaceResource"
-    ) DefaultStopPlaceResource defaultStopPlaceResource) {
+    ) DefaultStopPlaceResource defaultStopPlaceResource
+  ) {
     return new DefaultStopPlaceRepository(
       defaultStopPlaceResource,
-      stopPlaceIdCache,
-      quayIdCache,
-      quayIdNotFoundCache,
-      transportModesForQuayIdCache,
-      coordinatesPerQuayIdCache,
-      stopPlaceNamePerQuayIdCache,
+      stopPlaceCache,
+      quayCache,
       quayFetcher,
       stopPlaceFetcher,
-      stopPlaceForQuayIdFetcher
+      stopPlaceForQuayIdFetcher,
+      quayIdNotFoundCache
     );
   }
 
