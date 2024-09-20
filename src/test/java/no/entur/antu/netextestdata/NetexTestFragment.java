@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -24,6 +25,7 @@ import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
+import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeRefStructure;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
@@ -37,6 +39,7 @@ import org.rutebanken.netex.model.Interchange_VersionStructure;
 import org.rutebanken.netex.model.JourneyInterchangesInFrame_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
+import org.rutebanken.netex.model.JourneyRefStructure;
 import org.rutebanken.netex.model.Journey_VersionStructure;
 import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
 import org.rutebanken.netex.model.Line;
@@ -60,6 +63,7 @@ import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceFrame;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
+import org.rutebanken.netex.model.ServiceJourneyRefStructure;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.ServiceLinkRefStructure;
 import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
@@ -115,8 +119,10 @@ public class NetexTestFragment {
     return deadRun(new CreateLine().create(), journeyPattern);
   }
 
-  public CreateDatedServiceJourney datedServiceJourney() {
-    return new CreateDatedServiceJourney();
+  public CreateDatedServiceJourney datedServiceJourney(
+    int serviceJourneyRefId
+  ) {
+    return new CreateDatedServiceJourney(serviceJourneyRefId);
   }
 
   public List<JourneyPattern> createJourneyPatterns(
@@ -197,7 +203,7 @@ public class NetexTestFragment {
   ) {
     return new CreateNetexEntitiesIndex()
       .addJourneyPatterns(journeyPattern)
-      .addServiceJourneys(journey);
+      .addJourneys(journey);
   }
 
   public CreateNetexEntitiesIndex netexEntitiesIndex(ServiceLink serviceLink) {
@@ -328,31 +334,97 @@ public class NetexTestFragment {
   public static class CreateDatedServiceJourney {
 
     private int id = 1;
-    private LocalDate operatingDayDate;
+    private int operatingDayRefId = -1;
+    private final int serviceJourneyRefId;
+    private ServiceAlterationEnumeration serviceAlteration;
+    private int datedServiceJourneyRefId = -1;
+
+    public CreateDatedServiceJourney(int serviceJourneyRefId) {
+      assert serviceJourneyRefId > 0;
+      this.serviceJourneyRefId = serviceJourneyRefId;
+    }
 
     public CreateDatedServiceJourney withId(int id) {
       this.id = id;
       return this;
     }
 
-    public CreateDatedServiceJourney withOperatingDayDate(
-      LocalDate operatingDayDate
+    public CreateDatedServiceJourney withOperatingDayRefId(
+      int operatingDayRefId
     ) {
-      this.operatingDayDate = operatingDayDate;
+      assert operatingDayRefId > 0;
+      this.operatingDayRefId = operatingDayRefId;
+      return this;
+    }
+
+    public CreateDatedServiceJourney withServiceAlteration(
+      ServiceAlterationEnumeration serviceAlteration
+    ) {
+      this.serviceAlteration = serviceAlteration;
+      return this;
+    }
+
+    public CreateDatedServiceJourney withDatedServiceJourneyRef(
+      int datedServiceJourneyRefId
+    ) {
+      assert datedServiceJourneyRefId > 0;
+      this.datedServiceJourneyRefId = datedServiceJourneyRefId;
       return this;
     }
 
     public DatedServiceJourney create() {
-      OperatingDay operatingDay = new OperatingDay()
-        .withId(operatingDayDate.format(DATE_FORMATTER))
-        .withCalendarDate(operatingDayDate.atStartOfDay());
+      DatedServiceJourney datedServiceJourney = new DatedServiceJourney()
+        .withId("TST:DatedServiceJourney:" + id);
 
-      return new DatedServiceJourney()
-        .withId("TST:DatedServiceJourney:" + id)
-        .withServiceAlteration(ServiceAlterationEnumeration.PLANNED)
-        .withOperatingDayRef(
-          new OperatingDayRefStructure().withRef(operatingDay.getId())
+      Collection<JAXBElement<? extends JourneyRefStructure>> journeyRefs =
+        new ArrayList<>();
+      journeyRefs.add(
+        createJaxbElement(
+          new ServiceJourneyRefStructure()
+            .withRef("TST:ServiceJourney:" + serviceJourneyRefId)
+        )
+      );
+      if (datedServiceJourneyRefId > 0) {
+        journeyRefs.add(
+          createJaxbElement(
+            new DatedServiceJourneyRefStructure()
+              .withRef("TST:DatedServiceJourney:" + datedServiceJourneyRefId)
+          )
         );
+      }
+
+      if (operatingDayRefId > 0) {
+        datedServiceJourney.withOperatingDayRef(
+          new OperatingDayRefStructure()
+            .withRef("TST:OperatingDay:" + operatingDayRefId)
+        );
+      }
+
+      return datedServiceJourney
+        .withJourneyRef(journeyRefs)
+        .withServiceAlteration(serviceAlteration);
+    }
+  }
+
+  public static class CreateOperatingDay {
+
+    private int id = 1;
+    private final LocalDate calendarDate;
+
+    public CreateOperatingDay(LocalDate calendarDate) {
+      this.calendarDate = calendarDate;
+    }
+
+    public CreateOperatingDay withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public OperatingDay create() {
+      return new OperatingDay()
+        .withId("TST:OperatingDay:" + id)
+        //        .withId(calendarDate.format(DATE_FORMATTER))
+        .withCalendarDate(calendarDate.atStartOfDay());
     }
   }
 
@@ -973,10 +1045,10 @@ public class NetexTestFragment {
     private final List<PassengerStopAssignment> passengerStopAssignments =
       new ArrayList<>();
 
-    public CreateNetexEntitiesIndex addServiceJourneys(
-      Journey_VersionStructure... serviceJourney
+    public CreateNetexEntitiesIndex addJourneys(
+      Journey_VersionStructure... journeys
     ) {
-      this.journeys.addAll(Arrays.asList(serviceJourney));
+      this.journeys.addAll(Arrays.asList(journeys));
       return this;
     }
 
@@ -1116,6 +1188,16 @@ public class NetexTestFragment {
         .forEach(journey ->
           netexEntitiesIndex
             .getServiceJourneyIndex()
+            .put(journey.getId(), journey)
+        );
+
+      journeys
+        .stream()
+        .filter(DatedServiceJourney.class::isInstance)
+        .map(DatedServiceJourney.class::cast)
+        .forEach(journey ->
+          netexEntitiesIndex
+            .getDatedServiceJourneyIndex()
             .put(journey.getId(), journey)
         );
     }
