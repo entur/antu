@@ -4,7 +4,6 @@ import no.entur.antu.exception.AntuException;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.StopPlace;
 
-// TODO rename to TransportModeAndSubmode
 public record TransportModeAndSubMode(
   AllVehicleModesOfTransportEnumeration mode,
   TransportSubMode subMode

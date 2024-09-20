@@ -15,17 +15,9 @@
 
 package no.entur.antu.stop;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import no.entur.antu.exception.AntuException;
-import no.entur.antu.model.QuayCoordinates;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceId;
-import no.entur.antu.model.TransportModeAndSubMode;
+import java.util.*;
+import no.entur.antu.model.*;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
-import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
@@ -39,36 +31,31 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   private static final Logger LOGGER = LoggerFactory.getLogger(
     DefaultStopPlaceRepository.class
   );
-  public static final String STOP_PLACE_CACHE_KEY = "stopPlaceCache";
-  public static final String QUAY_CACHE_KEY = "quayCache";
+
+  public static final String QUAY_CACHE = "quayCache";
+  public static final String STOP_PLACE_CACHE = "stopPlaceCache";
 
   private final StopPlaceResource stopPlaceResource;
-  private final Map<String, Set<String>> stopPlaceCache;
-  private final Set<QuayId> quayIdNotFoundCache;
-  private final Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache;
-  private final Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache;
-  private final Map<QuayId, String> stopPlaceNamePerQuayIdCache;
   private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
   private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
   private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
+  private final Map<StopPlaceId, SimpleStopPlace> stopPlaceCache;
+  private final Map<QuayId, SimpleQuay> quayCache;
+  private final Set<QuayId> quayIdNotFoundCache;
 
   public DefaultStopPlaceRepository(
     StopPlaceResource stopPlaceResource,
-    Map<String, Set<String>> stopPlaceCache,
-    Set<QuayId> quayIdNotFoundCache,
-    Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache,
-    Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
-    Map<QuayId, String> stopPlaceNamePerQuayIdCache,
+    Map<StopPlaceId, SimpleStopPlace> stopPlaceCache,
+    Map<QuayId, SimpleQuay> quayCache,
     NetexEntityFetcher<Quay, QuayId> quayFetcher,
     NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
-    NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher
+    NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher,
+    Set<QuayId> quayIdNotFoundCache
   ) {
     this.stopPlaceResource = stopPlaceResource;
-    this.stopPlaceCache = stopPlaceCache;
-    this.transportModesForQuayIdCache = transportModesForQuayIdCache;
+    this.stopPlaceCache = Objects.requireNonNull(stopPlaceCache);
+    this.quayCache = Objects.requireNonNull(quayCache);
     this.quayIdNotFoundCache = quayIdNotFoundCache;
-    this.coordinatesPerQuayIdCache = coordinatesPerQuayIdCache;
-    this.stopPlaceNamePerQuayIdCache = stopPlaceNamePerQuayIdCache;
     this.quayFetcher = quayFetcher;
     this.stopPlaceFetcher = stopPlaceFetcher;
     this.stopPlaceForQuayIdFetcher = stopPlaceForQuayIdFetcher;
@@ -76,28 +63,29 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
 
   @Override
   public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
-    Set<String> stopPlaceIds = stopPlaceCache.get(STOP_PLACE_CACHE_KEY);
-    if (stopPlaceIds == null) {
-      throw new AntuException("Stop place ids cache not found");
+    if (stopPlaceCache.containsKey(stopPlaceId)) {
+      return true;
     }
-    boolean idFoundInCache = stopPlaceIds
-      .stream()
-      .anyMatch(id -> id.equals(stopPlaceId.id()));
-    return idFoundInCache || stopPlaceFetcher.tryFetch(stopPlaceId) != null;
+    StopPlace stopPlace = stopPlaceFetcher.tryFetch(stopPlaceId);
+    if (stopPlace != null) {
+      stopPlaceCache.put(
+        stopPlaceId,
+        new SimpleStopPlace(
+          stopPlace.getName().getValue(),
+          TransportModeAndSubMode.of(stopPlace)
+        )
+      );
+      return true;
+    }
+    return false;
   }
 
   @Override
   public boolean hasQuayId(QuayId quayId) {
-    Set<String> quayIds = stopPlaceCache.get(QUAY_CACHE_KEY);
-    if (quayIds == null) {
-      throw new AntuException("Quay ids cache not found");
+    if (quayCache.containsKey(quayId)) {
+      return true;
     }
-    boolean idFoundInCache = quayIds
-      .stream()
-      .anyMatch(id -> id.equals(quayId.id()));
-    return (
-      idFoundInCache || tryFetchWithNotFoundCheck(quayId, quayFetcher) != null
-    );
+    return getQuay(quayId).isPresent();
   }
 
   private <R> R tryFetchWithNotFoundCheck(
@@ -116,106 +104,109 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
 
   @Override
   public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
-    return getDataForQuayId(
-      quayId,
-      transportModesForQuayIdCache,
-      TransportModeAndSubMode::of
-    );
+    return stopPlaceCache
+      .get(
+        getQuay(quayId)
+          .orElseThrow(() ->
+            new IllegalStateException(
+              "The quay does not exist, this should be validated beforehand"
+            )
+          )
+          .stopPlaceId()
+      )
+      .transportModeAndSubMode();
   }
 
   @Override
   public QuayCoordinates getCoordinatesForQuayId(QuayId quayId) {
-    return getDataForQuayId(
-      quayId,
-      coordinatesPerQuayIdCache,
-      QuayCoordinates::of
-    );
+    return getQuay(quayId)
+      .orElseThrow(() ->
+        new IllegalStateException(
+          "The quay does not exist, this should be validated beforehand"
+        )
+      )
+      .quayCoordinates();
+  }
+
+  private Optional<SimpleQuay> getQuay(QuayId quayId) {
+    SimpleQuay quayFromCache = quayCache.get(quayId);
+    if (quayFromCache != null) {
+      return Optional.of(quayFromCache);
+    }
+    Quay quayFromReadApi = tryFetchWithNotFoundCheck(quayId, quayFetcher);
+    if (quayFromReadApi != null) {
+      StopPlace stopPlaceFromReadApi = stopPlaceForQuayIdFetcher.tryFetch(
+        quayId
+      );
+      StopPlaceId stopPlaceId = new StopPlaceId(stopPlaceFromReadApi.getId());
+      SimpleQuay simpleQuay = new SimpleQuay(
+        QuayCoordinates.of(quayFromReadApi),
+        stopPlaceId
+      );
+      quayCache.put(quayId, simpleQuay);
+      stopPlaceCache.put(
+        stopPlaceId,
+        new SimpleStopPlace(
+          stopPlaceFromReadApi.getName().getValue(),
+          TransportModeAndSubMode.of(stopPlaceFromReadApi)
+        )
+      );
+      return Optional.of(simpleQuay);
+    }
+    return Optional.empty();
   }
 
   @Override
   public String getStopPlaceNameForQuayId(QuayId quayId) {
-    return getDataForQuayId(
-      quayId,
-      stopPlaceNamePerQuayIdCache,
-      stopPlace ->
-        Optional
-          .of(stopPlace.getName())
-          .map(MultilingualString::getValue)
-          .orElse(null)
-    );
-  }
-
-  public <D> D getDataForQuayId(
-    QuayId quayId,
-    Map<QuayId, D> cache,
-    Function<StopPlace, D> dataOfStopPlace
-  ) {
-    // Intentionally not using the "Map.computeIfAbsent()", because we need
-    // to call the readApi from computeIfAbsent, which is somewhat long-running
-    // operation, which holds the RedissonLock.lock, causing java.lang.InterruptedException.
-    D data = cache.get(quayId);
-    if (data == null) {
-      StopPlace stopPlace = tryFetchWithNotFoundCheck(
-        quayId,
-        stopPlaceForQuayIdFetcher
-      );
-      if (stopPlace != null) {
-        D dataFromReadApi = dataOfStopPlace.apply(stopPlace);
-        cache.put(quayId, dataFromReadApi);
-        return dataFromReadApi;
-      }
-    }
-    return data;
+    return stopPlaceCache
+      .get(
+        getQuay(quayId)
+          .orElseThrow(() ->
+            new IllegalStateException(
+              "The quay does not exist, this should be validated beforehand"
+            )
+          )
+          .stopPlaceId()
+      )
+      .name();
   }
 
   @Override
   public void refreshCache() {
     stopPlaceResource.loadStopPlacesDataset();
+    LOGGER.info(
+      "Loaded {} stop places and {} quays from NeTEx dataset",
+      stopPlaceResource.getStopPlaces().size(),
+      stopPlaceResource.getQuays().size()
+    );
 
-    Set<String> stopPlaceIds = stopPlaceResource.getStopPlaceIds();
+    Map<StopPlaceId, SimpleStopPlace> newStopPlaceCache =
+      stopPlaceResource.getStopPlaces();
 
     // TODO: Keep warning logs for testing, remove them later
-    if (stopPlaceIds == null || stopPlaceIds.isEmpty()) {
-      LOGGER.warn("Unable to refresh cache, no stop place ids found");
+    if (newStopPlaceCache.isEmpty()) {
+      LOGGER.warn("Unable to refresh cache, no stop place found");
     } else {
-      stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceIds);
+      stopPlaceCache.keySet().retainAll(newStopPlaceCache.keySet());
+      stopPlaceCache.putAll(newStopPlaceCache);
     }
+    LOGGER.info("Updated Stop place cache");
 
-    Set<String> quayIds = stopPlaceResource.getQuayIds();
-    if (quayIds == null || quayIds.isEmpty()) {
-      LOGGER.warn("Unable to refresh cache, no quay ids found");
+    Map<QuayId, SimpleQuay> newQuayCache = stopPlaceResource.getQuays();
+    if (newQuayCache.isEmpty()) {
+      LOGGER.warn("Unable to refresh cache, no quay found");
     } else {
-      stopPlaceCache.put(QUAY_CACHE_KEY, quayIds);
+      quayCache.keySet().retainAll(newQuayCache.keySet());
+      quayCache.putAll(newQuayCache);
     }
-
-    Map<QuayId, TransportModeAndSubMode> transportModesPerQuayId =
-      stopPlaceResource.getTransportModesPerQuayId();
-    if (transportModesPerQuayId == null || transportModesPerQuayId.isEmpty()) {
-      LOGGER.warn("Unable to refresh cache, no transport modes found");
-    } else {
-      transportModesForQuayIdCache.putAll(transportModesPerQuayId);
-    }
-
-    Map<QuayId, QuayCoordinates> coordinatesPerQuayId =
-      stopPlaceResource.getCoordinatesPerQuayId();
-    if (coordinatesPerQuayId == null || coordinatesPerQuayId.isEmpty()) {
-      LOGGER.warn("Unable to refresh cache, no coordinates found");
-    } else {
-      coordinatesPerQuayIdCache.putAll(coordinatesPerQuayId);
-    }
+    LOGGER.info("Updated Quay cache");
 
     quayIdNotFoundCache.clear();
 
     LOGGER.info(
-      "Updated cache with " +
-      "{} stop places ids, " +
-      "{} quays ids, " +
-      "{} transport modes per quay id, " +
-      "{} coordinates per quay id",
-      stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(),
-      stopPlaceCache.get(QUAY_CACHE_KEY).size(),
-      transportModesForQuayIdCache.size(),
-      coordinatesPerQuayIdCache.size()
+      "Updated cache with " + "{} stop places ids, " + "{} quays ids ",
+      stopPlaceCache.size(),
+      quayCache.size()
     );
   }
 }
