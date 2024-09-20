@@ -1,5 +1,8 @@
 package no.entur.antu.config.cache;
 
+import static no.entur.antu.stop.DefaultStopPlaceRepository.QUAY_ID_CACHE;
+import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_ID_CACHE;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -8,9 +11,11 @@ import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.cache.codec.QuayCoordinatesCodec;
 import no.entur.antu.cache.codec.QuayIdCodec;
+import no.entur.antu.cache.codec.StopPlaceIdCodec;
 import no.entur.antu.cache.codec.TransportModesCodec;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
+import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
@@ -30,8 +35,7 @@ import org.springframework.context.annotation.Configuration;
 public class CacheConfig {
 
   public static final String ORGANISATION_CACHE = "organisationCache";
-  public static final String STOP_PLACE_AND_QUAY_CACHE =
-    "stopPlaceAndQuayCache";
+
   public static final String TRANSPORT_MODES_FOR_QUAY_ID_CACHE =
     "transportModesForQuayIdCache";
   public static final String COORDINATES_PER_QUAY_ID_CACHE =
@@ -49,19 +53,21 @@ public class CacheConfig {
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
   /**
-   * The set of StopPlace ids and Quay ids present in the National Stop Register,
-   * stored under the keys STOP_PLACE_CACHE_KEY and QUAY_CACHE_KEY respectively.
-   * The cache is refreshed  periodically by reading a new NeTEx stop dataset.
+   * The set of StopPlace ids present in the National Stop Register,
+   * The set is refreshed periodically by reading a new NeTEx stop dataset.
    */
-  @Bean(name = STOP_PLACE_AND_QUAY_CACHE)
-  public Map<String, Set<String>> stopPlaceAndQuayCache(
-    RedissonClient redissonClient
-  ) {
-    return getOrCreateApplicationScopedCache(
-      redissonClient,
-      STOP_PLACE_AND_QUAY_CACHE,
-      DEFAULT_CODEC
-    );
+  @Bean(name = STOP_PLACE_ID_CACHE)
+  public Set<StopPlaceId> stopPlaceIdCache(RedissonClient redissonClient) {
+    return redissonClient.getSet(STOP_PLACE_ID_CACHE, new StopPlaceIdCodec());
+  }
+
+  /**
+   * The set of Quay ids present in the National Stop Register,
+   * The set is refreshed periodically by reading a new NeTEx stop dataset.
+   */
+  @Bean(name = QUAY_ID_CACHE)
+  public Set<QuayId> quayIdCache(RedissonClient redissonClient) {
+    return redissonClient.getSet(QUAY_ID_CACHE, new QuayIdCodec());
   }
 
   /**

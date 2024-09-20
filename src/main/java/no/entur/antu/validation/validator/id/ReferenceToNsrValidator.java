@@ -3,7 +3,7 @@ package no.entur.antu.validation.validator.id;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import no.entur.antu.exception.AntuException;
+
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.stop.StopPlaceRepository;
@@ -42,26 +42,16 @@ public class ReferenceToNsrValidator implements ExternalReferenceValidator {
   }
 
   private boolean isValidStopPlaceReference(IdVersion id) {
-    try {
-      return (
-        StopPlaceId.isValid(id.getId()) &&
-        stopPlaceRepository.hasStopPlaceId(new StopPlaceId(id.getId()))
-      );
-    } catch (AntuException ex) {
-      LOGGER.error(ex.getMessage());
-      return false;
-    }
+    return (
+      StopPlaceId.isValid(id.getId()) &&
+      stopPlaceRepository.hasStopPlaceId(new StopPlaceId(id.getId()))
+    );
   }
 
   private boolean isValidQuayReference(IdVersion id) {
-    try {
-      return (
-        QuayId.isValid(id.getId()) &&
-        stopPlaceRepository.hasQuayId(new QuayId(id.getId()))
-      );
-    } catch (AntuException ex) {
-      LOGGER.error(ex.getMessage());
-      return false;
-    }
+    return (
+      QuayId.isValid(id.getId()) &&
+      stopPlaceRepository.hasQuayId(new QuayId(id.getId()))
+    );
   }
 }

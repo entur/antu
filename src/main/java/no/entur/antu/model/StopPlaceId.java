@@ -14,4 +14,13 @@ public record StopPlaceId(String id) {
   public static boolean isValid(String stopPlaceId) {
     return stopPlaceId.contains(":StopPlace:");
   }
+
+  /*
+   * Used to encode data to store in redis.
+   * Caution: Changes in this method can effect data stored in redis.
+   */
+  @Override
+  public String toString() {
+    return id();
+  }
 }

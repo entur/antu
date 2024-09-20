@@ -15,11 +15,10 @@
 
 package no.entur.antu.stop;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
-import no.entur.antu.exception.AntuException;
+import java.util.stream.Collectors;
+
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
@@ -39,11 +38,12 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   private static final Logger LOGGER = LoggerFactory.getLogger(
     DefaultStopPlaceRepository.class
   );
-  public static final String STOP_PLACE_CACHE_KEY = "stopPlaceCache";
-  public static final String QUAY_CACHE_KEY = "quayCache";
+  public static final String STOP_PLACE_ID_CACHE = "stopPlaceCache";
+  public static final String QUAY_ID_CACHE = "quayCache";
 
   private final StopPlaceResource stopPlaceResource;
-  private final Map<String, Set<String>> stopPlaceCache;
+  private final Set<QuayId> quayIds;
+  private final Set<StopPlaceId> stopPlaceIds;
   private final Set<QuayId> quayIdNotFoundCache;
   private final Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache;
   private final Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache;
@@ -53,18 +53,20 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
 
   public DefaultStopPlaceRepository(
-    StopPlaceResource stopPlaceResource,
-    Map<String, Set<String>> stopPlaceCache,
-    Set<QuayId> quayIdNotFoundCache,
-    Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache,
-    Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
-    Map<QuayId, String> stopPlaceNamePerQuayIdCache,
-    NetexEntityFetcher<Quay, QuayId> quayFetcher,
-    NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
-    NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher
+          StopPlaceResource stopPlaceResource,
+          Set<StopPlaceId> stopPlaceIds,
+          Set<QuayId> quayIds,
+          Set<QuayId> quayIdNotFoundCache,
+          Map<QuayId, TransportModeAndSubMode> transportModesForQuayIdCache,
+          Map<QuayId, QuayCoordinates> coordinatesPerQuayIdCache,
+          Map<QuayId, String> stopPlaceNamePerQuayIdCache,
+          NetexEntityFetcher<Quay, QuayId> quayFetcher,
+          NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
+          NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher
   ) {
     this.stopPlaceResource = stopPlaceResource;
-    this.stopPlaceCache = stopPlaceCache;
+    this.quayIds = Objects.requireNonNull(quayIds);
+    this.stopPlaceIds = Objects.requireNonNull(stopPlaceIds);
     this.transportModesForQuayIdCache = transportModesForQuayIdCache;
     this.quayIdNotFoundCache = quayIdNotFoundCache;
     this.coordinatesPerQuayIdCache = coordinatesPerQuayIdCache;
@@ -76,28 +78,42 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
 
   @Override
   public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
-    Set<String> stopPlaceIds = stopPlaceCache.get(STOP_PLACE_CACHE_KEY);
-    if (stopPlaceIds == null) {
-      throw new AntuException("Stop place ids cache not found");
+    if (stopPlaceIds.contains(stopPlaceId)) {
+      return true;
     }
-    boolean idFoundInCache = stopPlaceIds
-      .stream()
-      .anyMatch(id -> id.equals(stopPlaceId.id()));
-    return idFoundInCache || stopPlaceFetcher.tryFetch(stopPlaceId) != null;
+
+    StopPlace stopPlace = stopPlaceFetcher.tryFetch(stopPlaceId);
+    if (stopPlace != null) {
+      stopPlaceIds.add(stopPlaceId);
+      return true;
+    }
+    return false;
   }
 
   @Override
   public boolean hasQuayId(QuayId quayId) {
-    Set<String> quayIds = stopPlaceCache.get(QUAY_CACHE_KEY);
-    if (quayIds == null) {
-      throw new AntuException("Quay ids cache not found");
+    if (quayIds.contains(quayId)) {
+      return true;
     }
-    boolean idFoundInCache = quayIds
-      .stream()
-      .anyMatch(id -> id.equals(quayId.id()));
-    return (
-      idFoundInCache || tryFetchWithNotFoundCheck(quayId, quayFetcher) != null
-    );
+    if (coordinatesPerQuayIdCache.containsKey(quayId)) {
+      return true;
+    }
+
+    Quay quay = tryFetchWithNotFoundCheck(quayId, quayFetcher);
+    if (quay != null) {
+      quayIds.add(quayId);
+      coordinatesPerQuayIdCache.put(quayId, QuayCoordinates.of(quay));
+      StopPlace stopPlace = stopPlaceForQuayIdFetcher.tryFetch(quayId);
+      if (stopPlace != null) {
+        transportModesForQuayIdCache.put(
+          quayId,
+          TransportModeAndSubMode.of(stopPlace)
+        );
+        stopPlaceNamePerQuayIdCache.put(quayId, stopPlace.getName().getValue());
+      }
+      return true;
+    }
+    return false;
   }
 
   private <R> R tryFetchWithNotFoundCheck(
@@ -171,22 +187,39 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   @Override
   public void refreshCache() {
     stopPlaceResource.loadStopPlacesDataset();
+    LOGGER.info("Loaded {} stop places and {} quays from NeTEx dataset", stopPlaceResource
+            .getStopPlaceIds().size(), stopPlaceResource
+            .getQuayIds().size());
 
-    Set<String> stopPlaceIds = stopPlaceResource.getStopPlaceIds();
+    Set<StopPlaceId> newStopPlaceIds = stopPlaceResource
+      .getStopPlaceIds()
+      .stream()
+      .map(StopPlaceId::new)
+      .collect(Collectors.toUnmodifiableSet());
 
     // TODO: Keep warning logs for testing, remove them later
-    if (stopPlaceIds == null || stopPlaceIds.isEmpty()) {
+    if (newStopPlaceIds.isEmpty()) {
       LOGGER.warn("Unable to refresh cache, no stop place ids found");
     } else {
-      stopPlaceCache.put(STOP_PLACE_CACHE_KEY, stopPlaceIds);
+      // TODO redisson bug: cannot use retainAll on the entire collection https://github.com/redisson/redisson/issues/6186
+      stopPlaceIds.removeIf(stopPlaceId -> !newStopPlaceIds.contains(stopPlaceId));
+      stopPlaceIds.addAll(newStopPlaceIds);
     }
+    LOGGER.info("Updated Stop place cache");
 
-    Set<String> quayIds = stopPlaceResource.getQuayIds();
-    if (quayIds == null || quayIds.isEmpty()) {
+    Set<QuayId> newQuayIds = stopPlaceResource
+      .getQuayIds()
+      .stream()
+      .map(QuayId::new)
+      .collect(Collectors.toUnmodifiableSet());
+    if (newQuayIds.isEmpty()) {
       LOGGER.warn("Unable to refresh cache, no quay ids found");
     } else {
-      stopPlaceCache.put(QUAY_CACHE_KEY, quayIds);
+      // TODO redisson bug: cannot use retainAll on the entire collection https://github.com/redisson/redisson/issues/6186
+      quayIds.removeIf(quayId -> !newQuayIds.contains(quayId));
+      quayIds.addAll(newQuayIds);
     }
+    LOGGER.info("Updated Quay cache");
 
     Map<QuayId, TransportModeAndSubMode> transportModesPerQuayId =
       stopPlaceResource.getTransportModesPerQuayId();
@@ -212,8 +245,8 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
       "{} quays ids, " +
       "{} transport modes per quay id, " +
       "{} coordinates per quay id",
-      stopPlaceCache.get(STOP_PLACE_CACHE_KEY).size(),
-      stopPlaceCache.get(QUAY_CACHE_KEY).size(),
+      stopPlaceIds.size(),
+      quayIds.size(),
       transportModesForQuayIdCache.size(),
       coordinatesPerQuayIdCache.size()
     );
