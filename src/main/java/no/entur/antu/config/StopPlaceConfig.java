@@ -22,9 +22,9 @@ import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_CACHE;
 
 import java.util.Map;
 import java.util.Set;
+import no.entur.antu.model.QuayId;
 import no.entur.antu.model.SimpleQuay;
 import no.entur.antu.model.SimpleStopPlace;
-import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.DefaultStopPlaceResource;
