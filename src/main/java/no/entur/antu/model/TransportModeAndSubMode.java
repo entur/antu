@@ -21,7 +21,10 @@ public record TransportModeAndSubMode(
    */
   @Override
   public String toString() {
-    return mode.value() + (subMode != null ? "§" + subMode.name() : "");
+    return (
+      (mode != null ? mode.value() : "") +
+      (subMode != null ? "§" + subMode.name() : "")
+    );
   }
 
   /*

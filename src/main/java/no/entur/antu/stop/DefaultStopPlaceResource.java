@@ -3,17 +3,23 @@ package no.entur.antu.stop;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
 import java.util.stream.Collectors;
-import no.entur.antu.exception.AntuException;
 import no.entur.antu.model.*;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.rutebanken.netex.model.StopPlace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DefaultStopPlaceResource implements StopPlaceResource {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    DefaultStopPlaceResource.class
+  );
   private final StopPlacesDatasetLoader stopPlacesDatasetLoader;
 
-  private NetexEntitiesIndex netexEntitiesIndex;
+  private Map<StopPlaceId, SimpleStopPlace> stopPlaces;
+  private Map<QuayId, SimpleQuay> quays;
+  private boolean parsedDataset;
 
   public DefaultStopPlaceResource(
     StopPlacesDatasetLoader stopPlacesDatasetLoader
@@ -21,35 +27,45 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
     this.stopPlacesDatasetLoader = stopPlacesDatasetLoader;
   }
 
-  public void loadStopPlacesDataset() {
-    netexEntitiesIndex = stopPlacesDatasetLoader.loadNetexEntitiesIndex();
+  @Override
+  public synchronized Map<QuayId, SimpleQuay> getQuays() {
+    init();
+    return quays;
   }
 
   @Override
-  public Map<QuayId, SimpleQuay> getQuays() {
-    return getNetexEntitiesIndex()
-      .getQuayIndex()
-      .getLatestVersions()
-      .stream()
-      .collect(
-        Collectors.toUnmodifiableMap(
-          quay -> new QuayId(quay.getId()),
-          quay ->
-            new SimpleQuay(
-              QuayCoordinates.of(quay),
-              new StopPlaceId(
-                getNetexEntitiesIndex()
-                  .getStopPlaceIdByQuayIdIndex()
-                  .get(quay.getId())
-              )
-            )
-        )
-      );
+  public synchronized Map<StopPlaceId, SimpleStopPlace> getStopPlaces() {
+    init();
+    return stopPlaces;
   }
 
   @Override
-  public Map<StopPlaceId, SimpleStopPlace> getStopPlaces() {
-    return getNetexEntitiesIndex()
+  public synchronized void clear() {
+    quays = null;
+    stopPlaces = null;
+    parsedDataset = false;
+  }
+
+  private void init() {
+    if (parsedDataset) {
+      return;
+    }
+    NetexEntitiesIndex netexEntitiesIndex =
+      stopPlacesDatasetLoader.loadNetexEntitiesIndex();
+    quays = initQuays(netexEntitiesIndex);
+    stopPlaces = initStopPlaces(netexEntitiesIndex);
+    parsedDataset = true;
+    LOGGER.info(
+      "Loaded {} stop places and {} quays from NeTEx dataset",
+      stopPlaces.size(),
+      quays.size()
+    );
+  }
+
+  private static Map<StopPlaceId, SimpleStopPlace> initStopPlaces(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return netexEntitiesIndex
       .getSiteFrames()
       .stream()
       .flatMap(siteFrame -> siteFrame.getStopPlaces().getStopPlace_().stream())
@@ -67,10 +83,26 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
       );
   }
 
-  protected NetexEntitiesIndex getNetexEntitiesIndex() {
-    if (netexEntitiesIndex == null) {
-      throw new AntuException("Stop places dataset not loaded");
-    }
-    return netexEntitiesIndex;
+  private static Map<QuayId, SimpleQuay> initQuays(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return netexEntitiesIndex
+      .getQuayIndex()
+      .getLatestVersions()
+      .stream()
+      .collect(
+        Collectors.toUnmodifiableMap(
+          quay -> new QuayId(quay.getId()),
+          quay ->
+            new SimpleQuay(
+              QuayCoordinates.of(quay),
+              new StopPlaceId(
+                netexEntitiesIndex
+                  .getStopPlaceIdByQuayIdIndex()
+                  .get(quay.getId())
+              )
+            )
+        )
+      );
   }
 }
