@@ -9,7 +9,6 @@ import java.util.Set;
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.cache.codec.QuayIdCodec;
-import no.entur.antu.cache.codec.TransportModeAndSubModeCodec;
 import no.entur.antu.cache.codec.StopPlaceIdCodec;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.SimpleQuay;
