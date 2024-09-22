@@ -45,7 +45,8 @@ public record TransportModeAndSubMode(
         );
       } else {
         throw new AntuException(
-          "Invalid stopPlaceTransportModeAndSubMode string: " + stopPlaceTransportModeAndSubMode
+          "Invalid stopPlaceTransportModeAndSubMode string: " +
+          stopPlaceTransportModeAndSubMode
         );
       }
     }
