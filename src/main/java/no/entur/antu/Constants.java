@@ -50,6 +50,10 @@ public final class Constants {
   public static final String JOB_TYPE_AGGREGATE_REPORTS = "AGGREGATE_REPORTS";
   public static final String JOB_TYPE_AGGREGATE_COMMON_FILES =
     "AGGREGATE_COMMON_FILES";
+  public static final String JOB_TYPE_REFRESH_STOP_CACHE =
+    "REFRESH_STOP_PLACE_CACHE";
+  public static final String JOB_TYPE_REFRESH_ORGANISATION_CACHE =
+    "REFRESH_ORGANISATION_CACHE";
 
   public static final String STATUS_VALIDATION_STARTED = "started";
   public static final String STATUS_VALIDATION_OK = "ok";

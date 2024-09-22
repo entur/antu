@@ -16,6 +16,9 @@
 
 package no.entur.antu.routes.organisation;
 
+import static no.entur.antu.Constants.JOB_TYPE;
+import static no.entur.antu.Constants.JOB_TYPE_REFRESH_ORGANISATION_CACHE;
+
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,12 +48,19 @@ public class OrganisationRouteBuilder extends BaseRouteBuilder {
       "master:lockOnAntuRefreshOrganisationCache:quartz://antu/refreshOrganisationCache?" +
       quartzTrigger
     )
-      .to("direct:refresh-organisation-cache")
+      .setHeader(JOB_TYPE, simple(JOB_TYPE_REFRESH_ORGANISATION_CACHE))
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Scheduling organisation cache refresh job"
+      )
+      .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
       .routeId("refresh-organisation-cache-quartz");
 
-    from("direct:refresh-organisation-cache")
+    from("direct:refreshOrganisationCache")
       .log(LoggingLevel.INFO, correlation() + "Refreshing organisation cache")
+      .process(this::extendAckDeadline)
       .bean("organisationRepository", "refreshCache")
+      .process(this::extendAckDeadline)
       .log(LoggingLevel.INFO, correlation() + "Refreshed organisation cache")
       .routeId("refresh-organisation-cache");
   }
