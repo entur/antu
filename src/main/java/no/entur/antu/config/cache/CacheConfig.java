@@ -8,7 +8,7 @@ import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.cache.codec.QuayCoordinatesCodec;
 import no.entur.antu.cache.codec.QuayIdCodec;
-import no.entur.antu.cache.codec.TransportModesCodec;
+import no.entur.antu.cache.codec.TransportModeAndSubModeCodec;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.TransportModeAndSubMode;
@@ -75,7 +75,7 @@ public class CacheConfig {
     return getOrCreateApplicationScopedCache(
       redissonClient,
       TRANSPORT_MODES_FOR_QUAY_ID_CACHE,
-      new CompositeCodec(new QuayIdCodec(), new TransportModesCodec())
+      new CompositeCodec(new QuayIdCodec(), new TransportModeAndSubModeCodec())
     );
   }
 

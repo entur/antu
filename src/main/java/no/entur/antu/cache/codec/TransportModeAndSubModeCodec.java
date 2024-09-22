@@ -7,11 +7,11 @@ import org.redisson.client.handler.State;
 import org.redisson.client.protocol.Decoder;
 
 /**
- * Codec for TransportModes.
+ * Codec for TransportModeAndSubMode.
  * This codec is used to decode TransportModes from Redis cache.
  * Encoding is done by the toString method in TransportModes.
  */
-public class TransportModesCodec extends StringCodec {
+public class TransportModeAndSubModeCodec extends StringCodec {
 
   @Override
   public Decoder<Object> getValueDecoder() {

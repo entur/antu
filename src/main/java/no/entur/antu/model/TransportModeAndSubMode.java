@@ -4,7 +4,6 @@ import no.entur.antu.exception.AntuException;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.StopPlace;
 
-// TODO rename to TransportModeAndSubmode
 public record TransportModeAndSubMode(
   AllVehicleModesOfTransportEnumeration mode,
   TransportSubMode subMode
@@ -30,10 +29,10 @@ public record TransportModeAndSubMode(
    * Caution: Changes in this method can effect data stored in redis.
    */
   public static TransportModeAndSubMode fromString(
-    String stopPlaceTransportModes
+    String stopPlaceTransportModeAndSubMode
   ) {
-    if (stopPlaceTransportModes != null) {
-      String[] split = stopPlaceTransportModes.split("§");
+    if (stopPlaceTransportModeAndSubMode != null) {
+      String[] split = stopPlaceTransportModeAndSubMode.split("§");
       if (split.length == 1) {
         return new TransportModeAndSubMode(
           AllVehicleModesOfTransportEnumeration.fromValue(split[0]),
@@ -46,7 +45,7 @@ public record TransportModeAndSubMode(
         );
       } else {
         throw new AntuException(
-          "Invalid stopPlaceTransportModes string: " + stopPlaceTransportModes
+          "Invalid stopPlaceTransportModeAndSubMode string: " + stopPlaceTransportModeAndSubMode
         );
       }
     }

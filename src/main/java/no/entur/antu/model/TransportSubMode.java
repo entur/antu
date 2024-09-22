@@ -11,6 +11,9 @@ public record TransportSubMode(String name) {
   }
 
   public static Optional<TransportSubMode> of(StopPlace stopPlace) {
+    if (stopPlace == null || stopPlace.getTransportMode() == null) {
+      return Optional.empty();
+    }
     String subModeName =
       switch (stopPlace.getTransportMode()) {
         case AIR -> stopPlace.getAirSubmode() == null
