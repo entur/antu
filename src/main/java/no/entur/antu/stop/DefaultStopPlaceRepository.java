@@ -173,13 +173,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
 
   @Override
   public void refreshCache() {
-    stopPlaceResource.loadStopPlacesDataset();
-    LOGGER.info(
-      "Loaded {} stop places and {} quays from NeTEx dataset",
-      stopPlaceResource.getStopPlaces().size(),
-      stopPlaceResource.getQuays().size()
-    );
-
+    stopPlaceResource.clear();
     Map<StopPlaceId, SimpleStopPlace> newStopPlaceCache =
       stopPlaceResource.getStopPlaces();
 
@@ -202,6 +196,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
     LOGGER.info("Updated Quay cache");
 
     quayIdNotFoundCache.clear();
+    stopPlaceResource.clear();
 
     LOGGER.info(
       "Updated cache with " + "{} stop places ids, " + "{} quays ids ",
