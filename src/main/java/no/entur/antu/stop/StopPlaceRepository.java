@@ -15,6 +15,7 @@
 
 package no.entur.antu.stop;
 
+import jakarta.annotation.Nullable;
 import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
 import no.entur.antu.model.StopPlaceId;
@@ -40,18 +41,21 @@ public interface StopPlaceRepository {
    * Returns the transport modes for quay id present in the cache or try getting it from Read api.
    * @return transport modes for given quay id.
    */
+  @Nullable
   TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId);
 
   /**
    * Returns the coordinates for quay id present in the cache or try getting it from Read api.
    * @return coordinates for given quay id.
    */
+  @Nullable
   QuayCoordinates getCoordinatesForQuayId(QuayId quayId);
 
   /**
    * Returns the stop place names for quay id present in the cache or try getting it from Read api.
    * @return coordinates for given quay id.
    */
+  @Nullable
   String getStopPlaceNameForQuayId(QuayId quayId);
 
   /**
