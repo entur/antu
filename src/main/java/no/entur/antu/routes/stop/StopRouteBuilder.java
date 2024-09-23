@@ -16,6 +16,8 @@
 
 package no.entur.antu.routes.stop;
 
+import static no.entur.antu.Constants.*;
+
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,13 +50,17 @@ public class StopRouteBuilder extends BaseRouteBuilder {
     )
       .log(
         LoggingLevel.INFO,
-        correlation() + "Refreshing stop place cache periodically"
+        correlation() + "Scheduling stop place cache refresh job"
       )
-      .to("direct:refresh-stop-cache")
+      .setHeader(JOB_TYPE, simple(JOB_TYPE_REFRESH_STOP_CACHE))
+      .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
       .routeId("refresh-stop-cache-periodically");
 
-    from("direct:refresh-stop-cache")
+    from("direct:refreshStopCache")
+      .log(LoggingLevel.INFO, correlation() + "Refreshing stop place cache")
+      .process(this::extendAckDeadline)
       .bean("stopPlaceRepository", "refreshCache")
+      .process(this::extendAckDeadline)
       .log(LoggingLevel.INFO, correlation() + "Refreshed stop place cache")
       .routeId("refresh-stop-cache");
   }

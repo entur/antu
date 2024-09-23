@@ -1,49 +1,30 @@
 package no.entur.antu.stop;
 
 import java.util.Map;
-import java.util.Set;
-import no.entur.antu.model.QuayCoordinates;
 import no.entur.antu.model.QuayId;
-import no.entur.antu.model.TransportModeAndSubMode;
+import no.entur.antu.model.SimpleQuay;
+import no.entur.antu.model.SimpleStopPlace;
+import no.entur.antu.model.StopPlaceId;
 
 /**
  * A resource to query the National Stop Place Register.
  */
 public interface StopPlaceResource {
   /**
-   * Returns all quay ids.
-   *
-   * @return all quay ids.
+   * Return a light-way representation of the stop places in the National Stop Place Register.
+   * Only data relevant to validation is kept.
    */
-  Set<String> getQuayIds();
+  Map<StopPlaceId, SimpleStopPlace> getStopPlaces();
 
   /**
-   * Returns all stop place ids.
-   *
-   * @return all stop place ids.
+   * Return a light-way representation of the quays in the National Stop Place Register.
+   * Only data relevant to validation is kept.
    */
-  Set<String> getStopPlaceIds();
+  Map<QuayId, SimpleQuay> getQuays();
 
   /**
-   * Returns transport modes per quay ids.
-   *
-   * @return map of quay ids and transport mode.
+   * Clear the maps of StopPlaces and Quays.
+   * NSR data will be reloaded the next time {@link #getStopPlaces()} or {@link #getQuays()} are called.
    */
-  Map<QuayId, TransportModeAndSubMode> getTransportModesPerQuayId();
-
-  /**
-   * Returns coordinates per quay ids.
-   *
-   * @return map of quay ids and coordinates.
-   */
-  Map<QuayId, QuayCoordinates> getCoordinatesPerQuayId();
-
-  /**
-   * Returns stop place names per quay ids.
-   *
-   * @return map of quay ids and stop place names.
-   */
-  Map<QuayId, String> getStopPlaceNamesPerQuayId();
-
-  void loadStopPlacesDataset();
+  void clear();
 }
