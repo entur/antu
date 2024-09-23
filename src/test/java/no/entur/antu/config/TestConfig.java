@@ -113,6 +113,11 @@ public class TestConfig {
 
       @Override
       public void refreshCache() {}
+
+      @Override
+      public boolean isEmpty() {
+        return true;
+      }
     };
   }
 }

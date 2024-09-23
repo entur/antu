@@ -47,6 +47,11 @@ class ReferenceToNsrValidatorTest {
 
       @Override
       public void refreshCache() {}
+
+      @Override
+      public boolean isEmpty() {
+        return false;
+      }
     };
 
     referenceToNsrValidator = new ReferenceToNsrValidator(stopPlaceRepository);

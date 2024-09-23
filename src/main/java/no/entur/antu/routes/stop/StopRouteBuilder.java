@@ -56,6 +56,20 @@ public class StopRouteBuilder extends BaseRouteBuilder {
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
       .routeId("refresh-stop-cache-periodically");
 
+    from(
+      "master:lockOnAntuRefreshStopCachePeriodically:timer://antu/refreshStopPlaceCacheAtStartup?repeatCount=1&delay=5000"
+    )
+      .choice()
+      .when(method("stopPlaceRepository", "isEmpty"))
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Stop place cache is empty, priming cache"
+      )
+      .bean("stopPlaceRepository", "refreshCache")
+      .otherwise()
+      .log(LoggingLevel.INFO, correlation() + "Existing stop place cache found")
+      .routeId("prime-stop-cache");
+
     from("direct:refreshStopCache")
       .log(LoggingLevel.INFO, correlation() + "Refreshing stop place cache")
       .process(this::extendAckDeadline)
