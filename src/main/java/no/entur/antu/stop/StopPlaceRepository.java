@@ -46,6 +46,7 @@ public interface StopPlaceRepository {
 
   /**
    * Returns the coordinates for quay id present in the cache or try getting it from Read api.
+   *
    * @return coordinates for given quay id.
    */
   @Nullable
@@ -62,4 +63,9 @@ public interface StopPlaceRepository {
    * Refresh the cache with data retrieved from the Stop Place Register.
    */
   void refreshCache();
+
+  /**
+   * Return true if the repository is not primed.
+   */
+  boolean isEmpty();
 }

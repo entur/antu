@@ -110,6 +110,11 @@ public class DefaultStopPlaceRepository implements StopPlaceRepository {
   }
 
   @Override
+  public boolean isEmpty() {
+    return quayCache.isEmpty() || stopPlaceCache.isEmpty();
+  }
+
+  @Override
   public void refreshCache() {
     stopPlaceResource.clear();
     Map<StopPlaceId, SimpleStopPlace> newStopPlaceCache =
