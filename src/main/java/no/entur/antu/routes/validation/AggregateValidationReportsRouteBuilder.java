@@ -141,7 +141,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
     from("direct:validateDataset")
       .log(
-        LoggingLevel.DEBUG,
+        LoggingLevel.INFO,
         correlation() + "Downloading the aggregated validation report"
       )
       .convertBodyTo(String.class)
@@ -166,7 +166,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         "})"
       )
       .log(
-        LoggingLevel.DEBUG,
+        LoggingLevel.INFO,
         correlation() + "Completed all NeTEx dataset validators"
       )
       .to("direct:completeValidation")

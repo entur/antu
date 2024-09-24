@@ -49,7 +49,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
     NetexXMLParser netexXMLParser,
     NetexSchemaValidator netexSchemaValidator,
     List<NetexValidator> netexValidators,
-    List<NetexDatasetValidator> aggregatedNetexValidators,
+    List<NetexDatasetValidator> netexDatasetValidators,
     List<CommonDataScraper> commonDataScrapers,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -58,7 +58,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
       netexXMLParser,
       netexSchemaValidator,
       netexValidators,
-      aggregatedNetexValidators
+      netexDatasetValidators
     );
     this.netexXMLParser = netexXMLParser;
     this.commonDataScrapers = commonDataScrapers;

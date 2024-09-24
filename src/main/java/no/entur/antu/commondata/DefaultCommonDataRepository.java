@@ -137,6 +137,10 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
 
   @Override
   public void cleanUp(String validationReportId) {
+    LOGGER.info(
+      "Cleaning up common data cache for validation report with id: {}",
+      validationReportId
+    );
     scheduledStopPointAndQuayIdCache.remove(validationReportId);
     serviceLinksAndScheduledStopPointIdsCache.remove(validationReportId);
     lineInfoCache.remove(validationReportId);
