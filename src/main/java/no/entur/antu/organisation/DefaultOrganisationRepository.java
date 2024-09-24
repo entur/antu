@@ -33,8 +33,8 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
   private static final String ORGANISATION_CACHE_KEY_PREFIX =
     "ORGANISATION_CACHE_";
 
-  private static final String REFERENCE_CODESPACE = "codeSpace";
-  private static final String REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST =
+  static final String REFERENCE_CODESPACE = "codeSpace";
+  static final String REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST =
     "netexAuthorityIdsWhitelist";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
@@ -56,8 +56,41 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
   public void refreshCache() {
     Collection<Organisation> organisations =
       organisationResource.getOrganisations();
+    Map<String, Set<String>> authorityIdWhitelistByOrganisation =
+      parseOrganisations(organisations);
 
-    Map<String, Set<String>> authorityIdWhitelistByCodespace = organisations
+    // remove deleted organisations
+    organisationCache
+      .keySet()
+      .retainAll(authorityIdWhitelistByOrganisation.keySet());
+    // update existing organisations and add new ones
+    organisationCache.putAll(authorityIdWhitelistByOrganisation);
+
+    LOGGER.debug(
+      "Updated organisation cache. Cache now has {} elements",
+      organisationCache.size()
+    );
+  }
+
+  @Override
+  public Set<String> getWhitelistedAuthorityIds(String codespace) {
+    Set<String> whitelistedIds = organisationCache.get(
+      getOrganisationKey(codespace)
+    );
+    if (whitelistedIds == null) {
+      return Collections.emptySet();
+    }
+    return whitelistedIds;
+  }
+
+  static String getOrganisationKey(String codespace) {
+    return ORGANISATION_CACHE_KEY_PREFIX + codespace;
+  }
+
+  static Map<String, Set<String>> parseOrganisations(
+    Collection<Organisation> organisations
+  ) {
+    return organisations
       .stream()
       .filter(organisation ->
         organisation.references.containsKey(REFERENCE_CODESPACE)
@@ -82,35 +115,9 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
                   .get(REFERENCE_NETEX_AUTHORITY_IDS_WHITELIST)
                   .split(",")
               )
+              .map(String::strip)
               .collect(Collectors.toUnmodifiableSet())
         )
       );
-
-    // remove deleted organisations
-    organisationCache
-      .keySet()
-      .retainAll(authorityIdWhitelistByCodespace.keySet());
-    // update existing organisations and add new ones
-    organisationCache.putAll(authorityIdWhitelistByCodespace);
-
-    LOGGER.debug(
-      "Updated organisation cache. Cache now has {} elements",
-      organisationCache.size()
-    );
-  }
-
-  @Override
-  public Set<String> getWhitelistedAuthorityIds(String codespace) {
-    Set<String> whitelistedIds = organisationCache.get(
-      getOrganisationKey(codespace)
-    );
-    if (whitelistedIds == null) {
-      return Collections.emptySet();
-    }
-    return whitelistedIds;
-  }
-
-  private static String getOrganisationKey(String codespace) {
-    return ORGANISATION_CACHE_KEY_PREFIX + codespace;
   }
 }
