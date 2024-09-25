@@ -123,7 +123,10 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
   protected void postPrepareValidationContext(
     ValidationContext validationContext
   ) {
-    LOGGER.info("Starting data scraping for file {}", validationContext.getFileName());
+    LOGGER.info(
+      "Starting data scraping for file {}",
+      validationContext.getFileName()
+    );
     if (!validationContext.isCommonFile()) {
       commonDataScrapers.forEach(commonDataScraper ->
         commonDataScraper.scrapeData(validationContext)

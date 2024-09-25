@@ -90,7 +90,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
       // TODO: Not throwing exception for now, for testing.
       LOGGER.warn("No line info cache found.");
       return List.of();
-/*
+      /*
       throw new AntuException(
         "Line names not found for validation report with id: " +
         validationReportId
