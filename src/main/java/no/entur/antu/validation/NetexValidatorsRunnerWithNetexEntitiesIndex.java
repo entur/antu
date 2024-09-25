@@ -19,12 +19,18 @@ import org.entur.netex.validation.validator.id.NetexIdExtractorHelper;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a Netex validator runner with NetexEntitiesIndex.
  */
 public class NetexValidatorsRunnerWithNetexEntitiesIndex
   extends NetexValidatorsRunner {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    NetexValidatorsRunnerWithNetexEntitiesIndex.class
+  );
 
   private final NetexXMLParser netexXMLParser;
   private final CommonDataRepository commonDataRepository;
@@ -117,6 +123,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
   protected void postPrepareValidationContext(
     ValidationContext validationContext
   ) {
+    LOGGER.info("Starting data scraping for file {}", validationContext.getFileName());
     if (!validationContext.isCommonFile()) {
       commonDataScrapers.forEach(commonDataScraper ->
         commonDataScraper.scrapeData(validationContext)
