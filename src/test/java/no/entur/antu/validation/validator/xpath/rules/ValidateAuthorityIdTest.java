@@ -47,6 +47,11 @@ class ValidateAuthorityIdTest {
         public void refreshCache() {}
 
         @Override
+        public boolean isEmpty() {
+          return false;
+        }
+
+        @Override
         public Set<String> getWhitelistedAuthorityIds(String codespace) {
           return Set.of(TEST_VALID_AUTHORITY_ID);
         }

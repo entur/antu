@@ -56,6 +56,23 @@ public class OrganisationRouteBuilder extends BaseRouteBuilder {
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
       .routeId("refresh-organisation-cache-quartz");
 
+    from(
+      "master:lockOnAntuRefreshOrganisationCachePeriodically:timer://antu/refreshOrganisationCacheAtStartup?repeatCount=1&delay=5000"
+    )
+      .choice()
+      .when(method("organisationRepository", "isEmpty"))
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Organisation cache is empty, priming cache"
+      )
+      .bean("organisationRepository", "refreshCache")
+      .otherwise()
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Existing organisation cache found"
+      )
+      .routeId("prime-organisation-cache");
+
     from("direct:refreshOrganisationCache")
       .log(LoggingLevel.INFO, correlation() + "Refreshing organisation cache")
       .process(this::extendAckDeadline)

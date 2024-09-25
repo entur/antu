@@ -70,6 +70,11 @@ public class TestConfig {
       public void refreshCache() {}
 
       @Override
+      public boolean isEmpty() {
+        return false;
+      }
+
+      @Override
       public Set<String> getWhitelistedAuthorityIds(String codespace) {
         if ("avi".equals(codespace)) {
           return Set.of("AVI:Authority:Avinor");

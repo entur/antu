@@ -34,6 +34,11 @@ class XpathValidatorIntegrationTest {
         public void refreshCache() {}
 
         @Override
+        public boolean isEmpty() {
+          return false;
+        }
+
+        @Override
         public Set<String> getWhitelistedAuthorityIds(String codespace) {
           return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
         }
