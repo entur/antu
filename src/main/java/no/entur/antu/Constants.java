@@ -92,8 +92,6 @@ public final class Constants {
   public static final String VALIDATION_CORRELATION_ID_HEADER =
     "EnturValidationCorrelationId";
 
-  public static final String HAS_VALIDATION_ERRORS = "hasValidationErrors";
-
   public static final String VALIDATION_CLIENT_MARDUK = "Marduk";
   public static final String VALIDATION_CLIENT_KAKKA = "Kakka";
 

@@ -24,7 +24,6 @@ import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.HAS_VALIDATION_ERRORS;
 import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE_DATASET;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
@@ -131,18 +130,17 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         PROP_STOP_WATCH +
         ".taken()} ms"
       )
-      .setHeader(HAS_VALIDATION_ERRORS, simple("${body.hasError()}"))
-      .marshal()
-      .json(JsonLibrary.Jackson)
-      .to("direct:uploadValidationReport")
       .choice()
-      .when(header(HAS_VALIDATION_ERRORS))
+      .when(simple("${body.hasError()}"))
       .log(
         LoggingLevel.INFO,
         correlation() + "Validation errors found, skipping dataset validation"
       )
       .to("direct:completeValidation")
       .otherwise()
+      .marshal()
+      .json(JsonLibrary.Jackson)
+      .to("direct:uploadValidationReport")
       .setBody(header(NETEX_FILE_NAME))
       .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE_DATASET))
       .convertHeaderTo(REPORT_CREATION_DATE, String.class)
@@ -181,13 +179,12 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() + "Completed all NeTEx dataset validators"
       )
-      .setHeader(HAS_VALIDATION_ERRORS, simple("${body.hasError()}"))
       .to("direct:completeValidation")
       .routeId("validate-dataset");
 
     from("direct:completeValidation")
       .choice()
-      .when(header(HAS_VALIDATION_ERRORS))
+      .when(simple("${body.hasError()}"))
       .setHeader(DATASET_STATUS, constant(STATUS_VALIDATION_FAILED))
       .log(LoggingLevel.INFO, correlation() + "Validation errors found")
       .otherwise()
