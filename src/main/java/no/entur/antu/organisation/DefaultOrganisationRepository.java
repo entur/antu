@@ -73,6 +73,11 @@ public class DefaultOrganisationRepository implements OrganisationRepository {
   }
 
   @Override
+  public boolean isEmpty() {
+    return organisationCache.isEmpty();
+  }
+
+  @Override
   public Set<String> getWhitelistedAuthorityIds(String codespace) {
     Set<String> whitelistedIds = organisationCache.get(
       getOrganisationKey(codespace)

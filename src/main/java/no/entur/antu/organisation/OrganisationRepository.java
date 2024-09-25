@@ -27,6 +27,11 @@ public interface OrganisationRepository {
   void refreshCache();
 
   /**
+   * Return true if the repository is not primed.
+   */
+  boolean isEmpty();
+
+  /**
    * Return the set of whitelisted authorities for a given codespace.
    * @param codespace the dataset codespace
    * @return the set of whitelisted authorities for the codespace.
