@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
 
-  private static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
+  public static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
   private static final String PROP_ALL_NETEX_FILE_NAMES =
     "ALL_NETEX_FILE_NAMES";
   private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
@@ -70,6 +70,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .to("direct:downloadSingleNetexFileFromMemoryStore")
       .setProperty(PROP_NETEX_FILE_CONTENT, body())
       .to("direct:runNetexValidators")
+      .to("direct:storeCommonData")
       // Duplicated PubSub messages are detected when trying to download the NeTEx file:
       // it does not exist anymore after the report is generated and all temporary files are deleted
       .doCatch(AntuMemoryStoreFileNotFoundException.class)
