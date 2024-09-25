@@ -87,15 +87,10 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   public List<LineInfo> getLineNames(String validationReportId) {
     List<String> lineInfoForReportId = lineInfoCache.get(validationReportId);
     if (lineInfoForReportId == null) {
-      // TODO: Not throwing exception for now, for testing.
-      LOGGER.warn("No line info cache found.");
-      return List.of();
-      /*
       throw new AntuException(
         "Line names not found for validation report with id: " +
         validationReportId
       );
-*/
     }
     return lineInfoForReportId.stream().map(LineInfo::fromString).toList();
   }
