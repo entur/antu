@@ -22,7 +22,6 @@ import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
 import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
-import static no.entur.antu.Constants.NETEX_COMMON_FILE_NAME;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER;
@@ -79,7 +78,6 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
       })
       .choice()
       .when(header(DATASET_NB_COMMON_FILES).isGreaterThan(0))
-      .to("direct:parseAndStoreCommonData")
       .to("direct:createCommonFilesValidationJobs")
       .otherwise()
       // skip the common file barrier and go directly to the line file job creation step
@@ -154,22 +152,6 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
       )
       .setBody(constant(""))
       .routeId("upload-single-netex-files");
-
-    from("direct:parseAndStoreCommonData")
-      .log(LoggingLevel.DEBUG, correlation() + "Start parsing common files")
-      .split(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
-      .filter(body().startsWith("_"))
-      .setHeader(
-        Constants.DATASET_NB_NETEX_FILES,
-        exchangeProperty(Exchange.SPLIT_SIZE)
-      )
-      .setHeader(NETEX_COMMON_FILE_NAME, body())
-      .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
-      .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
-      .to("direct:storeCommonData")
-      //end split
-      .end()
-      .routeId("create-parse-and-store-common-data-jobs");
 
     from("direct:createCommonFilesValidationJobs")
       .log(
