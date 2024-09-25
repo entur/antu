@@ -19,10 +19,9 @@
 package no.entur.antu.routes.validation;
 
 import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.NETEX_COMMON_FILE_NAME;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.PROP_NETEX_FILE_CONTENT;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
-import static no.entur.antu.routes.memorystore.MemoryStoreRoute.MEMORY_STORE_FILE_NAME;
 
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
@@ -48,17 +47,19 @@ public class ParseAndStoreCommonDataRouteBuilder extends BaseRouteBuilder {
     super.configure();
 
     from("direct:storeCommonData")
+      .filter(header(NETEX_FILE_NAME).startsWith("_"))
       .log(
         LoggingLevel.INFO,
-        correlation() + "Parsing NeTEx file ${header." + FILE_HANDLE + "}"
+        correlation() +
+        "Extracting common data from NeTEx file ${header." +
+        NETEX_FILE_NAME +
+        "}"
       )
       .setProperty(PROP_STOP_WATCH, StopWatch::new)
       .doTry()
-      .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_COMMON_FILE_NAME))
-      .to("direct:downloadSingleNetexFileFromMemoryStore")
       .process(exchange ->
         netexDataRepository.fillNetexDataCache(
-          exchange.getIn().getBody(byte[].class),
+          exchange.getProperty(PROP_NETEX_FILE_CONTENT, byte[].class),
           exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class)
         )
       )
@@ -77,7 +78,7 @@ public class ParseAndStoreCommonDataRouteBuilder extends BaseRouteBuilder {
       .log(
         LoggingLevel.INFO,
         correlation() +
-        "Parsed NeTEx file ${header." +
+        "Extracted common data from NeTEx file ${header." +
         NETEX_FILE_NAME +
         "} in " +
         "${exchangeProperty." +
