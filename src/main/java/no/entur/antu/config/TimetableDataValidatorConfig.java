@@ -287,7 +287,7 @@ public class TimetableDataValidatorConfig {
       netexXMLParser,
       netexSchemaValidator,
       netexTimetableDataValidators,
-      List.of(),
+      netexTimetableDatasetValidators,
       commonDataScrapers,
       commonDataRepository,
       stopPlaceRepository
