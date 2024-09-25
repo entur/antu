@@ -57,7 +57,7 @@ public class OrganisationRouteBuilder extends BaseRouteBuilder {
       .routeId("refresh-organisation-cache-quartz");
 
     from(
-      "master:lockOnAntuRefreshOrganisationCachePeriodically:timer://antu/refreshOrganisationCacheAtStartup?repeatCount=1&delay=5000"
+      "master:lockOnAntuRefreshOrganisationCache:timer://antu/refreshOrganisationCacheAtStartup?repeatCount=1&delay=5000"
     )
       .choice()
       .when(method("organisationRepository", "isEmpty"))
