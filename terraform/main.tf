@@ -141,7 +141,7 @@ resource "google_redis_instance" "antu-redis" {
   tier                    = "STANDARD_HA"
   memory_size_gb          = 5
 
-  redis_version           = "REDIS_6_X"
+  redis_version           = "REDIS_7_0"
   authorized_network      = data.google_compute_network.main_network_project_vpc.id
   connect_mode            = "PRIVATE_SERVICE_ACCESS"
   region                  = var.gcp_region
