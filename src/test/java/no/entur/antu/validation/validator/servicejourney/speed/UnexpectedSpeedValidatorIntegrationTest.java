@@ -55,12 +55,12 @@ class UnexpectedSpeedValidatorIntegrationTest {
         JAXBValidationContext.class
       );
 
-      NetexDataRepository commonDataRepository = Mockito.mock(
+      NetexDataRepository netexDataRepository = Mockito.mock(
         NetexDataRepository.class
       );
 
       Mockito
-        .when(commonDataRepository.hasQuayIds(anyString()))
+        .when(netexDataRepository.hasQuayIds(anyString()))
         .thenReturn(false);
 
       when(validationContext.isCommonFile()).thenReturn(false);
@@ -69,7 +69,7 @@ class UnexpectedSpeedValidatorIntegrationTest {
       when(validationContext.getNetexEntitiesIndex())
         .thenReturn(netexEntitiesIndex);
       when(validationContext.getNetexDataRepository())
-        .thenReturn(commonDataRepository);
+        .thenReturn(netexDataRepository);
       when(validationContext.getStopPlaceRepository())
         .thenReturn(mock(StopPlaceRepository.class));
 

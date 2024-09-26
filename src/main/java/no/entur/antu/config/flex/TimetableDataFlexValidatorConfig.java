@@ -143,7 +143,7 @@ public class TimetableDataFlexValidatorConfig {
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
     InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
-    NetexDataRepository commonDataRepository,
+    NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
     List<XPathValidator> xpathValidators = List.of(
@@ -166,7 +166,7 @@ public class TimetableDataFlexValidatorConfig {
       jaxbValidators,
       List.of(),
       List.of(),
-      commonDataRepository,
+      netexDataRepository,
       stopPlaceRepository
     );
   }
@@ -190,7 +190,7 @@ public class TimetableDataFlexValidatorConfig {
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
     InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
-    NetexDataRepository commonDataRepository,
+    NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
     List<XPathValidator> xpathValidators = List.of(
@@ -215,7 +215,7 @@ public class TimetableDataFlexValidatorConfig {
       jaxbValidators,
       List.of(),
       List.of(),
-      commonDataRepository,
+      netexDataRepository,
       stopPlaceRepository
     );
   }

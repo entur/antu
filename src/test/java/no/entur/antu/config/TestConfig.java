@@ -15,7 +15,7 @@ public class TestConfig {
 
   @Bean
   @Primary
-  public NetexDataRepository commonDataRepository() {
+  public NetexDataRepository netexDataRepository() {
     return new NetexDataRepository() {
       @Override
       public boolean hasQuayIds(String validationReportId) {
@@ -23,7 +23,7 @@ public class TestConfig {
       }
 
       @Override
-      public QuayId findQuayIdForScheduledStopPoint(
+      public QuayId quayIdForScheduledStopPoint(
         ScheduledStopPointId scheduledStopPointId,
         String validationReportId
       ) {
@@ -31,7 +31,7 @@ public class TestConfig {
       }
 
       @Override
-      public FromToScheduledStopPointId findFromToScheduledStopPointIdForServiceLink(
+      public FromToScheduledStopPointId fromToScheduledStopPointIdForServiceLink(
         ServiceLinkId serviceLinkId,
         String validationReportId
       ) {
@@ -39,12 +39,27 @@ public class TestConfig {
       }
 
       @Override
-      public List<SimpleLine> getLineNames(String validationReportId) {
+      public List<SimpleLine> lineNames(String validationReportId) {
         return List.of();
       }
 
       @Override
-      public void loadCommonDataCache(
+      public List<ServiceJourneyStop> serviceJourneyStops(
+        String validationReportId,
+        ServiceJourneyId serviceJourneyId
+      ) {
+        return List.of();
+      }
+
+      @Override
+      public List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos(
+        String validationReportId
+      ) {
+        return List.of();
+      }
+
+      @Override
+      public void fillNetexDataCache(
         byte[] fileContent,
         String validationReportId
       ) {}

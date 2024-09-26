@@ -1,11 +1,12 @@
 package no.entur.antu.validation.validator.servicejourney.passingtime;
 
 import no.entur.antu.validation.ValidationError;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 
 public record NonIncreasingPassingTimeError(
   RuleCode ruleCode,
   String stopPointName,
-  String serviceJourneyId
+  ServiceJourneyId serviceJourneyId
 )
   implements ValidationError {
   @Override
@@ -15,7 +16,7 @@ public record NonIncreasingPassingTimeError(
 
   @Override
   public String getEntityId() {
-    return serviceJourneyId;
+    return serviceJourneyId.id();
   }
 
   @Override
