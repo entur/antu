@@ -57,7 +57,7 @@ public class ParseAndStoreCommonDataRouteBuilder extends BaseRouteBuilder {
       .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_COMMON_FILE_NAME))
       .to("direct:downloadSingleNetexFileFromMemoryStore")
       .process(exchange ->
-        commonDataRepository.loadCommonDataCache(
+        commonDataRepository.fillCommonDataCache(
           exchange.getIn().getBody(byte[].class),
           exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class)
         )

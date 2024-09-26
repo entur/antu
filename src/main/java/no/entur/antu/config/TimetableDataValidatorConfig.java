@@ -19,14 +19,17 @@ package no.entur.antu.config;
 import java.util.List;
 import java.util.Set;
 import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.commondata.CommonDataScraper;
-import no.entur.antu.commondata.LineInfoScraper;
+import no.entur.antu.commondata.scraper.CommonDataScraper;
+import no.entur.antu.commondata.scraper.LineInfoScraper;
+import no.entur.antu.commondata.scraper.ServiceJourneyStopsScraper;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterchangeDistanceValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
+import no.entur.antu.validation.validator.interchange.stoppoints.StopPointsInVehicleJourneyValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.identicalstoppoints.IdenticalStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRefValidator;
@@ -210,6 +213,28 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new UnexpectedInterchangeDistanceValidator(
+      validationReportEntryFactory
+    );
+  }
+
+  @Bean
+  public StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new StopPointsInVehicleJourneyValidator(
+      validationReportEntryFactory
+    );
+  }
+
+  @Bean
   public DuplicateLineNameValidator duplicateLineNameValidator(
     @Qualifier(
       "validationReportEntryFactory"
@@ -247,8 +272,11 @@ public class TimetableDataValidatorConfig {
     MismatchedStopPointsValidator mismatchedStopPointsValidator,
     MandatoryFieldsValidator mandatoryFieldsValidator,
     DuplicateInterchangesValidator duplicateInterchangesValidator,
+    UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator,
+    StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
     LineInfoScraper lineInfoScraper,
+    ServiceJourneyStopsScraper serviceJourneyStopsScraper,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
@@ -274,14 +302,19 @@ public class TimetableDataValidatorConfig {
       unexpectedDistanceInServiceLinkValidator,
       mismatchedStopPointsValidator,
       mandatoryFieldsValidator,
-      duplicateInterchangesValidator
+      duplicateInterchangesValidator,
+      unexpectedInterchangeDistanceValidator,
+      stopPointsInVehicleJourneyValidator
     );
 
     List<NetexDatasetValidator> netexTimetableDatasetValidators = List.of(
       duplicateLineNameValidator
     );
 
-    List<CommonDataScraper> commonDataScrapers = List.of(lineInfoScraper);
+    List<CommonDataScraper> commonDataScrapers = List.of(
+      lineInfoScraper,
+      serviceJourneyStopsScraper
+    );
 
     return new NetexValidatorsRunnerWithNetexEntitiesIndex(
       netexXMLParser,

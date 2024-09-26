@@ -111,3 +111,15 @@ validationRuleConfigs:
   - code: DUPLICATE_LINE_NAME
     name: Duplicate line names found
     severity: WARNING
+  - code: DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_MAX_LIMIT
+    name: Distance between stop points in interchange is more than maximum limit
+    severity: WARNING
+  - code: DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_WARNING_LIMIT
+    name: Distance between stop points in interchange is more than warning limit
+    severity: WARNING
+  - code: FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF
+    name: FromPointRef in interchange is not a part of FromJourneyRef
+    severity: WARNING
+  - code: TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF
+    name: ToPointRef in interchange is not a part of ToJourneyRef
+    severity: WARNING
