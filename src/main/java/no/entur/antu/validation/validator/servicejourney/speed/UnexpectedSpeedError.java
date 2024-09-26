@@ -2,9 +2,10 @@ package no.entur.antu.validation.validator.servicejourney.speed;
 
 import no.entur.antu.validation.ValidationError;
 import no.entur.antu.validation.utilities.Comparison;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 
 public record UnexpectedSpeedError(
-  String serviceJourneyId,
+  ServiceJourneyId serviceJourneyId,
   String fromStopPointName,
   String toStopPointName,
   RuleCode ruleCode,
@@ -35,7 +36,7 @@ public record UnexpectedSpeedError(
 
   @Override
   public String getEntityId() {
-    return serviceJourneyId;
+    return serviceJourneyId.id();
   }
 
   @Override

@@ -13,6 +13,8 @@ import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
@@ -182,10 +184,18 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
         )
         .mapToObj(index ->
           new NetexTestFragment.CreateServiceJourneyInterchange()
-            .withFromJourneyRef(serviceJourneys.get(index * 2).getId())
-            .withToJourneyRef(serviceJourneys.get((index * 2) + 1).getId())
-            .withFromPointRef("TST:ScheduledStopPoint:" + (index + 1))
-            .withToPointRef("TST:ScheduledStopPoint:" + (index + 2))
+            .withFromJourneyRef(
+              ServiceJourneyId.ofValidId(serviceJourneys.get(index * 2))
+            )
+            .withToJourneyRef(
+              ServiceJourneyId.ofValidId(serviceJourneys.get((index * 2) + 1))
+            )
+            .withFromPointRef(
+              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1))
+            )
+            .withToPointRef(
+              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 2))
+            )
         )
         .toList();
 

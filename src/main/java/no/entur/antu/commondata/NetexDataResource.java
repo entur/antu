@@ -16,9 +16,12 @@ import org.rutebanken.netex.model.ServiceFrame;
 
 /**
  * Represents a resource for common data.
- * This resource is used to load and retrieve common data from the Netex Common file.
+ * This resource is used to load and retrieve common data from the Netex Common file,
+ * and from the line files, which is used and to be validated across the line files.
+ *  For example: For validating the duplicate line names and interchanges,
+ *  need to be validated across the line files.
  */
-public class CommonDataResource {
+public class NetexDataResource {
 
   private NetexEntitiesIndex netexEntitiesIndex;
 

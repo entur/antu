@@ -38,19 +38,17 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndNoDeadRunShouldFail()
     throws IOException {
-    NetexDataRepository commonDataRepository = Mockito.mock(
+    NetexDataRepository netexDataRepository = Mockito.mock(
       NetexDataRepository.class
     );
 
     // Mocking that the quay ids are not present in the common data repository.
     // Validator will try to fetch quay ids from the line file instead.
-    Mockito
-      .when(commonDataRepository.hasQuayIds(anyString()))
-      .thenReturn(false);
+    Mockito.when(netexDataRepository.hasQuayIds(anyString())).thenReturn(false);
 
     ValidationReport validationReport = getValidationReport(
       TEST_FILE_WITH_NO_COMPOSITE_FRAME,
-      commonDataRepository
+      netexDataRepository
     );
 
     assertFalse(validationReport.getValidationReportEntries().isEmpty());
@@ -64,19 +62,17 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndWithAllDeadRun()
     throws IOException {
-    NetexDataRepository commonDataRepository = Mockito.mock(
+    NetexDataRepository netexDataRepository = Mockito.mock(
       NetexDataRepository.class
     );
 
     // Mocking that the quay ids are not present in the common data repository.
     // Validator will try to fetch quay ids from the line file instead.
-    Mockito
-      .when(commonDataRepository.hasQuayIds(anyString()))
-      .thenReturn(false);
+    Mockito.when(netexDataRepository.hasQuayIds(anyString())).thenReturn(false);
 
     ValidationReport validationReport = getValidationReport(
       TEST_FILE_WITH_NO_COMPOSITE_FRAME_DEAD_RUN,
-      commonDataRepository
+      netexDataRepository
     );
 
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
@@ -84,7 +80,7 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(
     String testFile,
-    NetexDataRepository commonDataRepository
+    NetexDataRepository netexDataRepository
   ) throws IOException {
     String validationReportId = "Test1122";
     ValidationReport testValidationReport = new ValidationReport(
@@ -118,7 +114,7 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       when(validationContext.getNetexEntitiesIndex())
         .thenReturn(netexEntitiesIndex);
       when(validationContext.getNetexDataRepository())
-        .thenReturn(commonDataRepository);
+        .thenReturn(netexDataRepository);
       when(validationContext.getStopPlaceRepository())
         .thenReturn(stopPlaceRepository);
 
