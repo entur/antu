@@ -12,7 +12,7 @@ import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class MismatchedTransportModeValidator extends AntuNetexValidator {
   @Override
   public void validate(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    XPathValidationContext validationContext
   ) {
     if (validationContext.isCommonFile()) {
       // ServiceJourneys and Line only appear in the Line file.

@@ -29,9 +29,9 @@ import no.entur.antu.validation.validator.id.NetexIdValidator;
 import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
 import org.entur.netex.validation.configuration.ValidationConfigLoader;
 import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
-import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.BlockJourneyReferencesIgnorer;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
@@ -156,7 +156,7 @@ public class TimetableDataSwedenValidatorConfig {
     ) NetexReferenceValidator swedenNetexReferenceValidator,
     NetexIdUniquenessValidator netexIdUniquenessValidator
   ) {
-    List<NetexValidator> netexValidators = List.of(
+    List<XPathValidator> netexValidators = List.of(
       swedenXPathValidator,
       netexIdValidator,
       versionOnLocalNetexIdValidator,

@@ -3,15 +3,15 @@ package no.entur.antu.validation.flex.validator;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
-import org.entur.netex.validation.validator.AbstractNetexValidator;
+import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FileNameValidator extends AbstractNetexValidator {
+public class FileNameValidator extends AbstractXPathValidator {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     FileNameValidator.class
@@ -34,7 +34,7 @@ public class FileNameValidator extends AbstractNetexValidator {
   @Override
   public void validate(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    XPathValidationContext validationContext
   ) {
     String fileName = validationContext.getFileName();
 

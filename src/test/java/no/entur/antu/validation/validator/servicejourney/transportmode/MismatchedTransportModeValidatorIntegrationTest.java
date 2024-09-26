@@ -17,7 +17,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
@@ -69,7 +69,9 @@ class MismatchedTransportModeValidatorIntegrationTest {
     ) {
       assert testDatasetAsStream != null;
 
-      ValidationContext validationContext = mock(ValidationContext.class);
+      XPathValidationContext validationContext = mock(
+        XPathValidationContext.class
+      );
 
       NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
       when(validationContext.getNetexXMLParser()).thenReturn(netexXMLParser);

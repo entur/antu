@@ -41,9 +41,9 @@ import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanc
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.NetexDatasetValidator;
-import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
@@ -254,7 +254,7 @@ public class TimetableDataValidatorConfig {
   ) {
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
 
-    List<NetexValidator> netexTimetableDataValidators = List.of(
+    List<XPathValidator> netexTimetableDataValidators = List.of(
       xpathValidator,
       netexIdValidator,
       versionOnLocalNetexIdValidator,

@@ -14,14 +14,14 @@ import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.model.TransportSubMode;
 import org.entur.netex.validation.Constants;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public record MismatchedTransportModeContext(
-  ValidationContext validationContext,
+  XPathValidationContext validationContext,
   XdmItem serviceJourneyItem,
   String serviceJourneyId,
   TransportModeAndSubMode transportModeAndSubMode,
@@ -78,11 +78,11 @@ public record MismatchedTransportModeContext(
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
-    private final ValidationContext validationContext;
+    private final XPathValidationContext validationContext;
     private final TransportModeAndSubMode transportModeAndSubModeForLine;
     private final String pathToFrames;
 
-    public Builder(ValidationContext validationContext) {
+    public Builder(XPathValidationContext validationContext) {
       this.validationContext = validationContext;
       this.pathToFrames =
         isCompositeFrameExists()

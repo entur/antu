@@ -6,7 +6,7 @@ import java.util.Map;
 import no.entur.antu.model.LineInfo;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class LineInfoScraper implements CommonDataScraper {
   }
 
   @Override
-  public void scrapeData(ValidationContext validationContext) {
+  public void scrapeData(XPathValidationContext validationContext) {
     if (
       validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
     ) {
