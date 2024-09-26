@@ -9,6 +9,7 @@ import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.rutebanken.netex.model.DeadRun;
 import org.rutebanken.netex.model.Journey_VersionStructure;
@@ -48,7 +49,7 @@ public class MissingPassengerStopAssignmentValidator
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating Stop place in journey pattern");
@@ -84,7 +85,7 @@ public class MissingPassengerStopAssignmentValidator
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     // StopPoints and JourneyPatterns only appear in the Line file.

@@ -6,13 +6,12 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
-import no.entur.antu.validation.AntuNetexData;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.junit.jupiter.api.Test;
 
 class UnexpectedDistanceInServiceLinkValidatorIntegrationTest {
@@ -48,15 +47,17 @@ class UnexpectedDistanceInServiceLinkValidatorIntegrationTest {
         testDatasetAsStream
       );
 
-      ValidationContextWithNetexEntitiesIndex validationContext = mock(
-        ValidationContextWithNetexEntitiesIndex.class
+      JAXBValidationContext validationContext = mock(
+        JAXBValidationContext.class
       );
 
       when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getAntuNetexData())
-        .thenReturn(
-          new AntuNetexData(validationReportId, netexEntitiesIndex, null, null)
-        );
+      when(validationContext.getValidationReportId())
+        .thenReturn(validationReportId);
+      when(validationContext.getNetexEntitiesIndex())
+        .thenReturn(netexEntitiesIndex);
+      when(validationContext.getNetexDataRepository()).thenReturn(null);
+      when(validationContext.getStopPlaceRepository()).thenReturn(null);
 
       UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator =
         new UnexpectedDistanceInServiceLinkValidator(

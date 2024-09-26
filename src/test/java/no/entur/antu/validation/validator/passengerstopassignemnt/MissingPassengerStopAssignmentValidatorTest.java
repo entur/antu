@@ -5,14 +5,14 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 import java.util.stream.IntStream;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex.validation.validator.model.QuayId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.DeadRun;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -250,7 +250,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
         );
       });
 
-    mockNoQuayIdsInCommonDataRepository();
+    mockNoQuayIdsInNetexDataRepository();
 
     ValidationReport validationReport = runValidation(
       createNetexEntitiesIndex.create()

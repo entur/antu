@@ -1,6 +1,6 @@
 package no.entur.antu.stoptime;
 
-import no.entur.antu.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**

@@ -10,12 +10,12 @@ import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.cache.codec.QuayIdCodec;
 import no.entur.antu.cache.codec.StopPlaceIdCodec;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.SimpleQuay;
-import no.entur.antu.model.SimpleStopPlace;
-import no.entur.antu.model.StopPlaceId;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
+import org.entur.netex.validation.validator.model.QuayId;
+import org.entur.netex.validation.validator.model.SimpleQuay;
+import org.entur.netex.validation.validator.model.SimpleStopPlace;
+import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.options.LocalCachedMapOptions;
@@ -36,7 +36,7 @@ public class CacheConfig {
   public static final String SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE =
     "scheduledStopPointAndQuayIdCache";
   public static final String SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE =
-    "serviceLinksAndScheduledStopPointIdsCache";
+    "serviceLinksAndFromToScheduledStopPointIdCache";
   public static final String LINE_INFO_CACHE = "linesInfoCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
 
@@ -131,7 +131,7 @@ public class CacheConfig {
    * The cache key is the current validation report.
    */
   @Bean(name = SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE)
-  public Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache(
+  public Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache(
     RedissonClient redissonClient
   ) {
     return getOrCreateReportScopedCache(

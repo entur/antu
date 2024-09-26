@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.validation.AntuNetexData;
+import org.entur.netex.validation.validator.model.FromToScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ServiceLinkId;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +17,8 @@ public record MismatchedStopPointsContext(
   String journeyPatternId,
   List<ScheduledStopPointId> stopPointsInJourneyPattern,
   List<ServiceLinkId> linksInJourneyPattern,
-  Map<ServiceLinkId, ScheduledStopPointIds> stopPointsForServiceLinksInJourneyPattern,
-  Map<ServiceLinkId, ScheduledStopPointIds> stopPointsInServiceLink
+  Map<ServiceLinkId, FromToScheduledStopPointId> stopPointsForServiceLinksInJourneyPattern,
+  Map<ServiceLinkId, FromToScheduledStopPointId> stopPointsInServiceLink
 ) {
   public static final class Builder {
 
@@ -51,7 +51,7 @@ public record MismatchedStopPointsContext(
             Collectors.toMap(
               serviceLinkIdsInJourneyPattern::get,
               index ->
-                new ScheduledStopPointIds(
+                new FromToScheduledStopPointId(
                   stopPointsInJourneyPattern.get(index),
                   stopPointsInJourneyPattern.get(index + 1)
                 )

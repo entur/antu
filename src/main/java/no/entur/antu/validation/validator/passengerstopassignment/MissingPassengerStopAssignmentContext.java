@@ -2,8 +2,8 @@ package no.entur.antu.validation.validator.passengerstopassignment;
 
 import java.util.List;
 import java.util.function.Predicate;
-import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.validation.AntuNetexData;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.JourneyPattern;
 
 public record MissingPassengerStopAssignmentContext(

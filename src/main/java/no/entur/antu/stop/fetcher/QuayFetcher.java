@@ -2,7 +2,7 @@ package no.entur.antu.stop.fetcher;
 
 import java.time.Duration;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.model.QuayId;
+import org.entur.netex.validation.validator.model.QuayId;
 import org.rutebanken.netex.model.Quay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

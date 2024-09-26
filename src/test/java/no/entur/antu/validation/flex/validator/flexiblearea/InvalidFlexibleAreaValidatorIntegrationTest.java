@@ -6,17 +6,15 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validation.AntuNetexData;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class InvalidFlexibleAreaValidatorIntegrationTest {
 
@@ -53,20 +51,19 @@ class InvalidFlexibleAreaValidatorIntegrationTest {
       NetexEntitiesIndex netexEntitiesIndex = NETEX_PARSER.parse(
         testDatasetAsStream
       );
-      ValidationContextWithNetexEntitiesIndex validationContext = mock(
-        ValidationContextWithNetexEntitiesIndex.class
+      JAXBValidationContext validationContext = mock(
+        JAXBValidationContext.class
       );
 
       when(validationContext.isCommonFile()).thenReturn(true);
-      when(validationContext.getAntuNetexData())
-        .thenReturn(
-          new AntuNetexData(
-            validationReportId,
-            netexEntitiesIndex,
-            Mockito.mock(CommonDataRepository.class),
-            Mockito.mock(StopPlaceRepository.class)
-          )
-        );
+      when(validationContext.getValidationReportId())
+        .thenReturn(validationReportId);
+      when(validationContext.getNetexEntitiesIndex())
+        .thenReturn(netexEntitiesIndex);
+      when(validationContext.getNetexDataRepository())
+        .thenReturn(mock(NetexDataRepository.class));
+      when(validationContext.getStopPlaceRepository())
+        .thenReturn(mock(StopPlaceRepository.class));
 
       InvalidFlexibleAreaValidator invalidFlexibleAreaValidator =
         new InvalidFlexibleAreaValidator((code, message, dataLocation) ->

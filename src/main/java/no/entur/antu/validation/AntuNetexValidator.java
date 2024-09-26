@@ -3,16 +3,15 @@ package no.entur.antu.validation;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
-import no.entur.antu.exception.AntuException;
-import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.IdVersion;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.jaxb.AbstractJAXBValidator;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 
-public abstract class AntuNetexValidator extends AbstractXPathValidator {
+public abstract class AntuNetexValidator extends AbstractJAXBValidator {
 
   protected AntuNetexValidator(
     ValidationReportEntryFactory validationReportEntryFactory
@@ -20,11 +19,10 @@ public abstract class AntuNetexValidator extends AbstractXPathValidator {
     super(validationReportEntryFactory);
   }
 
-  protected abstract RuleCode[] getRuleCodes();
-
+  @Override
   public void validate(
     ValidationReport validationReport,
-    XPathValidationContext validationContext
+    JAXBValidationContext validationContext
   ) {
     AntuNetexData antuNetexData = getAntuNetexData(validationContext);
 
@@ -37,21 +35,11 @@ public abstract class AntuNetexValidator extends AbstractXPathValidator {
     }
   }
 
-  private AntuNetexData getAntuNetexData(
-    XPathValidationContext validationContext
-  ) {
-    if (
-      validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
-    ) {
-      return validationContextWithNetexEntitiesIndex.getAntuNetexData();
-    } else {
-      throw new AntuException("Netex data not available in context");
-    }
-  }
+  protected abstract RuleCode[] getRuleCodes();
 
   protected void validateCommonFile(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     // Nothing here
@@ -59,7 +47,7 @@ public abstract class AntuNetexValidator extends AbstractXPathValidator {
 
   protected void validateLineFile(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     // Nothing here
@@ -67,7 +55,7 @@ public abstract class AntuNetexValidator extends AbstractXPathValidator {
 
   protected void addValidationReportEntry(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     ValidationError validationError
   ) {
     ValidationReportEntry validationReportEntry = createValidationReportEntry(
@@ -79,8 +67,19 @@ public abstract class AntuNetexValidator extends AbstractXPathValidator {
     validationReport.addValidationReportEntry(validationReportEntry);
   }
 
+  private AntuNetexData getAntuNetexData(
+    JAXBValidationContext validationContext
+  ) {
+    return new AntuNetexData(
+      validationContext.getValidationReportId(),
+      validationContext.getNetexEntitiesIndex(),
+      validationContext.getNetexDataRepository(),
+      validationContext.getStopPlaceRepository()
+    );
+  }
+
   private static DataLocation findDataLocation(
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     String entityId
   ) {
     String fileName = validationContext.getFileName();

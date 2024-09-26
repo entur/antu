@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex.validation.validator.model.FromToScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ServiceLinkId;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -44,7 +44,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       .stream()
       .collect(collectToNetexEntitiesIndex(fragment));
 
-    mockGetScheduledStopPointIdsInServiceLink(
+    mockGetFromToScheduledStopPointIdInServiceLink(
       numberOfJourneyPatterns,
       numberOfStopPointsInJourneyPattern
     );
@@ -68,7 +68,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       .stream()
       .collect(collectToNetexEntitiesIndex(fragment));
 
-    mockGetScheduledStopPointIdsInServiceLink(
+    mockGetFromToScheduledStopPointIdInServiceLink(
       numberOfJourneyPatterns,
       numberOfStopPointsInJourneyPattern
     );
@@ -93,7 +93,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       .stream()
       .collect(collectToNetexEntitiesIndex(fragment));
 
-    mockGetScheduledStopPointIdsInServiceLink(
+    mockGetFromToScheduledStopPointIdInServiceLink(
       numberOfServiceLinks,
       numberOfStopPointsInJourneyPattern
     );
@@ -140,9 +140,9 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       )
       .create();
 
-    mockGetScheduledStopPointIds(
+    mockGetFromToScheduledStopPointId(
       new ServiceLinkId("TST:ServiceLink:1"),
-      new ScheduledStopPointIds(
+      new FromToScheduledStopPointId(
         ScheduledStopPointId.of(fromStopPointInServiceLink),
         ScheduledStopPointId.of(toStopPoint)
       )
@@ -203,9 +203,9 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       )
       .create();
 
-    mockGetScheduledStopPointIds(
+    mockGetFromToScheduledStopPointId(
       new ServiceLinkId("TST:ServiceLink:1"),
-      new ScheduledStopPointIds(
+      new FromToScheduledStopPointId(
         ScheduledStopPointId.of(fromStopPoint),
         ScheduledStopPointId.of(toStopPointInServiceLink)
       )
@@ -241,7 +241,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
     );
   }
 
-  private void mockGetScheduledStopPointIdsInServiceLink(
+  private void mockGetFromToScheduledStopPointIdInServiceLink(
     int numberOfServiceLinks,
     int numberOfStopPointsInJourneyPattern
   ) {
@@ -251,11 +251,11 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
         IntStream
           .rangeClosed(1, numberOfStopPointsInJourneyPattern - 1)
           .forEach(stopPointId ->
-            mockGetScheduledStopPointIds(
+            mockGetFromToScheduledStopPointId(
               new ServiceLinkId(
                 "TST:ServiceLink:" + journeyPatternId + stopPointId
               ),
-              new ScheduledStopPointIds(
+              new FromToScheduledStopPointId(
                 new ScheduledStopPointId(
                   "TST:ScheduledStopPoint:" + journeyPatternId + stopPointId
                 ),

@@ -4,14 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.util.List;
-import no.entur.antu.model.QuayCoordinates;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex.validation.validator.model.QuayCoordinates;
+import org.entur.netex.validation.validator.model.QuayId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -199,7 +199,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
     NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
 
-    mockNoQuayIdsInCommonDataRepository();
+    mockNoQuayIdsInNetexDataRepository();
 
     for (int i = 0; i < quayCoordinates.size(); i++) {
       mockGetCoordinates(
@@ -238,7 +238,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
     NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
 
-    mockNoQuayIdsInCommonDataRepository();
+    mockNoQuayIdsInNetexDataRepository();
 
     ValidationReport validationReport = runValidation(
       createNetexEntitiesIndex.create()
