@@ -11,7 +11,7 @@ import no.entur.antu.validation.ValidationError;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,10 +105,10 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
         reportError.accept(
           new NonIncreasingPassingTimeError(
             NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME,
-            antuNetexData.getStopPointName(
+            antuNetexData.stopPointName(
               previousPassingTime.scheduledStopPointId()
             ),
-            serviceJourney.getId()
+            ServiceJourneyId.ofValidId(serviceJourney)
           )
         );
         return;
@@ -124,12 +124,15 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
     StopTime stopTime,
     Consumer<ValidationError> reportError
   ) {
+    ServiceJourneyId serviceJourneyId = ServiceJourneyId.ofValidId(
+      serviceJourney
+    );
     if (!stopTime.isComplete()) {
       reportError.accept(
         new NonIncreasingPassingTimeError(
           NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
-          antuNetexData.getStopPointName(stopTime.scheduledStopPointId()),
-          serviceJourney.getId()
+          antuNetexData.stopPointName(stopTime.scheduledStopPointId()),
+          serviceJourneyId
         )
       );
       return true;
@@ -138,8 +141,8 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
       reportError.accept(
         new NonIncreasingPassingTimeError(
           NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
-          antuNetexData.getStopPointName(stopTime.scheduledStopPointId()),
-          serviceJourney.getId()
+          antuNetexData.stopPointName(stopTime.scheduledStopPointId()),
+          serviceJourneyId
         )
       );
       return true;

@@ -2,6 +2,7 @@ package no.entur.antu.commondata;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.validation.validator.jaxb.*;
@@ -19,22 +20,25 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     DefaultNetexDataRepository.class
   );
 
-  private final CommonDataResource commonDataResource;
+  private final NetexDataResource netexDataResource;
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
   private final Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache;
   private final Map<String, List<String>> lineInfoCache;
+  private final Map<String, Map<String, List<String>>> serviceJourneyStopsCache;
 
   public DefaultNetexDataRepository(
-    CommonDataResource commonDataResource,
+    NetexDataResource netexDataResource,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
-    Map<String, List<String>> lineInfoCache
+    Map<String, List<String>> lineInfoCache,
+    Map<String, Map<String, List<String>>> serviceJourneyStopsCache
   ) {
-    this.commonDataResource = commonDataResource;
+    this.netexDataResource = netexDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     this.serviceLinksAndFromToScheduledStopPointIdCache =
       serviceLinksAndFromToScheduledStopPointIdCache;
     this.lineInfoCache = lineInfoCache;
+    this.serviceJourneyStopsCache = serviceJourneyStopsCache;
   }
 
   @Override
@@ -46,7 +50,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   }
 
   @Override
-  public QuayId findQuayIdForScheduledStopPoint(
+  public QuayId quayIdForScheduledStopPoint(
     ScheduledStopPointId scheduledStopPointId,
     String validationReportId
   ) {
@@ -63,7 +67,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   }
 
   @Override
-  public FromToScheduledStopPointId findFromToScheduledStopPointIdForServiceLink(
+  public FromToScheduledStopPointId fromToScheduledStopPointIdForServiceLink(
     ServiceLinkId serviceLinkId,
     String validationReportId
   ) {
@@ -81,7 +85,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   }
 
   @Override
-  public List<SimpleLine> getLineNames(String validationReportId) {
+  public List<SimpleLine> lineNames(String validationReportId) {
     List<String> lineInfoForReportId = lineInfoCache.get(validationReportId);
     if (lineInfoForReportId == null) {
       throw new AntuException(
@@ -93,16 +97,41 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   }
 
   @Override
-  public void loadCommonDataCache(
+  public List<ServiceJourneyStop> serviceJourneyStops(
+    String validationReportId,
+    ServiceJourneyId serviceJourneyId
+  ) {
+    Map<String, List<String>> serviceJourneyStopsForReport =
+      serviceJourneyStopsCache.get(validationReportId);
+    if (serviceJourneyStopsForReport == null) {
+      throw new AntuException(
+        "ServiceJourneyStops cache not found for validation report with id: " +
+        validationReportId
+      );
+    }
+    return Optional
+      .ofNullable(serviceJourneyStopsForReport.get(serviceJourneyId.id()))
+      .map(serviceJourneyStops ->
+        serviceJourneyStops
+          .stream()
+          .map(ServiceJourneyStop::fromString)
+          .filter(ServiceJourneyStop::isValid)
+          .toList()
+      )
+      .orElse(List.of());
+  }
+
+  @Override
+  public void fillNetexDataCache(
     byte[] fileContent,
     String validationReportId
   ) {
-    commonDataResource.loadCommonData(fileContent);
+    netexDataResource.loadCommonData(fileContent);
     // Merging with the existing map, for handing the case where there are
     // multiple common files in the dataset.
     scheduledStopPointAndQuayIdCache.merge(
       validationReportId,
-      commonDataResource.getQuayIdsPerScheduledStopPoints(),
+      netexDataResource.getQuayIdsPerScheduledStopPoints(),
       (existingMap, newMap) -> {
         existingMap.putAll(newMap);
         return existingMap;
@@ -110,7 +139,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     );
 
     Map<String, String> scheduledStopPointIdsPerServiceLinkId =
-      commonDataResource
+      netexDataResource
         .getFromToScheduledStopPointIdPerServiceLinkId()
         .entrySet()
         .stream()

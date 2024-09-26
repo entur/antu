@@ -1,4 +1,4 @@
-package no.entur.antu.commondata;
+package no.entur.antu.commondata.scraper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +12,12 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LineInfoScraper implements NetexDataCollector {
+public class LineInfoCollector extends NetexDataCollector {
 
   private final RedissonClient redissonClient;
   private final Map<String, List<String>> lineInfoCache;
 
-  public LineInfoScraper(
+  public LineInfoCollector(
     RedissonClient redissonClient,
     Map<String, List<String>> lineInfoCache
   ) {
@@ -26,7 +26,9 @@ public class LineInfoScraper implements NetexDataCollector {
   }
 
   @Override
-  public void collect(JAXBValidationContext validationContext) {
+  protected void collectDataFromLineFile(
+    JAXBValidationContext validationContext
+  ) {
     AntuNetexData antuNetexData = new AntuNetexData(
       validationContext.getValidationReportId(),
       validationContext.getNetexEntitiesIndex(),
@@ -35,8 +37,15 @@ public class LineInfoScraper implements NetexDataCollector {
     );
     addLineName(
       antuNetexData.validationReportId(),
-      antuNetexData.getLineInfo(validationContext.getFileName())
+      antuNetexData.lineInfo(validationContext.getFileName())
     );
+  }
+
+  @Override
+  protected void collectDataFromCommonFile(
+    JAXBValidationContext validationContext
+  ) {
+    // No Lines in common files
   }
 
   public void addLineName(String validationReportId, SimpleLine lineInfo) {

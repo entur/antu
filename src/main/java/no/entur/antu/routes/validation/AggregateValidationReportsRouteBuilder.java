@@ -332,7 +332,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})"
       )
       .bean(
-        "commonDataRepository",
+        "netexDataRepository",
         "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})"
       )
       .log(LoggingLevel.INFO, correlation() + "Cleaned up cache")
