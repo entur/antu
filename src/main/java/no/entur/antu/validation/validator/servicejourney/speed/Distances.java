@@ -3,11 +3,11 @@ package no.entur.antu.validation.validator.servicejourney.speed;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import no.entur.antu.model.QuayCoordinates;
-import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.StopTime;
 import no.entur.antu.validation.utilities.SphericalDistanceLibrary;
+import org.entur.netex.validation.validator.model.QuayCoordinates;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 
 public class Distances {
 

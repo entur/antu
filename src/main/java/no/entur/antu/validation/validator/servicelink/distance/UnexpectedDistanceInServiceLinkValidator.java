@@ -10,6 +10,7 @@ import no.entur.antu.validation.utilities.Comparison;
 import no.entur.antu.validation.utilities.SphericalDistanceLibrary;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.locationtech.jts.geom.Coordinate;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ public class UnexpectedDistanceInServiceLinkValidator
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating ServiceLinks");
@@ -71,7 +72,7 @@ public class UnexpectedDistanceInServiceLinkValidator
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     /*

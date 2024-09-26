@@ -2,7 +2,7 @@ package no.entur.antu.stoptime;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
-import no.entur.antu.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**

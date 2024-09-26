@@ -3,7 +3,7 @@ package no.entur.antu.cache.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.CharsetUtil;
-import no.entur.antu.model.ServiceLinkId;
+import org.entur.netex.validation.validator.model.ServiceLinkId;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.client.handler.State;
 import org.redisson.client.protocol.Decoder;

@@ -9,15 +9,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.model.LineInfo;
-import no.entur.antu.model.QuayCoordinates;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceLinkId;
-import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.validation.validator.jaxb.*;
+import org.entur.netex.validation.validator.model.*;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
@@ -49,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public record AntuNetexData(
   String validationReportId,
   NetexEntitiesIndex netexEntitiesIndex,
-  CommonDataRepository commonDataRepository,
+  NetexDataRepository commonDataRepository,
   StopPlaceRepository stopPlaceRepository
 ) {
   private static final Logger LOGGER = LoggerFactory.getLogger(
@@ -90,12 +84,12 @@ public record AntuNetexData(
       );
   }
 
-  public ScheduledStopPointIds findScheduledStopPointsForServiceLinkId(
+  public FromToScheduledStopPointId findScheduledStopPointsForServiceLinkId(
     ServiceLinkId serviceLinkId
   ) {
     // Should extend this function to check line file if we don't find the
     // service links in common file. Same as findQuayIdForScheduledStopPoint.
-    return commonDataRepository.findScheduledStopPointIdsForServiceLink(
+    return commonDataRepository.findFromToScheduledStopPointIdForServiceLink(
       serviceLinkId,
       validationReportId()
     );
@@ -200,13 +194,13 @@ public record AntuNetexData(
     );
   }
 
-  public LineInfo getLineInfo(String fileName) {
+  public SimpleLine getLineInfo(String fileName) {
     return netexEntitiesIndex
       .getLineIndex()
       .getAll()
       .stream()
       .findFirst()
-      .map(line -> LineInfo.of(line, fileName))
+      .map(line -> SimpleLine.of(line, fileName))
       .orElse(
         netexEntitiesIndex
           .getFlexibleLineIndex()
@@ -214,7 +208,7 @@ public record AntuNetexData(
           .stream()
           .filter(AntuNetexData::isFixedFlexibleLine)
           .findFirst()
-          .map(line -> LineInfo.of(line, fileName))
+          .map(line -> SimpleLine.of(line, fileName))
           .orElse(null)
       );
   }

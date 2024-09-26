@@ -18,12 +18,8 @@ package no.entur.antu.config;
 
 import java.util.List;
 import java.util.Set;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.commondata.CommonDataScraper;
 import no.entur.antu.commondata.LineInfoScraper;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
@@ -36,11 +32,10 @@ import no.entur.antu.validation.validator.line.DuplicateLineNameValidator;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeValidator;
 import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeedValidator;
-import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportModeValidator;
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import org.entur.netex.validation.validator.NetexDatasetValidator;
+import org.entur.netex.validation.validator.DatasetValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.XPathValidator;
@@ -49,6 +44,10 @@ import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
+import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
+import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
@@ -157,21 +156,6 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public MismatchedTransportModeValidator mismatchedTransportModeValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
-  ) {
-    return new MismatchedTransportModeValidator(
-      validationReportEntryFactory,
-      commonDataRepository,
-      stopPlaceRepository
-    );
-  }
-
-  @Bean
   public UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator(
     @Qualifier(
       "validationReportEntryFactory"
@@ -214,7 +198,7 @@ public class TimetableDataValidatorConfig {
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository
+    NetexDataRepository commonDataRepository
   ) {
     return new DuplicateLineNameValidator(
       validationReportEntryFactory,
@@ -225,7 +209,9 @@ public class TimetableDataValidatorConfig {
   @Bean
   public NetexValidatorsRunner timetableDataValidatorsRunner(
     NetexSchemaValidator netexSchemaValidator,
-    @Qualifier("timetableDataXPathValidator") XPathRuleValidator xpathValidator,
+    @Qualifier(
+      "timetableDataXPathValidator"
+    ) XPathRuleValidator xPathRuleValidator,
     NetexIdValidator netexIdValidator,
     VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
     VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
@@ -242,26 +228,28 @@ public class TimetableDataValidatorConfig {
     MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator,
     NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator,
     UnexpectedSpeedValidator unexpectedSpeedValidator,
-    MismatchedTransportModeValidator mismatchedTransportModeValidator,
     UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator,
     MismatchedStopPointsValidator mismatchedStopPointsValidator,
     MandatoryFieldsValidator mandatoryFieldsValidator,
     DuplicateInterchangesValidator duplicateInterchangesValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
     LineInfoScraper lineInfoScraper,
-    CommonDataRepository commonDataRepository,
+    NetexDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
 
-    List<XPathValidator> netexTimetableDataValidators = List.of(
-      xpathValidator,
+    List<XPathValidator> xPathValidators = List.of(
+      xPathRuleValidator,
       netexIdValidator,
       versionOnLocalNetexIdValidator,
       versionOnRefToLocalNetexIdValidator,
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
-      netexIdUniquenessValidator,
+      netexIdUniquenessValidator
+    );
+
+    List<JAXBValidator> jaxbValidators = List.of(
       unexpectedDistanceBetweenStopPointsValidator,
       identicalStopPointsValidator,
       sameQuayRefValidator,
@@ -270,23 +258,23 @@ public class TimetableDataValidatorConfig {
       missingPassengerStopAssignmentValidator,
       nonIncreasingPassingTimeValidator,
       unexpectedSpeedValidator,
-      mismatchedTransportModeValidator,
       unexpectedDistanceInServiceLinkValidator,
       mismatchedStopPointsValidator,
       mandatoryFieldsValidator,
       duplicateInterchangesValidator
     );
 
-    List<NetexDatasetValidator> netexTimetableDatasetValidators = List.of(
+    List<DatasetValidator> netexTimetableDatasetValidators = List.of(
       duplicateLineNameValidator
     );
 
-    List<CommonDataScraper> commonDataScrapers = List.of(lineInfoScraper);
+    List<NetexDataCollector> commonDataScrapers = List.of(lineInfoScraper);
 
-    return new NetexValidatorsRunnerWithNetexEntitiesIndex(
+    return new NetexValidatorsRunner(
       netexXMLParser,
       netexSchemaValidator,
-      netexTimetableDataValidators,
+      xPathValidators,
+      jaxbValidators,
       netexTimetableDatasetValidators,
       commonDataScrapers,
       commonDataRepository,

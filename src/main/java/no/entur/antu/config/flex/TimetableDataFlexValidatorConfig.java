@@ -18,10 +18,7 @@ package no.entur.antu.config.flex;
 
 import java.util.List;
 import java.util.Set;
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validation.NetexValidatorsRunnerWithNetexEntitiesIndex;
 import no.entur.antu.validation.flex.validator.EnturFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.flex.validator.FileNameValidator;
@@ -35,6 +32,9 @@ import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
+import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
@@ -143,10 +143,10 @@ public class TimetableDataFlexValidatorConfig {
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
     InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
-    CommonDataRepository commonDataRepository,
+    NetexDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    List<XPathValidator> netexValidators = List.of(
+    List<XPathValidator> xpathValidators = List.of(
       fileNameValidator,
       flexXPathValidator,
       netexIdValidator,
@@ -154,15 +154,18 @@ public class TimetableDataFlexValidatorConfig {
       versionOnRefToLocalNetexIdValidator,
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
-      netexIdUniquenessValidator,
-      invalidFlexibleAreaValidator
+      netexIdUniquenessValidator
     );
+    List<JAXBValidator> jaxbValidators = List.of(invalidFlexibleAreaValidator);
     // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return new NetexValidatorsRunnerWithNetexEntitiesIndex(
+    return new NetexValidatorsRunner(
       netexXMLParser,
       netexSchemaValidator,
-      netexValidators,
+      xpathValidators,
+      jaxbValidators,
+      List.of(),
+      List.of(),
       commonDataRepository,
       stopPlaceRepository
     );
@@ -187,10 +190,10 @@ public class TimetableDataFlexValidatorConfig {
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
     InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
-    CommonDataRepository commonDataRepository,
+    NetexDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    List<XPathValidator> netexValidators = List.of(
+    List<XPathValidator> xpathValidators = List.of(
       fileNameValidator,
       flexXPathValidator,
       netexIdValidator,
@@ -198,15 +201,20 @@ public class TimetableDataFlexValidatorConfig {
       versionOnRefToLocalNetexIdValidator,
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
-      netexIdUniquenessValidator,
-      invalidFlexibleAreaValidator
+      netexIdUniquenessValidator
     );
+
+    List<JAXBValidator> jaxbValidators = List.of(invalidFlexibleAreaValidator);
+
     // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return new NetexValidatorsRunnerWithNetexEntitiesIndex(
+    return new NetexValidatorsRunner(
       netexXMLParser,
       netexSchemaValidator,
-      netexValidators,
+      xpathValidators,
+      jaxbValidators,
+      List.of(),
+      List.of(),
       commonDataRepository,
       stopPlaceRepository
     );

@@ -16,6 +16,7 @@ import no.entur.antu.validation.ValidationError;
 import no.entur.antu.validation.utilities.Comparison;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating Speed");
@@ -84,7 +85,7 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    XPathValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     // ServiceJourneys and Line only appear in the Line file.

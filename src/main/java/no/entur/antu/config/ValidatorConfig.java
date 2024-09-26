@@ -26,7 +26,6 @@ import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.stop.StopPlaceRepository;
 import no.entur.antu.validation.NetexValidationProfile;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.id.ReferenceToNsrValidator;
@@ -46,6 +45,7 @@ import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidat
 import org.entur.netex.validation.validator.id.ServiceJourneyInterchangeIgnorer;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
+import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

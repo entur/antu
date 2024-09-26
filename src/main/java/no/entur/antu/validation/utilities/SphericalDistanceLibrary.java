@@ -7,7 +7,7 @@ import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.toRadians;
 
-import no.entur.antu.model.QuayCoordinates;
+import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.locationtech.jts.geom.Coordinate;
 
 /**
