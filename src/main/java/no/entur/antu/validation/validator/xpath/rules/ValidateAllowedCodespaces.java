@@ -15,7 +15,7 @@ import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.exception.NetexValidationException;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 
 /**
@@ -29,7 +29,7 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
 
   @Override
   public List<XPathValidationReportEntry> validate(
-    XPathValidationContext validationContext
+    XPathRuleValidationContext validationContext
   ) {
     Objects.requireNonNull(validationContext);
     List<XPathValidationReportEntry> validationReportEntries =

@@ -3,7 +3,7 @@ package no.entur.antu.validation.validator.xpath.rules;
 import java.util.List;
 import java.util.Set;
 import net.sf.saxon.s9api.XdmNode;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 import org.entur.netex.validation.xml.NetexXMLParser;
@@ -49,12 +49,13 @@ class ValidateNoStopPlacesInImportedFlexDatasetTest {
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
       NETEX_SITE_FRAME_WITH_FLEXIBLE_STOP_PLACES
     );
-    XPathValidationContext xpathValidationContext = new XPathValidationContext(
-      document,
-      NETEX_XML_PARSER,
-      TEST_CODESPACE,
-      null
-    );
+    XPathRuleValidationContext xpathValidationContext =
+      new XPathRuleValidationContext(
+        document,
+        NETEX_XML_PARSER,
+        TEST_CODESPACE,
+        null
+      );
     List<XPathValidationReportEntry> xPathValidationReportEntries =
       validateStopPlacesNotExist.validate(xpathValidationContext);
     Assertions.assertNotNull(xPathValidationReportEntries);
@@ -66,12 +67,13 @@ class ValidateNoStopPlacesInImportedFlexDatasetTest {
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
       NETEX_SITE_FRAME_WITH_STOP_PLACES
     );
-    XPathValidationContext xpathValidationContext = new XPathValidationContext(
-      document,
-      NETEX_XML_PARSER,
-      TEST_CODESPACE,
-      null
-    );
+    XPathRuleValidationContext xpathValidationContext =
+      new XPathRuleValidationContext(
+        document,
+        NETEX_XML_PARSER,
+        TEST_CODESPACE,
+        null
+      );
     List<XPathValidationReportEntry> xPathValidationReportEntries =
       validateStopPlacesNotExist.validate(xpathValidationContext);
     Assertions.assertNotNull(xPathValidationReportEntries);

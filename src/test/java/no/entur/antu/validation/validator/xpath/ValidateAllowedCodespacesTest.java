@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
@@ -46,12 +46,13 @@ class ValidateAllowedCodespacesTest {
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
       publicationDeliveryWithInvalidCodespace
     );
-    XPathValidationContext xpathValidationContext = new XPathValidationContext(
-      document,
-      NETEX_XML_PARSER,
-      TEST_CODESPACE,
-      null
-    );
+    XPathRuleValidationContext xpathValidationContext =
+      new XPathRuleValidationContext(
+        document,
+        NETEX_XML_PARSER,
+        TEST_CODESPACE,
+        null
+      );
     List<XPathValidationReportEntry> xPathValidationReportEntries =
       validateAllowedCodespaces.validate(xpathValidationContext);
     Assertions.assertNotNull(xPathValidationReportEntries);
@@ -69,12 +70,13 @@ class ValidateAllowedCodespacesTest {
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
       publicationDeliveryWithValidCodespace
     );
-    XPathValidationContext xpathValidationContext = new XPathValidationContext(
-      document,
-      NETEX_XML_PARSER,
-      TEST_CODESPACE,
-      null
-    );
+    XPathRuleValidationContext xpathValidationContext =
+      new XPathRuleValidationContext(
+        document,
+        NETEX_XML_PARSER,
+        TEST_CODESPACE,
+        null
+      );
     List<XPathValidationReportEntry> xPathValidationReportEntries =
       validateAllowedCodespaces.validate(xpathValidationContext);
     Assertions.assertNotNull(xPathValidationReportEntries);

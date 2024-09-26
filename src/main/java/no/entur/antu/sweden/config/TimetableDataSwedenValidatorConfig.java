@@ -43,7 +43,7 @@ import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.XPathValidator;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -86,7 +86,7 @@ public class TimetableDataSwedenValidatorConfig {
   }
 
   @Bean
-  public XPathValidator swedenTimetableDataXPathValidator(
+  public XPathRuleValidator swedenTimetableDataXPathValidator(
     @Qualifier(
       "swedenTimetableDataValidationTreeFactory"
     ) ValidationTreeFactory validationTreeFactory,
@@ -94,7 +94,7 @@ public class TimetableDataSwedenValidatorConfig {
       "swedenValidationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new XPathValidator(
+    return new XPathRuleValidator(
       validationTreeFactory,
       validationReportEntryFactory
     );
@@ -145,7 +145,7 @@ public class TimetableDataSwedenValidatorConfig {
     NetexSchemaValidator netexSchemaValidator,
     @Qualifier(
       "swedenTimetableDataXPathValidator"
-    ) XPathValidator swedenXPathValidator,
+    ) XPathRuleValidator swedenXPathValidator,
     NetexIdValidator netexIdValidator,
     VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
     VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
