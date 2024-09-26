@@ -8,7 +8,7 @@ import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.utilities.GeometryUtilities;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.operation.valid.IsValidOp;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class InvalidFlexibleAreaValidator extends AntuNetexValidator {
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext,
+    XPathValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating flexible area");
@@ -69,7 +69,7 @@ public class InvalidFlexibleAreaValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext,
+    XPathValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     // Flexible areas only appear in the Common file.

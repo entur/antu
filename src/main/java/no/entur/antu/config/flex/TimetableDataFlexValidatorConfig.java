@@ -27,9 +27,9 @@ import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValid
 import no.entur.antu.validation.flex.validator.FileNameValidator;
 import no.entur.antu.validation.flex.validator.flexiblearea.InvalidFlexibleAreaValidator;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
-import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
@@ -146,7 +146,7 @@ public class TimetableDataFlexValidatorConfig {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    List<NetexValidator> netexValidators = List.of(
+    List<XPathValidator> netexValidators = List.of(
       fileNameValidator,
       flexXPathValidator,
       netexIdValidator,
@@ -190,7 +190,7 @@ public class TimetableDataFlexValidatorConfig {
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    List<NetexValidator> netexValidators = List.of(
+    List<XPathValidator> netexValidators = List.of(
       fileNameValidator,
       flexXPathValidator,
       netexIdValidator,

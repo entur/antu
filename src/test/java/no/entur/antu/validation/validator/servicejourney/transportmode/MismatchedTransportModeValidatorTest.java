@@ -18,7 +18,7 @@ import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -1004,7 +1004,7 @@ class MismatchedTransportModeValidatorTest {
       testData.getData()
     );
 
-    ValidationContext validationContext = new ValidationContext(
+    XPathValidationContext validationContext = new XPathValidationContext(
       document,
       NETEX_XML_PARSER,
       TestData.CODE_SPACE,

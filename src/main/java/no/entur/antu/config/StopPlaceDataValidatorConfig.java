@@ -19,9 +19,9 @@ package no.entur.antu.config;
 import java.util.List;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.xpath.EnturStopPlaceDataValidationTreeFactory;
-import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
@@ -67,7 +67,7 @@ public class StopPlaceDataValidatorConfig {
     NetexReferenceValidator netexReferenceValidator,
     NetexIdUniquenessValidator netexIdUniquenessValidator
   ) {
-    List<NetexValidator> netexValidators = List.of(
+    List<XPathValidator> netexValidators = List.of(
       xpathValidator,
       netexIdValidator,
       versionOnLocalNetexIdValidator,

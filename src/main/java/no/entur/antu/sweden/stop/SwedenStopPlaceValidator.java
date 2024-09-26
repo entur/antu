@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.entur.netex.validation.validator.AbstractNetexValidator;
+import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.IdVersion;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Verify that Stop place and Quays referenced in the dataset are defined in a SiteFrame inside the dataset.
  */
-public class SwedenStopPlaceValidator extends AbstractNetexValidator {
+public class SwedenStopPlaceValidator extends AbstractXPathValidator {
 
   private static final String MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE_TO_STOP_OR_QUAY =
     "Unresolved reference to stop place or quay";
@@ -41,7 +41,7 @@ public class SwedenStopPlaceValidator extends AbstractNetexValidator {
   @Override
   public void validate(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    XPathValidationContext validationContext
   ) {
     LOGGER.debug(
       "Validating file {} in report {}",

@@ -12,12 +12,12 @@ import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.NetexDatasetValidator;
-import org.entur.netex.validation.validator.NetexValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.id.NetexIdExtractorHelper;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
   public NetexValidatorsRunnerWithNetexEntitiesIndex(
     NetexXMLParser netexXMLParser,
     NetexSchemaValidator netexSchemaValidator,
-    List<NetexValidator> netexValidators,
+    List<XPathValidator> netexValidators,
     CommonDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
@@ -54,7 +54,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
   public NetexValidatorsRunnerWithNetexEntitiesIndex(
     NetexXMLParser netexXMLParser,
     NetexSchemaValidator netexSchemaValidator,
-    List<NetexValidator> netexValidators,
+    List<XPathValidator> netexValidators,
     List<NetexDatasetValidator> netexDatasetValidators,
     List<CommonDataScraper> commonDataScrapers,
     CommonDataRepository commonDataRepository,
@@ -73,7 +73,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
   }
 
   @Override
-  protected ValidationContext prepareValidationContext(
+  protected XPathValidationContext prepareValidationContext(
     String validationReportId,
     String codespace,
     String filename,
@@ -121,7 +121,7 @@ public class NetexValidatorsRunnerWithNetexEntitiesIndex
 
   @Override
   protected void postPrepareValidationContext(
-    ValidationContext validationContext
+    XPathValidationContext validationContext
   ) {
     LOGGER.info(
       "Starting data scraping for file {}",
