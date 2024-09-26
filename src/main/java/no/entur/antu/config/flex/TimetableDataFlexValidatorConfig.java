@@ -37,7 +37,7 @@ import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.XPathValidator;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -68,26 +68,26 @@ public class TimetableDataFlexValidatorConfig {
   }
 
   @Bean
-  public XPathValidator flexTimetableDataXPathValidator(
+  public XPathRuleValidator flexTimetableDataXPathValidator(
     @Qualifier(
       "flexTimetableDataValidationTreeFactory"
     ) ValidationTreeFactory validationTreeFactory,
     ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new XPathValidator(
+    return new XPathRuleValidator(
       validationTreeFactory,
       validationReportEntryFactory
     );
   }
 
   @Bean
-  public XPathValidator importFlexTimetableDataXPathValidator(
+  public XPathRuleValidator importFlexTimetableDataXPathValidator(
     @Qualifier(
       "importFlexTimetableDataValidationTreeFactory"
     ) ValidationTreeFactory validationTreeFactory,
     ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new XPathValidator(
+    return new XPathRuleValidator(
       validationTreeFactory,
       validationReportEntryFactory
     );
@@ -131,7 +131,7 @@ public class TimetableDataFlexValidatorConfig {
   public NetexValidatorsRunner flexTimetableDataValidatorsRunner(
     @Qualifier(
       "flexTimetableDataXPathValidator"
-    ) XPathValidator flexXPathValidator,
+    ) XPathRuleValidator flexXPathValidator,
     @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
     @Qualifier(
       "netexIdUniquenessValidator"
@@ -175,7 +175,7 @@ public class TimetableDataFlexValidatorConfig {
   public NetexValidatorsRunner importFlexTimetableDataValidatorsRunner(
     @Qualifier(
       "importFlexTimetableDataXPathValidator"
-    ) XPathValidator flexXPathValidator,
+    ) XPathRuleValidator flexXPathValidator,
     @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
     @Qualifier(
       "netexIdUniquenessValidator"

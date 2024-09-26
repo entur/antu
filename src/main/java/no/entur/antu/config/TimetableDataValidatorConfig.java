@@ -51,7 +51,7 @@ import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.XPathValidator;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -68,13 +68,13 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public XPathValidator timetableDataXPathValidator(
+  public XPathRuleValidator timetableDataXPathValidator(
     @Qualifier(
       "timetableDataValidationTreeFactory"
     ) ValidationTreeFactory validationTreeFactory,
     ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new XPathValidator(
+    return new XPathRuleValidator(
       validationTreeFactory,
       validationReportEntryFactory
     );
@@ -225,7 +225,7 @@ public class TimetableDataValidatorConfig {
   @Bean
   public NetexValidatorsRunner timetableDataValidatorsRunner(
     NetexSchemaValidator netexSchemaValidator,
-    @Qualifier("timetableDataXPathValidator") XPathValidator xpathValidator,
+    @Qualifier("timetableDataXPathValidator") XPathRuleValidator xpathValidator,
     NetexIdValidator netexIdValidator,
     VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
     VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,

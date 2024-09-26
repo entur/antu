@@ -14,7 +14,7 @@ import no.entur.antu.exception.AntuException;
 import no.entur.antu.organisation.OrganisationRepository;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class ValidateAuthorityId extends AbstractXPathValidationRule {
 
   @Override
   public List<XPathValidationReportEntry> validate(
-    XPathValidationContext validationContext
+    XPathRuleValidationContext validationContext
   ) {
     try {
       Set<String> whitelistedAuthorityIds =
