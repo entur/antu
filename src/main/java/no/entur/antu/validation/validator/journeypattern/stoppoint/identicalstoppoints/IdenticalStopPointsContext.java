@@ -64,7 +64,7 @@ public record IdenticalStopPointsContext(
           .filter(Objects::nonNull)
           .map(stopPoint ->
             new StopPointContext(
-              antuNetexData.findQuayIdForScheduledStopPoint(
+              antuNetexData.quayIdForScheduledStopPoint(
                 ScheduledStopPointId.of(stopPoint)
               ),
               Optional

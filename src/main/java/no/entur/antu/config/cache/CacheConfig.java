@@ -38,6 +38,8 @@ public class CacheConfig {
   public static final String SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE =
     "serviceLinksAndScheduledStopPointIdsCache";
   public static final String LINE_INFO_CACHE = "linesInfoCache";
+  public static final String SERVICE_JOURNEY_STOPS_CACHE =
+    "serviceJourneyStopsCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
 
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
@@ -153,6 +155,17 @@ public class CacheConfig {
     return getOrCreateReportScopedCache(
       redissonClient,
       LINE_INFO_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+    );
+  }
+
+  @Bean(name = SERVICE_JOURNEY_STOPS_CACHE)
+  public Map<String, Map<String, List<String>>> serviceJourneyStopsCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      SERVICE_JOURNEY_STOPS_CACHE,
       new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
     );
   }
