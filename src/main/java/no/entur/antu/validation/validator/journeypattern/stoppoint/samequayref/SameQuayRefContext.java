@@ -1,9 +1,9 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref;
 
 import java.util.List;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.validation.AntuNetexData;
+import org.entur.netex.validation.validator.model.QuayId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.JourneyPattern;
 
 public record SameQuayRefContext(

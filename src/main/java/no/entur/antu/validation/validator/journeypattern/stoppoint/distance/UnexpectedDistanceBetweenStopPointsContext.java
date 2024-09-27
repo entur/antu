@@ -3,9 +3,9 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import no.entur.antu.model.QuayCoordinates;
-import no.entur.antu.model.ScheduledStopPointId;
 import no.entur.antu.validation.AntuNetexData;
+import org.entur.netex.validation.validator.model.QuayCoordinates;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 

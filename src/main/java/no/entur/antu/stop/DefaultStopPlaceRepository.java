@@ -16,8 +16,9 @@
 package no.entur.antu.stop;
 
 import java.util.*;
-import no.entur.antu.model.*;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
+import org.entur.netex.validation.validator.jaxb.*;
+import org.entur.netex.validation.validator.model.*;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;

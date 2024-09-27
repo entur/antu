@@ -1,10 +1,10 @@
 package no.entur.antu.stop;
 
 import java.util.Map;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.SimpleQuay;
-import no.entur.antu.model.SimpleStopPlace;
-import no.entur.antu.model.StopPlaceId;
+import org.entur.netex.validation.validator.model.QuayId;
+import org.entur.netex.validation.validator.model.SimpleQuay;
+import org.entur.netex.validation.validator.model.SimpleStopPlace;
+import org.entur.netex.validation.validator.model.StopPlaceId;
 
 /**
  * A resource to query the National Stop Place Register.

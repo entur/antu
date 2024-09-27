@@ -3,7 +3,7 @@ package no.entur.antu.validation.validator.xpath.rules;
 import java.util.List;
 import java.util.Set;
 import net.sf.saxon.s9api.XdmNode;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 import org.entur.netex.validation.xml.NetexXMLParser;
@@ -48,12 +48,13 @@ class ValidateNoLineInImportedFlexDatasetTest {
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
       NETEX_FRAGMENT_LINE
     );
-    XPathValidationContext xpathValidationContext = new XPathValidationContext(
-      document,
-      NETEX_XML_PARSER,
-      TEST_CODESPACE,
-      null
-    );
+    XPathRuleValidationContext xpathValidationContext =
+      new XPathRuleValidationContext(
+        document,
+        NETEX_XML_PARSER,
+        TEST_CODESPACE,
+        null
+      );
     List<XPathValidationReportEntry> xPathValidationReportEntries =
       validateLineNotExist.validate(xpathValidationContext);
     Assertions.assertNotNull(xPathValidationReportEntries);
@@ -65,12 +66,13 @@ class ValidateNoLineInImportedFlexDatasetTest {
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
       NETEX_FRAGMENT_FLEXIBLE_LINE
     );
-    XPathValidationContext xpathValidationContext = new XPathValidationContext(
-      document,
-      NETEX_XML_PARSER,
-      TEST_CODESPACE,
-      null
-    );
+    XPathRuleValidationContext xpathValidationContext =
+      new XPathRuleValidationContext(
+        document,
+        NETEX_XML_PARSER,
+        TEST_CODESPACE,
+        null
+      );
     List<XPathValidationReportEntry> xPathValidationReportEntries =
       validateLineNotExist.validate(xpathValidationContext);
     Assertions.assertNotNull(xPathValidationReportEntries);

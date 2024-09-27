@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Objects;
-import no.entur.antu.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 public sealed interface StopTime permits AbstractStopTime {

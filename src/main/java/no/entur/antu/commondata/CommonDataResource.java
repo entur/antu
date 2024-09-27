@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.validation.AntuNetexData;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.validation.validator.model.FromToScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ServiceLinkId;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceFrame;
 
@@ -59,13 +59,13 @@ public class CommonDataResource {
       );
   }
 
-  public Map<String, String> getScheduledStopPointIdsPerServiceLinkId() {
+  public Map<String, String> getFromToScheduledStopPointIdPerServiceLinkId() {
     return AntuNetexData
       .serviceLinks(getCommonDataIndex())
       .collect(
         Collectors.toMap(
           serviceLink -> ServiceLinkId.of(serviceLink).toString(),
-          serviceLink -> ScheduledStopPointIds.of(serviceLink).toString(),
+          serviceLink -> FromToScheduledStopPointId.of(serviceLink).toString(),
           (v1, v2) -> v2
         )
       );

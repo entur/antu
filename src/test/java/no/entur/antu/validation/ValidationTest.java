@@ -5,19 +5,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.model.QuayCoordinates;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceLinkId;
-import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.jaxb.*;
+import org.entur.netex.validation.validator.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
@@ -25,14 +20,14 @@ public class ValidationTest {
 
   private static final String VALIDATION_REPORT_ID = "Test1122";
   private static final String VALIDATION_REPORT_CODEBASE = "TST";
-  protected CommonDataRepository commonDataRepositoryMock;
+  protected NetexDataRepository commonDataRepositoryMock;
   protected StopPlaceRepository stopPlaceRepositoryMock;
 
   protected ValidationTest() {}
 
   @BeforeEach
   void resetMocks() {
-    this.commonDataRepositoryMock = mock(CommonDataRepository.class);
+    this.commonDataRepositoryMock = mock(NetexDataRepository.class);
     Mockito
       .when(commonDataRepositoryMock.hasQuayIds(anyString()))
       .thenReturn(true);
@@ -40,7 +35,7 @@ public class ValidationTest {
     this.stopPlaceRepositoryMock = mock(StopPlaceRepository.class);
   }
 
-  protected void mockNoQuayIdsInCommonDataRepository() {
+  protected void mockNoQuayIdsInNetexDataRepository() {
     Mockito
       .when(commonDataRepositoryMock.hasQuayIds(anyString()))
       .thenReturn(false);
@@ -91,13 +86,13 @@ public class ValidationTest {
       .thenReturn(quayCoordinates);
   }
 
-  protected void mockGetScheduledStopPointIds(
+  protected void mockGetFromToScheduledStopPointId(
     ServiceLinkId serviceLinkId,
-    ScheduledStopPointIds scheduledStopPointIds
+    FromToScheduledStopPointId scheduledStopPointIds
   ) {
     Mockito
       .when(
-        commonDataRepositoryMock.findScheduledStopPointIdsForServiceLink(
+        commonDataRepositoryMock.findFromToScheduledStopPointIdForServiceLink(
           eq(serviceLinkId),
           anyString()
         )
@@ -144,18 +139,17 @@ public class ValidationTest {
       VALIDATION_REPORT_ID
     );
 
-    ValidationContextWithNetexEntitiesIndex validationContext = mock(
-      ValidationContextWithNetexEntitiesIndex.class
-    );
+    JAXBValidationContext validationContext = mock(JAXBValidationContext.class);
     when(validationContext.isCommonFile()).thenReturn(mockAsCommonFile);
 
-    AntuNetexData antuNetexData = new AntuNetexData(
-      VALIDATION_REPORT_ID,
-      netexEntitiesIndex,
-      commonDataRepositoryMock,
-      stopPlaceRepositoryMock
-    );
-    when(validationContext.getAntuNetexData()).thenReturn(antuNetexData);
+    when(validationContext.getValidationReportId())
+      .thenReturn(VALIDATION_REPORT_ID);
+    when(validationContext.getNetexEntitiesIndex())
+      .thenReturn(netexEntitiesIndex);
+    when(validationContext.getNetexDataRepository())
+      .thenReturn(commonDataRepositoryMock);
+    when(validationContext.getStopPlaceRepository())
+      .thenReturn(stopPlaceRepositoryMock);
 
     try {
       V validator = validatorClass

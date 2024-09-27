@@ -13,8 +13,8 @@ import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
 import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidator;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ class XpathValidatorIntegrationTest {
     ValidationTreeFactory validationTreeFactory =
       new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository);
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
-    XPathValidator xPathValidator = new XPathValidator(
+    XPathRuleValidator xPathValidator = new XPathRuleValidator(
       validationTreeFactory,
       new DefaultValidationEntryFactory(
         new DefaultValidationConfigLoader(CONFIGURATION_ANTU_YAML)
@@ -66,8 +66,8 @@ class XpathValidatorIntegrationTest {
       while (zipEntry != null) {
         byte[] content = zipInputStream.readAllBytes();
         XdmNode document = netexXMLParser.parseByteArrayToXdmNode(content);
-        XPathValidationContext xPathValidationContext =
-          new XPathValidationContext(
+        XPathRuleValidationContext xPathValidationContext =
+          new XPathRuleValidationContext(
             document,
             netexXMLParser,
             "FLB",

@@ -6,9 +6,9 @@ import static no.entur.antu.config.cache.CacheConfig.SERVICE_LINKS_AND_SCHEDULED
 
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.commondata.CommonDataResource;
-import no.entur.antu.commondata.DefaultCommonDataRepository;
+import no.entur.antu.commondata.DefaultNetexDataRepository;
+import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,20 +25,20 @@ public class CommonDataConfig {
 
   @Bean
   @Profile("!test")
-  CommonDataRepository commonDataRepository(
+  NetexDataRepository commonDataRepository(
     CommonDataResource commonDataResource,
     @Qualifier(
       SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE
     ) Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     @Qualifier(
       SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE
-    ) Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache,
+    ) Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
     @Qualifier(LINE_INFO_CACHE) Map<String, List<String>> lineInfoCache
   ) {
-    return new DefaultCommonDataRepository(
+    return new DefaultNetexDataRepository(
       commonDataResource,
       scheduledStopPointAndQuayIdCache,
-      serviceLinksAndScheduledStopPointIdsCache,
+      serviceLinksAndFromToScheduledStopPointIdCache,
       lineInfoCache
     );
   }

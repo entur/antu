@@ -24,10 +24,10 @@ import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.routes.memorystore.MemoryStoreRoute.MEMORY_STORE_FILE_NAME;
 
-import no.entur.antu.commondata.CommonDataRepository;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.util.StopWatch;
+import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,10 +35,10 @@ public class ParseAndStoreCommonDataRouteBuilder extends BaseRouteBuilder {
 
   private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
 
-  private final CommonDataRepository commonDataRepository;
+  private final NetexDataRepository commonDataRepository;
 
   public ParseAndStoreCommonDataRouteBuilder(
-    CommonDataRepository commonDataRepository
+    NetexDataRepository commonDataRepository
   ) {
     this.commonDataRepository = commonDataRepository;
   }

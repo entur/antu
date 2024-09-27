@@ -10,16 +10,15 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.stop.StopPlaceRepository;
-import no.entur.antu.validation.AntuNetexData;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -39,8 +38,8 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndNoDeadRunShouldFail()
     throws IOException {
-    CommonDataRepository commonDataRepository = Mockito.mock(
-      CommonDataRepository.class
+    NetexDataRepository commonDataRepository = Mockito.mock(
+      NetexDataRepository.class
     );
 
     // Mocking that the quay ids are not present in the common data repository.
@@ -65,8 +64,8 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndWithAllDeadRun()
     throws IOException {
-    CommonDataRepository commonDataRepository = Mockito.mock(
-      CommonDataRepository.class
+    NetexDataRepository commonDataRepository = Mockito.mock(
+      NetexDataRepository.class
     );
 
     // Mocking that the quay ids are not present in the common data repository.
@@ -85,7 +84,7 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(
     String testFile,
-    CommonDataRepository commonDataRepository
+    NetexDataRepository commonDataRepository
   ) throws IOException {
     String validationReportId = "Test1122";
     ValidationReport testValidationReport = new ValidationReport(
@@ -102,8 +101,8 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
         testDatasetAsStream
       );
 
-      ValidationContextWithNetexEntitiesIndex validationContext = mock(
-        ValidationContextWithNetexEntitiesIndex.class
+      JAXBValidationContext validationContext = mock(
+        JAXBValidationContext.class
       );
 
       StopPlaceRepository stopPlaceRepository = Mockito.mock(
@@ -114,15 +113,14 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
         .thenReturn("TestName");
 
       when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getAntuNetexData())
-        .thenReturn(
-          new AntuNetexData(
-            validationReportId,
-            netexEntitiesIndex,
-            commonDataRepository,
-            stopPlaceRepository
-          )
-        );
+      when(validationContext.getValidationReportId())
+        .thenReturn(validationReportId);
+      when(validationContext.getNetexEntitiesIndex())
+        .thenReturn(netexEntitiesIndex);
+      when(validationContext.getNetexDataRepository())
+        .thenReturn(commonDataRepository);
+      when(validationContext.getStopPlaceRepository())
+        .thenReturn(stopPlaceRepository);
 
       MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator =
         new MissingPassengerStopAssignmentValidator(

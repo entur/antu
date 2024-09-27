@@ -3,16 +3,16 @@ package no.entur.antu.commondata;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.model.LineInfo;
 import no.entur.antu.validation.AntuNetexData;
-import no.entur.antu.validation.ValidationContextWithNetexEntitiesIndex;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
+import org.entur.netex.validation.validator.model.SimpleLine;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LineInfoScraper implements CommonDataScraper {
+public class LineInfoScraper implements NetexDataCollector {
 
   private final RedissonClient redissonClient;
   private final Map<String, List<String>> lineInfoCache;
@@ -26,26 +26,20 @@ public class LineInfoScraper implements CommonDataScraper {
   }
 
   @Override
-  public void scrapeData(ValidationContext validationContext) {
-    if (
-      validationContext instanceof ValidationContextWithNetexEntitiesIndex validationContextWithNetexEntitiesIndex
-    ) {
-      AntuNetexData antuNetexData =
-        validationContextWithNetexEntitiesIndex.getAntuNetexData();
-      addLineName(
-        validationContextWithNetexEntitiesIndex
-          .getAntuNetexData()
-          .validationReportId(),
-        antuNetexData.getLineInfo(validationContext.getFileName())
-      );
-    } else {
-      throw new IllegalArgumentException(
-        "ValidationContext must be of type ValidationContextWithNetexEntitiesIndex"
-      );
-    }
+  public void collect(JAXBValidationContext validationContext) {
+    AntuNetexData antuNetexData = new AntuNetexData(
+      validationContext.getValidationReportId(),
+      validationContext.getNetexEntitiesIndex(),
+      validationContext.getNetexDataRepository(),
+      validationContext.getStopPlaceRepository()
+    );
+    addLineName(
+      antuNetexData.validationReportId(),
+      antuNetexData.getLineInfo(validationContext.getFileName())
+    );
   }
 
-  public void addLineName(String validationReportId, LineInfo lineInfo) {
+  public void addLineName(String validationReportId, SimpleLine lineInfo) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {
       lock.lock();

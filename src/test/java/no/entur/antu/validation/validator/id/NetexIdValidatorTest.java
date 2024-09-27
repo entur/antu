@@ -7,7 +7,7 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.entur.netex.validation.validator.id.IdVersion;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    ValidationContext validationContext = new ValidationContext(
+    XPathValidationContext validationContext = new XPathValidationContext(
       null,
       null,
       TEST_CODESPACE,
@@ -101,7 +101,7 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    ValidationContext validationContext = new ValidationContext(
+    XPathValidationContext validationContext = new XPathValidationContext(
       null,
       null,
       TEST_CODESPACE,
@@ -137,7 +137,7 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    ValidationContext validationContext = new ValidationContext(
+    XPathValidationContext validationContext = new XPathValidationContext(
       null,
       null,
       TEST_CODESPACE,
@@ -179,7 +179,7 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    ValidationContext validationContext = new ValidationContext(
+    XPathValidationContext validationContext = new XPathValidationContext(
       null,
       null,
       TEST_CODESPACE,
@@ -215,7 +215,7 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    ValidationContext validationContext = new ValidationContext(
+    XPathValidationContext validationContext = new XPathValidationContext(
       null,
       null,
       TEST_CODESPACE,

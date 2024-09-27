@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
@@ -61,12 +61,13 @@ class ValidateAllowedCodespacesIntegrationTest {
     XdmNode document = NETEX_XML_PARSER.parseByteArrayToXdmNode(
       testDatasetAsStream.readAllBytes()
     );
-    XPathValidationContext validationContext = new XPathValidationContext(
-      document,
-      NETEX_XML_PARSER,
-      testCodespace,
-      testFileValidCodespace
-    );
+    XPathRuleValidationContext validationContext =
+      new XPathRuleValidationContext(
+        document,
+        NETEX_XML_PARSER,
+        testCodespace,
+        testFileValidCodespace
+      );
     return validateAllowedCodespaces.validate(validationContext);
   }
 }

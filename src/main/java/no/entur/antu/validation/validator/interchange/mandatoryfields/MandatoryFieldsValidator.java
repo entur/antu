@@ -7,7 +7,8 @@ import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 
 /**
  * Validator for mandatory fields in interchange.
@@ -33,7 +34,7 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     // ServiceJourneyInterchanges exists only in line files,
@@ -43,7 +44,7 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     antuNetexData

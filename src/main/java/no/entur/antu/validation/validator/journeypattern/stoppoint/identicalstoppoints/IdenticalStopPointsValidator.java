@@ -7,7 +7,8 @@ import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ public class IdenticalStopPointsValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating identical Journey Patterns");
@@ -75,7 +76,7 @@ public class IdenticalStopPointsValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     // JourneyPatterns only appear in the Line file.

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.netextestdata.NetexXmlTestFragment;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
@@ -179,12 +179,13 @@ class NoAlightingAtFirstStopPointTest {
   private List<XPathValidationReportEntry> runTestWith(String journeyPatterns) {
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(journeyPatterns);
 
-    XPathValidationContext xpathValidationContext = new XPathValidationContext(
-      document,
-      NETEX_XML_PARSER,
-      NetexXmlTestFragment.TEST_CODESPACE,
-      null
-    );
+    XPathRuleValidationContext xpathValidationContext =
+      new XPathRuleValidationContext(
+        document,
+        NETEX_XML_PARSER,
+        NetexXmlTestFragment.TEST_CODESPACE,
+        null
+      );
 
     return new NoAlightingAtFirstStopPoint("ServiceFrame")
       .validate(xpathValidationContext);

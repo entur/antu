@@ -1,7 +1,7 @@
 package no.entur.antu.cache.codec;
 
 import io.netty.buffer.ByteBuf;
-import no.entur.antu.model.QuayCoordinates;
+import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.client.handler.State;
 import org.redisson.client.protocol.Decoder;

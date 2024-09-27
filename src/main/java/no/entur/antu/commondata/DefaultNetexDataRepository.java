@@ -4,39 +4,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.model.LineInfo;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceLinkId;
+import org.entur.netex.validation.validator.jaxb.*;
+import org.entur.netex.validation.validator.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default implementation of CommonDataRepository.
+ * Default implementation of NetexDataRepository.
  * This repository is used to store and retrieve common data from Redis cache.
  */
-public class DefaultCommonDataRepository implements CommonDataRepository {
+public class DefaultNetexDataRepository implements NetexDataRepository {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    DefaultCommonDataRepository.class
+    DefaultNetexDataRepository.class
   );
 
   private final CommonDataResource commonDataResource;
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
-  private final Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache;
+  private final Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache;
   private final Map<String, List<String>> lineInfoCache;
 
-  public DefaultCommonDataRepository(
+  public DefaultNetexDataRepository(
     CommonDataResource commonDataResource,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
-    Map<String, Map<String, String>> serviceLinksAndScheduledStopPointIdsCache,
+    Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
     Map<String, List<String>> lineInfoCache
   ) {
     this.commonDataResource = commonDataResource;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
-    this.serviceLinksAndScheduledStopPointIdsCache =
-      serviceLinksAndScheduledStopPointIdsCache;
+    this.serviceLinksAndFromToScheduledStopPointIdCache =
+      serviceLinksAndFromToScheduledStopPointIdCache;
     this.lineInfoCache = lineInfoCache;
   }
 
@@ -66,25 +63,25 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
   }
 
   @Override
-  public ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+  public FromToScheduledStopPointId findFromToScheduledStopPointIdForServiceLink(
     ServiceLinkId serviceLinkId,
     String validationReportId
   ) {
     Map<String, String> idsForReport =
-      serviceLinksAndScheduledStopPointIdsCache.get(validationReportId);
+      serviceLinksAndFromToScheduledStopPointIdCache.get(validationReportId);
     if (idsForReport == null) {
       throw new AntuException(
         "Service links cache not found for validation report with id: " +
         validationReportId
       );
     }
-    return ScheduledStopPointIds.fromString(
+    return FromToScheduledStopPointId.fromString(
       idsForReport.get(serviceLinkId.id())
     );
   }
 
   @Override
-  public List<LineInfo> getLineNames(String validationReportId) {
+  public List<SimpleLine> getLineNames(String validationReportId) {
     List<String> lineInfoForReportId = lineInfoCache.get(validationReportId);
     if (lineInfoForReportId == null) {
       throw new AntuException(
@@ -92,7 +89,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
         validationReportId
       );
     }
-    return lineInfoForReportId.stream().map(LineInfo::fromString).toList();
+    return lineInfoForReportId.stream().map(SimpleLine::fromString).toList();
   }
 
   @Override
@@ -114,12 +111,12 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
 
     Map<String, String> scheduledStopPointIdsPerServiceLinkId =
       commonDataResource
-        .getScheduledStopPointIdsPerServiceLinkId()
+        .getFromToScheduledStopPointIdPerServiceLinkId()
         .entrySet()
         .stream()
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    serviceLinksAndScheduledStopPointIdsCache.merge(
+    serviceLinksAndFromToScheduledStopPointIdCache.merge(
       validationReportId,
       scheduledStopPointIdsPerServiceLinkId,
       (existingMap, newMap) -> {
@@ -142,7 +139,7 @@ public class DefaultCommonDataRepository implements CommonDataRepository {
       validationReportId
     );
     scheduledStopPointAndQuayIdCache.remove(validationReportId);
-    serviceLinksAndScheduledStopPointIdsCache.remove(validationReportId);
+    serviceLinksAndFromToScheduledStopPointIdCache.remove(validationReportId);
     lineInfoCache.remove(validationReportId);
   }
 }

@@ -8,20 +8,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import no.entur.antu.validation.NetexCodespace;
-import org.entur.netex.validation.validator.AbstractNetexValidator;
+import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.id.IdVersion;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Validate that NeTEX IDs have a valid structure.
  */
-public class NetexIdValidator extends AbstractNetexValidator {
+public class NetexIdValidator extends AbstractXPathValidator {
 
   static final String RULE_CODE_NETEX_ID_2 = "NETEX_ID_2";
   static final String RULE_CODE_NETEX_ID_3 = "NETEX_ID_3";
@@ -66,13 +66,13 @@ public class NetexIdValidator extends AbstractNetexValidator {
   @Override
   public void validate(
     ValidationReport validationReport,
-    ValidationContext validationContext
+    XPathValidationContext validationContext
   ) {
     validationReport.addAllValidationReportEntries(validate(validationContext));
   }
 
   protected List<ValidationReportEntry> validate(
-    ValidationContext validationContext
+    XPathValidationContext validationContext
   ) {
     List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
 

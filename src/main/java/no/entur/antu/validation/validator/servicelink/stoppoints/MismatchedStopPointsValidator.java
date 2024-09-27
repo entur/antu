@@ -4,8 +4,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ScheduledStopPointIds;
 import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
@@ -13,7 +11,9 @@ import no.entur.antu.validation.ValidationError;
 import no.entur.antu.validation.utilities.Comparison;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.xpath.ValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.model.FromToScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +57,7 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    ValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     // Journey pattern are only in line file.
@@ -66,7 +66,7 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    ValidationContext validationContext,
+    JAXBValidationContext validationContext,
     AntuNetexData antuNetexData
   ) {
     LOGGER.debug("Validating ServiceLinks");
@@ -92,7 +92,7 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
     MismatchedStopPointsContext context,
     Consumer<ValidationError> reportError
   ) {
-    BiFunction<ScheduledStopPointIds, Function<ScheduledStopPointIds, ScheduledStopPointId>, String> stopPointName =
+    BiFunction<FromToScheduledStopPointId, Function<FromToScheduledStopPointId, ScheduledStopPointId>, String> stopPointName =
       (scheduledStopPointIds, getStopPointId) ->
         Optional
           .ofNullable(scheduledStopPointIds)
@@ -118,25 +118,25 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
             Comparison.of(
               stopPointName.apply(
                 context.stopPointsInServiceLink().get(serviceLinkId),
-                ScheduledStopPointIds::from
+                FromToScheduledStopPointId::from
               ),
               stopPointName.apply(
                 context
                   .stopPointsForServiceLinksInJourneyPattern()
                   .get(serviceLinkId),
-                ScheduledStopPointIds::from
+                FromToScheduledStopPointId::from
               )
             ),
             Comparison.of(
               stopPointName.apply(
                 context.stopPointsInServiceLink().get(serviceLinkId),
-                ScheduledStopPointIds::to
+                FromToScheduledStopPointId::to
               ),
               stopPointName.apply(
                 context
                   .stopPointsForServiceLinksInJourneyPattern()
                   .get(serviceLinkId),
-                ScheduledStopPointIds::to
+                FromToScheduledStopPointId::to
               )
             )
           )

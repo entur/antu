@@ -3,17 +3,9 @@ package no.entur.antu.config;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.model.LineInfo;
-import no.entur.antu.model.QuayCoordinates;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.ScheduledStopPointId;
-import no.entur.antu.model.ScheduledStopPointIds;
-import no.entur.antu.model.ServiceLinkId;
-import no.entur.antu.model.StopPlaceId;
-import no.entur.antu.model.TransportModeAndSubMode;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.stop.StopPlaceRepository;
+import org.entur.netex.validation.validator.jaxb.*;
+import org.entur.netex.validation.validator.model.*;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -23,8 +15,8 @@ public class TestConfig {
 
   @Bean
   @Primary
-  public CommonDataRepository commonDataRepository() {
-    return new CommonDataRepository() {
+  public NetexDataRepository commonDataRepository() {
+    return new NetexDataRepository() {
       @Override
       public boolean hasQuayIds(String validationReportId) {
         return true;
@@ -39,7 +31,7 @@ public class TestConfig {
       }
 
       @Override
-      public ScheduledStopPointIds findScheduledStopPointIdsForServiceLink(
+      public FromToScheduledStopPointId findFromToScheduledStopPointIdForServiceLink(
         ServiceLinkId serviceLinkId,
         String validationReportId
       ) {
@@ -47,7 +39,7 @@ public class TestConfig {
       }
 
       @Override
-      public List<LineInfo> getLineNames(String validationReportId) {
+      public List<SimpleLine> getLineNames(String validationReportId) {
         return List.of();
       }
 

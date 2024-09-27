@@ -3,21 +3,17 @@ package no.entur.antu.validation.validator.line;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import no.entur.antu.commondata.CommonDataRepository;
-import no.entur.antu.model.LineInfo;
-import org.entur.netex.validation.validator.DataLocation;
-import org.entur.netex.validation.validator.NetexDatasetValidator;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.*;
+import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.model.SimpleLine;
 
-public class DuplicateLineNameValidator extends NetexDatasetValidator {
+public class DuplicateLineNameValidator extends AbstractDatasetValidator {
 
-  private final CommonDataRepository commonDataRepository;
+  private final NetexDataRepository commonDataRepository;
 
   public DuplicateLineNameValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
-    CommonDataRepository commonDataRepository
+    NetexDataRepository commonDataRepository
   ) {
     super(validationReportEntryFactory);
     this.commonDataRepository = commonDataRepository;
@@ -25,7 +21,7 @@ public class DuplicateLineNameValidator extends NetexDatasetValidator {
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
-    List<LineInfo> lineNames = commonDataRepository.getLineNames(
+    List<SimpleLine> lineNames = commonDataRepository.getLineNames(
       validationReport.getValidationReportId()
     );
 
@@ -49,7 +45,7 @@ public class DuplicateLineNameValidator extends NetexDatasetValidator {
           entry
             .getValue()
             .stream()
-            .map(LineInfo::fileName)
+            .map(SimpleLine::fileName)
             .filter(filename -> !filename.equals(entry.getKey().fileName()))
             .map(filename -> "'" + filename + "'")
             .collect(Collectors.joining(", "))

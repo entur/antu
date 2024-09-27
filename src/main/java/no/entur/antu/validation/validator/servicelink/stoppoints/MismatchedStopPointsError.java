@@ -1,8 +1,8 @@
 package no.entur.antu.validation.validator.servicelink.stoppoints;
 
-import no.entur.antu.model.ServiceLinkId;
 import no.entur.antu.validation.ValidationError;
 import no.entur.antu.validation.utilities.Comparison;
+import org.entur.netex.validation.validator.model.ServiceLinkId;
 
 public record MismatchedStopPointsError(
   RuleCode ruleCode,

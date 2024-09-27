@@ -3,11 +3,11 @@ package no.entur.antu.validation.validator.id;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import no.entur.antu.model.QuayId;
-import no.entur.antu.model.StopPlaceId;
-import no.entur.antu.stop.StopPlaceRepository;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.IdVersion;
+import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
+import org.entur.netex.validation.validator.model.QuayId;
+import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
