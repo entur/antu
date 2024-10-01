@@ -1,66 +1,55 @@
 package no.entur.antu.validation.validator.interchange.stoppoints;
 
 import java.util.Objects;
-import java.util.function.Consumer;
-import no.entur.antu.validation.AntuNetexData;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import no.entur.antu.validation.ValidationError;
+import org.entur.netex.validation.validator.AbstractDatasetValidator;
+import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 
 /**
  * Validates that the stop points in interchange are part of the respective service journeys in the interchange.
  * Chouette reference: 3-Interchange-6-1, 3-Interchange-6-2
  */
-public class StopPointsInVehicleJourneyValidator extends AntuNetexValidator {
+public class StopPointsInVehicleJourneyValidator
+  extends AbstractDatasetValidator {
+
+  private final NetexDataRepository netexDataRepository;
 
   public StopPointsInVehicleJourneyValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
+    ValidationReportEntryFactory validationReportEntryFactory,
+    NetexDataRepository netexDataRepository
   ) {
     super(validationReportEntryFactory);
+    this.netexDataRepository = netexDataRepository;
   }
 
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return StopPointsInVehicleJourneyError.RuleCode.values();
-  }
-
-  @Override
-  protected void validateLineFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
-  ) {
-    antuNetexData
-      .serviceJourneyInterchanges()
+  public ValidationReport validate(ValidationReport validationReport) {
+    netexDataRepository
+      .serviceJourneyInterchangeInfos(validationReport.getValidationReportId())
+      .stream()
       .map(serviceJourneyInterchange ->
         StopPointsInVehicleJourneyContext.of(
-          antuNetexData,
+          validationReport.getValidationReportId(),
+          netexDataRepository,
           serviceJourneyInterchange
         )
       )
       .filter(StopPointsInVehicleJourneyContext::isValid)
-      .forEach(context ->
-        validateStopPoint(
-          antuNetexData,
-          context,
-          validationError ->
-            addValidationReportEntry(
-              validationReport,
-              validationContext,
-              validationError
-            )
-        )
-      );
+      .map(this::validateStopPoint)
+      .filter(Objects::nonNull)
+      .forEach(validationReport::addValidationReportEntry);
+
+    return validationReport;
   }
 
-  private void validateStopPoint(
-    AntuNetexData antuNetexData,
-    StopPointsInVehicleJourneyContext context,
-    Consumer<ValidationError> reportError
+  private ValidationReportEntry validateStopPoint(
+    StopPointsInVehicleJourneyContext context
   ) {
     if (
       context
@@ -68,16 +57,18 @@ public class StopPointsInVehicleJourneyValidator extends AntuNetexValidator {
         .stream()
         .map(ServiceJourneyStop::scheduledStopPointId)
         .noneMatch(fromStopPoint ->
-          Objects.equals(fromStopPoint, context.fromStopPoint())
+          Objects.equals(
+            fromStopPoint,
+            context.serviceJourneyInterchangeInfo().fromStopPoint()
+          )
         )
     ) {
-      reportError.accept(
-        new StopPointsInVehicleJourneyError(
-          StopPointsInVehicleJourneyError.RuleCode.FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF,
-          context.interchangeId(),
-          antuNetexData.stopPointName(context.fromStopPoint()),
-          context.fromJourneyRef()
-        )
+      return createValidationReportEntry(
+        "FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF",
+        context.serviceJourneyInterchangeInfo().interchangeId(),
+        context.serviceJourneyInterchangeInfo().filename(),
+        context.serviceJourneyInterchangeInfo().fromStopPoint(),
+        context.serviceJourneyInterchangeInfo().fromJourneyRef()
       );
     }
 
@@ -87,17 +78,38 @@ public class StopPointsInVehicleJourneyValidator extends AntuNetexValidator {
         .stream()
         .map(ServiceJourneyStop::scheduledStopPointId)
         .noneMatch(toStopPoint ->
-          Objects.equals(toStopPoint, context.toStopPoint())
+          Objects.equals(
+            toStopPoint,
+            context.serviceJourneyInterchangeInfo().toStopPoint()
+          )
         )
     ) {
-      reportError.accept(
-        new StopPointsInVehicleJourneyError(
-          StopPointsInVehicleJourneyError.RuleCode.TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF,
-          context.interchangeId(),
-          antuNetexData.stopPointName(context.toStopPoint()),
-          context.toJourneyRef()
-        )
+      return createValidationReportEntry(
+        "TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF",
+        context.serviceJourneyInterchangeInfo().interchangeId(),
+        context.serviceJourneyInterchangeInfo().filename(),
+        context.serviceJourneyInterchangeInfo().toStopPoint(),
+        context.serviceJourneyInterchangeInfo().toJourneyRef()
       );
     }
+    return null;
+  }
+
+  private ValidationReportEntry createValidationReportEntry(
+    String ruleCode,
+    String interchangeId,
+    String filename,
+    ScheduledStopPointId stopPoint,
+    ServiceJourneyId journeyRef
+  ) {
+    return createValidationReportEntry(
+      ruleCode,
+      new DataLocation(interchangeId, filename, 0, 0),
+      String.format(
+        "Stop point (%s) is not a part of journey ref (%s).",
+        stopPoint.id(),
+        journeyRef.id()
+      )
+    );
   }
 }

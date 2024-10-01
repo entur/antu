@@ -1,12 +1,14 @@
 package no.entur.antu.validation.validator.interchange.stoppoints;
 
 import no.entur.antu.validation.ValidationError;
+import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 
 public record StopPointsInVehicleJourneyError(
   RuleCode ruleCode,
   String interchangeId,
-  String stopPointName,
-  String journeyRef
+  ScheduledStopPointId stopPointName,
+  ServiceJourneyId journeyRef
 )
   implements ValidationError {
   @Override
@@ -20,7 +22,7 @@ public record StopPointsInVehicleJourneyError(
       String.format(
         "Stop point (%s) is not a part of journey ref (%s).",
         stopPointName,
-        journeyRef
+        journeyRef.id()
       )
     );
   }

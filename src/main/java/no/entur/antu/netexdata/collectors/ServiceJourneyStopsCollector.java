@@ -1,4 +1,4 @@
-package no.entur.antu.commondata.scraper;
+package no.entur.antu.netexdata.collectors;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +8,9 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
   private final Map<String, Map<String, List<String>>> serviceJourneyStopsCache;
