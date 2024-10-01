@@ -1,4 +1,4 @@
-package no.entur.antu.commondata.scraper;
+package no.entur.antu.netexdata.collectors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +9,7 @@ import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.SimpleLine;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.springframework.stereotype.Component;
 
-@Component
 public class LineInfoCollector extends NetexDataCollector {
 
   private final RedissonClient redissonClient;

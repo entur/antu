@@ -7,27 +7,16 @@ import java.util.Collection;
 import java.util.List;
 import no.entur.antu.netextestdata.NetexTestFragment;
 import no.entur.antu.validation.ValidationTest;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
+import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
 class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
-
-  private ValidationReport runValidation(
-    NetexEntitiesIndex netexEntitiesIndex
-  ) {
-    return runValidationOnLineFile(
-      netexEntitiesIndex,
-      StopPointsInVehicleJourneyValidator.class
-    );
-  }
 
   @Test
   void interchangeStopPointArePartOfVehicleJourneys() {
@@ -96,9 +85,8 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
   @Test
   void noInterchangeNoEffect() {
-    NetexTestFragment fragment = new NetexTestFragment();
-    ValidationReport validationReport = runValidation(
-      fragment.netexEntitiesIndex().create()
+    ValidationReport validationReport = runDatasetValidation(
+      StopPointsInVehicleJourneyValidator.class
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -111,11 +99,14 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       .serviceJourneyInterchange()
       .create();
 
-    ValidationReport validationReport = runValidation(
-      fragment
-        .netexEntitiesIndex()
-        .addInterchanges(serviceJourneyInterchange)
-        .create()
+    mockGetServiceJourneyInterchangeInfo(
+      List.of(
+        ServiceJourneyInterchangeInfo.of("test.xml", serviceJourneyInterchange)
+      )
+    );
+
+    ValidationReport validationReport = runDatasetValidation(
+      StopPointsInVehicleJourneyValidator.class
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -177,33 +168,6 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       "TST:ServiceJourney:" + toServiceJourneyId
     );
 
-    JourneyPattern journeyPattern = fragment
-      .journeyPattern()
-      .withId(1)
-      .withStopPointsInJourneyPattern(
-        List.of(
-          fragment
-            .stopPointInJourneyPattern(1)
-            .withScheduledStopPointId(fromPointRefId)
-            .create(),
-          fragment
-            .stopPointInJourneyPattern(2)
-            .withScheduledStopPointId(toPointRefId)
-            .create()
-        )
-      )
-      .create();
-
-    ServiceJourney serviceJourney1 = fragment
-      .serviceJourney(journeyPattern)
-      .withId(fromServiceJourneyId)
-      .create();
-
-    ServiceJourney serviceJourney2 = fragment
-      .serviceJourney(journeyPattern)
-      .withId(toServiceJourneyId)
-      .create();
-
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
       .serviceJourneyInterchange()
       .withFromPointRef(fromPointRef)
@@ -212,13 +176,12 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       .withToJourneyRef(toServiceJourneyRef)
       .create();
 
-    return runValidation(
-      fragment
-        .netexEntitiesIndex()
-        .addJourneyPatterns(journeyPattern)
-        .addServiceJourneys(serviceJourney1, serviceJourney2)
-        .addInterchanges(serviceJourneyInterchange)
-        .create()
+    mockGetServiceJourneyInterchangeInfo(
+      List.of(
+        ServiceJourneyInterchangeInfo.of("test.xml", serviceJourneyInterchange)
+      )
     );
+
+    return runDatasetValidation(StopPointsInVehicleJourneyValidator.class);
   }
 }

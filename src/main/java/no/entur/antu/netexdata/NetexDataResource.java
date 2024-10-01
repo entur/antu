@@ -1,4 +1,4 @@
-package no.entur.antu.commondata;
+package no.entur.antu.netexdata;
 
 import jakarta.xml.bind.JAXBElement;
 import java.io.ByteArrayInputStream;

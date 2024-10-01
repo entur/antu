@@ -52,6 +52,13 @@ public class TestConfig {
       }
 
       @Override
+      public List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos(
+        String validationReportId
+      ) {
+        return List.of();
+      }
+
+      @Override
       public void fillNetexDataCache(
         byte[] fileContent,
         String validationReportId
