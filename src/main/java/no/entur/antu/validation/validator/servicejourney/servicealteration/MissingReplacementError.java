@@ -2,13 +2,13 @@ package no.entur.antu.validation.validator.servicejourney.servicealteration;
 
 import no.entur.antu.validation.ValidationError;
 
-public record MissingServiceAlterationError(
-  String serviceJourneyId,
+public record MissingReplacementError(
+  String datedServiceJourneyId,
   RuleCode ruleCode
 )
   implements ValidationError {
   public enum RuleCode implements no.entur.antu.validation.RuleCode {
-    MISSING_SERVICE_ALTERATION("Missing service alteration");
+    MISSING_REPLACEMENT("Missing replacement");
 
     private final String errorMessage;
 
@@ -29,13 +29,11 @@ public record MissingServiceAlterationError(
 
   @Override
   public String getEntityId() {
-    return serviceJourneyId;
+    return datedServiceJourneyId;
   }
 
   @Override
   public String validationReportEntryMessage() {
-    return (
-      ruleCode.getErrorMessage()
-    );
+    return "No replacement found";
   }
 }

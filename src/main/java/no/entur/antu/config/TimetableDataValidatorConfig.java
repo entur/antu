@@ -31,6 +31,7 @@ import no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscou
 import no.entur.antu.validation.validator.line.DuplicateLineNameValidator;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeValidator;
+import no.entur.antu.validation.validator.servicejourney.servicealteration.InvalidServiceAlterationValidator;
 import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeedValidator;
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
@@ -194,6 +195,15 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public InvalidServiceAlterationValidator missingServiceAlterationValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new InvalidServiceAlterationValidator(validationReportEntryFactory);
+  }
+
+  @Bean
   public DuplicateLineNameValidator duplicateLineNameValidator(
     @Qualifier(
       "validationReportEntryFactory"
@@ -232,6 +242,7 @@ public class TimetableDataValidatorConfig {
     MismatchedStopPointsValidator mismatchedStopPointsValidator,
     MandatoryFieldsValidator mandatoryFieldsValidator,
     DuplicateInterchangesValidator duplicateInterchangesValidator,
+    InvalidServiceAlterationValidator missingServiceAlterationValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
     LineInfoScraper lineInfoScraper,
     NetexDataRepository commonDataRepository,
@@ -261,7 +272,8 @@ public class TimetableDataValidatorConfig {
       unexpectedDistanceInServiceLinkValidator,
       mismatchedStopPointsValidator,
       mandatoryFieldsValidator,
-      duplicateInterchangesValidator
+      duplicateInterchangesValidator,
+      missingServiceAlterationValidator
     );
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
@@ -274,7 +286,7 @@ public class TimetableDataValidatorConfig {
       netexXMLParser,
       netexSchemaValidator,
       xPathValidators,
-      jaxbValidators,
+      List.of(missingServiceAlterationValidator), // jaxbValidators,
       netexTimetableDatasetValidators,
       commonDataScrapers,
       commonDataRepository,
