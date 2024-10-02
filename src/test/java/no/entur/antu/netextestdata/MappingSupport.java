@@ -17,12 +17,28 @@ public class MappingSupport {
    * Short for {@code createJaxbElement(createRef(id, clazz))}
    *
    * @see #createRef(String, Class)
-   * @see #createJaxbElement(Object)
+   * @see #jaxbElement(Object)
    */
   public static <
     T extends VersionOfObjectRefStructure
-  > JAXBElement<T> createWrappedRef(String id, Class<T> clazz) {
-    return createJaxbElement(createRef(id, clazz));
+  > JAXBElement<T> jaxbElement(String id, Class<T> clazz) {
+    return jaxbElement(createRef(id, clazz));
+  }
+
+  /**
+   * Wrap an object in a JAXBElement instance.
+   *
+   * @param value the value wrapped
+   * @param <T>   the value type
+   * @return the value wrapped in a JAXBElement
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> JAXBElement<T> jaxbElement(@Nonnull T value) {
+    return new JAXBElement<>(
+      new QName("x"),
+      (Class<T>) value.getClass(),
+      value
+    );
   }
 
   /**
@@ -34,7 +50,7 @@ public class MappingSupport {
    * @param <T>   the type of the created ref structure
    */
   @SuppressWarnings("unchecked")
-  public static <T extends VersionOfObjectRefStructure> T createRef(
+  private static <T extends VersionOfObjectRefStructure> T createRef(
     String id,
     Class<T> clazz
   ) {
@@ -43,21 +59,5 @@ public class MappingSupport {
     } catch (Exception e) {
       throw new RuntimeException(e.getLocalizedMessage(), e);
     }
-  }
-
-  /**
-   * Wrap an object in a JAXBElement instance.
-   *
-   * @param value the value wrapped
-   * @param <T>   the value type
-   * @return the value wrapped in a JAXBElement
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> JAXBElement<T> createJaxbElement(@Nonnull T value) {
-    return new JAXBElement<>(
-      new QName("x"),
-      (Class<T>) value.getClass(),
-      value
-    );
   }
 }
