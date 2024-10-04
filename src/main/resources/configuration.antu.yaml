@@ -112,8 +112,8 @@ validationRuleConfigs:
     name: Duplicate line names found
     severity: WARNING
   - code: INVALID_SERVICE_ALTERATION
-    name: Invalid ServiceAlteration
+    name: Invalid/Missing ServiceAlteration
     severity: WARNING
-  - code: MISSING_REPLACEMENT
+  - code: MISSING_REPLACEMENT_FOR_SERVICE_ALTERATION
     name: Missing replacement for ServiceAlteration
     severity: WARNING

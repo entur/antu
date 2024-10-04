@@ -64,9 +64,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addServiceJourneys(
-          serviceJourneys.toArray(Journey_VersionStructure[]::new)
-        )
+        .addJourneys(serviceJourneys.toArray(Journey_VersionStructure[]::new))
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
@@ -110,7 +108,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addServiceJourneys(serviceJourney)
+        .addJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
@@ -165,7 +163,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addServiceJourneys(serviceJourney)
+        .addJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
@@ -212,7 +210,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addServiceJourneys(serviceJourney)
+        .addJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
@@ -259,7 +257,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addServiceJourneys(serviceJourney)
+        .addJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
