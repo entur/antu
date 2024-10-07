@@ -106,6 +106,8 @@ public final class Constants {
     "TimetableSweden";
   public static final String VALIDATION_PROFILE_STOP = "Stop";
 
+  public static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
+
   public static final String CAMEL_ALL_HTTP_HEADERS = "CamelHttp*";
   public static final String VALIDATION_REPORT_PREFIX = "/validation-report-";
   public static final String VALIDATION_REPORT_SUFFIX = ".json";
