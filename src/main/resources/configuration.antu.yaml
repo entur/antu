@@ -114,6 +114,6 @@ validationRuleConfigs:
   - code: INVALID_SERVICE_ALTERATION
     name: Invalid/Missing ServiceAlteration
     severity: WARNING
-  - code: MISSING_REPLACEMENT_FOR_SERVICE_ALTERATION
+  - code: MISSING_REPLACEMENT
     name: Missing replacement for ServiceAlteration
     severity: WARNING
