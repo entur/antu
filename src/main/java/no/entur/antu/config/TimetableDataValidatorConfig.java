@@ -31,6 +31,8 @@ import no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscou
 import no.entur.antu.validation.validator.line.DuplicateLineNameValidator;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeValidator;
+import no.entur.antu.validation.validator.servicejourney.servicealteration.InvalidServiceAlterationValidator;
+import no.entur.antu.validation.validator.servicejourney.servicealteration.MissingReplacementValidator;
 import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeedValidator;
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
@@ -194,6 +196,24 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public InvalidServiceAlterationValidator missingServiceAlterationValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new InvalidServiceAlterationValidator(validationReportEntryFactory);
+  }
+
+  @Bean
+  public MissingReplacementValidator missingReplacementValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory
+  ) {
+    return new MissingReplacementValidator(validationReportEntryFactory);
+  }
+
+  @Bean
   public DuplicateLineNameValidator duplicateLineNameValidator(
     @Qualifier(
       "validationReportEntryFactory"
@@ -232,7 +252,9 @@ public class TimetableDataValidatorConfig {
     MismatchedStopPointsValidator mismatchedStopPointsValidator,
     MandatoryFieldsValidator mandatoryFieldsValidator,
     DuplicateInterchangesValidator duplicateInterchangesValidator,
+    InvalidServiceAlterationValidator invalidServiceAlterationValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
+    MissingReplacementValidator missingReplacementValidator,
     LineInfoScraper lineInfoScraper,
     NetexDataRepository commonDataRepository,
     StopPlaceRepository stopPlaceRepository
@@ -261,7 +283,9 @@ public class TimetableDataValidatorConfig {
       unexpectedDistanceInServiceLinkValidator,
       mismatchedStopPointsValidator,
       mandatoryFieldsValidator,
-      duplicateInterchangesValidator
+      duplicateInterchangesValidator,
+      invalidServiceAlterationValidator,
+      missingReplacementValidator
     );
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(

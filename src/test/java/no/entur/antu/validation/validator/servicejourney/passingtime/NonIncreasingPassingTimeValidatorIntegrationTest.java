@@ -40,10 +40,7 @@ class NonIncreasingPassingTimeValidatorIntegrationTest {
     ValidationReport validationReport = getValidationReport(
       TEST_FILE_VALID_INVALID
     );
-    Collection<ValidationReportEntry> validationReportEntries =
-      validationReport.getValidationReportEntries();
-    assertFalse(validationReportEntries.isEmpty());
-    assertEquals(3, validationReportEntries.size());
+    assertEquals(3, validationReport.getValidationReportEntries().size());
   }
 
   private ValidationReport getValidationReport(String testFile)

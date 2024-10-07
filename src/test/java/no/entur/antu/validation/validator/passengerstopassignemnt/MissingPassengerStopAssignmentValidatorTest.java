@@ -115,9 +115,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
     NetexEntitiesIndex netexEntitiesIndex = testData
       .netexEntitiesIndex()
       .addJourneyPatterns(journeyPatterns.toArray(JourneyPattern[]::new))
-      .addServiceJourneys(
-        serviceJourneys.toArray(Journey_VersionStructure[]::new)
-      )
+      .addJourneys(serviceJourneys.toArray(Journey_VersionStructure[]::new))
       .create();
 
     ValidationReport validationReport = runValidation(netexEntitiesIndex);
@@ -177,7 +175,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
     NetexEntitiesIndex netexEntitiesIndex = testData
       .netexEntitiesIndex()
       .addJourneyPatterns(journeyPattern)
-      .addServiceJourneys(deadRun, serviceJourney)
+      .addJourneys(deadRun, serviceJourney)
       .create();
 
     ValidationReport validationReport = runValidation(netexEntitiesIndex);

@@ -13,6 +13,8 @@ import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.*;
 import org.entur.netex.validation.validator.model.*;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.DatedServiceJourney;
+import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 import org.rutebanken.netex.model.FlexibleStopPlace;
@@ -25,6 +27,7 @@ import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Route;
+import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
@@ -303,6 +306,54 @@ public record AntuNetexData(
           timetabledPassingTimes(serviceJourney).toList().size()
         );
       });
+  }
+
+  public Stream<DatedServiceJourney> datedServiceJourneysWithReferenceToReplaced() {
+    return netexEntitiesIndex
+      .getDatedServiceJourneyIndex()
+      .getAll()
+      .stream()
+      .filter(dsj -> dsj.getJourneyRef() != null)
+      .filter(dsj ->
+        dsj
+          .getJourneyRef()
+          .stream()
+          .map(JAXBElement::getValue)
+          .anyMatch(DatedServiceJourneyRefStructure.class::isInstance)
+      );
+  }
+
+  public Stream<DatedServiceJourney> replacedDatedServiceJourneys() {
+    return netexEntitiesIndex
+      .getDatedServiceJourneyIndex()
+      .getAll()
+      .stream()
+      .filter(dsj ->
+        dsj.getServiceAlteration() == ServiceAlterationEnumeration.REPLACED
+      );
+  }
+
+  public DatedServiceJourneyRefStructure datedServiceJourneyRef(
+    DatedServiceJourney datedServiceJourney
+  ) {
+    return datedServiceJourney
+      .getJourneyRef()
+      .stream()
+      .map(JAXBElement::getValue)
+      .filter(DatedServiceJourneyRefStructure.class::isInstance)
+      .map(DatedServiceJourneyRefStructure.class::cast)
+      .findFirst()
+      .orElse(null);
+  }
+
+  public DatedServiceJourney datedServiceJourney(
+    DatedServiceJourneyRefStructure datedServiceJourneyRefStructure
+  ) {
+    return Optional
+      .ofNullable(datedServiceJourneyRefStructure)
+      .map(DatedServiceJourneyRefStructure::getRef)
+      .map(ref -> netexEntitiesIndex.getDatedServiceJourneyIndex().get(ref))
+      .orElse(null);
   }
 
   /**
