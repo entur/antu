@@ -5,8 +5,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.validation.validator.DatasetValidator;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
@@ -20,16 +22,16 @@ public class ValidationTest {
 
   private static final String VALIDATION_REPORT_ID = "Test1122";
   private static final String VALIDATION_REPORT_CODEBASE = "TST";
-  protected NetexDataRepository commonDataRepositoryMock;
+  protected NetexDataRepository netexDataRepositoryMock;
   protected StopPlaceRepository stopPlaceRepositoryMock;
 
   protected ValidationTest() {}
 
   @BeforeEach
   void resetMocks() {
-    this.commonDataRepositoryMock = mock(NetexDataRepository.class);
+    this.netexDataRepositoryMock = mock(NetexDataRepository.class);
     Mockito
-      .when(commonDataRepositoryMock.hasQuayIds(anyString()))
+      .when(netexDataRepositoryMock.hasQuayIds(anyString()))
       .thenReturn(true);
 
     this.stopPlaceRepositoryMock = mock(StopPlaceRepository.class);
@@ -37,14 +39,14 @@ public class ValidationTest {
 
   protected void mockNoQuayIdsInNetexDataRepository() {
     Mockito
-      .when(commonDataRepositoryMock.hasQuayIds(anyString()))
+      .when(netexDataRepositoryMock.hasQuayIds(anyString()))
       .thenReturn(false);
   }
 
   protected void mockGetStopName(ScheduledStopPointId scheduledStopPointId) {
     QuayId quayId = new QuayId("TST:Quay:007");
     when(
-      commonDataRepositoryMock.findQuayIdForScheduledStopPoint(
+      netexDataRepositoryMock.quayIdForScheduledStopPoint(
         scheduledStopPointId,
         VALIDATION_REPORT_ID
       )
@@ -69,7 +71,7 @@ public class ValidationTest {
   ) {
     Mockito
       .when(
-        commonDataRepositoryMock.findQuayIdForScheduledStopPoint(
+        netexDataRepositoryMock.quayIdForScheduledStopPoint(
           eq(scheduledStopPointId),
           anyString()
         )
@@ -92,12 +94,34 @@ public class ValidationTest {
   ) {
     Mockito
       .when(
-        commonDataRepositoryMock.findFromToScheduledStopPointIdForServiceLink(
+        netexDataRepositoryMock.fromToScheduledStopPointIdForServiceLink(
           eq(serviceLinkId),
           anyString()
         )
       )
       .thenReturn(scheduledStopPointIds);
+  }
+
+  protected void mockGetServiceJourneyStops(
+    ServiceJourneyId serviceJourneyId,
+    List<ServiceJourneyStop> serviceJourneyStops
+  ) {
+    Mockito
+      .when(
+        netexDataRepositoryMock.serviceJourneyStops(
+          anyString(),
+          eq(serviceJourneyId)
+        )
+      )
+      .thenReturn(serviceJourneyStops);
+  }
+
+  protected void mockGetServiceJourneyInterchangeInfo(
+    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos
+  ) {
+    Mockito
+      .when(netexDataRepositoryMock.serviceJourneyInterchangeInfos(anyString()))
+      .thenReturn(serviceJourneyInterchangeInfos);
   }
 
   protected <
@@ -107,6 +131,40 @@ public class ValidationTest {
     Class<V> validatorClass
   ) {
     return runValidation(netexEntitiesIndex, validatorClass, true);
+  }
+
+  protected <V extends DatasetValidator> ValidationReport runDatasetValidation(
+    Class<V> validatorClass
+  ) {
+    ValidationReportEntryFactory validationReportEntryFactory = (
+        code,
+        message,
+        dataLocation
+      ) ->
+      new ValidationReportEntry(
+        message,
+        code,
+        ValidationReportEntrySeverity.ERROR
+      );
+
+    ValidationReport testValidationReport = new ValidationReport(
+      VALIDATION_REPORT_CODEBASE,
+      VALIDATION_REPORT_ID
+    );
+
+    try {
+      V validator = validatorClass
+        .getDeclaredConstructor(
+          ValidationReportEntryFactory.class,
+          NetexDataRepository.class
+        )
+        .newInstance(validationReportEntryFactory, netexDataRepositoryMock);
+      validator.validate(testValidationReport);
+
+      return testValidationReport;
+    } catch (Exception ex) {
+      throw new AntuException("Failed to initialize validator", ex);
+    }
   }
 
   protected <
@@ -147,7 +205,7 @@ public class ValidationTest {
     when(validationContext.getNetexEntitiesIndex())
       .thenReturn(netexEntitiesIndex);
     when(validationContext.getNetexDataRepository())
-      .thenReturn(commonDataRepositoryMock);
+      .thenReturn(netexDataRepositoryMock);
     when(validationContext.getStopPlaceRepository())
       .thenReturn(stopPlaceRepositoryMock);
 

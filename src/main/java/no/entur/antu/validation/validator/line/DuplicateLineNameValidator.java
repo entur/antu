@@ -9,19 +9,19 @@ import org.entur.netex.validation.validator.model.SimpleLine;
 
 public class DuplicateLineNameValidator extends AbstractDatasetValidator {
 
-  private final NetexDataRepository commonDataRepository;
+  private final NetexDataRepository netexDataRepository;
 
   public DuplicateLineNameValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
-    NetexDataRepository commonDataRepository
+    NetexDataRepository netexDataRepository
   ) {
     super(validationReportEntryFactory);
-    this.commonDataRepository = commonDataRepository;
+    this.netexDataRepository = netexDataRepository;
   }
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
-    List<SimpleLine> lineNames = commonDataRepository.getLineNames(
+    List<SimpleLine> lineNames = netexDataRepository.lineNames(
       validationReport.getValidationReportId()
     );
 

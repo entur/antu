@@ -61,8 +61,8 @@ public record UnexpectedDistanceInServiceLinkContext(
         return null;
       }
 
-      QuayCoordinates from = antuNetexData.getCoordinatesForQuayId(fromQuayId);
-      QuayCoordinates to = antuNetexData.getCoordinatesForQuayId(toQuayId);
+      QuayCoordinates from = antuNetexData.coordinatesForQuayId(fromQuayId);
+      QuayCoordinates to = antuNetexData.coordinatesForQuayId(toQuayId);
 
       if (from == null || to == null) {
         LOGGER.warn(
@@ -94,7 +94,7 @@ public record UnexpectedDistanceInServiceLinkContext(
         .ofNullable(scheduledStopPointRef)
         .map(VersionOfObjectRefStructure::getRef)
         .map(ScheduledStopPointId::new)
-        .map(antuNetexData::findQuayIdForScheduledStopPoint)
+        .map(antuNetexData::quayIdForScheduledStopPoint)
         .orElse(null);
     }
 

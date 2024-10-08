@@ -1,12 +1,13 @@
 package no.entur.antu.validation.validator.servicejourney.transportmode;
 
 import no.entur.antu.validation.ValidationError;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 
 public record MismatchedTransportModeError(
   RuleCode ruleCode,
   String actual,
   String expected,
-  String serviceJourneyId
+  ServiceJourneyId serviceJourneyId
 )
   implements ValidationError {
   @Override
@@ -16,7 +17,7 @@ public record MismatchedTransportModeError(
 
   @Override
   public String getEntityId() {
-    return serviceJourneyId();
+    return serviceJourneyId.id();
   }
 
   @Override

@@ -20,7 +20,7 @@ import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Test;
 
-class NonIncreasingPassingTimeValidatorIntegrationTest {
+class NonIncreasingTimetabledPassingTimeValidatorIntegrationTest {
 
   public static final String TEST_CODESPACE = "FLB";
   public static final String TEST_FILE_VALID =
@@ -65,17 +65,15 @@ class NonIncreasingPassingTimeValidatorIntegrationTest {
         JAXBValidationContext.class
       );
 
-      NetexDataRepository commonDataRepository = mock(
-        NetexDataRepository.class
-      );
-      when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
+      NetexDataRepository netexDataRepository = mock(NetexDataRepository.class);
+      when(netexDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
       when(validationContext.getValidationReportId())
         .thenReturn(validationReportId);
       when(validationContext.getNetexEntitiesIndex())
         .thenReturn(netexEntitiesIndex);
       when(validationContext.getNetexDataRepository())
-        .thenReturn(commonDataRepository);
+        .thenReturn(netexDataRepository);
       when(validationContext.getStopPlaceRepository())
         .thenReturn(mock(StopPlaceRepository.class));
 

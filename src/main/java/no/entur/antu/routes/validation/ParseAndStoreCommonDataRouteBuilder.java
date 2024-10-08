@@ -35,12 +35,12 @@ public class ParseAndStoreCommonDataRouteBuilder extends BaseRouteBuilder {
 
   private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
 
-  private final NetexDataRepository commonDataRepository;
+  private final NetexDataRepository netexDataRepository;
 
   public ParseAndStoreCommonDataRouteBuilder(
-    NetexDataRepository commonDataRepository
+    NetexDataRepository netexDataRepository
   ) {
-    this.commonDataRepository = commonDataRepository;
+    this.netexDataRepository = netexDataRepository;
   }
 
   @Override
@@ -57,7 +57,7 @@ public class ParseAndStoreCommonDataRouteBuilder extends BaseRouteBuilder {
       .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_COMMON_FILE_NAME))
       .to("direct:downloadSingleNetexFileFromMemoryStore")
       .process(exchange ->
-        commonDataRepository.loadCommonDataCache(
+        netexDataRepository.fillNetexDataCache(
           exchange.getIn().getBody(byte[].class),
           exchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER, String.class)
         )
