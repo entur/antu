@@ -17,11 +17,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-public class CommonDataConfig {
+public class NetexDataConfig {
 
   @Bean
   @Profile("!test")
-  NetexDataResource commonDataResource() {
+  NetexDataResource netexDataResource() {
     return new NetexDataResource();
   }
 

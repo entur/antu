@@ -285,7 +285,6 @@ public class TimetableDataValidatorConfig {
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
     MissingReplacementValidator missingReplacementValidator,
-    NetexDataRepository commonDataRepository,
     LineInfoCollector lineInfoCollector,
     ServiceJourneyStopsCollector serviceJourneyStopsCollector,
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
@@ -328,7 +327,7 @@ public class TimetableDataValidatorConfig {
       stopPointsInVehicleJourneyValidator
     );
 
-    List<NetexDataCollector> commonDataScrapers = List.of(
+    List<NetexDataCollector> commonDataCollectors = List.of(
       lineInfoCollector,
       serviceJourneyStopsCollector,
       serviceJourneyInterchangeInfoCollector
@@ -340,7 +339,7 @@ public class TimetableDataValidatorConfig {
       xPathValidators,
       jaxbValidators,
       netexTimetableDatasetValidators,
-      commonDataScrapers,
+      commonDataCollectors,
       netexDataRepository,
       stopPlaceRepository
     );

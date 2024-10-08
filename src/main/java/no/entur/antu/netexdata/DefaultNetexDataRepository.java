@@ -149,7 +149,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     byte[] fileContent,
     String validationReportId
   ) {
-    netexDataResource.loadCommonData(fileContent);
+    netexDataResource.loadNetexData(fileContent);
     // Merging with the existing map, for handing the case where there are
     // multiple common files in the dataset.
     scheduledStopPointAndQuayIdCache.merge(

@@ -59,17 +59,15 @@ class InvalidServiceAlterationValidatorIntegrationTest {
         JAXBValidationContext.class
       );
 
-      NetexDataRepository commonDataRepository = mock(
-        NetexDataRepository.class
-      );
-      when(commonDataRepository.hasQuayIds(anyString())).thenReturn(true);
+      NetexDataRepository netexDataRepository = mock(NetexDataRepository.class);
+      when(netexDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
       when(validationContext.getValidationReportId())
         .thenReturn(validationReportId);
       when(validationContext.getNetexEntitiesIndex())
         .thenReturn(netexEntitiesIndex);
       when(validationContext.getNetexDataRepository())
-        .thenReturn(commonDataRepository);
+        .thenReturn(netexDataRepository);
       when(validationContext.getStopPlaceRepository())
         .thenReturn(mock(StopPlaceRepository.class));
 

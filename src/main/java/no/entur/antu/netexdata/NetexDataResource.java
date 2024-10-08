@@ -25,7 +25,7 @@ public class NetexDataResource {
 
   private NetexEntitiesIndex netexEntitiesIndex;
 
-  public void loadCommonData(byte[] fileContent) {
+  public void loadNetexData(byte[] fileContent) {
     NetexParser netexParser = new NetexParser();
     netexEntitiesIndex =
       netexParser.parse(new ByteArrayInputStream(fileContent));
