@@ -310,7 +310,7 @@ public class TimetableDataValidatorConfig {
       sameStopPointsValidator,
       stopPointsCountValidator,
       missingPassengerStopAssignmentValidator,
-      nonIncreasingPassingTimeValidator,
+      //      nonIncreasingPassingTimeValidator,
       unexpectedSpeedValidator,
       unexpectedDistanceInServiceLinkValidator,
       mismatchedStopPointsValidator,
