@@ -126,6 +126,16 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   }
 
   @Override
+  public boolean hasServiceJourneyInterchangeInfos(String validationReportId) {
+    List<String> serviceJourneyInterchangeInfos =
+      serviceJourneyInterchangeInfoCache.get(validationReportId);
+    return (
+      serviceJourneyInterchangeInfos != null &&
+      !serviceJourneyInterchangeInfos.isEmpty()
+    );
+  }
+
+  @Override
   public List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos(
     String validationReportId
   ) {

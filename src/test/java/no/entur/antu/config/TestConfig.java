@@ -52,6 +52,11 @@ public class TestConfig {
       }
 
       @Override
+      public boolean hasServiceJourneyInterchangeInfos(String s) {
+        return false;
+      }
+
+      @Override
       public List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos(
         String validationReportId
       ) {

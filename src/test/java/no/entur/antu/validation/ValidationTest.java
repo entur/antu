@@ -33,6 +33,11 @@ public class ValidationTest {
     Mockito
       .when(netexDataRepositoryMock.hasQuayIds(anyString()))
       .thenReturn(true);
+    Mockito
+      .when(
+        netexDataRepositoryMock.hasServiceJourneyInterchangeInfos(anyString())
+      )
+      .thenReturn(true);
 
     this.stopPlaceRepositoryMock = mock(StopPlaceRepository.class);
   }

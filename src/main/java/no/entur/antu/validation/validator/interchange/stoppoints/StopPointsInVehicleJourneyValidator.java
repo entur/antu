@@ -30,21 +30,28 @@ public class StopPointsInVehicleJourneyValidator
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
-    netexDataRepository
-      .serviceJourneyInterchangeInfos(validationReport.getValidationReportId())
-      .stream()
-      .map(serviceJourneyInterchange ->
-        StopPointsInVehicleJourneyContext.of(
-          validationReport.getValidationReportId(),
-          netexDataRepository,
-          serviceJourneyInterchange
-        )
+    if (
+      netexDataRepository.hasServiceJourneyInterchangeInfos(
+        validationReport.getValidationReportId()
       )
-      .filter(StopPointsInVehicleJourneyContext::isValid)
-      .map(this::validateStopPoint)
-      .filter(Objects::nonNull)
-      .forEach(validationReport::addValidationReportEntry);
-
+    ) {
+      netexDataRepository
+        .serviceJourneyInterchangeInfos(
+          validationReport.getValidationReportId()
+        )
+        .stream()
+        .map(serviceJourneyInterchange ->
+          StopPointsInVehicleJourneyContext.of(
+            validationReport.getValidationReportId(),
+            netexDataRepository,
+            serviceJourneyInterchange
+          )
+        )
+        .filter(StopPointsInVehicleJourneyContext::isValid)
+        .map(this::validateStopPoint)
+        .filter(Objects::nonNull)
+        .forEach(validationReport::addValidationReportEntry);
+    }
     return validationReport;
   }
 
