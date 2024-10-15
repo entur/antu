@@ -310,8 +310,8 @@ public class TimetableDataValidatorConfig {
       sameStopPointsValidator,
       stopPointsCountValidator,
       missingPassengerStopAssignmentValidator,
-// TODO: Commented out due to unsupported winter time changes, Discuss with Andreas before re-enabling
-// nonIncreasingPassingTimeValidator,
+      // TODO: Commented out due to unsupported winter time changes, Discuss with Andreas before re-enabling
+      // nonIncreasingPassingTimeValidator,
       unexpectedSpeedValidator,
       unexpectedDistanceInServiceLinkValidator,
       mismatchedStopPointsValidator,
@@ -325,12 +325,12 @@ public class TimetableDataValidatorConfig {
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
       duplicateLineNameValidator
-//      stopPointsInVehicleJourneyValidator
+      //      stopPointsInVehicleJourneyValidator
     );
 
     List<NetexDataCollector> commonDataCollectors = List.of(
       lineInfoCollector,
-//      serviceJourneyStopsCollector,
+      //      serviceJourneyStopsCollector,
       serviceJourneyInterchangeInfoCollector
     );
 
