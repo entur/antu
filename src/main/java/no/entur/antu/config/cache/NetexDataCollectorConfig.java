@@ -40,10 +40,14 @@ public class NetexDataCollectorConfig {
 
   @Bean
   public ServiceJourneyStopsCollector serviceJourneyStopsCollector(
+    RedissonClient redissonClient,
     @Qualifier(
       SERVICE_JOURNEY_STOPS_CACHE
     ) Map<String, Map<String, List<String>>> serviceJourneyStopsCache
   ) {
-    return new ServiceJourneyStopsCollector(serviceJourneyStopsCache);
+    return new ServiceJourneyStopsCollector(
+      redissonClient,
+      serviceJourneyStopsCache
+    );
   }
 }
