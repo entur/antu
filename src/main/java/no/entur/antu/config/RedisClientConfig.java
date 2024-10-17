@@ -53,6 +53,7 @@ public class RedisClientConfig {
         redisProperties.getPort()
       );
       redissonConfig
+        .setNettyThreads(64)
         .useSingleServer()
         .setAddress(address)
         .setSslTruststore(new File(trustStoreFile).toURI().toURL())
