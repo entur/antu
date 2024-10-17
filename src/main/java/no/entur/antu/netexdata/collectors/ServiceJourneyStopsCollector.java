@@ -9,6 +9,7 @@ import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.redisson.api.RLock;
+import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +45,6 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
     Map<String, List<String>> serviceJourneyStops = antuNetexData
       .validServiceJourneys()
-      // TODO: unique service journeys ids
       .map(serviceJourney -> {
         Map<String, ScheduledStopPointId> scheduledStopPointIdMap =
           AntuNetexData.scheduledStopPointIdByStopPointId(
@@ -71,6 +71,7 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
     addServiceJourneyStops(
       validationContext.getValidationReportId(),
+      validationContext.getFileName(),
       serviceJourneyStops
     );
   }
@@ -84,19 +85,20 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
   private void addServiceJourneyStops(
     String validationReportId,
+    String filename,
     Map<String, List<String>> serviceJourneyStops
   ) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {
       lock.lock();
 
-      serviceJourneyStopsCache.merge(
-        validationReportId,
-        serviceJourneyStops,
-        (existingMap, newMap) -> {
-          existingMap.putAll(newMap);
-          return existingMap;
-        }
+      RMap<String, List<String>> serviceJourneyStopsMap = redissonClient.getMap(
+        validationReportId + "_" + filename
+      );
+      serviceJourneyStopsMap.putAll(serviceJourneyStops);
+      serviceJourneyStopsCache.put(
+        validationReportId + "_" + filename,
+        serviceJourneyStopsMap
       );
     } finally {
       if (lock.isHeldByCurrentThread()) {
