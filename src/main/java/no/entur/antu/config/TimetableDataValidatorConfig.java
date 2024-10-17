@@ -324,14 +324,14 @@ public class TimetableDataValidatorConfig {
     );
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
-      duplicateLineNameValidator,
-      stopPointsInVehicleJourneyValidator
+      duplicateLineNameValidator
+      //      stopPointsInVehicleJourneyValidator
     );
 
     List<NetexDataCollector> commonDataCollectors = List.of(
       lineInfoCollector,
-      serviceJourneyInterchangeInfoCollector,
-      serviceJourneyStopsCollector
+      //      serviceJourneyStopsCollector,
+      serviceJourneyInterchangeInfoCollector
     );
 
     return new NetexValidatorsRunner(

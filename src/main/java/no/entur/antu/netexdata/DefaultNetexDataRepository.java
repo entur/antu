@@ -2,13 +2,11 @@ package no.entur.antu.netexdata;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.validation.validator.jaxb.*;
 import org.entur.netex.validation.validator.model.*;
-import org.redisson.RedissonLocalCachedMap;
-import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +21,6 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   );
 
   private final NetexDataResource netexDataResource;
-  private final RedissonClient redissonClient;
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
   private final Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache;
   private final Map<String, List<String>> lineInfoCache;
@@ -32,7 +29,6 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
 
   public DefaultNetexDataRepository(
     NetexDataResource netexDataResource,
-    RedissonClient redissonClient,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
     Map<String, List<String>> lineInfoCache,
@@ -40,7 +36,6 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     Map<String, List<String>> serviceJourneyInterchangeInfoCache
   ) {
     this.netexDataResource = netexDataResource;
-    this.redissonClient = redissonClient;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     this.serviceLinksAndFromToScheduledStopPointIdCache =
       serviceLinksAndFromToScheduledStopPointIdCache;
@@ -110,20 +105,24 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     String validationReportId,
     ServiceJourneyId serviceJourneyId
   ) {
-    if (
-      serviceJourneyStopsCache instanceof RedissonLocalCachedMap<String, Map<String, List<String>>> localCachedMap
-    ) {
-      return localCachedMap
-        .keySet(validationReportId + "*")
-        .stream()
-        .map(localCachedMap::get)
-        .flatMap(m -> m.entrySet().stream())
-        .filter(e -> e.getKey().equals(serviceJourneyId.id()))
-        .flatMap(e -> e.getValue().stream())
-        .map(ServiceJourneyStop::fromString)
-        .toList();
+    Map<String, List<String>> serviceJourneyStopsForReport =
+      serviceJourneyStopsCache.get(validationReportId);
+    if (serviceJourneyStopsForReport == null) {
+      throw new AntuException(
+        "ServiceJourneyStops cache not found for validation report with id: " +
+        validationReportId
+      );
     }
-    return List.of();
+    return Optional
+      .ofNullable(serviceJourneyStopsForReport.get(serviceJourneyId.id()))
+      .map(serviceJourneyStops ->
+        serviceJourneyStops
+          .stream()
+          .map(ServiceJourneyStop::fromString)
+          .filter(ServiceJourneyStop::isValid)
+          .toList()
+      )
+      .orElse(List.of());
   }
 
   @Override
@@ -177,7 +176,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
         .getFromToScheduledStopPointIdPerServiceLinkId()
         .entrySet()
         .stream()
-        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     serviceLinksAndFromToScheduledStopPointIdCache.merge(
       validationReportId,
@@ -200,10 +199,6 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     scheduledStopPointAndQuayIdCache.remove(validationReportId);
     serviceLinksAndFromToScheduledStopPointIdCache.remove(validationReportId);
     lineInfoCache.remove(validationReportId);
-    redissonClient.getKeys().deleteByPattern(validationReportId + '*');
-    serviceJourneyStopsCache
-      .keySet()
-      .removeIf(k -> k.startsWith(validationReportId));
     serviceJourneyStopsCache.remove(validationReportId);
     serviceJourneyInterchangeInfoCache.remove(validationReportId);
   }
