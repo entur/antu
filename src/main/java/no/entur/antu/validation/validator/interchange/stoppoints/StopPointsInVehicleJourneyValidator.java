@@ -10,6 +10,8 @@ import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validates that the stop points in interchange are part of the respective service journeys in the interchange.
@@ -17,6 +19,10 @@ import org.entur.netex.validation.validator.model.ServiceJourneyStop;
  */
 public class StopPointsInVehicleJourneyValidator
   extends AbstractDatasetValidator {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    StopPointsInVehicleJourneyValidator.class
+  );
 
   private final NetexDataRepository netexDataRepository;
 
@@ -30,6 +36,7 @@ public class StopPointsInVehicleJourneyValidator
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
+    LOGGER.info("Validating interchange stop points in vehicle journey.");
     if (
       netexDataRepository.hasServiceJourneyInterchangeInfos(
         validationReport.getValidationReportId()
