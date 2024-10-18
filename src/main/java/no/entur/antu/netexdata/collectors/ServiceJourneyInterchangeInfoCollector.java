@@ -1,12 +1,15 @@
 package no.entur.antu.netexdata.collectors;
 
-import java.util.ArrayList;
+import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE;
+
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import no.entur.antu.validation.AntuNetexData;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
+import org.redisson.api.RList;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 
@@ -35,20 +38,18 @@ public class ServiceJourneyInterchangeInfoCollector extends NetexDataCollector {
       validationContext.getStopPlaceRepository()
     );
 
-    antuNetexData
-      .serviceJourneyInterchanges()
-      .map(serviceJourneyInterchange ->
-        ServiceJourneyInterchangeInfo.of(
-          validationContext.getFileName(),
-          serviceJourneyInterchange
+    addData(
+      validationContext.getFileName(),
+      antuNetexData.validationReportId(),
+      antuNetexData
+        .serviceJourneyInterchanges()
+        .map(serviceJourneyInterchange ->
+          ServiceJourneyInterchangeInfo.of(
+            validationContext.getFileName(),
+            serviceJourneyInterchange
+          )
         )
-      )
-      .forEach(serviceJourneyInterchangeInfo ->
-        addData(
-          antuNetexData.validationReportId(),
-          serviceJourneyInterchangeInfo
-        )
-      );
+    );
   }
 
   @Override
@@ -59,20 +60,31 @@ public class ServiceJourneyInterchangeInfoCollector extends NetexDataCollector {
   }
 
   private void addData(
+    String fileName,
     String validationReportId,
-    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo
+    Stream<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos
   ) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {
       lock.lock();
 
-      serviceJourneyInterchangeInfoCache.merge(
-        validationReportId,
-        new ArrayList<>(List.of(serviceJourneyInterchangeInfo.toString())),
-        (existingList, newList) -> {
-          existingList.addAll(newList);
-          return existingList;
-        }
+      String keyName =
+        validationReportId +
+        "_" +
+        SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE +
+        "_" +
+        fileName;
+
+      RList<String> serviceJourneyInterchangeInfosListCache =
+        redissonClient.getList(keyName);
+      serviceJourneyInterchangeInfosListCache.addAll(
+        serviceJourneyInterchangeInfos
+          .map(ServiceJourneyInterchangeInfo::toString)
+          .toList()
+      );
+      serviceJourneyInterchangeInfoCache.put(
+        keyName,
+        serviceJourneyInterchangeInfosListCache
       );
     } finally {
       if (lock.isHeldByCurrentThread()) {

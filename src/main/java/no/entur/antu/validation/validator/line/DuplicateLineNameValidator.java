@@ -6,8 +6,14 @@ import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.SimpleLine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DuplicateLineNameValidator extends AbstractDatasetValidator {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    DuplicateLineNameValidator.class
+  );
 
   private final NetexDataRepository netexDataRepository;
 
@@ -21,6 +27,8 @@ public class DuplicateLineNameValidator extends AbstractDatasetValidator {
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
+    LOGGER.info("Validating duplicate line names.");
+
     List<SimpleLine> lineNames = netexDataRepository.lineNames(
       validationReport.getValidationReportId()
     );

@@ -2,6 +2,7 @@ package no.entur.antu.config;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import no.entur.antu.organisation.OrganisationRepository;
 import org.entur.netex.validation.validator.jaxb.*;
@@ -44,16 +45,10 @@ public class TestConfig {
       }
 
       @Override
-      public List<ServiceJourneyStop> serviceJourneyStops(
-        String validationReportId,
-        ServiceJourneyId serviceJourneyId
+      public Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStops(
+        String validationReportId
       ) {
-        return List.of();
-      }
-
-      @Override
-      public boolean hasServiceJourneyInterchangeInfos(String s) {
-        return false;
+        return Map.of();
       }
 
       @Override

@@ -2,11 +2,14 @@ package no.entur.antu.netexdata;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.validation.validator.jaxb.*;
 import org.entur.netex.validation.validator.model.*;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +24,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   );
 
   private final NetexDataResource netexDataResource;
+  private final RedissonClient redissonClient;
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
   private final Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache;
   private final Map<String, List<String>> lineInfoCache;
@@ -29,6 +33,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
 
   public DefaultNetexDataRepository(
     NetexDataResource netexDataResource,
+    RedissonClient redissonClient,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
     Map<String, List<String>> lineInfoCache,
@@ -36,6 +41,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     Map<String, List<String>> serviceJourneyInterchangeInfoCache
   ) {
     this.netexDataResource = netexDataResource;
+    this.redissonClient = redissonClient;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     this.serviceLinksAndFromToScheduledStopPointIdCache =
       serviceLinksAndFromToScheduledStopPointIdCache;
@@ -100,56 +106,36 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     return lineInfoForReportId.stream().map(SimpleLine::fromString).toList();
   }
 
-  @Override
-  public List<ServiceJourneyStop> serviceJourneyStops(
-    String validationReportId,
-    ServiceJourneyId serviceJourneyId
+  public Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStops(
+    String validationReportId
   ) {
-    Map<String, List<String>> serviceJourneyStopsForReport =
-      serviceJourneyStopsCache.get(validationReportId);
-    if (serviceJourneyStopsForReport == null) {
-      throw new AntuException(
-        "ServiceJourneyStops cache not found for validation report with id: " +
-        validationReportId
+    return serviceJourneyStopsCache
+      .keySet()
+      .stream()
+      .filter(k -> k.startsWith(validationReportId))
+      .map(serviceJourneyStopsCache::get)
+      .flatMap(m -> m.entrySet().stream())
+      .collect(
+        Collectors.toMap(
+          k -> ServiceJourneyId.ofValidId(k.getKey()),
+          v ->
+            v.getValue().stream().map(ServiceJourneyStop::fromString).toList(),
+          (p, n) -> n
+        )
       );
-    }
-    return Optional
-      .ofNullable(serviceJourneyStopsForReport.get(serviceJourneyId.id()))
-      .map(serviceJourneyStops ->
-        serviceJourneyStops
-          .stream()
-          .map(ServiceJourneyStop::fromString)
-          .filter(ServiceJourneyStop::isValid)
-          .toList()
-      )
-      .orElse(List.of());
-  }
-
-  @Override
-  public boolean hasServiceJourneyInterchangeInfos(String validationReportId) {
-    List<String> serviceJourneyInterchangeInfos =
-      serviceJourneyInterchangeInfoCache.get(validationReportId);
-    return (
-      serviceJourneyInterchangeInfos != null &&
-      !serviceJourneyInterchangeInfos.isEmpty()
-    );
   }
 
   @Override
   public List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos(
     String validationReportId
   ) {
-    List<String> serviceJourneyInterchangeInfosForReport =
-      serviceJourneyInterchangeInfoCache.get(validationReportId);
-    if (serviceJourneyInterchangeInfosForReport == null) {
-      throw new AntuException(
-        "ServiceJourneyInterchangeInfoCache not found for validation report with id: " +
-        validationReportId
-      );
-    }
-
-    return serviceJourneyInterchangeInfosForReport
+    return Optional
+      .ofNullable(serviceJourneyInterchangeInfoCache)
+      .map(Map::entrySet)
       .stream()
+      .flatMap(Set::stream)
+      .filter(entry -> entry.getKey().startsWith(validationReportId))
+      .flatMap(entry -> entry.getValue().stream())
       .map(ServiceJourneyInterchangeInfo::fromString)
       .toList();
   }
@@ -176,7 +162,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
         .getFromToScheduledStopPointIdPerServiceLinkId()
         .entrySet()
         .stream()
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
     serviceLinksAndFromToScheduledStopPointIdCache.merge(
       validationReportId,
@@ -199,7 +185,12 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     scheduledStopPointAndQuayIdCache.remove(validationReportId);
     serviceLinksAndFromToScheduledStopPointIdCache.remove(validationReportId);
     lineInfoCache.remove(validationReportId);
-    serviceJourneyStopsCache.remove(validationReportId);
-    serviceJourneyInterchangeInfoCache.remove(validationReportId);
+    redissonClient.getKeys().deleteByPattern(validationReportId + '*');
+    serviceJourneyStopsCache
+      .keySet()
+      .removeIf(k -> k.startsWith(validationReportId));
+    serviceJourneyInterchangeInfoCache
+      .keySet()
+      .removeIf(k -> k.startsWith(validationReportId));
   }
 }

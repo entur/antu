@@ -1,5 +1,6 @@
 package no.entur.antu.validation.validator.interchange.stoppoints;
 
+import java.util.List;
 import java.util.Objects;
 import org.entur.netex.validation.validator.AbstractDatasetValidator;
 import org.entur.netex.validation.validator.DataLocation;
@@ -9,7 +10,10 @@ import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
+import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validates that the stop points in interchange are part of the respective service journeys in the interchange.
@@ -17,6 +21,10 @@ import org.entur.netex.validation.validator.model.ServiceJourneyStop;
  */
 public class StopPointsInVehicleJourneyValidator
   extends AbstractDatasetValidator {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    StopPointsInVehicleJourneyValidator.class
+  );
 
   private final NetexDataRepository netexDataRepository;
 
@@ -30,28 +38,37 @@ public class StopPointsInVehicleJourneyValidator
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
-    if (
-      netexDataRepository.hasServiceJourneyInterchangeInfos(
+    LOGGER.info("Validating interchange stop points in vehicle journey.");
+
+    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos =
+      netexDataRepository.serviceJourneyInterchangeInfos(
         validationReport.getValidationReportId()
-      )
+      );
+
+    if (
+      serviceJourneyInterchangeInfos == null ||
+      serviceJourneyInterchangeInfos.isEmpty()
     ) {
-      netexDataRepository
-        .serviceJourneyInterchangeInfos(
-          validationReport.getValidationReportId()
-        )
-        .stream()
-        .map(serviceJourneyInterchange ->
-          StopPointsInVehicleJourneyContext.of(
-            validationReport.getValidationReportId(),
-            netexDataRepository,
-            serviceJourneyInterchange
-          )
-        )
-        .filter(StopPointsInVehicleJourneyContext::isValid)
-        .map(this::validateStopPoint)
-        .filter(Objects::nonNull)
-        .forEach(validationReport::addValidationReportEntry);
+      return validationReport;
     }
+
+    StopPointsInVehicleJourneyContext.Builder builder =
+      new StopPointsInVehicleJourneyContext.Builder(
+        validationReport.getValidationReportId(),
+        netexDataRepository
+      );
+
+    builder.primeCache();
+
+    serviceJourneyInterchangeInfos
+      .stream()
+      .map(builder::build)
+      .filter(Objects::nonNull)
+      .filter(StopPointsInVehicleJourneyContext::isValid)
+      .map(this::validateStopPoint)
+      .filter(Objects::nonNull)
+      .forEach(validationReport::addValidationReportEntry);
+
     return validationReport;
   }
 
@@ -59,6 +76,7 @@ public class StopPointsInVehicleJourneyValidator
     StopPointsInVehicleJourneyContext context
   ) {
     if (
+      context.serviceJourneyStopsForFromJourneyRef() == null ||
       context
         .serviceJourneyStopsForFromJourneyRef()
         .stream()
@@ -80,6 +98,7 @@ public class StopPointsInVehicleJourneyValidator
     }
 
     if (
+      context.serviceJourneyStopsForToJourneyRef() == null ||
       context
         .serviceJourneyStopsForToJourneyRef()
         .stream()
