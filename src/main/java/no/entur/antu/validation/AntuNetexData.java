@@ -132,6 +132,13 @@ public record AntuNetexData(
       : Map.entry(scheduledStopPointId, coordinatesForQuayId);
   }
 
+  public QuayCoordinates coordinatesForScheduledStopPoint(
+    ScheduledStopPointId scheduledStopPointId
+  ) {
+    QuayId quayId = quayIdForScheduledStopPoint(scheduledStopPointId);
+    return quayId == null ? null : coordinatesForQuayId(quayId);
+  }
+
   public String stopPointName(ScheduledStopPointId scheduledStopPointId) {
     QuayId quayId = quayIdForScheduledStopPoint(scheduledStopPointId);
     if (quayId == null) {

@@ -22,9 +22,7 @@ public record UnexpectedInterchangeDistanceContext(
       scheduledStopPointId ->
         new ScheduledStopPointCoordinates(
           scheduledStopPointId,
-          antuNetexData.coordinatesForQuayId(
-            antuNetexData.quayIdForScheduledStopPoint(scheduledStopPointId)
-          )
+          antuNetexData.coordinatesForScheduledStopPoint(scheduledStopPointId)
         );
 
     return new UnexpectedInterchangeDistanceContext(
@@ -36,6 +34,7 @@ public record UnexpectedInterchangeDistanceContext(
           )
         )
         .map(scheduledStopPointCoordinates)
+        .filter(ScheduledStopPointCoordinates::isValid)
         .orElse(null),
       Optional
         .ofNullable(
@@ -44,6 +43,7 @@ public record UnexpectedInterchangeDistanceContext(
           )
         )
         .map(scheduledStopPointCoordinates)
+        .filter(ScheduledStopPointCoordinates::isValid)
         .orElse(null)
     );
   }
