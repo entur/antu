@@ -310,8 +310,7 @@ public class TimetableDataValidatorConfig {
       sameStopPointsValidator,
       stopPointsCountValidator,
       missingPassengerStopAssignmentValidator,
-      // TODO: Commented out due to unsupported winter time changes, Discuss with Andreas before re-enabling
-      // nonIncreasingPassingTimeValidator,
+      nonIncreasingPassingTimeValidator,
       unexpectedSpeedValidator,
       unexpectedDistanceInServiceLinkValidator,
       mismatchedStopPointsValidator,
