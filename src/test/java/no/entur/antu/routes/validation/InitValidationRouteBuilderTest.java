@@ -43,13 +43,13 @@ import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_KAKKA;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
 import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
 import static no.entur.antu.util.TestValidationReportUtil.getValidationReport;
+import static no.entur.antu.validation.ValidationProfile.STOP;
+import static no.entur.antu.validation.ValidationProfile.TIMETABLE;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -155,10 +155,7 @@ class InitValidationRouteBuilderTest
       VALIDATION_STAGE_PREVALIDATION
     );
     headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
-    headers.put(
-      Constants.VALIDATION_PROFILE_HEADER,
-      VALIDATION_PROFILE_TIMETABLE
-    );
+    headers.put(Constants.VALIDATION_PROFILE_HEADER, TIMETABLE.id());
     initDatasetValidation.sendBodyAndHeaders(" ", headers);
     notifyStatus.assertIsSatisfied();
     Assertions.assertTrue(
@@ -282,7 +279,7 @@ class InitValidationRouteBuilderTest
       VALIDATION_STAGE_PREVALIDATION
     );
     headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_KAKKA);
-    headers.put(Constants.VALIDATION_PROFILE_HEADER, VALIDATION_PROFILE_STOP);
+    headers.put(Constants.VALIDATION_PROFILE_HEADER, STOP.id());
     initDatasetValidation.sendBodyAndHeaders(" ", headers);
     notifyStatus.assertIsSatisfied();
     Assertions.assertTrue(
@@ -423,10 +420,7 @@ class InitValidationRouteBuilderTest
       VALIDATION_STAGE_PREVALIDATION
     );
     headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
-    headers.put(
-      Constants.VALIDATION_PROFILE_HEADER,
-      VALIDATION_PROFILE_TIMETABLE
-    );
+    headers.put(Constants.VALIDATION_PROFILE_HEADER, TIMETABLE.id());
     initDatasetValidation.sendBodyAndHeaders(" ", headers);
     notifyStatus.assertIsSatisfied();
 
@@ -528,10 +522,7 @@ class InitValidationRouteBuilderTest
       VALIDATION_STAGE_PREVALIDATION
     );
     headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
-    headers.put(
-      Constants.VALIDATION_PROFILE_HEADER,
-      VALIDATION_PROFILE_TIMETABLE
-    );
+    headers.put(Constants.VALIDATION_PROFILE_HEADER, TIMETABLE.id());
     initDatasetValidation.sendBodyAndHeaders(" ", headers);
     notifyStatus.assertIsSatisfied();
 
@@ -655,10 +646,7 @@ class InitValidationRouteBuilderTest
       VALIDATION_STAGE_PREVALIDATION
     );
     headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
-    headers.put(
-      Constants.VALIDATION_PROFILE_HEADER,
-      VALIDATION_PROFILE_TIMETABLE
-    );
+    headers.put(Constants.VALIDATION_PROFILE_HEADER, TIMETABLE.id());
     initDatasetValidation.sendBodyAndHeaders(" ", headers);
     notifyStatus.assertIsSatisfied();
 
