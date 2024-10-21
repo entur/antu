@@ -62,6 +62,10 @@ public class TimetableDataFlexMergingValidatorConfig {
     List<XPathValidator> netexValidators = List.of(netexIdUniquenessValidator);
     // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return new NetexValidatorsRunner(netexXMLParser, netexValidators);
+    return NetexValidatorsRunner
+      .of()
+      .withNetexXMLParser(netexXMLParser)
+      .withXPathValidators(netexValidators)
+      .build();
   }
 }

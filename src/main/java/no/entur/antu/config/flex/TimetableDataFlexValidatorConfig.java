@@ -159,16 +159,15 @@ public class TimetableDataFlexValidatorConfig {
     List<JAXBValidator> jaxbValidators = List.of(invalidFlexibleAreaValidator);
     // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return new NetexValidatorsRunner(
-      netexXMLParser,
-      netexSchemaValidator,
-      xpathValidators,
-      jaxbValidators,
-      List.of(),
-      List.of(),
-      netexDataRepository,
-      stopPlaceRepository
-    );
+    return NetexValidatorsRunner
+      .of()
+      .withNetexXMLParser(netexXMLParser)
+      .withNetexSchemaValidator(netexSchemaValidator)
+      .withXPathValidators(xpathValidators)
+      .withJaxbValidators(jaxbValidators)
+      .withNetexDataRepository(netexDataRepository)
+      .withStopPlaceRepository(stopPlaceRepository)
+      .build();
   }
 
   /**
@@ -208,15 +207,14 @@ public class TimetableDataFlexValidatorConfig {
 
     // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return new NetexValidatorsRunner(
-      netexXMLParser,
-      netexSchemaValidator,
-      xpathValidators,
-      jaxbValidators,
-      List.of(),
-      List.of(),
-      netexDataRepository,
-      stopPlaceRepository
-    );
+    return NetexValidatorsRunner
+      .of()
+      .withNetexXMLParser(netexXMLParser)
+      .withNetexSchemaValidator(netexSchemaValidator)
+      .withXPathValidators(xpathValidators)
+      .withJaxbValidators(jaxbValidators)
+      .withNetexDataRepository(netexDataRepository)
+      .withStopPlaceRepository(stopPlaceRepository)
+      .build();
   }
 }
