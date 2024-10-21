@@ -42,11 +42,11 @@ import static no.entur.antu.Constants.STATUS_VALIDATION_STARTED;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
 import static no.entur.antu.Constants.VALIDATION_CLIENT_MARDUK;
 import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
+import static no.entur.antu.validation.ValidationProfile.TIMETABLE_SWEDEN;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -151,10 +151,7 @@ class SwedenDatasetValidationTest extends AntuRouteBuilderIntegrationTestBase {
       VALIDATION_STAGE_PREVALIDATION
     );
     headers.put(Constants.VALIDATION_CLIENT_HEADER, VALIDATION_CLIENT_MARDUK);
-    headers.put(
-      Constants.VALIDATION_PROFILE_HEADER,
-      VALIDATION_PROFILE_TIMETABLE_SWEDEN
-    );
+    headers.put(Constants.VALIDATION_PROFILE_HEADER, TIMETABLE_SWEDEN.id());
     initDatasetValidation.sendBodyAndHeaders(" ", headers);
     notifyStatus.assertIsSatisfied();
     Assertions.assertTrue(

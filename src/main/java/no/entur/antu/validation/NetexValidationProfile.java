@@ -12,12 +12,12 @@ import org.entur.netex.validation.validator.ValidationReport;
  */
 public class NetexValidationProfile {
 
-  private final Map<String, NetexValidatorsRunner> netexValidatorsRunners;
+  private final Map<ValidationProfile, NetexValidatorsRunner> netexValidatorsRunners;
   private final boolean skipSchemaValidation;
   private final boolean skipNetexValidators;
 
   public NetexValidationProfile(
-    Map<String, NetexValidatorsRunner> netexValidatorsRunners,
+    Map<ValidationProfile, NetexValidatorsRunner> netexValidatorsRunners,
     boolean skipSchemaValidation,
     boolean skipNetexValidators
   ) {
@@ -50,24 +50,18 @@ public class NetexValidationProfile {
     if (codespace == null) {
       throw new AntuException("Missing codespace");
     }
-    NetexValidatorsRunner netexValidatorsRunner = netexValidatorsRunners.get(
+    NetexValidatorsRunner netexValidatorsRunner = getNetexValidatorsRunner(
       validationProfile
     );
-    if (netexValidatorsRunner == null) {
-      throw new AntuException(
-        "Unknown validation profile " + validationProfile
-      );
-    } else {
-      return netexValidatorsRunner.validate(
-        codespace,
-        validationReportId,
-        filename,
-        fileContent,
-        skipSchemaValidation,
-        skipNetexValidators,
-        netexValidationProgressCallBack
-      );
-    }
+    return netexValidatorsRunner.validate(
+      codespace,
+      validationReportId,
+      filename,
+      fileContent,
+      skipSchemaValidation,
+      skipNetexValidators,
+      netexValidationProgressCallBack
+    );
   }
 
   /**
@@ -86,18 +80,32 @@ public class NetexValidationProfile {
     if (validationProfile == null) {
       throw new AntuException("Missing validation profile");
     }
-    NetexValidatorsRunner netexValidatorsRunner = netexValidatorsRunners.get(
+    NetexValidatorsRunner netexValidatorsRunner = getNetexValidatorsRunner(
       validationProfile
+    );
+
+    return netexValidatorsRunner.runNetexDatasetValidators(
+      validationReport,
+      netexValidationProgressCallBack
+    );
+  }
+
+  private NetexValidatorsRunner getNetexValidatorsRunner(
+    String validationProfile
+  ) {
+    ValidationProfile profile = ValidationProfile
+      .findById(validationProfile)
+      .orElseThrow(() ->
+        new AntuException("Unknown validation profile: " + validationProfile)
+      );
+    NetexValidatorsRunner netexValidatorsRunner = netexValidatorsRunners.get(
+      profile
     );
     if (netexValidatorsRunner == null) {
       throw new AntuException(
         "Unknown validation profile " + validationProfile
       );
-    } else {
-      return netexValidatorsRunner.runNetexDatasetValidators(
-        validationReport,
-        netexValidationProgressCallBack
-      );
     }
+    return netexValidatorsRunner;
   }
 }

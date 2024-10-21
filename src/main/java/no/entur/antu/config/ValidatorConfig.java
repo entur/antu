@@ -16,12 +16,7 @@
 
 package no.entur.antu.config;
 
-import static no.entur.antu.Constants.VALIDATION_PROFILE_IMPORT_TIMETABLE_FLEX;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_STOP;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_FLEX;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_FLEX_MERGING;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_TIMETABLE_SWEDEN;
+import static no.entur.antu.validation.ValidationProfile.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -193,17 +188,17 @@ public class ValidatorConfig {
   ) {
     return new NetexValidationProfile(
       Map.of(
-        VALIDATION_PROFILE_TIMETABLE,
+        TIMETABLE,
         timetableDataValidatorsRunner,
-        VALIDATION_PROFILE_TIMETABLE_FLEX,
+        TIMETABLE_FLEXIBLE_TRANSPORT,
         flexTimetableDataValidatorsRunner,
-        VALIDATION_PROFILE_IMPORT_TIMETABLE_FLEX,
+        IMPORT_TIMETABLE_FLEXIBLE_TRANSPORT,
         importFlexTimetableDataValidatorsRunner,
-        VALIDATION_PROFILE_TIMETABLE_FLEX_MERGING,
+        TIMETABLE_FLEXIBLE_TRANSPORT_MERGING,
         flexMergingTimetableDataValidatorsRunner,
-        VALIDATION_PROFILE_TIMETABLE_SWEDEN,
+        TIMETABLE_SWEDEN,
         timetableSwedenDataValidatorsRunner,
-        VALIDATION_PROFILE_STOP,
+        STOP,
         stopDataValidatorsRunner
       ),
       skipSchemaValidation,
