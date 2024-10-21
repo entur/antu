@@ -86,10 +86,20 @@ public class SwedenStopPlaceValidator extends AbstractXPathValidator {
         idVersion.getId().contains(":Quay:")
       )
       .collect(Collectors.toSet());
+
+    // remove NSR ids
+    referencesToStopAndQuay.removeIf(idVersion ->
+      idVersion.getId().startsWith("NSR:")
+    );
+
+    // remove local IDs
     referencesToStopAndQuay.removeAll(netexFileLocalIds);
+
     if (!referencesToStopAndQuay.isEmpty()) {
       Set<String> sharedStopPlaceIds =
         swedenStopPlaceNetexIdRepository.getSharedStopPlaceAndQuayIds(reportId);
+
+      // remove shared IDs from SiteFrame
       referencesToStopAndQuay.removeIf(idVersion ->
         sharedStopPlaceIds.contains(idVersion.getId())
       );
