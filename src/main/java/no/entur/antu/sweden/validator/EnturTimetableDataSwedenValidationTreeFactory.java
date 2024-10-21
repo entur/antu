@@ -82,20 +82,6 @@ public class EnturTimetableDataSwedenValidationTreeFactory
   }
 
   @Override
-  protected ValidationTree getServiceFrameValidationTreeForLineFile(
-    String path
-  ) {
-    ValidationTree serviceFrameValidationTree =
-      super.getServiceFrameValidationTreeForLineFile(path);
-    // use valid transport mode for swedish data
-    serviceFrameValidationTree.removeValidationRule("TRANSPORT_MODE");
-    serviceFrameValidationTree.addValidationRule(
-      new SwedenValidateAllowedTransportMode()
-    );
-    return serviceFrameValidationTree;
-  }
-
-  @Override
   protected ValidationTree getResourceFrameValidationTree(String path) {
     ValidationTree resourceFrameValidationTree =
       super.getResourceFrameValidationTree(path);
