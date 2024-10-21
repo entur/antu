@@ -26,6 +26,7 @@ import no.entur.antu.sweden.validator.EnturTimetableDataSwedenValidationTreeFact
 import no.entur.antu.sweden.validator.LineRefOnGroupOfLinesIgnorer;
 import no.entur.antu.sweden.validator.OrganisationRefOnStopPlaceIgnorer;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.id.ReferenceToNsrValidator;
 import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
 import org.entur.netex.validation.configuration.ValidationConfigLoader;
 import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
@@ -103,6 +104,7 @@ public class TimetableDataSwedenValidatorConfig {
   @Bean
   public NetexReferenceValidator swedenNetexReferenceValidator(
     NetexIdRepository netexIdRepository,
+    ReferenceToNsrValidator referenceToNsrValidator,
     @Qualifier(
       "swedenValidationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory
@@ -113,6 +115,7 @@ public class TimetableDataSwedenValidatorConfig {
     externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
     externalReferenceValidators.add(new OrganisationRefOnStopPlaceIgnorer());
     externalReferenceValidators.add(new LineRefOnGroupOfLinesIgnorer());
+    externalReferenceValidators.add(referenceToNsrValidator);
     return new NetexReferenceValidator(
       netexIdRepository,
       externalReferenceValidators,
