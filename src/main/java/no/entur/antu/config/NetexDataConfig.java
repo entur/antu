@@ -11,6 +11,7 @@ import java.util.Map;
 import no.entur.antu.netexdata.DefaultNetexDataRepository;
 import no.entur.antu.netexdata.NetexDataResource;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ public class NetexDataConfig {
   @Profile("!test")
   NetexDataRepository netexDataRepository(
     NetexDataResource netexDataResource,
+    RedissonClient redissonClient,
     @Qualifier(
       SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE
     ) Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
@@ -45,6 +47,7 @@ public class NetexDataConfig {
   ) {
     return new DefaultNetexDataRepository(
       netexDataResource,
+      redissonClient,
       scheduledStopPointAndQuayIdCache,
       serviceLinksAndFromToScheduledStopPointIdCache,
       lineInfoCache,
