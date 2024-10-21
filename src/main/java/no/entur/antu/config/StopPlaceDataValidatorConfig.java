@@ -77,10 +77,11 @@ public class StopPlaceDataValidatorConfig {
       netexIdUniquenessValidator
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser();
-    return new NetexValidatorsRunner(
-      netexXMLParser,
-      netexSchemaValidator,
-      netexValidators
-    );
+    return NetexValidatorsRunner
+      .of()
+      .withNetexXMLParser(netexXMLParser)
+      .withNetexSchemaValidator(netexSchemaValidator)
+      .withXPathValidators(netexValidators)
+      .build();
   }
 }
