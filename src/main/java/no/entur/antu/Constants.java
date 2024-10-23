@@ -95,6 +95,8 @@ public final class Constants {
   public static final String VALIDATION_CLIENT_MARDUK = "Marduk";
   public static final String VALIDATION_CLIENT_KAKKA = "Kakka";
 
+  public static final String PROP_NETEX_FILE_CONTENT = "NETEX_FILE_CONTENT";
+
   public static final String CAMEL_ALL_HTTP_HEADERS = "CamelHttp*";
   public static final String VALIDATION_REPORT_PREFIX = "/validation-report-";
   public static final String VALIDATION_REPORT_SUFFIX = ".json";
