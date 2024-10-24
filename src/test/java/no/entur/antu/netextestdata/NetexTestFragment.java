@@ -1,7 +1,6 @@
 package no.entur.antu.netextestdata;
 
-import static no.entur.antu.netextestdata.MappingSupport.createJaxbElement;
-import static no.entur.antu.netextestdata.MappingSupport.createWrappedRef;
+import static no.entur.antu.netextestdata.MappingSupport.jaxbElement;
 
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
@@ -14,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
@@ -29,6 +29,8 @@ import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DayType;
+import org.rutebanken.netex.model.DayTypeAssignment;
+import org.rutebanken.netex.model.DayTypeAssignmentsInFrame_RelStructure;
 import org.rutebanken.netex.model.DayTypeRefStructure;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import org.rutebanken.netex.model.DeadRun;
@@ -53,6 +55,8 @@ import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingDayRefStructure;
+import org.rutebanken.netex.model.OperatingDaysInFrame_RelStructure;
+import org.rutebanken.netex.model.OperatingPeriodRefStructure;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
@@ -62,6 +66,7 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RouteRefStructure;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.ServiceCalendarFrame;
 import org.rutebanken.netex.model.ServiceFrame;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
@@ -80,7 +85,7 @@ import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 public class NetexTestFragment {
 
-  private static final DateTimeFormatter DATE_FORMATTER =
+  private static final DateTimeFormatter OPERATING_DAY_DATE_FORMATTER =
     DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final DayType EVERYDAY = new DayType()
     .withId("EVERYDAY")
@@ -122,9 +127,12 @@ public class NetexTestFragment {
   }
 
   public CreateDatedServiceJourney datedServiceJourney(
-    int serviceJourneyRefId
+    ServiceJourney serviceJourney,
+    OperatingDay operatingDay
   ) {
-    return new CreateDatedServiceJourney(serviceJourneyRefId);
+    return new CreateDatedServiceJourney()
+      .withServiceJourneyId(ServiceJourneyId.ofValidId(serviceJourney))
+      .withOperatingDayRef(operatingDay.getId());
   }
 
   public List<JourneyPattern> createJourneyPatterns(
@@ -195,6 +203,10 @@ public class NetexTestFragment {
     return new CreatePassengerStopAssignment();
   }
 
+  public CreateOperatingDay operatingDay(LocalDate date) {
+    return new CreateOperatingDay().withOperatingDayDate(date);
+  }
+
   public CreateNetexEntitiesIndex netexEntitiesIndex() {
     return new CreateNetexEntitiesIndex();
   }
@@ -217,6 +229,10 @@ public class NetexTestFragment {
   ) {
     return new CreateNetexEntitiesIndex()
       .addFlexibleStopPlace(flexibleStopPlace);
+  }
+
+  public CreateDayTypeAssignment dayTypeAssignment() {
+    return new CreateDayTypeAssignment();
   }
 
   public static class CreateFlexibleArea {
@@ -288,11 +304,11 @@ public class NetexTestFragment {
 
     private int id;
 
-    private String scheduleStopPointRef;
+    private String scheduleStopPointId;
 
-    private String stopPlaceRef;
+    private String stopPlaceId;
 
-    private String quayRef;
+    private String quayId;
 
     public CreatePassengerStopAssignment withId(int id) {
       this.id = id;
@@ -302,18 +318,18 @@ public class NetexTestFragment {
     public CreatePassengerStopAssignment withScheduleStopPointId(
       int scheduleStopPointId
     ) {
-      this.scheduleStopPointRef =
+      this.scheduleStopPointId =
         "TST:ScheduledStopPoint:" + scheduleStopPointId;
       return this;
     }
 
     public CreatePassengerStopAssignment withStopPlaceId(int stopPlaceId) {
-      this.stopPlaceRef = "TST:StopPlace:" + stopPlaceId;
+      this.stopPlaceId = "TST:StopPlace:" + stopPlaceId;
       return this;
     }
 
     public CreatePassengerStopAssignment withQuayId(int quayId) {
-      this.quayRef = "TST:Quay:" + quayId;
+      this.quayId = "TST:Quay:" + quayId;
       return this;
     }
 
@@ -321,14 +337,11 @@ public class NetexTestFragment {
       return new PassengerStopAssignment()
         .withId("TST:PassengerStopAssignment:" + id)
         .withScheduledStopPointRef(
-          createWrappedRef(
-            scheduleStopPointRef,
-            ScheduledStopPointRefStructure.class
-          )
+          jaxbElement(scheduleStopPointId, ScheduledStopPointRefStructure.class)
         )
-        .withQuayRef(createWrappedRef(quayRef, QuayRefStructure.class))
+        .withQuayRef(jaxbElement(quayId, QuayRefStructure.class))
         .withStopPlaceRef(
-          createWrappedRef(stopPlaceRef, StopPlaceRefStructure.class)
+          jaxbElement(stopPlaceId, StopPlaceRefStructure.class)
         );
     }
   }
@@ -381,14 +394,14 @@ public class NetexTestFragment {
       Collection<JAXBElement<? extends JourneyRefStructure>> journeyRefs =
         new ArrayList<>();
       journeyRefs.add(
-        createJaxbElement(
+        jaxbElement(
           new ServiceJourneyRefStructure()
             .withRef("TST:ServiceJourney:" + serviceJourneyRefId)
         )
       );
       if (datedServiceJourneyRefId > 0) {
         journeyRefs.add(
-          createJaxbElement(
+          jaxbElement(
             new DatedServiceJourneyRefStructure()
               .withRef("TST:DatedServiceJourney:" + datedServiceJourneyRefId)
           )
@@ -427,6 +440,70 @@ public class NetexTestFragment {
         .withId("TST:OperatingDay:" + id)
         //        .withId(calendarDate.format(DATE_FORMATTER))
         .withCalendarDate(calendarDate.atStartOfDay());
+    }
+  }
+
+
+  public static class CreateDayTypeAssignment {
+
+    private int id = 1;
+    private LocalDate date;
+    private String operatingDayRef;
+    private String operatingPeriodRef;
+
+    public CreateDayTypeAssignment withId(int id) {
+      this.id = id;
+      return this;
+    }
+
+    public CreateDayTypeAssignment withDate(LocalDate date) {
+      this.date = date;
+      this.operatingDayRef = null;
+      this.operatingPeriodRef = null;
+      return this;
+    }
+
+    public CreateDayTypeAssignment withOperatingDayRef(String operatingDayRef) {
+      this.operatingDayRef = operatingDayRef;
+      this.date = null;
+      this.operatingPeriodRef = null;
+      return this;
+    }
+
+    public CreateDayTypeAssignment withOperatingPeriodRef(
+      String operatingPeriodRef
+    ) {
+      this.operatingPeriodRef = operatingPeriodRef;
+      this.date = null;
+      this.operatingDayRef = null;
+      return this;
+    }
+
+    public DayTypeAssignment create() {
+      DayTypeAssignment dayTypeAssignment = new DayTypeAssignment()
+        .withId("TST:DayTypeAssignment:" + id);
+
+      Optional
+        .ofNullable(date)
+        .ifPresent(d -> dayTypeAssignment.withDate(d.atStartOfDay()));
+
+      Optional
+        .ofNullable(operatingDayRef)
+        .ifPresent(ref ->
+                     dayTypeAssignment.withOperatingDayRef(
+                       new OperatingDayRefStructure().withRef(ref)
+                     )
+        );
+
+      Optional
+        .ofNullable(operatingPeriodRef)
+        .ifPresent(ref ->
+                     dayTypeAssignment.withOperatingPeriodRef(
+                       jaxbElement(ref, OperatingPeriodRefStructure.class)
+                     )
+        );
+
+      return dayTypeAssignment;
     }
   }
 
@@ -473,7 +550,7 @@ public class NetexTestFragment {
     public Route create() {
       return new Route()
         .withLineRef(
-          createJaxbElement(new LineRefStructure().withRef(line.getId()))
+          MappingSupport.jaxbElement(line.getId(), LineRefStructure.class)
         )
         .withId("TST:Route:" + id);
     }
@@ -1043,6 +1120,11 @@ public class NetexTestFragment {
     private final List<ServiceLink> serviceLinks = new ArrayList<>();
     private final List<FlexibleStopPlace> flexibleStopPlaces =
       new ArrayList<>();
+    private final List<PassengerStopAssignment> passengerStopAssignments =
+      new ArrayList<>();
+    private final List<OperatingDay> operatingDays = new ArrayList<>();
+    private final List<DayTypeAssignment> dayTypeAssignments =
+      new ArrayList<>();
 
     public CreateNetexEntitiesIndex addLine(Line line) {
       this.line = line;
@@ -1060,9 +1142,6 @@ public class NetexTestFragment {
       this.flexibleStopPlaces.addAll(Arrays.asList(flexibleStopPlace));
       return this;
     }
-
-    private final List<PassengerStopAssignment> passengerStopAssignments =
-      new ArrayList<>();
 
     public CreateNetexEntitiesIndex addJourneys(
       Journey_VersionStructure... journeys
@@ -1108,12 +1187,22 @@ public class NetexTestFragment {
       return this;
     }
 
+    public CreateNetexEntitiesIndex addOperatingDays(
+      OperatingDay... operatingDays
+    ) {
+      this.operatingDays.addAll(Arrays.asList(operatingDays));
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addDayTypeAssignments(
+      DayTypeAssignment... dayTypeAssignments
+    ) {
+      this.dayTypeAssignments.addAll(Arrays.asList(dayTypeAssignments));
+      return this;
+    }
+
     public NetexEntitiesIndex create() {
       NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
-
-      TimetableFrame timetableFrame = new TimetableFrame();
-      SiteFrame siteFrame = new SiteFrame();
-      ServiceFrame serviceFrame = new ServiceFrame();
 
       if (line != null) {
         netexEntitiesIndex.getLineIndex().put(line.getId(), line);
@@ -1123,9 +1212,25 @@ public class NetexTestFragment {
         netexEntitiesIndex.getRouteIndex().put(route.getId(), route);
       }
 
+      createTimeTableFrame(netexEntitiesIndex);
+      createServiceFrame(netexEntitiesIndex);
+      createSiteFrame(netexEntitiesIndex);
+      createServiceCalendarFrame(netexEntitiesIndex);
+
+      fillIndexes(netexEntitiesIndex);
+      return netexEntitiesIndex;
+    }
+
+    private void createTimeTableFrame(NetexEntitiesIndex netexEntitiesIndex) {
+      // Skip creating timetable frame if there is nothing existing for timetable frame
+      if (journeys.isEmpty() && interchanges.isEmpty()) {
+        return;
+      }
+
+      TimetableFrame timetableFrame = new TimetableFrame();
+
       timetableFrame.withVehicleJourneys(
         new JourneysInFrame_RelStructure()
-          .withId("JR:123")
           .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
             journeys
           )
@@ -1133,30 +1238,63 @@ public class NetexTestFragment {
 
       timetableFrame.withJourneyInterchanges(
         new JourneyInterchangesInFrame_RelStructure()
-          .withId("TST:123")
           .withServiceJourneyPatternInterchangeOrServiceJourneyInterchange(
             interchanges
           )
       );
 
-      serviceFrame.withServiceLinks(
-        new ServiceLinksInFrame_RelStructure()
-          .withId("TST:123")
-          .withServiceLink(serviceLinks)
-      );
+      netexEntitiesIndex.getTimetableFrames().add(timetableFrame);
+    }
+
+    private void createServiceFrame(NetexEntitiesIndex netexEntitiesIndex) {
+      // Skip creating site frame if there is nothing existing for site frame
+      if (flexibleStopPlaces.isEmpty()) {
+        return;
+      }
+
+      SiteFrame siteFrame = new SiteFrame();
 
       siteFrame.withFlexibleStopPlaces(
         new FlexibleStopPlacesInFrame_RelStructure()
-          .withId("TST:123")
           .withFlexibleStopPlace(flexibleStopPlaces)
       );
 
-      netexEntitiesIndex.getTimetableFrames().add(timetableFrame);
-      netexEntitiesIndex.getServiceFrames().add(serviceFrame);
       netexEntitiesIndex.getSiteFrames().add(siteFrame);
+    }
 
-      fillIndexes(netexEntitiesIndex);
-      return netexEntitiesIndex;
+    private void createSiteFrame(NetexEntitiesIndex netexEntitiesIndex) {
+      // Skip creating site frame if there is nothing existing for site frame
+      if (serviceLinks.isEmpty()) {
+        return;
+      }
+
+      ServiceFrame serviceFrame = new ServiceFrame();
+
+      serviceFrame.withServiceLinks(
+        new ServiceLinksInFrame_RelStructure().withServiceLink(serviceLinks)
+      );
+
+      netexEntitiesIndex.getServiceFrames().add(serviceFrame);
+    }
+
+    private void createServiceCalendarFrame(
+      NetexEntitiesIndex netexEntitiesIndex
+    ) {
+      // Skip creating service calendar frame if there is nothing existing for service calendar frame
+      if (operatingDays.isEmpty() && dayTypeAssignments.isEmpty()) {
+        return;
+      }
+
+      ServiceCalendarFrame serviceCalendarFrame = new ServiceCalendarFrame();
+
+      serviceCalendarFrame.withOperatingDays(
+        new OperatingDaysInFrame_RelStructure().withOperatingDay(operatingDays)
+      );
+      serviceCalendarFrame.withDayTypeAssignments(
+        new DayTypeAssignmentsInFrame_RelStructure()
+          .withDayTypeAssignment(dayTypeAssignments)
+      );
+      netexEntitiesIndex.getServiceCalendarFrames().add(serviceCalendarFrame);
     }
 
     private void fillIndexes(NetexEntitiesIndex netexEntitiesIndex) {
@@ -1219,6 +1357,27 @@ public class NetexTestFragment {
             .getDatedServiceJourneyIndex()
             .put(journey.getId(), journey)
         );
+/*
+      datedServiceJourneys.forEach(datedServiceJourney ->
+                                     datedServiceJourney
+                                       .getJourneyRef()
+                                       .forEach(journeyRefStructure ->
+                                                  netexEntitiesIndex
+                                                    .getDatedServiceJourneyByServiceJourneyRefIndex()
+                                                    .put(journeyRefStructure.getValue().getRef(), datedServiceJourney)
+                                       )
+      );
+
+
+      journeys        .stream()
+                      .filter(DatedServiceJourney.class::isInstance)
+                      .map(DatedServiceJourney.class::cast)
+        .map(DatedServiceJourney::getJourneyRef).forEach(journeyRefStructure ->
+                                                  netexEntitiesIndex
+                                                    .getDatedServiceJourneyByServiceJourneyRefIndex()
+                                                    .put(journeyRefStructure.getValue().getRef(), datedServiceJourney)
+                                       )
+      );*/
     }
   }
 
@@ -1231,39 +1390,39 @@ public class NetexTestFragment {
   private static JAXBElement<LinkSequenceProjection_VersionStructure> createLinkSequenceProjection_VersionStructureElement(
     LinkSequenceProjection_VersionStructure value
   ) {
-    return createJaxbElement(value);
+    return MappingSupport.jaxbElement(value);
   }
 
   private static JAXBElement<ScheduledStopPointRefStructure> createScheduledStopPointRef(
     String id
   ) {
-    return createWrappedRef(id, ScheduledStopPointRefStructure.class);
+    return jaxbElement(id, ScheduledStopPointRefStructure.class);
   }
 
   private static JAXBElement<StopPointInJourneyPatternRefStructure> createStopPointRef(
     String id
   ) {
-    return createWrappedRef(id, StopPointInJourneyPatternRefStructure.class);
+    return jaxbElement(id, StopPointInJourneyPatternRefStructure.class);
   }
 
   private static JAXBElement<JourneyPatternRefStructure> createJourneyPatternRef(
     String id
   ) {
-    return createWrappedRef(id, JourneyPatternRefStructure.class);
+    return jaxbElement(id, JourneyPatternRefStructure.class);
   }
 
   private static JAXBElement<LineRefStructure> createLineRef(String id) {
-    return createWrappedRef(id, LineRefStructure.class);
+    return jaxbElement(id, LineRefStructure.class);
   }
 
   private static JAXBElement<DestinationDisplayRefStructure> createDestinationDisplayRef(
     String id
   ) {
-    return createWrappedRef(id, DestinationDisplayRefStructure.class);
+    return jaxbElement(id, DestinationDisplayRefStructure.class);
   }
 
   private static JAXBElement<DayTypeRefStructure> createEveryDayRef() {
-    return createJaxbElement(
+    return MappingSupport.jaxbElement(
       new DayTypeRefStructure().withRef(EVERYDAY.getId())
     );
   }

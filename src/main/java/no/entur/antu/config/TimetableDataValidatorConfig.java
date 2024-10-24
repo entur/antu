@@ -41,7 +41,10 @@ import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeedVa
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import org.entur.netex.validation.validator.*;
+import org.entur.netex.validation.validator.DatasetValidator;
+import org.entur.netex.validation.validator.NetexValidatorsRunner;
+import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;

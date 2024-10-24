@@ -33,6 +33,7 @@ import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.rutebanken.netex.model.ServiceCalendarFrame;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.rutebanken.netex.model.ServiceLink;
@@ -281,6 +282,32 @@ public record AntuNetexData(
           .get(vehicleJourneyRefStructure.getRef())
       )
       .orElse(null);
+  }
+
+  public ServiceJourneyStop serviceJourneyStopAtScheduleStopPoint(
+    VehicleJourneyRefStructure vehicleJourneyRefStructure,
+    ScheduledStopPointId scheduledStopPointId
+  ) {
+    return serviceJourneyStops(vehicleJourneyRefStructure)
+      .stream()
+      .filter(serviceJourneyStop ->
+        serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)
+      )
+      .findFirst()
+      .orElse(null);
+  }
+
+  public List<ServiceJourneyStop> serviceJourneyStops(
+    VehicleJourneyRefStructure vehicleJourneyRefStructure
+  ) {
+    return Optional
+      .ofNullable(
+        netexDataRepository.serviceJourneyStops(
+          validationReportId(),
+          ServiceJourneyId.ofValidId(vehicleJourneyRefStructure)
+        )
+      )
+      .orElse(List.of());
   }
 
   /**
@@ -541,5 +568,13 @@ public record AntuNetexData(
       )
       .findFirst()
       .orElse(null);
+  }
+
+  public boolean hasServiceCalenderFrames() {
+    return !netexEntitiesIndex.getServiceCalendarFrames().isEmpty();
+  }
+
+  public Stream<ServiceCalendarFrame> serviceCalendarFrames() {
+    return netexEntitiesIndex.getServiceCalendarFrames().stream();
   }
 }
