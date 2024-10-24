@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.DatasetValidator;
@@ -32,11 +33,6 @@ public class ValidationTest {
     this.netexDataRepositoryMock = mock(NetexDataRepository.class);
     Mockito
       .when(netexDataRepositoryMock.hasQuayIds(anyString()))
-      .thenReturn(true);
-    Mockito
-      .when(
-        netexDataRepositoryMock.hasServiceJourneyInterchangeInfos(anyString())
-      )
       .thenReturn(true);
 
     this.stopPlaceRepositoryMock = mock(StopPlaceRepository.class);
@@ -108,16 +104,10 @@ public class ValidationTest {
   }
 
   protected void mockGetServiceJourneyStops(
-    ServiceJourneyId serviceJourneyId,
-    List<ServiceJourneyStop> serviceJourneyStops
+    Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStops
   ) {
     Mockito
-      .when(
-        netexDataRepositoryMock.serviceJourneyStops(
-          anyString(),
-          eq(serviceJourneyId)
-        )
-      )
+      .when(netexDataRepositoryMock.serviceJourneyStops(anyString()))
       .thenReturn(serviceJourneyStops);
   }
 

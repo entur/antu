@@ -1,7 +1,9 @@
 package no.entur.antu.validation.validator.interchange.stoppoints;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import no.entur.antu.netexdata.DefaultNetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
@@ -12,57 +14,49 @@ public record StopPointsInVehicleJourneyContext(
   List<ServiceJourneyStop> serviceJourneyStopsForFromJourneyRef,
   List<ServiceJourneyStop> serviceJourneyStopsForToJourneyRef
 ) {
-  public static StopPointsInVehicleJourneyContext of(
-    String validationReportId,
-    NetexDataRepository netexDataRepository,
-    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo
-  ) {
-    return new StopPointsInVehicleJourneyContext(
-      serviceJourneyInterchangeInfo,
-      Optional
-        .ofNullable(serviceJourneyInterchangeInfo.fromJourneyRef())
-        .map(serviceJourneyId ->
-          serviceJourneyStops(
-            validationReportId,
-            netexDataRepository,
-            serviceJourneyId
+  public static class Builder {
+
+    private final String validationReportId;
+    private final NetexDataRepository netexDataRepository;
+    private Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyIdListMap;
+
+    public Builder(
+      String validationReportId,
+      NetexDataRepository netexDataRepository
+    ) {
+      this.validationReportId = validationReportId;
+      this.netexDataRepository = netexDataRepository;
+    }
+
+    public Builder primeCache() {
+      serviceJourneyIdListMap =
+        netexDataRepository.serviceJourneyStops(validationReportId);
+      return this;
+    }
+
+    public StopPointsInVehicleJourneyContext build(
+      ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo
+    ) {
+      return new StopPointsInVehicleJourneyContext(
+        serviceJourneyInterchangeInfo,
+        Optional
+          .ofNullable(serviceJourneyInterchangeInfo.fromJourneyRef())
+          .map(serviceJourneyId -> serviceJourneyIdListMap.get(serviceJourneyId)
           )
-        )
-        .orElse(null),
-      Optional
-        .ofNullable(serviceJourneyInterchangeInfo.toJourneyRef())
-        .map(serviceJourneyId ->
-          serviceJourneyStops(
-            validationReportId,
-            netexDataRepository,
-            serviceJourneyId
+          .orElse(null),
+        Optional
+          .ofNullable(serviceJourneyInterchangeInfo.toJourneyRef())
+          .map(serviceJourneyId -> serviceJourneyIdListMap.get(serviceJourneyId)
           )
-        )
-        .orElse(null)
-    );
+          .orElse(null)
+      );
+    }
   }
 
   public boolean isValid() {
     return (
       serviceJourneyInterchangeInfo != null &&
-      serviceJourneyInterchangeInfo.isValid() &&
-      serviceJourneyStopsForFromJourneyRef != null &&
-      serviceJourneyStopsForToJourneyRef != null
+      serviceJourneyInterchangeInfo.isValid()
     );
-  }
-
-  private static List<ServiceJourneyStop> serviceJourneyStops(
-    String validationReportId,
-    NetexDataRepository netexDataRepository,
-    ServiceJourneyId serviceJourneyId
-  ) {
-    return Optional
-      .ofNullable(
-        netexDataRepository.serviceJourneyStops(
-          validationReportId,
-          serviceJourneyId
-        )
-      )
-      .orElse(List.of());
   }
 }

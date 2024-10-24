@@ -283,32 +283,6 @@ public record AntuNetexData(
       .orElse(null);
   }
 
-  public ServiceJourneyStop serviceJourneyStopAtScheduleStopPoint(
-    VehicleJourneyRefStructure vehicleJourneyRefStructure,
-    ScheduledStopPointId scheduledStopPointId
-  ) {
-    return serviceJourneyStops(vehicleJourneyRefStructure)
-      .stream()
-      .filter(serviceJourneyStop ->
-        serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)
-      )
-      .findFirst()
-      .orElse(null);
-  }
-
-  public List<ServiceJourneyStop> serviceJourneyStops(
-    VehicleJourneyRefStructure vehicleJourneyRefStructure
-  ) {
-    return Optional
-      .ofNullable(
-        netexDataRepository.serviceJourneyStops(
-          validationReportId(),
-          ServiceJourneyId.ofValidId(vehicleJourneyRefStructure)
-        )
-      )
-      .orElse(List.of());
-  }
-
   /**
    * Returns the Stream of all ServiceJourneyInterchanges in all the TimeTableFrames.
    */

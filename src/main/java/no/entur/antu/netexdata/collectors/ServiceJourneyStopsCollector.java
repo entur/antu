@@ -1,5 +1,7 @@
 package no.entur.antu.netexdata.collectors;
 
+import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_STOPS_CACHE;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -9,6 +11,7 @@ import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.redisson.api.RLock;
+import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +47,6 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
     Map<String, List<String>> serviceJourneyStops = antuNetexData
       .validServiceJourneys()
-      // TODO: unique service journeys ids
       .map(serviceJourney -> {
         Map<String, ScheduledStopPointId> scheduledStopPointIdMap =
           AntuNetexData.scheduledStopPointIdByStopPointId(
@@ -71,6 +73,7 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
     addServiceJourneyStops(
       validationContext.getValidationReportId(),
+      validationContext.getFileName(),
       serviceJourneyStops
     );
   }
@@ -84,20 +87,21 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
   private void addServiceJourneyStops(
     String validationReportId,
+    String filename,
     Map<String, List<String>> serviceJourneyStops
   ) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {
       lock.lock();
 
-      serviceJourneyStopsCache.merge(
-        validationReportId,
-        serviceJourneyStops,
-        (existingMap, newMap) -> {
-          existingMap.putAll(newMap);
-          return existingMap;
-        }
+      String keyName =
+        validationReportId + "_" + SERVICE_JOURNEY_STOPS_CACHE + "_" + filename;
+
+      RMap<String, List<String>> serviceJourneyStopsMap = redissonClient.getMap(
+        keyName
       );
+      serviceJourneyStopsMap.putAll(serviceJourneyStops);
+      serviceJourneyStopsCache.put(keyName, serviceJourneyStopsMap);
     } finally {
       if (lock.isHeldByCurrentThread()) {
         lock.unlock();
