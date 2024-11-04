@@ -21,6 +21,10 @@ public class StopPlaceForQuayIdFetcher
     StopPlaceForQuayIdFetcher.class
   );
 
+  public static boolean isValidNSRQuay(QuayId quayId) {
+    return quayId != null && quayId.id().startsWith("NSR:Quay:");
+  }
+
   protected StopPlaceForQuayIdFetcher(
     @Qualifier("stopPlaceWebClient") WebClient stopPlaceWebClient
   ) {
@@ -29,6 +33,14 @@ public class StopPlaceForQuayIdFetcher
 
   @Override
   public StopPlace tryFetch(QuayId quayId) {
+    if (!isValidNSRQuay(quayId)) {
+      LOGGER.warn(
+        "Ignored fetching stop place for invalid NSR Quay with id : {}",
+        quayId
+      );
+      return null;
+    }
+
     LOGGER.info(
       "Trying to fetch the stop place with quay id {}, from read API",
       quayId.id()

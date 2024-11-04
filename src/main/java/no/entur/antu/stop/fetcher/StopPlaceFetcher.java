@@ -27,8 +27,20 @@ public class StopPlaceFetcher
     super(stopPlaceWebClient);
   }
 
+  public static boolean isValidNSRStopPlace(StopPlaceId stopPlaceId) {
+    return stopPlaceId != null && stopPlaceId.id().startsWith("NSR:StopPlace:");
+  }
+
   @Override
   public StopPlace tryFetch(StopPlaceId stopPlaceId) {
+    if (!isValidNSRStopPlace(stopPlaceId)) {
+      LOGGER.warn(
+        "Ignore fetching stop place for invalid NSR Stop place with id : {}",
+        stopPlaceId
+      );
+      return null;
+    }
+
     LOGGER.info(
       "Trying to fetch the stop place with id {}, from read API",
       stopPlaceId.id()

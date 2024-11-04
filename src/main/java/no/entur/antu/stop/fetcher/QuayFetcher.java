@@ -26,8 +26,17 @@ public class QuayFetcher extends AntuNetexEntityFetcher<Quay, QuayId> {
     super(stopPlaceWebClient);
   }
 
+  public static boolean isValidNSRQuay(QuayId quayId) {
+    return quayId != null && quayId.id().startsWith("NSR:Quay:");
+  }
+
   @Override
   public Quay tryFetch(QuayId quayId) {
+    if (!isValidNSRQuay(quayId)) {
+      LOGGER.warn("Ignoring invalid NSR Quay with id : {}", quayId);
+      return null;
+    }
+
     LOGGER.info(
       "Trying to fetch the Quay with id {}, from read API",
       quayId.id()
