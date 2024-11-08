@@ -15,7 +15,7 @@
     <version>2.0.0-SNAPSHOT</version>
 
     <name>antu</name>
-    <description>Backend integration</description>
+    <description>NeTEx Dataset validation</description>
     <url>https://github.com/entur/antu</url>
 
     <scm>
