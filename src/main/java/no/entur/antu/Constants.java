@@ -43,6 +43,11 @@ public final class Constants {
 
   public static final String JOB_TYPE = "JOB_TYPE";
   public static final String JOB_TYPE_SPLIT = "SPLIT";
+  public static final String JOB_TYPE_VALIDATE_XML_SCHEMA =
+    "VALIDATE_XML_SCHEMA";
+  public static final String JOB_TYPE_AGGREGATE_XML_SCHEMA_VALIDATION =
+    "AGGREGATE_XML_SCHEMA_VALIDATION";
+
   public static final String JOB_TYPE_VALIDATE = "VALIDATE";
   public static final String JOB_TYPE_VALIDATE_DATASET = "VALIDATE_DATASET";
   public static final String JOB_TYPE_COMPLETE_VALIDATION =
@@ -107,6 +112,14 @@ public final class Constants {
 
   public static final String PEN_XMLNS = "PEN";
   public static final String PEN_XMLNSURL = "http://www.rutebanken.org/ns/pen";
+
+  public static final String PROP_DATASET_NETEX_FILE_NAMES_STRING =
+    "EnturDatasetNetexFileNamesString";
+  public static final String PROP_DATASET_NETEX_FILE_NAMES_SET =
+    "EnturDatasetNetexFileNamesSet";
+  public static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
+  public static final String PROP_NETEX_VALIDATION_CALLBACK =
+    "PROP_NETEX_VALIDATION_CALLBACK";
 
   private Constants() {}
 }

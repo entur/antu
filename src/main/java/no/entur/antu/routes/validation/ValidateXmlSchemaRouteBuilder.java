@@ -21,44 +21,74 @@ package no.entur.antu.routes.validation;
 import static no.entur.antu.Constants.*;
 import static no.entur.antu.routes.memorystore.MemoryStoreRoute.MEMORY_STORE_FILE_NAME;
 
+import java.util.Set;
 import no.entur.antu.Constants;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.exception.RetryableAntuException;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.util.NetexFileUtils;
 import no.entur.antu.validation.AntuNetexValidationProgressCallback;
-import no.entur.antu.validation.ValidationReportTransformer;
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.util.StopWatch;
 import org.entur.netex.validation.exception.RetryableNetexValidationException;
 import org.springframework.stereotype.Component;
 
 /**
- * Validate NeTEx files, both common files and line files.
+ * Validate NeTEx files against the NeTEx XML Schema.
  */
 @Component
-public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
+public class ValidateXmlSchemaRouteBuilder extends BaseRouteBuilder {
 
   @Override
   public void configure() throws Exception {
     super.configure();
 
-    from("direct:validateNetex")
+    from("direct:createXMLSchemaValidationJobs")
+      .log(
+        LoggingLevel.DEBUG,
+        correlation() + "Creating XML Schema validation jobs"
+      )
+      .split(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES_SET))
+      .setHeader(
+        Constants.DATASET_NB_NETEX_FILES,
+        exchangeProperty(Exchange.SPLIT_SIZE)
+      )
+      .setHeader(NETEX_FILE_NAME, body())
+      .setHeader(FILE_HANDLE, simple(Constants.GCS_BUCKET_FILE_NAME))
+      .process(exchange ->
+        exchange
+          .getIn()
+          .setBody(
+            NetexFileUtils.buildFileNamesListFromSet(
+              exchange.getProperty(PROP_DATASET_NETEX_FILE_NAMES_SET, Set.class)
+            )
+          )
+      )
+      .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
+      .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_VALIDATE_XML_SCHEMA))
+      .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
+      //end split
+      .end()
+      .routeId("create-xml-schema-validation-jobs");
+
+    from("direct:validateXmlSchema")
       .log(
         LoggingLevel.INFO,
-        correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}"
+        correlation() +
+        "Validating XML schema for NeTEx file ${header." +
+        FILE_HANDLE +
+        "}"
       )
       .process(this::extendAckDeadline)
       .setProperty(PROP_STOP_WATCH, StopWatch::new)
-      .setProperty(PROP_DATASET_NETEX_FILE_NAMES_STRING, body())
+      .setProperty(PROP_DATASET_NETEX_FILE_NAMES_SET, body())
       .doTry()
       .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_FILE_NAME))
       .to("direct:downloadSingleNetexFileFromMemoryStore")
-      .setProperty(Constants.PROP_NETEX_FILE_CONTENT, body())
-      // TODO we should not parse NeTEx data before the file is validated against the XSD
-      //      and the XPath validators are run.
-      .to("direct:storeCommonData")
-      .to("direct:runNetexValidators")
+      .setProperty(PROP_NETEX_FILE_CONTENT, body())
+      .to("direct:runXmlSchemaValidator")
       // Duplicated PubSub messages are detected when trying to download the NeTEx file:
       // it does not exist anymore after the report is generated and all temporary files are deleted
       .doCatch(AntuMemoryStoreFileNotFoundException.class)
@@ -94,30 +124,22 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .to("direct:reportSystemError")
       // end catch
       .end()
-      .to("direct:truncateReport")
       .to("direct:saveValidationReport")
-      .to("direct:notifyValidationReportAggregator")
+      .to("direct:notifyXmlSchemaValidationAggregator")
       .log(
         LoggingLevel.INFO,
         correlation() +
-        "Validated NeTEx file ${header." +
+        "Validated XML Schema for NeTEx file ${header." +
         NETEX_FILE_NAME +
         "} in ${exchangeProperty." +
         PROP_STOP_WATCH +
         ".taken()} ms"
       )
-      .routeId("validate-netex");
+      .routeId("validate-xml-schema");
 
-    from("direct:runNetexValidators")
+    from("direct:runXmlSchemaValidator")
       .streamCaching()
-      .log(
-        LoggingLevel.DEBUG,
-        correlation() +
-        "Running NeTEx validators using validation profile ${header." +
-        VALIDATION_PROFILE_HEADER +
-        "}"
-      )
-      .validate(header(VALIDATION_PROFILE_HEADER).isNotNull())
+      .log(LoggingLevel.DEBUG, correlation() + "Running XML Schema validator")
       .validate(header(DATASET_CODESPACE).isNotNull())
       .process(exchange ->
         exchange.setProperty(
@@ -127,7 +149,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       )
       .bean(
         "netexValidationWorkflow",
-        "runNetexValidators(${header." +
+        "runSchemaValidation(${header." +
         VALIDATION_PROFILE_HEADER +
         "}, ${header." +
         DATASET_CODESPACE +
@@ -142,32 +164,20 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         PROP_NETEX_VALIDATION_CALLBACK +
         "})"
       )
-      .log(LoggingLevel.DEBUG, correlation() + "Completed all NeTEx validators")
-      .routeId("run-netex-validators");
-
-    from("direct:truncateReport")
-      .log(LoggingLevel.DEBUG, correlation() + "Truncating validation report")
-      .bean(new ValidationReportTransformer(50))
-      .log(LoggingLevel.DEBUG, correlation() + "Truncated validation report")
-      .routeId("truncate-validation-report");
-
-    from("direct:notifyValidationReportAggregator")
       .log(
         LoggingLevel.DEBUG,
-        correlation() + "Notifying validation report aggregator"
+        correlation() + "Completed NeTEx XML Schema validation"
       )
-      .to("google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue")
-      .filter(header(NETEX_FILE_NAME).startsWith("_"))
+      .routeId("run-xml-schema-validator");
+
+    from("direct:notifyXmlSchemaValidationAggregator")
       .log(
         LoggingLevel.DEBUG,
-        correlation() + "Notifying common files aggregator"
+        correlation() + "Notifying XML Schema validation report aggregator"
       )
-      .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES_STRING))
       .to(
-        "google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue"
+        "google-pubsub:{{antu.pubsub.project.id}}:AntuXmlSchemaValidationAggregationQueue"
       )
-      //end filter
-      .end()
-      .routeId("notify-validation-report-aggregator");
+      .routeId("notify-xml-schema-validation-aggregator");
   }
 }

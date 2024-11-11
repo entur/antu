@@ -18,10 +18,7 @@
 
 package no.entur.antu.routes.validation;
 
-import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.NETEX_FILE_NAME;
-import static no.entur.antu.Constants.PROP_NETEX_FILE_CONTENT;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
+import static no.entur.antu.Constants.*;
 
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
@@ -31,8 +28,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ParseAndStoreCommonDataRouteBuilder extends BaseRouteBuilder {
-
-  private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
 
   private final NetexDataRepository netexDataRepository;
 
