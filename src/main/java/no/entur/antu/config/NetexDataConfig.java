@@ -9,7 +9,6 @@ import static no.entur.antu.config.cache.CacheConfig.SERVICE_LINKS_AND_SCHEDULED
 import java.util.List;
 import java.util.Map;
 import no.entur.antu.netexdata.DefaultNetexDataRepository;
-import no.entur.antu.netexdata.NetexDataResource;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,14 +21,7 @@ public class NetexDataConfig {
 
   @Bean
   @Profile("!test")
-  NetexDataResource netexDataResource() {
-    return new NetexDataResource();
-  }
-
-  @Bean
-  @Profile("!test")
   NetexDataRepository netexDataRepository(
-    NetexDataResource netexDataResource,
     RedissonClient redissonClient,
     @Qualifier(
       SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE
@@ -46,7 +38,6 @@ public class NetexDataConfig {
     ) Map<String, List<String>> serviceJourneyInterchangeInfoCache
   ) {
     return new DefaultNetexDataRepository(
-      netexDataResource,
       redissonClient,
       scheduledStopPointAndQuayIdCache,
       serviceLinksAndFromToScheduledStopPointIdCache,

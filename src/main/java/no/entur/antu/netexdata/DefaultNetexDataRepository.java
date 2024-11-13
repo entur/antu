@@ -23,7 +23,6 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     DefaultNetexDataRepository.class
   );
 
-  private final NetexDataResource netexDataResource;
   private final RedissonClient redissonClient;
   private final Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache;
   private final Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache;
@@ -32,7 +31,6 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
   private final Map<String, List<String>> serviceJourneyInterchangeInfoCache;
 
   public DefaultNetexDataRepository(
-    NetexDataResource netexDataResource,
     RedissonClient redissonClient,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
@@ -40,7 +38,6 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
     Map<String, List<String>> serviceJourneyInterchangeInfoCache
   ) {
-    this.netexDataResource = netexDataResource;
     this.redissonClient = redissonClient;
     this.scheduledStopPointAndQuayIdCache = scheduledStopPointAndQuayIdCache;
     this.serviceLinksAndFromToScheduledStopPointIdCache =
@@ -145,6 +142,7 @@ public class DefaultNetexDataRepository implements NetexDataRepository {
     byte[] fileContent,
     String validationReportId
   ) {
+    NetexDataResource netexDataResource = new NetexDataResource();
     netexDataResource.loadNetexData(fileContent);
     // Merging with the existing map, for handing the case where there are
     // multiple common files in the dataset.
