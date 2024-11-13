@@ -1,7 +1,8 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref;
 
 import java.util.List;
-import no.entur.antu.validation.AntuNetexData;
+import no.entur.antu.validation.validator.support.NetexUtils;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -15,27 +16,28 @@ public record SameQuayRefContext(
     return scheduledStopPointId != null && quayId != null;
   }
 
-  public static Builder builder(AntuNetexData antuNetexData) {
-    return new Builder(antuNetexData);
+  public static Builder builder(JAXBValidationContext validationContext) {
+    return new Builder(validationContext);
   }
 
   public static class Builder {
 
-    private final AntuNetexData antuNetexData;
+    private final JAXBValidationContext validationContext;
 
-    private Builder(AntuNetexData antuNetexData) {
-      this.antuNetexData = antuNetexData;
+    private Builder(JAXBValidationContext validationContext) {
+      this.validationContext = validationContext;
     }
 
     public List<SameQuayRefContext> build(JourneyPattern journeyPattern) {
-      return AntuNetexData
+      return NetexUtils
         .stopPointsInJourneyPattern(journeyPattern)
+        .stream()
         .map(ScheduledStopPointId::of)
         .map(stopPointId ->
           new SameQuayRefContext(
             journeyPattern.getId(),
             stopPointId,
-            antuNetexData.quayIdForScheduledStopPoint(stopPointId)
+            validationContext.quayIdForScheduledStopPoint(stopPointId)
           )
         )
         .toList();

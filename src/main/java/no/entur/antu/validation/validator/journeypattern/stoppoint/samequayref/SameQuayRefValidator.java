@@ -3,14 +3,12 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,23 +37,23 @@ public class SameQuayRefValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug(
       "Validating Same quayRefs in two consecutive Stop points In Journey Patterns"
     );
 
     SameQuayRefContext.Builder builder = SameQuayRefContext.builder(
-      antuNetexData
+      validationContext
     );
 
-    antuNetexData
+    validationContext
       .journeyPatterns()
+      .stream()
       .map(builder::build)
       .forEach(sameQuayRefContexts ->
         validateSameQuayRefs(
-          antuNetexData,
+          validationContext,
           sameQuayRefContexts,
           error ->
             addValidationReportEntry(validationReport, validationContext, error)
@@ -66,14 +64,13 @@ public class SameQuayRefValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // JourneyPatterns only appear in the Line file.
   }
 
   private void validateSameQuayRefs(
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     List<SameQuayRefContext> contextForJourneyPattern,
     Consumer<ValidationError> reportError
   ) {
@@ -97,10 +94,12 @@ public class SameQuayRefValidator extends AntuNetexValidator {
             new SameQuayRefError(
               SameQuayRefError.RuleCode.SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN,
               currentContext.journeyPatternId(),
-              antuNetexData.stopPointName(
+              validationContext.stopPointName(
                 previousContext.scheduledStopPointId()
               ),
-              antuNetexData.stopPointName(currentContext.scheduledStopPointId())
+              validationContext.stopPointName(
+                currentContext.scheduledStopPointId()
+              )
             )
           );
         }

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
@@ -41,17 +40,16 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating ServiceJourney non-increasing passing time");
 
-    antuNetexData
-      .validServiceJourneys()
+    validationContext
+      .serviceJourneys()
       .forEach(serviceJourney ->
         validateServiceJourney(
           serviceJourney,
-          antuNetexData,
+          validationContext,
           validationError ->
             addValidationReportEntry(
               validationReport,
@@ -65,25 +63,24 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // ServiceJourneys and Line only appear in the Line file.
   }
 
   public void validateServiceJourney(
     ServiceJourney serviceJourney,
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     Consumer<ValidationError> reportError
   ) {
     List<StopTime> sortedTimetabledPassingTime =
-      SortStopTimesUtil.getSortedStopTimes(serviceJourney, antuNetexData);
+      SortStopTimesUtil.getSortedStopTimes(serviceJourney, validationContext);
 
     var previousPassingTime = sortedTimetabledPassingTime.get(0);
     if (
       validateStopTime(
         serviceJourney,
-        antuNetexData,
+        validationContext,
         previousPassingTime,
         reportError
       )
@@ -95,7 +92,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
       if (
         validateStopTime(
           serviceJourney,
-          antuNetexData,
+          validationContext,
           currentPassingTime,
           reportError
         )
@@ -105,7 +102,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
         reportError.accept(
           new NonIncreasingPassingTimeError(
             NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME,
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               previousPassingTime.scheduledStopPointId()
             ),
             ServiceJourneyId.ofValidId(serviceJourney)
@@ -120,7 +117,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
 
   private static boolean validateStopTime(
     ServiceJourney serviceJourney,
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     StopTime stopTime,
     Consumer<ValidationError> reportError
   ) {
@@ -131,7 +128,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
       reportError.accept(
         new NonIncreasingPassingTimeError(
           NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
-          antuNetexData.stopPointName(stopTime.scheduledStopPointId()),
+          validationContext.stopPointName(stopTime.scheduledStopPointId()),
           serviceJourneyId
         )
       );
@@ -141,7 +138,7 @@ public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
       reportError.accept(
         new NonIncreasingPassingTimeError(
           NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
-          antuNetexData.stopPointName(stopTime.scheduledStopPointId()),
+          validationContext.stopPointName(stopTime.scheduledStopPointId()),
           serviceJourneyId
         )
       );

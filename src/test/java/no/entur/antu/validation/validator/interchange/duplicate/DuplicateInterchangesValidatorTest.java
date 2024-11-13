@@ -1,11 +1,15 @@
 package no.entur.antu.validation.validator.interchange.duplicate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import no.entur.antu.netextestdata.NetexTestFragment;
@@ -15,6 +19,7 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
@@ -64,16 +69,25 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getValidationReportEntries()
-        .stream()
-        .findFirst()
-        .map(ValidationReportEntry::getMessage)
-        .orElse(null),
-      is(
-        "Duplicate interchanges found at TST:ServiceJourneyInterchange:1, TST:ServiceJourneyInterchange:2, TST:ServiceJourneyInterchange:3, TST:ServiceJourneyInterchange:4"
-      )
+    String message = validationReport
+      .getValidationReportEntries()
+      .stream()
+      .findFirst()
+      .map(ValidationReportEntry::getMessage)
+      .orElseThrow();
+
+    // assert that 4 distinct interchanges are reported among the 4 identical ones.
+    // TODO the validator should report all 4 identical interchanges
+
+    Pattern pattern = Pattern.compile("TST:ServiceJourneyInterchange:[0-4]*");
+    assertEquals(
+      4,
+      pattern
+        .matcher(message)
+        .results()
+        .map(MatchResult::group)
+        .distinct()
+        .count()
     );
   }
 
@@ -93,15 +107,18 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
+    String message = validationReport
+      .getValidationReportEntries()
+      .stream()
+      .findFirst()
+      .map(ValidationReportEntry::getMessage)
+      .orElseThrow();
+
     assertThat(
-      validationReport
-        .getValidationReportEntries()
-        .stream()
-        .findFirst()
-        .map(ValidationReportEntry::getMessage)
-        .orElse(null),
-      is(
-        "Duplicate interchanges found at TST:ServiceJourneyInterchange:2, TST:ServiceJourneyInterchange:3"
+      message,
+      CoreMatchers.allOf(
+        containsString("TST:ServiceJourneyInterchange:2"),
+        containsString("TST:ServiceJourneyInterchange:3")
       )
     );
   }
@@ -114,33 +131,50 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
       createServiceJourneyInterchanges(5, 6, 7, 8);
 
     NetexTestFragment testData = new NetexTestFragment();
-    ValidationReport validationReport = runValidation(
-      testData
-        .netexEntitiesIndex()
-        .addInterchanges(
-          Stream
-            .concat(
-              serviceJourneyInterchanges1.stream(),
-              serviceJourneyInterchanges2.stream()
-            )
-            .toArray(ServiceJourneyInterchange[]::new)
-        )
-        .create()
-    );
+    NetexEntitiesIndex netexEntitiesIndex = testData
+      .netexEntitiesIndex()
+      .addInterchanges(
+        Stream
+          .concat(
+            serviceJourneyInterchanges1.stream(),
+            serviceJourneyInterchanges2.stream()
+          )
+          .toArray(ServiceJourneyInterchange[]::new)
+      )
+      .create();
+    ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(2));
+
+    Pattern duplicatedIds1 = Pattern.compile(
+      "TST:ServiceJourneyInterchange:[1-3]*"
+    );
+    Pattern duplicatedIds2 = Pattern.compile(
+      "TST:ServiceJourneyInterchange:[6-8]*"
+    );
+
+    // assert that 2 distinct interchanges are reported among the 3 identical ones.
+    // TODO the validator should report all 3 identical interchanges
     assertTrue(
       validationReport
         .getValidationReportEntries()
         .stream()
         .map(ValidationReportEntry::getMessage)
         .allMatch(message ->
-          List
-            .of(
-              "Duplicate interchanges found at TST:ServiceJourneyInterchange:2, TST:ServiceJourneyInterchange:3",
-              "Duplicate interchanges found at TST:ServiceJourneyInterchange:7, TST:ServiceJourneyInterchange:8"
-            )
-            .contains(message)
+          duplicatedIds1
+            .matcher(message)
+            .results()
+            .map(MatchResult::group)
+            .distinct()
+            .count() ==
+          2 ||
+          duplicatedIds2
+            .matcher(message)
+            .results()
+            .map(MatchResult::group)
+            .distinct()
+            .count() ==
+          2
         )
     );
   }

@@ -5,7 +5,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.StopTime;
-import no.entur.antu.validation.AntuNetexData;
+import no.entur.antu.validation.validator.support.JourneyPatternUtils;
+import no.entur.antu.validation.validator.support.NetexUtils;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
@@ -65,14 +67,14 @@ public record UnexpectedSpeedContext(
   public static final class Builder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
-    private final AntuNetexData antuNetexData;
+    private final JAXBValidationContext validationContext;
 
-    public Builder(AntuNetexData antuNetexData) {
-      this.antuNetexData = antuNetexData;
+    public Builder(JAXBValidationContext validationContext) {
+      this.validationContext = validationContext;
     }
 
     public UnexpectedSpeedContext build(ServiceJourney serviceJourney) {
-      JourneyPattern journeyPattern = antuNetexData.journeyPattern(
+      JourneyPattern journeyPattern = validationContext.journeyPattern(
         serviceJourney
       );
 
@@ -86,9 +88,10 @@ public record UnexpectedSpeedContext(
 
       return new UnexpectedSpeedContext(
         serviceJourney,
-        antuNetexData.transportMode(serviceJourney),
-        antuNetexData
+        validationContext.transportMode(serviceJourney),
+        validationContext
           .timetabledPassingTimes(serviceJourney)
+          .stream()
           .map(timetabledPassingTime ->
             findQuayCoordinates(timetabledPassingTime, journeyPattern)
           )
@@ -107,11 +110,11 @@ public record UnexpectedSpeedContext(
       TimetabledPassingTime timetabledPassingTime,
       JourneyPattern journeyPattern
     ) {
-      String stopPointInJourneyPatternRef = AntuNetexData.stopPointRef(
+      String stopPointInJourneyPatternRef = NetexUtils.stopPointRef(
         timetabledPassingTime
       );
       StopPointInJourneyPattern stopPointInJourneyPattern =
-        AntuNetexData.stopPointInJourneyPattern(
+        NetexUtils.stopPointInJourneyPattern(
           stopPointInJourneyPatternRef,
           journeyPattern
         );
@@ -124,7 +127,10 @@ public record UnexpectedSpeedContext(
       }
 
       Map.Entry<ScheduledStopPointId, QuayCoordinates> coordinatesPerQuayId =
-        antuNetexData.coordinatesPerQuayId(stopPointInJourneyPattern);
+        JourneyPatternUtils.coordinatesPerQuayId(
+          stopPointInJourneyPattern,
+          validationContext
+        );
 
       if (coordinatesPerQuayId == null) {
         LOGGER.warn(

@@ -1,18 +1,14 @@
 package no.entur.antu.validation.validator.passengerstopassignment;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.rutebanken.netex.model.DeadRun;
-import org.rutebanken.netex.model.Journey_VersionStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,16 +45,16 @@ public class MissingPassengerStopAssignmentValidator
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating Stop place in journey pattern");
 
     MissingPassengerStopAssignmentContext.Builder builder =
-      new MissingPassengerStopAssignmentContext.Builder(antuNetexData);
+      new MissingPassengerStopAssignmentContext.Builder(validationContext);
 
-    antuNetexData
+    validationContext
       .journeyPatterns()
+      .stream()
       .map(builder::build)
       .flatMap(List::stream)
       .filter(
@@ -67,7 +63,7 @@ public class MissingPassengerStopAssignmentValidator
         )
       )
       .filter(context ->
-        !validateStopPointInJourneyPattern(antuNetexData, context)
+        !validateStopPointInJourneyPattern(validationContext, context)
       )
       .forEach(context ->
         addValidationReportEntry(
@@ -75,7 +71,7 @@ public class MissingPassengerStopAssignmentValidator
           validationContext,
           new MissingPassengerStopAssignmentError(
             context.stopPointInJourneyPatternRef(),
-            antuNetexData.stopPointName(context.scheduledStopPointId()),
+            validationContext.stopPointName(context.scheduledStopPointId()),
             MissingPassengerStopAssignmentError.RuleCode.MISSING_SCHEDULED_STOP_ASSIGNMENT
           )
         )
@@ -85,42 +81,18 @@ public class MissingPassengerStopAssignmentValidator
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // StopPoints and JourneyPatterns only appear in the Line file.
   }
 
   private boolean validateStopPointInJourneyPattern(
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     MissingPassengerStopAssignmentContext missingPassengerStopAssignmentContext
   ) {
-    Map<Boolean, List<Journey_VersionStructure>> deadRunsAndRestOfServiceJourneys =
-      antuNetexData
-        .netexEntitiesIndex()
-        .getTimetableFrames()
-        .stream()
-        .flatMap(timetableFrame ->
-          timetableFrame
-            .getVehicleJourneys()
-            .getVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney()
-            .stream()
-        )
-        .collect(Collectors.partitioningBy(DeadRun.class::isInstance));
-
-    List<DeadRun> deadRuns = deadRunsAndRestOfServiceJourneys
-      .get(Boolean.TRUE)
-      .stream()
-      .filter(DeadRun.class::isInstance)
-      .map(DeadRun.class::cast)
-      .toList();
-
-    List<ServiceJourney> serviceJourneys = deadRunsAndRestOfServiceJourneys
-      .get(Boolean.FALSE)
-      .stream()
-      .filter(ServiceJourney.class::isInstance)
-      .map(ServiceJourney.class::cast)
-      .toList();
+    Collection<DeadRun> deadRuns = validationContext.deadRuns();
+    Collection<ServiceJourney> serviceJourneys =
+      validationContext.serviceJourneys();
 
     return (
       isAssignedToDeadRun(
@@ -135,7 +107,7 @@ public class MissingPassengerStopAssignmentValidator
   }
 
   private boolean isAssignedToDeadRun(
-    List<DeadRun> deadRuns,
+    Collection<DeadRun> deadRuns,
     String journeyPatternRef
   ) {
     return deadRuns
@@ -147,7 +119,7 @@ public class MissingPassengerStopAssignmentValidator
   }
 
   private boolean isNotAssignedToAnyServiceJourney(
-    List<ServiceJourney> serviceJourneys,
+    Collection<ServiceJourney> serviceJourneys,
     String journeyPatternRef
   ) {
     return serviceJourneys

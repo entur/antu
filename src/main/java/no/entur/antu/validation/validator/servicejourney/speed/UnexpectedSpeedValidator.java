@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 import no.entur.antu.stoptime.PassingTimes;
 import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
@@ -60,22 +59,22 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating Speed");
 
     UnexpectedSpeedContext.Builder contextBuilder =
-      new UnexpectedSpeedContext.Builder(antuNetexData);
+      new UnexpectedSpeedContext.Builder(validationContext);
 
-    antuNetexData
-      .validServiceJourneys()
+    validationContext
+      .serviceJourneys()
+      .stream()
       .map(contextBuilder::build)
       .filter(UnexpectedSpeedContext::isValid)
       .forEach(context ->
         validateServiceJourney(
           context,
-          antuNetexData,
+          validationContext,
           error ->
             addValidationReportEntry(validationReport, validationContext, error)
         )
@@ -85,21 +84,20 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // ServiceJourneys and Line only appear in the Line file.
   }
 
   private void validateServiceJourney(
     UnexpectedSpeedContext context,
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     Consumer<ValidationError> reportError
   ) {
     List<StopTime> sortedTimetabledPassingTime =
       SortStopTimesUtil.getSortedStopTimes(
         context.serviceJourney(),
-        antuNetexData
+        validationContext
       );
 
     IntStream
@@ -118,20 +116,20 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
         // TODO: This will never reached due to the takeWhile above. Reported as WARNING in Chouette
         filterAndReportInValidTimeDifference(
           context.serviceJourney(),
-          antuNetexData,
+          validationContext,
           passingTimes,
           reportError
         )
       )
       .filter(context::hasValidCoordinates)
       .forEach(passingTimes ->
-        validateSpeed(context, antuNetexData, passingTimes, reportError)
+        validateSpeed(context, validationContext, passingTimes, reportError)
       );
   }
 
   private boolean filterAndReportInValidTimeDifference(
     ServiceJourney serviceJourney,
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     PassingTimes passingTimes,
     Consumer<ValidationError> reportError
   ) {
@@ -139,10 +137,12 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       reportError.accept(
         new SameDepartureArrivalTimeError(
           ServiceJourneyId.ofValidId(serviceJourney),
-          antuNetexData.stopPointName(
+          validationContext.stopPointName(
             passingTimes.from().scheduledStopPointId()
           ),
-          antuNetexData.stopPointName(passingTimes.to().scheduledStopPointId()),
+          validationContext.stopPointName(
+            passingTimes.to().scheduledStopPointId()
+          ),
           SameDepartureArrivalTimeError.RuleCode.SAME_DEPARTURE_ARRIVAL_TIME
         )
       );
@@ -177,7 +177,7 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
 
   private static void validateSpeed(
     UnexpectedSpeedContext context,
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     PassingTimes passingTimes,
     Consumer<ValidationError> reportError
   ) {
@@ -223,10 +223,12 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
       reportError.accept(
         new UnexpectedSpeedError(
           ServiceJourneyId.ofValidId(context.serviceJourney()),
-          antuNetexData.stopPointName(
+          validationContext.stopPointName(
             passingTimes.from().scheduledStopPointId()
           ),
-          antuNetexData.stopPointName(passingTimes.to().scheduledStopPointId()),
+          validationContext.stopPointName(
+            passingTimes.to().scheduledStopPointId()
+          ),
           UnexpectedSpeedError.RuleCode.LOW_SPEED,
           Comparison.of(
             Long.toString(expectedSpeed.minSpeed()),
@@ -240,10 +242,10 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
         reportError.accept(
           new UnexpectedSpeedError(
             ServiceJourneyId.ofValidId(context.serviceJourney()),
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               passingTimes.from().scheduledStopPointId()
             ),
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               passingTimes.to().scheduledStopPointId()
             ),
             UnexpectedSpeedError.RuleCode.HIGH_SPEED,
@@ -257,10 +259,10 @@ public class UnexpectedSpeedValidator extends AntuNetexValidator {
         reportError.accept(
           new UnexpectedSpeedError(
             ServiceJourneyId.ofValidId(context.serviceJourney()),
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               passingTimes.from().scheduledStopPointId()
             ),
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               passingTimes.to().scheduledStopPointId()
             ),
             UnexpectedSpeedError.RuleCode.WARNING_SPEED,

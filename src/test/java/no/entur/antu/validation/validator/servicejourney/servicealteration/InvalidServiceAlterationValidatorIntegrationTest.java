@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -15,14 +16,15 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
-import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Test;
 
 class InvalidServiceAlterationValidatorIntegrationTest {
 
-  public static final String TEST_CODESPACE = "NSB";
-  public static final String TEST_FILE_INVALID = "servicealteration/NSB_L1.xml";
-  public static final String TEST_FILE_VALID = "servicealteration/VYG_41.xml";
+  private static final String TEST_CODESPACE = "NSB";
+  private static final String TEST_LINE_XML_FILE = "line.xml";
+  private static final String TEST_FILE_INVALID =
+    "servicealteration/NSB_L1.xml";
+  private static final String TEST_FILE_VALID = "servicealteration/VYG_41.xml";
   private static final NetexParser NETEX_PARSER = new NetexParser();
 
   @Test
@@ -55,21 +57,18 @@ class InvalidServiceAlterationValidatorIntegrationTest {
         testDatasetAsStream
       );
 
-      JAXBValidationContext validationContext = mock(
-        JAXBValidationContext.class
-      );
-
       NetexDataRepository netexDataRepository = mock(NetexDataRepository.class);
       when(netexDataRepository.hasQuayIds(anyString())).thenReturn(true);
 
-      when(validationContext.getValidationReportId())
-        .thenReturn(validationReportId);
-      when(validationContext.getNetexEntitiesIndex())
-        .thenReturn(netexEntitiesIndex);
-      when(validationContext.getNetexDataRepository())
-        .thenReturn(netexDataRepository);
-      when(validationContext.getStopPlaceRepository())
-        .thenReturn(mock(StopPlaceRepository.class));
+      JAXBValidationContext validationContext = new JAXBValidationContext(
+        validationReportId,
+        netexEntitiesIndex,
+        netexDataRepository,
+        null,
+        TEST_CODESPACE,
+        TEST_LINE_XML_FILE,
+        Map.of()
+      );
 
       InvalidServiceAlterationValidator invalidServiceAlterationValidator =
         new InvalidServiceAlterationValidator((code, message, dataLocation) ->

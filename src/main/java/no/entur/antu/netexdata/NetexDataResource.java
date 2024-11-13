@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.validation.AntuNetexData;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.FromToScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceLinkId;
 import org.rutebanken.netex.model.PassengerStopAssignment;
@@ -63,8 +63,10 @@ public class NetexDataResource {
   }
 
   public Map<String, String> getFromToScheduledStopPointIdPerServiceLinkId() {
-    return AntuNetexData
-      .serviceLinks(getCommonDataIndex())
+    return getCommonDataIndex()
+      .getServiceLinkIndex()
+      .getAll()
+      .stream()
       .collect(
         Collectors.toMap(
           serviceLink -> ServiceLinkId.of(serviceLink).toString(),

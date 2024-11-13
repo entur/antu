@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import net.opengis.gml._3.LineStringType;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.utilities.GeometryUtilities;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
@@ -31,10 +31,10 @@ public record UnexpectedDistanceInServiceLinkContext(
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Builder.class);
 
-    private final AntuNetexData antuNetexData;
+    private final JAXBValidationContext validationContext;
 
-    public Builder(AntuNetexData antuNetexData) {
-      this.antuNetexData = antuNetexData;
+    public Builder(JAXBValidationContext validationContext) {
+      this.validationContext = validationContext;
     }
 
     public UnexpectedDistanceInServiceLinkContext build(
@@ -61,8 +61,12 @@ public record UnexpectedDistanceInServiceLinkContext(
         return null;
       }
 
-      QuayCoordinates from = antuNetexData.coordinatesForQuayId(fromQuayId);
-      QuayCoordinates to = antuNetexData.coordinatesForQuayId(toQuayId);
+      QuayCoordinates from = validationContext
+        .getStopPlaceRepository()
+        .getCoordinatesForQuayId(fromQuayId);
+      QuayCoordinates to = validationContext
+        .getStopPlaceRepository()
+        .getCoordinatesForQuayId(toQuayId);
 
       if (from == null || to == null) {
         LOGGER.warn(
@@ -94,7 +98,7 @@ public record UnexpectedDistanceInServiceLinkContext(
         .ofNullable(scheduledStopPointRef)
         .map(VersionOfObjectRefStructure::getRef)
         .map(ScheduledStopPointId::new)
-        .map(antuNetexData::quayIdForScheduledStopPoint)
+        .map(validationContext::quayIdForScheduledStopPoint)
         .orElse(null);
     }
 

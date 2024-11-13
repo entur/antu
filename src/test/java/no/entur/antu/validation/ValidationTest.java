@@ -21,6 +21,10 @@ import org.mockito.Mockito;
 
 public class ValidationTest {
 
+  private static final String TEST_CODESPACE = "ENT";
+  private static final String TEST_LINE_XML_FILE = "line.xml";
+  private static final String TEST_COMMON_XML_FILE = "_common.xml";
+
   private static final String VALIDATION_REPORT_ID = "Test1122";
   private static final String VALIDATION_REPORT_CODEBASE = "TST";
   protected NetexDataRepository netexDataRepositoryMock;
@@ -192,17 +196,15 @@ public class ValidationTest {
       VALIDATION_REPORT_ID
     );
 
-    JAXBValidationContext validationContext = mock(JAXBValidationContext.class);
-    when(validationContext.isCommonFile()).thenReturn(mockAsCommonFile);
-
-    when(validationContext.getValidationReportId())
-      .thenReturn(VALIDATION_REPORT_ID);
-    when(validationContext.getNetexEntitiesIndex())
-      .thenReturn(netexEntitiesIndex);
-    when(validationContext.getNetexDataRepository())
-      .thenReturn(netexDataRepositoryMock);
-    when(validationContext.getStopPlaceRepository())
-      .thenReturn(stopPlaceRepositoryMock);
+    JAXBValidationContext validationContext = new JAXBValidationContext(
+      VALIDATION_REPORT_ID,
+      netexEntitiesIndex,
+      netexDataRepositoryMock,
+      stopPlaceRepositoryMock,
+      TEST_CODESPACE,
+      mockAsCommonFile ? TEST_COMMON_XML_FILE : TEST_LINE_XML_FILE,
+      Map.of()
+    );
 
     try {
       V validator = validatorClass

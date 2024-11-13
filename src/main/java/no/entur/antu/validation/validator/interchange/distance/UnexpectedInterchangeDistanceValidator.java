@@ -1,7 +1,6 @@
 package no.entur.antu.validation.validator.interchange.distance;
 
 import java.util.function.Consumer;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
@@ -33,21 +32,21 @@ public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
-    antuNetexData
+    validationContext
       .serviceJourneyInterchanges()
+      .stream()
       .map(serviceJourneyInterchange ->
         UnexpectedInterchangeDistanceContext.of(
-          antuNetexData,
+          validationContext,
           serviceJourneyInterchange
         )
       )
       .filter(UnexpectedInterchangeDistanceContext::isValid)
       .forEach(context ->
         validateDistance(
-          antuNetexData,
+          validationContext,
           context,
           validationError ->
             addValidationReportEntry(
@@ -60,7 +59,7 @@ public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
   }
 
   private void validateDistance(
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     UnexpectedInterchangeDistanceContext distanceContext,
     Consumer<ValidationError> reportError
   ) {
@@ -75,10 +74,10 @@ public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
           new UnexpectedInterchangeDistanceError(
             UnexpectedInterchangeDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_MAX_LIMIT,
             distanceContext.interchangeId(),
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               distanceContext.fromStopPointCoordinates().scheduledStopPointId()
             ),
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               distanceContext.toStopPointCoordinates().scheduledStopPointId()
             ),
             Comparison.of(3 * INTERCHANGE_EXPECTED_DISTANCE, distance)
@@ -89,10 +88,10 @@ public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
           new UnexpectedInterchangeDistanceError(
             UnexpectedInterchangeDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_WARNING_LIMIT,
             distanceContext.interchangeId(),
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               distanceContext.fromStopPointCoordinates().scheduledStopPointId()
             ),
-            antuNetexData.stopPointName(
+            validationContext.stopPointName(
               distanceContext.toStopPointCoordinates().scheduledStopPointId()
             ),
             Comparison.of(INTERCHANGE_EXPECTED_DISTANCE, distance)

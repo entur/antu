@@ -3,7 +3,9 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import no.entur.antu.validation.AntuNetexData;
+import no.entur.antu.validation.validator.support.JourneyPatternUtils;
+import no.entur.antu.validation.validator.support.NetexUtils;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
@@ -34,10 +36,10 @@ public record UnexpectedDistanceBetweenStopPointsContext(
 
   public static class Builder {
 
-    private final AntuNetexData antuNetexData;
+    private final JAXBValidationContext validationContext;
 
-    public Builder(AntuNetexData antuNetexData) {
-      this.antuNetexData = antuNetexData;
+    public Builder(JAXBValidationContext validationContext) {
+      this.validationContext = validationContext;
     }
 
     public UnexpectedDistanceBetweenStopPointsContext build(
@@ -45,10 +47,16 @@ public record UnexpectedDistanceBetweenStopPointsContext(
     ) {
       return new UnexpectedDistanceBetweenStopPointsContext(
         journeyPattern.getId(),
-        antuNetexData.transportMode(journeyPattern),
-        AntuNetexData
+        validationContext.transportMode(journeyPattern),
+        NetexUtils
           .stopPointsInJourneyPattern(journeyPattern)
-          .map(antuNetexData::coordinatesPerQuayId)
+          .stream()
+          .map(stopPointInJourneyPattern ->
+            JourneyPatternUtils.coordinatesPerQuayId(
+              stopPointInJourneyPattern,
+              validationContext
+            )
+          )
           .filter(Objects::nonNull)
           .map(ScheduledStopPointCoordinates::of)
           .toList()

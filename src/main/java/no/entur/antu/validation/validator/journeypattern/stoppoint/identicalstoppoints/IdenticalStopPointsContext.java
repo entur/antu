@@ -3,7 +3,8 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.identicalsto
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import no.entur.antu.validation.AntuNetexData;
+import no.entur.antu.validation.validator.support.NetexUtils;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.DestinationDisplayRefStructure;
@@ -20,8 +21,8 @@ public record IdenticalStopPointsContext(
     Boolean forAlighting
   ) {}
 
-  public static Builder builder(AntuNetexData antuNetexData) {
-    return new Builder(antuNetexData);
+  public static Builder builder(JAXBValidationContext validationContext) {
+    return new Builder(validationContext);
   }
 
   /**
@@ -50,21 +51,22 @@ public record IdenticalStopPointsContext(
 
   public static class Builder {
 
-    private final AntuNetexData antuNetexData;
+    private final JAXBValidationContext validationContext;
 
-    private Builder(AntuNetexData antuNetexData) {
-      this.antuNetexData = antuNetexData;
+    private Builder(JAXBValidationContext validationContext) {
+      this.validationContext = validationContext;
     }
 
     public IdenticalStopPointsContext build(JourneyPattern journeyPattern) {
       return new IdenticalStopPointsContext(
         journeyPattern.getId(),
-        AntuNetexData
+        NetexUtils
           .stopPointsInJourneyPattern(journeyPattern)
+          .stream()
           .filter(Objects::nonNull)
           .map(stopPoint ->
             new StopPointContext(
-              antuNetexData.quayIdForScheduledStopPoint(
+              validationContext.quayIdForScheduledStopPoint(
                 ScheduledStopPointId.of(stopPoint)
               ),
               Optional

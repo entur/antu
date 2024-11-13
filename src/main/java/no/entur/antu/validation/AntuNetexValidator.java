@@ -24,14 +24,12 @@ public abstract class AntuNetexValidator extends AbstractJAXBValidator {
     ValidationReport validationReport,
     JAXBValidationContext validationContext
   ) {
-    AntuNetexData antuNetexData = getAntuNetexData(validationContext);
-
     if (validationContext.isCommonFile()) {
-      validateCommonFile(validationReport, validationContext, antuNetexData);
+      validateCommonFile(validationReport, validationContext);
     }
 
     if (!validationContext.isCommonFile()) {
-      validateLineFile(validationReport, validationContext, antuNetexData);
+      validateLineFile(validationReport, validationContext);
     }
   }
 
@@ -39,16 +37,14 @@ public abstract class AntuNetexValidator extends AbstractJAXBValidator {
 
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // Nothing here
   }
 
   protected void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // Nothing here
   }
@@ -65,17 +61,6 @@ public abstract class AntuNetexValidator extends AbstractJAXBValidator {
     );
 
     validationReport.addValidationReportEntry(validationReportEntry);
-  }
-
-  private AntuNetexData getAntuNetexData(
-    JAXBValidationContext validationContext
-  ) {
-    return new AntuNetexData(
-      validationContext.getValidationReportId(),
-      validationContext.getNetexEntitiesIndex(),
-      validationContext.getNetexDataRepository(),
-      validationContext.getStopPlaceRepository()
-    );
   }
 
   private static DataLocation findDataLocation(

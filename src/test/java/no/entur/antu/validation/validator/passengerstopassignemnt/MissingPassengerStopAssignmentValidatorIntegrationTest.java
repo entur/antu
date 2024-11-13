@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -24,11 +24,14 @@ import org.mockito.Mockito;
 
 class MissingPassengerStopAssignmentValidatorIntegrationTest {
 
-  public static final String TEST_CODESPACE = "ENT";
-  public static final String TEST_FILE_WITH_NO_COMPOSITE_FRAME =
+  private static final String TEST_CODESPACE = "ENT";
+  private static final String TEST_FILE_WITH_NO_COMPOSITE_FRAME =
     "ENT_No_Composite_Frame.xml";
-  public static final String TEST_FILE_WITH_NO_COMPOSITE_FRAME_DEAD_RUN =
+  private static final String TEST_FILE_WITH_NO_COMPOSITE_FRAME_DEAD_RUN =
     "ENT_No_Composite_Frame_Dead_Run.xml";
+
+  private static final String TEST_LINE_XML_FILE = "line.xml";
+
   private static final NetexParser NETEX_PARSER = new NetexParser();
 
   /**
@@ -56,8 +59,7 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   }
 
   /**
-   * Since the dataset does not contain any passenger stop assignments,
-   * the validator should try to validate and fail, because there are no Dead runs.
+   * Since the dataset contains only dead runs, the validation should succeed.
    */
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndWithAllDeadRun()
@@ -97,26 +99,21 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
         testDatasetAsStream
       );
 
-      JAXBValidationContext validationContext = mock(
-        JAXBValidationContext.class
-      );
-
       StopPlaceRepository stopPlaceRepository = Mockito.mock(
         StopPlaceRepository.class
       );
-
       when(stopPlaceRepository.getStopPlaceNameForQuayId(any()))
         .thenReturn("TestName");
 
-      when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getValidationReportId())
-        .thenReturn(validationReportId);
-      when(validationContext.getNetexEntitiesIndex())
-        .thenReturn(netexEntitiesIndex);
-      when(validationContext.getNetexDataRepository())
-        .thenReturn(netexDataRepository);
-      when(validationContext.getStopPlaceRepository())
-        .thenReturn(stopPlaceRepository);
+      JAXBValidationContext validationContext = new JAXBValidationContext(
+        validationReportId,
+        netexEntitiesIndex,
+        netexDataRepository,
+        stopPlaceRepository,
+        TEST_CODESPACE,
+        TEST_LINE_XML_FILE,
+        Map.of()
+      );
 
       MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator =
         new MissingPassengerStopAssignmentValidator(

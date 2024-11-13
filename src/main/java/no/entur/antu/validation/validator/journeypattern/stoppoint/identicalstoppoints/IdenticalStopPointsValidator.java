@@ -2,13 +2,11 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.identicalsto
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,16 +37,16 @@ public class IdenticalStopPointsValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating identical Journey Patterns");
 
     IdenticalStopPointsContext.Builder builder =
-      IdenticalStopPointsContext.builder(antuNetexData);
+      IdenticalStopPointsContext.builder(validationContext);
 
-    antuNetexData
+    validationContext
       .journeyPatterns()
+      .stream()
       .map(builder::build)
       .collect(
         // Two IdenticalStopPointsContexts are equal if their StopPointsContexts are equal
@@ -76,8 +74,7 @@ public class IdenticalStopPointsValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // JourneyPatterns only appear in the Line file.
   }

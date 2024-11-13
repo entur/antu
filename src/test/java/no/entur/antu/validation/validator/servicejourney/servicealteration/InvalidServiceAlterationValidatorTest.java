@@ -44,7 +44,10 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       testData
         .netexEntitiesIndex()
-        .addJourneys(datedServiceJourneyReplaced, datedServiceJourneyNew)
+        .addDatedServiceJourneys(
+          datedServiceJourneyReplaced,
+          datedServiceJourneyNew
+        )
         .create()
     );
 
@@ -67,7 +70,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
           .withServiceAlteration(ServiceAlterationEnumeration.REPLACED)
           .create()
       )
-      .forEach(createNetexEntitiesIndex::addJourneys);
+      .forEach(createNetexEntitiesIndex::addDatedServiceJourneys);
 
     IntStream
       .of(1, 2, 3)
@@ -78,7 +81,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
           .withDatedServiceJourneyRef(i) // Reference to replaced
           .create()
       )
-      .forEach(createNetexEntitiesIndex::addJourneys);
+      .forEach(createNetexEntitiesIndex::addDatedServiceJourneys);
 
     ValidationReport validationReport = runValidation(
       createNetexEntitiesIndex.create()
@@ -105,7 +108,10 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       testData
         .netexEntitiesIndex()
-        .addJourneys(datedServiceJourneyReplaced, datedServiceJourneyNew)
+        .addDatedServiceJourneys(
+          datedServiceJourneyReplaced,
+          datedServiceJourneyNew
+        )
         .create()
     );
 
@@ -131,7 +137,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
     IntStream
       .of(1, 2, 3)
       .mapToObj(i -> testData.datedServiceJourney(i).withId(i).create())
-      .forEach(createNetexEntitiesIndex::addJourneys);
+      .forEach(createNetexEntitiesIndex::addDatedServiceJourneys);
 
     IntStream
       .of(1, 2, 3)
@@ -142,7 +148,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
           .withDatedServiceJourneyRef(i) // Reference to replaced
           .create()
       )
-      .forEach(createNetexEntitiesIndex::addJourneys);
+      .forEach(createNetexEntitiesIndex::addDatedServiceJourneys);
 
     ValidationReport validationReport = runValidation(
       createNetexEntitiesIndex.create()
@@ -179,7 +185,10 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       testData
         .netexEntitiesIndex()
-        .addJourneys(datedServiceJourneyReplaced, datedServiceJourneyNew)
+        .addDatedServiceJourneys(
+          datedServiceJourneyReplaced,
+          datedServiceJourneyNew
+        )
         .create()
     );
 
