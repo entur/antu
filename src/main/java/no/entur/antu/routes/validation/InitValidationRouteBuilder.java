@@ -78,6 +78,12 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .choice()
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_SPLIT))
       .to("direct:splitDataset")
+      .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE_XML_SCHEMA))
+      .to("direct:validateXmlSchema")
+      .when(
+        header(JOB_TYPE).isEqualTo(JOB_TYPE_AGGREGATE_XML_SCHEMA_VALIDATION)
+      )
+      .to("direct:aggregateXmlSchemaValidation")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE))
       .to("direct:validateNetex")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE_DATASET))

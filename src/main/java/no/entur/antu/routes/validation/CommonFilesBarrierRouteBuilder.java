@@ -18,14 +18,7 @@
 
 package no.entur.antu.routes.validation;
 
-import static no.entur.antu.Constants.DATASET_CODESPACE;
-import static no.entur.antu.Constants.DATASET_NB_COMMON_FILES;
-import static no.entur.antu.Constants.FILENAME_DELIMITER;
-import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_COMMON_FILES;
-import static no.entur.antu.Constants.JOB_TYPE_VALIDATE;
-import static no.entur.antu.Constants.NETEX_FILE_NAME;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
+import static no.entur.antu.Constants.*;
 
 import java.util.List;
 import java.util.Set;
@@ -47,9 +40,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
 
-  private static final String PROP_DATASET_NETEX_FILE_NAMES =
-    "EnturDatasetNetexFileNames";
-
   @Override
   public void configure() throws Exception {
     super.configure();
@@ -67,7 +57,7 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
         correlation() +
         "Aggregated ${exchangeProperty.CamelAggregatedSize} common files (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy})."
       )
-      .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
+      .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES_STRING))
       .log(LoggingLevel.TRACE, correlation() + "All NeTEx Files: ${body}")
       .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_COMMON_FILES))
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
@@ -109,7 +99,7 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
       Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
       copyValidationHeaders(newExchange, aggregatedExchange);
       aggregatedExchange.setProperty(
-        PROP_DATASET_NETEX_FILE_NAMES,
+        PROP_DATASET_NETEX_FILE_NAMES_STRING,
         newExchange.getIn().getBody()
       );
       // check if all individual reports have been received
