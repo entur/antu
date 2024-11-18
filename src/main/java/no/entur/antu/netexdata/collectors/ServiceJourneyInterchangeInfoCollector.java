@@ -5,7 +5,6 @@ import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_INTERCHANGE
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import no.entur.antu.validation.AntuNetexData;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
@@ -31,18 +30,12 @@ public class ServiceJourneyInterchangeInfoCollector extends NetexDataCollector {
   protected void collectDataFromLineFile(
     JAXBValidationContext validationContext
   ) {
-    AntuNetexData antuNetexData = new AntuNetexData(
-      validationContext.getValidationReportId(),
-      validationContext.getNetexEntitiesIndex(),
-      validationContext.getNetexDataRepository(),
-      validationContext.getStopPlaceRepository()
-    );
-
     addData(
       validationContext.getFileName(),
-      antuNetexData.validationReportId(),
-      antuNetexData
+      validationContext.getValidationReportId(),
+      validationContext
         .serviceJourneyInterchanges()
+        .stream()
         .map(serviceJourneyInterchange ->
           ServiceJourneyInterchangeInfo.of(
             validationContext.getFileName(),

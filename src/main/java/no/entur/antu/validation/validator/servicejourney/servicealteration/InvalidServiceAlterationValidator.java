@@ -1,8 +1,8 @@
 package no.entur.antu.validation.validator.servicejourney.servicealteration;
 
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
+import no.entur.antu.validation.validator.servicejourney.servicealteration.support.ServiceAlterationUtils;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
@@ -28,14 +28,19 @@ public class InvalidServiceAlterationValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // Validate that those DSJs that got replaced have the 'replaced' service alteration.
-    antuNetexData
-      .datedServiceJourneysWithReferenceToReplaced()
-      .map(antuNetexData::datedServiceJourneyRef)
-      .map(antuNetexData::datedServiceJourney)
+    ServiceAlterationUtils
+      .datedServiceJourneysWithReferenceToReplaced(validationContext)
+      .stream()
+      .map(ServiceAlterationUtils::datedServiceJourneyRef)
+      .map(datedServiceJourneyRefStructure ->
+        ServiceAlterationUtils.datedServiceJourney(
+          datedServiceJourneyRefStructure,
+          validationContext.getNetexEntitiesIndex()
+        )
+      )
       .filter(dsj ->
         dsj.getServiceAlteration() != ServiceAlterationEnumeration.REPLACED
       )

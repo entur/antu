@@ -13,7 +13,6 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.Journey_VersionStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
@@ -62,7 +61,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addJourneys(serviceJourneys.toArray(Journey_VersionStructure[]::new))
+        .addServiceJourneys(serviceJourneys.toArray(ServiceJourney[]::new))
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
@@ -100,7 +99,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addJourneys(serviceJourney)
+        .addServiceJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
@@ -152,7 +151,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addJourneys(serviceJourney)
+        .addServiceJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
@@ -196,7 +195,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addJourneys(serviceJourney)
+        .addServiceJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );
@@ -240,7 +239,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       netexFragment
         .netexEntitiesIndex()
-        .addJourneys(serviceJourney)
+        .addServiceJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
         .create()
     );

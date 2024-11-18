@@ -4,7 +4,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
@@ -57,8 +56,7 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
   @Override
   public void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // Journey pattern are only in line file.
   }
@@ -66,20 +64,20 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating ServiceLinks");
 
     MismatchedStopPointsContext.Builder contextBuilder =
-      new MismatchedStopPointsContext.Builder(antuNetexData);
+      new MismatchedStopPointsContext.Builder(validationContext);
 
-    antuNetexData
+    validationContext
       .journeyPatterns()
+      .stream()
       .map(contextBuilder::build)
       .forEach(context ->
         validateServiceLink(
-          antuNetexData,
+          validationContext,
           context,
           error ->
             addValidationReportEntry(validationReport, validationContext, error)
@@ -88,7 +86,7 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
   }
 
   private void validateServiceLink(
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     MismatchedStopPointsContext context,
     Consumer<ValidationError> reportError
   ) {
@@ -97,7 +95,7 @@ public class MismatchedStopPointsValidator extends AntuNetexValidator {
         Optional
           .ofNullable(scheduledStopPointIds)
           .map(getStopPointId)
-          .map(antuNetexData::stopPointName)
+          .map(validationContext::stopPointName)
           .orElse("unknown");
 
     context

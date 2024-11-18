@@ -2,13 +2,11 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointsco
 
 import java.util.Objects;
 import java.util.function.Predicate;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +36,13 @@ public class StopPointsCountValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating Stop points or service links In Journey Patterns");
 
-    antuNetexData
+    validationContext
       .journeyPatterns()
+      .stream()
       .map(StopPointsCountContext::of)
       .filter(Objects::nonNull)
       .filter(Predicate.not(StopPointsCountContext::isValid))
@@ -65,8 +63,7 @@ public class StopPointsCountValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // JourneyPatterns only appear in the Line file.
   }

@@ -1,7 +1,6 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 
 import java.util.function.Consumer;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
@@ -10,7 +9,6 @@ import no.entur.antu.validation.utilities.SphericalDistanceLibrary;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,21 +40,21 @@ public class UnexpectedDistanceBetweenStopPointsValidator
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating distance between stops in journey patterns");
 
     UnexpectedDistanceBetweenStopPointsContext.Builder builder =
-      new UnexpectedDistanceBetweenStopPointsContext.Builder(antuNetexData);
+      new UnexpectedDistanceBetweenStopPointsContext.Builder(validationContext);
 
-    antuNetexData
+    validationContext
       .journeyPatterns()
+      .stream()
       .map(builder::build)
       .filter(UnexpectedDistanceBetweenStopPointsContext::isValid)
       .forEach(context ->
         validateDistance(
-          antuNetexData,
+          validationContext,
           context,
           validationError ->
             addValidationReportEntry(
@@ -71,14 +69,13 @@ public class UnexpectedDistanceBetweenStopPointsValidator
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // JourneyPatterns only appear in the Line file.
   }
 
   private void validateDistance(
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     UnexpectedDistanceBetweenStopPointsContext distanceContext,
     Consumer<ValidationError> reportError
   ) {
@@ -106,8 +103,8 @@ public class UnexpectedDistanceBetweenStopPointsValidator
           new UnexpectedDistanceBetweenStopPointsError(
             UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED,
             distanceContext.journeyPatternRef(),
-            antuNetexData.stopPointName(previous.scheduledStopPointId()),
-            antuNetexData.stopPointName(current.scheduledStopPointId()),
+            validationContext.stopPointName(previous.scheduledStopPointId()),
+            validationContext.stopPointName(current.scheduledStopPointId()),
             Comparison.of(expectedDistance.minDistance(), distance)
           )
         );
@@ -116,8 +113,8 @@ public class UnexpectedDistanceBetweenStopPointsValidator
           new UnexpectedDistanceBetweenStopPointsError(
             UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED,
             distanceContext.journeyPatternRef(),
-            antuNetexData.stopPointName(previous.scheduledStopPointId()),
-            antuNetexData.stopPointName(current.scheduledStopPointId()),
+            validationContext.stopPointName(previous.scheduledStopPointId()),
+            validationContext.stopPointName(current.scheduledStopPointId()),
             Comparison.of(expectedDistance.maxDistance(), distance)
           )
         );

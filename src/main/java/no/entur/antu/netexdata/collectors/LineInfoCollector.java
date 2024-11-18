@@ -3,9 +3,9 @@ package no.entur.antu.netexdata.collectors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.validation.AntuNetexData;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
+import org.entur.netex.validation.validator.jaxb.support.FlexibleLineUtils;
 import org.entur.netex.validation.validator.model.SimpleLine;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -27,15 +27,9 @@ public class LineInfoCollector extends NetexDataCollector {
   protected void collectDataFromLineFile(
     JAXBValidationContext validationContext
   ) {
-    AntuNetexData antuNetexData = new AntuNetexData(
-      validationContext.getValidationReportId(),
-      validationContext.getNetexEntitiesIndex(),
-      validationContext.getNetexDataRepository(),
-      validationContext.getStopPlaceRepository()
-    );
     addLineName(
-      antuNetexData.validationReportId(),
-      antuNetexData.lineInfo(validationContext.getFileName())
+      validationContext.getValidationReportId(),
+      lineInfo(validationContext)
     );
   }
 
@@ -64,5 +58,26 @@ public class LineInfoCollector extends NetexDataCollector {
         lock.unlock();
       }
     }
+  }
+
+  private SimpleLine lineInfo(JAXBValidationContext validationContext) {
+    return validationContext
+      .getNetexEntitiesIndex()
+      .getLineIndex()
+      .getAll()
+      .stream()
+      .findFirst()
+      .map(line -> SimpleLine.of(line, validationContext.getFileName()))
+      .orElse(
+        validationContext
+          .getNetexEntitiesIndex()
+          .getFlexibleLineIndex()
+          .getAll()
+          .stream()
+          .filter(FlexibleLineUtils::isFixedFlexibleLine)
+          .findFirst()
+          .map(line -> SimpleLine.of(line, validationContext.getFileName()))
+          .orElse(null)
+      );
   }
 }

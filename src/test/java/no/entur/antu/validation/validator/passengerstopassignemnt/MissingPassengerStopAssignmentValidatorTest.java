@@ -16,7 +16,6 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.DeadRun;
 import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.Journey_VersionStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -105,17 +104,17 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
     NetexTestFragment testData = new NetexTestFragment();
     List<JourneyPattern> journeyPatterns = testData.createJourneyPatterns(4);
     Line line = testData.line().create();
-    List<Journey_VersionStructure> serviceJourneys = journeyPatterns
+    List<ServiceJourney> serviceJourneys = journeyPatterns
       .stream()
       .map(journeyPattern -> testData.serviceJourney(line, journeyPattern))
       .map(NetexTestFragment.CreateServiceJourney::create)
-      .map(Journey_VersionStructure.class::cast)
+      .map(ServiceJourney.class::cast)
       .toList();
 
     NetexEntitiesIndex netexEntitiesIndex = testData
       .netexEntitiesIndex()
       .addJourneyPatterns(journeyPatterns.toArray(JourneyPattern[]::new))
-      .addJourneys(serviceJourneys.toArray(Journey_VersionStructure[]::new))
+      .addServiceJourneys(serviceJourneys.toArray(ServiceJourney[]::new))
       .create();
 
     ValidationReport validationReport = runValidation(netexEntitiesIndex);
@@ -151,7 +150,9 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
     DeadRun deadRun = testData.deadRun(journeyPattern).create();
 
     NetexEntitiesIndex netexEntitiesIndex = testData
-      .netexEntitiesIndex(journeyPattern, deadRun)
+      .netexEntitiesIndex()
+      .addJourneyPatterns(journeyPattern)
+      .addDeadRuns(deadRun)
       .create();
 
     ValidationReport validationReport = runValidation(netexEntitiesIndex);
@@ -175,7 +176,8 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
     NetexEntitiesIndex netexEntitiesIndex = testData
       .netexEntitiesIndex()
       .addJourneyPatterns(journeyPattern)
-      .addJourneys(deadRun, serviceJourney)
+      .addServiceJourneys(serviceJourney)
+      .addDeadRuns(deadRun)
       .create();
 
     ValidationReport validationReport = runValidation(netexEntitiesIndex);

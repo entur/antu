@@ -3,8 +3,8 @@ package no.entur.antu.validation.validator.interchange.distance;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
@@ -15,14 +15,16 @@ public record UnexpectedInterchangeDistanceContext(
   ScheduledStopPointCoordinates toStopPointCoordinates
 ) {
   public static UnexpectedInterchangeDistanceContext of(
-    AntuNetexData antuNetexData,
+    JAXBValidationContext validationContext,
     ServiceJourneyInterchange serviceJourneyInterchange
   ) {
     Function<ScheduledStopPointId, ScheduledStopPointCoordinates> scheduledStopPointCoordinates =
       scheduledStopPointId ->
         new ScheduledStopPointCoordinates(
           scheduledStopPointId,
-          antuNetexData.coordinatesForScheduledStopPoint(scheduledStopPointId)
+          validationContext.coordinatesForScheduledStopPoint(
+            scheduledStopPointId
+          )
         );
 
     return new UnexpectedInterchangeDistanceContext(

@@ -2,11 +2,10 @@ package no.entur.antu.validation.validator.servicejourney.speed;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -14,7 +13,6 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
-import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -51,27 +49,22 @@ class UnexpectedSpeedValidatorIntegrationTest {
         testDatasetAsStream
       );
 
-      JAXBValidationContext validationContext = mock(
-        JAXBValidationContext.class
-      );
-
       NetexDataRepository netexDataRepository = Mockito.mock(
         NetexDataRepository.class
       );
-
       Mockito
         .when(netexDataRepository.hasQuayIds(anyString()))
         .thenReturn(false);
 
-      when(validationContext.isCommonFile()).thenReturn(false);
-      when(validationContext.getValidationReportId())
-        .thenReturn(validationReportId);
-      when(validationContext.getNetexEntitiesIndex())
-        .thenReturn(netexEntitiesIndex);
-      when(validationContext.getNetexDataRepository())
-        .thenReturn(netexDataRepository);
-      when(validationContext.getStopPlaceRepository())
-        .thenReturn(mock(StopPlaceRepository.class));
+      JAXBValidationContext validationContext = new JAXBValidationContext(
+        validationReportId,
+        netexEntitiesIndex,
+        netexDataRepository,
+        null,
+        TEST_CODESPACE,
+        testFile,
+        Map.of()
+      );
 
       UnexpectedSpeedValidator unexpectedSpeedValidator =
         new UnexpectedSpeedValidator((code, message, dataLocation) ->

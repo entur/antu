@@ -200,6 +200,7 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
 
         return fragment
           .serviceJourneyInterchange()
+          .withId(i)
           .withFromPointRef(fromPointRef)
           .withToPointRef(toPointRef)
           .withFromJourneyRef(

@@ -20,63 +20,13 @@ import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.DirectPositionType;
 import net.opengis.gml._3.LineStringType;
 import net.opengis.gml._3.LinearRingType;
+import net.opengis.gml._3.ObjectFactory;
 import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.DatedServiceJourney;
-import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
-import org.rutebanken.netex.model.DayType;
-import org.rutebanken.netex.model.DayTypeRefStructure;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
-import org.rutebanken.netex.model.DeadRun;
-import org.rutebanken.netex.model.DestinationDisplayRefStructure;
-import org.rutebanken.netex.model.FlexibleArea;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
-import org.rutebanken.netex.model.FlexibleStopPlacesInFrame_RelStructure;
-import org.rutebanken.netex.model.Interchange_VersionStructure;
-import org.rutebanken.netex.model.JourneyInterchangesInFrame_RelStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.JourneyPatternRefStructure;
-import org.rutebanken.netex.model.JourneyRefStructure;
-import org.rutebanken.netex.model.Journey_VersionStructure;
-import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.LineRefStructure;
-import org.rutebanken.netex.model.LinkInJourneyPattern;
-import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
-import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.MultilingualString;
-import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDayRefStructure;
-import org.rutebanken.netex.model.PassengerStopAssignment;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.Projections_RelStructure;
-import org.rutebanken.netex.model.QuayRefStructure;
-import org.rutebanken.netex.model.Route;
-import org.rutebanken.netex.model.RouteRefStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
-import org.rutebanken.netex.model.ServiceFrame;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
-import org.rutebanken.netex.model.ServiceJourneyRefStructure;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.ServiceLinkRefStructure;
-import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
-import org.rutebanken.netex.model.SiteFrame;
-import org.rutebanken.netex.model.StopPlaceRefStructure;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.TimetableFrame;
-import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
-import org.rutebanken.netex.model.VehicleJourneyRefStructure;
+import org.rutebanken.netex.model.*;
 
 public class NetexTestFragment {
 
@@ -201,11 +151,11 @@ public class NetexTestFragment {
 
   public CreateNetexEntitiesIndex netexEntitiesIndex(
     JourneyPattern journeyPattern,
-    Journey_VersionStructure journey
+    ServiceJourney journey
   ) {
     return new CreateNetexEntitiesIndex()
       .addJourneyPatterns(journeyPattern)
-      .addJourneys(journey);
+      .addServiceJourneys(journey);
   }
 
   public CreateNetexEntitiesIndex netexEntitiesIndex(ServiceLink serviceLink) {
@@ -249,8 +199,7 @@ public class NetexTestFragment {
             .withExterior(
               new AbstractRingPropertyType()
                 .withAbstractRing(
-                  new net.opengis.gml._3.ObjectFactory()
-                    .createLinearRing(linearRing)
+                  new ObjectFactory().createLinearRing(linearRing)
                 )
             )
         );
@@ -1036,13 +985,18 @@ public class NetexTestFragment {
 
     private Line line;
     private Route route;
+
     private final List<JourneyPattern> journeyPatterns = new ArrayList<>();
-    private final List<Journey_VersionStructure> journeys = new ArrayList<>();
-    private final List<Interchange_VersionStructure> interchanges =
+    private final List<ServiceJourney> serviceJourneys = new ArrayList<>();
+    private final List<DatedServiceJourney> datedServiceJourneys =
+      new ArrayList<>();
+
+    private final List<ServiceJourneyInterchange> interchanges =
       new ArrayList<>();
     private final List<ServiceLink> serviceLinks = new ArrayList<>();
     private final List<FlexibleStopPlace> flexibleStopPlaces =
       new ArrayList<>();
+    private final List<DeadRun> deadRuns = new ArrayList<>();
 
     public CreateNetexEntitiesIndex addLine(Line line) {
       this.line = line;
@@ -1064,10 +1018,23 @@ public class NetexTestFragment {
     private final List<PassengerStopAssignment> passengerStopAssignments =
       new ArrayList<>();
 
-    public CreateNetexEntitiesIndex addJourneys(
-      Journey_VersionStructure... journeys
+    public CreateNetexEntitiesIndex addServiceJourneys(
+      ServiceJourney... journeys
     ) {
-      this.journeys.addAll(Arrays.asList(journeys));
+      this.serviceJourneys.addAll(Arrays.asList(journeys));
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addDatedServiceJourneys(
+      DatedServiceJourney... journeys
+    ) {
+      this.datedServiceJourneys.addAll(Arrays.asList(journeys));
+      return this;
+    }
+
+    public CreateNetexEntitiesIndex addDeadRuns(DeadRun... deadRuns) {
+      this.deadRuns.addAll(Arrays.asList(deadRuns));
+
       return this;
     }
 
@@ -1111,10 +1078,6 @@ public class NetexTestFragment {
     public NetexEntitiesIndex create() {
       NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
 
-      TimetableFrame timetableFrame = new TimetableFrame();
-      SiteFrame siteFrame = new SiteFrame();
-      ServiceFrame serviceFrame = new ServiceFrame();
-
       if (line != null) {
         netexEntitiesIndex.getLineIndex().put(line.getId(), line);
       }
@@ -1123,37 +1086,33 @@ public class NetexTestFragment {
         netexEntitiesIndex.getRouteIndex().put(route.getId(), route);
       }
 
-      timetableFrame.withVehicleJourneys(
-        new JourneysInFrame_RelStructure()
-          .withId("JR:123")
-          .withVehicleJourneyOrDatedVehicleJourneyOrNormalDatedVehicleJourney(
-            journeys
-          )
+      serviceJourneys.forEach(journey ->
+        netexEntitiesIndex
+          .getServiceJourneyIndex()
+          .put(journey.getId(), journey)
+      );
+      datedServiceJourneys.forEach(dsj ->
+        netexEntitiesIndex.getDatedServiceJourneyIndex().put(dsj.getId(), dsj)
+      );
+      deadRuns.forEach(deadRun ->
+        netexEntitiesIndex.getDeadRunIndex().put(deadRun.getId(), deadRun)
       );
 
-      timetableFrame.withJourneyInterchanges(
-        new JourneyInterchangesInFrame_RelStructure()
-          .withId("TST:123")
-          .withServiceJourneyPatternInterchangeOrServiceJourneyInterchange(
-            interchanges
-          )
+      interchanges.forEach(interchange ->
+        netexEntitiesIndex
+          .getServiceJourneyInterchangeIndex()
+          .put(interchange.getId(), interchange)
       );
-
-      serviceFrame.withServiceLinks(
-        new ServiceLinksInFrame_RelStructure()
-          .withId("TST:123")
-          .withServiceLink(serviceLinks)
+      serviceLinks.forEach(serviceLink ->
+        netexEntitiesIndex
+          .getServiceLinkIndex()
+          .put(serviceLink.getId(), serviceLink)
       );
-
-      siteFrame.withFlexibleStopPlaces(
-        new FlexibleStopPlacesInFrame_RelStructure()
-          .withId("TST:123")
-          .withFlexibleStopPlace(flexibleStopPlaces)
+      flexibleStopPlaces.forEach(flexibleStopPlace ->
+        netexEntitiesIndex
+          .getFlexibleStopPlaceIndex()
+          .put(flexibleStopPlace.getId(), flexibleStopPlace)
       );
-
-      netexEntitiesIndex.getTimetableFrames().add(timetableFrame);
-      netexEntitiesIndex.getServiceFrames().add(serviceFrame);
-      netexEntitiesIndex.getSiteFrames().add(siteFrame);
 
       fillIndexes(netexEntitiesIndex);
       return netexEntitiesIndex;
@@ -1190,35 +1149,29 @@ public class NetexTestFragment {
           .put(journeyPattern.getId(), journeyPattern)
       );
 
-      interchanges
-        .stream()
-        .filter(ServiceJourneyInterchange.class::isInstance)
-        .map(ServiceJourneyInterchange.class::cast)
-        .forEach(interchange ->
-          netexEntitiesIndex
-            .getServiceJourneyInterchangeIndex()
-            .put(interchange.getId(), interchange)
-        );
+      interchanges.forEach(interchange ->
+        netexEntitiesIndex
+          .getServiceJourneyInterchangeIndex()
+          .put(interchange.getId(), interchange)
+      );
 
-      journeys
-        .stream()
-        .filter(ServiceJourney.class::isInstance)
-        .map(ServiceJourney.class::cast)
-        .forEach(journey ->
-          netexEntitiesIndex
-            .getServiceJourneyIndex()
-            .put(journey.getId(), journey)
-        );
+      serviceJourneys.forEach(journey ->
+        netexEntitiesIndex
+          .getServiceJourneyIndex()
+          .put(journey.getId(), journey)
+      );
 
-      journeys
-        .stream()
-        .filter(DatedServiceJourney.class::isInstance)
-        .map(DatedServiceJourney.class::cast)
-        .forEach(journey ->
-          netexEntitiesIndex
-            .getDatedServiceJourneyIndex()
-            .put(journey.getId(), journey)
-        );
+      datedServiceJourneys.forEach(journey ->
+        netexEntitiesIndex
+          .getDatedServiceJourneyIndex()
+          .put(journey.getId(), journey)
+      );
+    }
+
+    public void addDatedServiceJourneys(
+      DatedServiceJourney datedServiceJourney
+    ) {
+      datedServiceJourneys.add(datedServiceJourney);
     }
   }
 

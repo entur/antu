@@ -154,7 +154,7 @@
           <OperatorRef version="1" ref="FLB:Operator:1"/>
           <DeadRunType>garageRunOut</DeadRunType>
         </DeadRun>
-        <DeadRun version="1" id="FLB:DeadRun:1">
+        <DeadRun version="1" id="FLB:DeadRun:2">
           <JourneyDuration>PT2H</JourneyDuration>
           <dayTypes>
             <DayTypeRef ref="FLB:DayType:117"/>

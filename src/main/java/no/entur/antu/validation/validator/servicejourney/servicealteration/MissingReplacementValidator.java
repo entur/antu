@@ -2,9 +2,9 @@ package no.entur.antu.validation.validator.servicejourney.servicealteration;
 
 import java.util.List;
 import java.util.function.Predicate;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
+import no.entur.antu.validation.validator.servicejourney.servicealteration.support.ServiceAlterationUtils;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
@@ -30,19 +30,20 @@ public class MissingReplacementValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     List<String> datedServiceJourneyRefsToReplacedDatedServiceJourneys =
-      antuNetexData
-        .datedServiceJourneysWithReferenceToReplaced()
-        .map(antuNetexData::datedServiceJourneyRef)
+      ServiceAlterationUtils
+        .datedServiceJourneysWithReferenceToReplaced(validationContext)
+        .stream()
+        .map(ServiceAlterationUtils::datedServiceJourneyRef)
         .map(VersionOfObjectRefStructure::getRef)
         .toList();
 
     // Validate that those DSJs that got replaced have a replacement.
-    antuNetexData
-      .replacedDatedServiceJourneys()
+    ServiceAlterationUtils
+      .replacedDatedServiceJourneys(validationContext)
+      .stream()
       .filter(
         Predicate.not(dsj ->
           datedServiceJourneyRefsToReplacedDatedServiceJourneys.contains(

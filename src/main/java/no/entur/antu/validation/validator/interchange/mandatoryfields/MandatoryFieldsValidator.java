@@ -1,14 +1,12 @@
 package no.entur.antu.validation.validator.interchange.mandatoryfields;
 
 import java.util.function.Consumer;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.ValidationError;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 
 /**
  * Validator for mandatory fields in interchange.
@@ -34,8 +32,7 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // ServiceJourneyInterchanges exists only in line files,
     // as they have reference to serviceJourneys.
@@ -44,11 +41,11 @@ public class MandatoryFieldsValidator extends AntuNetexValidator {
   @Override
   protected void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
-    antuNetexData
+    validationContext
       .serviceJourneyInterchanges()
+      .stream()
       .map(MandatoryFieldsContext::of)
       .forEach(serviceJourneyInterchange ->
         validateMandatoryFields(

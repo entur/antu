@@ -5,8 +5,9 @@ import static java.util.Comparator.comparing;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import no.entur.antu.validation.AntuNetexData;
+import no.entur.antu.validation.validator.support.NetexUtils;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -38,9 +39,9 @@ public final class SortStopTimesUtil {
    */
   public static List<StopTime> getSortedStopTimes(
     ServiceJourney serviceJourney,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
-    JourneyPattern journeyPattern = antuNetexData.journeyPattern(
+    JourneyPattern journeyPattern = validationContext.journeyPattern(
       serviceJourney
     );
 
@@ -57,28 +58,27 @@ public final class SortStopTimesUtil {
     );
 
     Map<String, ScheduledStopPointId> scheduledStopPointIdByStopPointId =
-      AntuNetexData.scheduledStopPointIdByStopPointId(journeyPattern);
+      NetexUtils.scheduledStopPointIdByStopPointId(journeyPattern);
 
-    return antuNetexData
+    return validationContext
       .timetabledPassingTimes(serviceJourney)
+      .stream()
       .filter(SortStopTimesUtil::hasStopPointInJourneyPatternRef)
       .sorted(
         comparing(timetabledPassingTime ->
-          stopPointIdToOrder.get(
-            AntuNetexData.stopPointRef(timetabledPassingTime)
-          )
+          stopPointIdToOrder.get(NetexUtils.stopPointRef(timetabledPassingTime))
         )
       )
       .map(timetabledPassingTime ->
         StopTime.of(
           scheduledStopPointIdByStopPointId.get(
-            AntuNetexData.stopPointRef(timetabledPassingTime)
+            NetexUtils.stopPointRef(timetabledPassingTime)
           ),
           timetabledPassingTime,
           hasFlexibleStopPoint(
-            antuNetexData.netexEntitiesIndex(),
+            validationContext.getNetexEntitiesIndex(),
             scheduledStopPointIdByStopPointId.get(
-              AntuNetexData.stopPointRef(timetabledPassingTime)
+              NetexUtils.stopPointRef(timetabledPassingTime)
             )
           )
         )
@@ -99,8 +99,9 @@ public final class SortStopTimesUtil {
   private static Map<String, Integer> getStopPointIdsOrder(
     JourneyPattern journeyPattern
   ) {
-    return AntuNetexData
+    return NetexUtils
       .stopPointsInJourneyPattern(journeyPattern)
+      .stream()
       .collect(
         Collectors.toMap(
           EntityStructure::getId,

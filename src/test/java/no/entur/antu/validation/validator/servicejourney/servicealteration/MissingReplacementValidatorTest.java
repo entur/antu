@@ -44,7 +44,10 @@ class MissingReplacementValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       testData
         .netexEntitiesIndex()
-        .addJourneys(datedServiceJourneyReplaced, datedServiceJourneyNew)
+        .addDatedServiceJourneys(
+          datedServiceJourneyReplaced,
+          datedServiceJourneyNew
+        )
         .create()
     );
 
@@ -69,7 +72,10 @@ class MissingReplacementValidatorTest extends ValidationTest {
     ValidationReport validationReport = runValidation(
       testData
         .netexEntitiesIndex()
-        .addJourneys(datedServiceJourneyReplaced, datedServiceJourneyNew)
+        .addDatedServiceJourneys(
+          datedServiceJourneyReplaced,
+          datedServiceJourneyNew
+        )
         .create()
     );
 
@@ -101,7 +107,7 @@ class MissingReplacementValidatorTest extends ValidationTest {
           .withServiceAlteration(ServiceAlterationEnumeration.REPLACED)
           .create()
       )
-      .forEach(createNetexEntitiesIndex::addJourneys);
+      .forEach(createNetexEntitiesIndex::addDatedServiceJourneys);
 
     ValidationReport validationReport = runValidation(
       createNetexEntitiesIndex.create()

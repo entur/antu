@@ -2,13 +2,11 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoin
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import no.entur.antu.validation.AntuNetexData;
 import no.entur.antu.validation.AntuNetexValidator;
 import no.entur.antu.validation.RuleCode;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +37,13 @@ public class SameStopPointsValidator extends AntuNetexValidator {
   @Override
   public void validateLineFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating Same Stops In Journey Patterns");
 
-    antuNetexData
+    validationContext
       .journeyPatterns()
+      .stream()
       .map(SameStopPointsContext::of)
       .collect(
         // Two SameStopPointsContexts are equal if their Stop points are equal
@@ -73,8 +71,7 @@ public class SameStopPointsValidator extends AntuNetexValidator {
   @Override
   protected void validateCommonFile(
     ValidationReport validationReport,
-    JAXBValidationContext validationContext,
-    AntuNetexData antuNetexData
+    JAXBValidationContext validationContext
   ) {
     // JourneyPatterns only appear in the Line file.
   }
