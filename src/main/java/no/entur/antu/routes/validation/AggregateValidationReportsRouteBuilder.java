@@ -18,6 +18,8 @@
 
 package no.entur.antu.routes.validation;
 
+import static no.entur.antu.Constants.DATASET_CODESPACE;
+import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
 import static no.entur.antu.Constants.DATASET_REFERENTIAL;
 import static no.entur.antu.Constants.DATASET_STATUS;
 import static no.entur.antu.Constants.FILENAME_DELIMITER;
@@ -36,16 +38,29 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_STATUS_SUFFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import no.entur.antu.Constants;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.metrics.AntuPrometheusMetricsService;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validation.AntuNetexValidationProgressCallback;
-import no.entur.antu.validation.NetexValidationWorkflow;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
+import org.apache.camel.Message;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.apache.camel.util.StopWatch;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,17 +69,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
-  private static final String PROP_HAS_DATASET_VALIDATORS =
-    "HAS_DATASET_VALIDATORS";
+  private static final String PROP_DATASET_NETEX_FILE_NAMES =
+    "EnturDatasetNetexFileNames";
+  private static final String PROP_NETEX_VALIDATION_CALLBACK =
+    "PROP_NETEX_VALIDATION_CALLBACK";
 
-  private final NetexValidationWorkflow netexValidationWorkflow;
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    AggregateValidationReportsRouteBuilder.class
+  );
+
+  private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
   private final AntuPrometheusMetricsService antuPrometheusMetricsService;
 
   public AggregateValidationReportsRouteBuilder(
-    NetexValidationWorkflow netexValidationWorkflow,
     AntuPrometheusMetricsService antuPrometheusMetricsService
   ) {
-    this.netexValidationWorkflow = netexValidationWorkflow;
     this.antuPrometheusMetricsService = antuPrometheusMetricsService;
   }
 
@@ -85,19 +104,19 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         correlation() +
         "Aggregated ${exchangeProperty.CamelAggregatedSize} validation reports (aggregation completion triggered by ${exchangeProperty.CamelAggregatedCompletedBy})."
       )
-      .setBody(exchangeProperty(Constants.PROP_DATASET_NETEX_FILE_NAMES_STRING))
+      .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES))
       .setHeader(Constants.JOB_TYPE, simple(JOB_TYPE_AGGREGATE_REPORTS))
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
       .routeId("aggregate-reports-pubsub");
 
     from("direct:aggregateReports")
       .log(LoggingLevel.INFO, correlation() + "Merging individual reports")
-      .setProperty(Constants.PROP_STOP_WATCH, StopWatch::new)
+      .setProperty(PROP_STOP_WATCH, StopWatch::new)
       .convertBodyTo(String.class)
       .split(method(ReverseSortedFileNameSplitter.class, "split"))
       .delimiter(FILENAME_DELIMITER)
       .aggregationStrategy(new AggregateValidationReportsAggregationStrategy())
-      .log(LoggingLevel.DEBUG, correlation() + "Merging file ${body}.json")
+      .log(LoggingLevel.INFO, correlation() + "Merging file ${body}.json")
       .setHeader(NETEX_FILE_NAME, body())
       .to("direct:downloadValidationReport")
       .unmarshal()
@@ -108,7 +127,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() +
         "Completed reports merging in ${exchangeProperty." +
-        Constants.PROP_STOP_WATCH +
+        PROP_STOP_WATCH +
         ".taken()} ms"
       )
       .choice()
@@ -142,34 +161,24 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .json(JsonLibrary.Jackson, ValidationReport.class)
       .process(exchange ->
         exchange.setProperty(
-          Constants.PROP_NETEX_VALIDATION_CALLBACK,
+          PROP_NETEX_VALIDATION_CALLBACK,
           new AntuNetexValidationProgressCallback(this, exchange)
         )
       )
-      .process(e -> {
-        boolean hasDatasetValidator =
-          netexValidationWorkflow.hasDatasetValidators(
-            e.getIn().getHeader(VALIDATION_PROFILE_HEADER, String.class)
-          );
-        e.setProperty(PROP_HAS_DATASET_VALIDATORS, hasDatasetValidator);
-      })
-      .filter(exchangeProperty(PROP_HAS_DATASET_VALIDATORS).isEqualTo(true))
       .bean(
-        "netexValidationWorkflow",
-        "runDatasetValidators(" +
+        "netexValidationProfile",
+        "validateDataset(" +
         "${body}, " +
         "${header." +
         VALIDATION_PROFILE_HEADER +
         "},${exchangeProperty." +
-        Constants.PROP_NETEX_VALIDATION_CALLBACK +
+        PROP_NETEX_VALIDATION_CALLBACK +
         "})"
       )
       .log(
         LoggingLevel.INFO,
         correlation() + "Completed all NeTEx dataset validators"
       )
-      //end filter
-      .end()
       .to("direct:completeValidation")
       .routeId("validate-dataset");
 
@@ -328,5 +337,165 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       )
       .log(LoggingLevel.INFO, correlation() + "Cleaned up cache")
       .routeId("cleanup-cache");
+  }
+
+  private static class AggregateValidationReportsAggregationStrategy
+    extends GroupedMessageAggregationStrategy {
+
+    @Override
+    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+      if (
+        oldExchange == null ||
+        oldExchange.getIn().getBody(ValidationReport.class) == null
+      ) {
+        return newExchange;
+      }
+
+      ValidationReport oldValidationReport = oldExchange
+        .getIn()
+        .getBody(ValidationReport.class);
+      ValidationReport newValidationReport = newExchange
+        .getIn()
+        .getBody(ValidationReport.class);
+
+      List<ValidationReportEntry> validationReportEntries = Stream
+        .concat(
+          oldValidationReport.getValidationReportEntries().stream(),
+          newValidationReport.getValidationReportEntries().stream()
+        )
+        .toList();
+
+      Map<String, Long> numberOfValidationEntriesPerRule = Stream
+        .concat(
+          oldValidationReport
+            .getNumberOfValidationEntriesPerRule()
+            .entrySet()
+            .stream(),
+          newValidationReport
+            .getNumberOfValidationEntriesPerRule()
+            .entrySet()
+            .stream()
+        )
+        .collect(
+          Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Long::sum)
+        );
+
+      oldExchange
+        .getIn()
+        .setBody(
+          new ValidationReport(
+            oldExchange.getIn().getHeader(DATASET_CODESPACE, String.class),
+            oldExchange
+              .getIn()
+              .getHeader(VALIDATION_REPORT_ID_HEADER, String.class),
+            validationReportEntries,
+            numberOfValidationEntriesPerRule
+          )
+        );
+
+      LocalDateTime reportCreationDate = oldExchange
+        .getIn()
+        .getHeader(REPORT_CREATION_DATE, LocalDateTime.class);
+      if (
+        reportCreationDate == null ||
+        reportCreationDate.isAfter(oldValidationReport.getCreationDate())
+      ) {
+        oldExchange
+          .getIn()
+          .setHeader(
+            REPORT_CREATION_DATE,
+            oldValidationReport.getCreationDate()
+          );
+      }
+
+      return oldExchange;
+    }
+  }
+
+  /**
+   * Complete the aggregation when all the individual reports have been received.
+   * The total number of reports to process is stored in a header that is included in every incoming message.
+   */
+  private static class CollectIndividualReportsAggregationStrategy
+    extends AntuGroupedMessageAggregationStrategy {
+
+    @Override
+    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+      Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
+      copyValidationHeaders(newExchange, aggregatedExchange);
+      String currentNetexFileNameList = aggregatedExchange.getProperty(
+        PROP_DATASET_NETEX_FILE_NAMES,
+        String.class
+      );
+      String incomingNetexFileName = newExchange
+        .getIn()
+        .getHeader(NETEX_FILE_NAME, String.class);
+      if (currentNetexFileNameList == null) {
+        aggregatedExchange.setProperty(
+          PROP_DATASET_NETEX_FILE_NAMES,
+          incomingNetexFileName
+        );
+      } else {
+        aggregatedExchange.setProperty(
+          PROP_DATASET_NETEX_FILE_NAMES,
+          currentNetexFileNameList + FILENAME_DELIMITER + incomingNetexFileName
+        );
+      }
+      // check if all individual reports have been received
+      // checking against the set of distinct file names in order to exclude possible multiple redeliveries of the same report.
+      Long nbNetexFiles = newExchange
+        .getIn()
+        .getHeader(DATASET_NB_NETEX_FILES, Long.class);
+      List<Message> aggregatedMessages = aggregatedExchange.getProperty(
+        ExchangePropertyKey.GROUPED_EXCHANGE,
+        List.class
+      );
+      Set<String> aggregatedFileNames = aggregatedMessages
+        .stream()
+        .map(message -> message.getHeader(NETEX_FILE_NAME, String.class))
+        .collect(Collectors.toSet());
+
+      if (LOGGER.isTraceEnabled()) {
+        String reportId = aggregatedExchange
+          .getIn()
+          .getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
+        String receivedFileNames = Arrays
+          .stream(
+            aggregatedExchange
+              .getProperty(PROP_DATASET_NETEX_FILE_NAMES, String.class)
+              .split(FILENAME_DELIMITER)
+          )
+          .sorted()
+          .collect(Collectors.joining(FILENAME_DELIMITER));
+        LOGGER.trace(
+          "Received file {} for report {}. All received files: {}",
+          incomingNetexFileName,
+          reportId,
+          receivedFileNames
+        );
+      }
+
+      if (aggregatedFileNames.size() >= nbNetexFiles) {
+        aggregatedExchange.setProperty(
+          Exchange.AGGREGATION_COMPLETE_CURRENT_GROUP,
+          true
+        );
+      }
+      return aggregatedExchange;
+    }
+  }
+
+  /**
+   * Sort the list in reverse order to get the common files first.
+   */
+  private static class ReverseSortedFileNameSplitter {
+
+    public static List<String> split(Exchange exchange) {
+      String fileNameList = exchange.getMessage().getBody(String.class);
+      return Arrays
+        .stream(fileNameList.split(FILENAME_DELIMITER))
+        .sorted(Collections.reverseOrder())
+        .toList();
+    }
   }
 }

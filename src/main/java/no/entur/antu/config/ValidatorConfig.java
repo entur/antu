@@ -21,7 +21,7 @@ import static no.entur.antu.validation.ValidationProfile.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.validation.NetexValidationWorkflow;
+import no.entur.antu.validation.NetexValidationProfile;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.id.ReferenceToNsrValidator;
 import no.entur.antu.validation.validator.id.TrainElementRegistryIdValidator;
@@ -160,7 +160,7 @@ public class ValidatorConfig {
   }
 
   @Bean
-  public NetexValidationWorkflow netexValidationWorkflow(
+  public NetexValidationProfile netexValidationProfile(
     @Qualifier(
       "timetableDataValidatorsRunner"
     ) NetexValidatorsRunner timetableDataValidatorsRunner,
@@ -186,7 +186,7 @@ public class ValidatorConfig {
       "${antu.netex.validation.validators.skip:false}"
     ) boolean skipNetexValidators
   ) {
-    return new NetexValidationWorkflow(
+    return new NetexValidationProfile(
       Map.of(
         TIMETABLE,
         timetableDataValidatorsRunner,

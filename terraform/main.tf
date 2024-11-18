@@ -98,23 +98,6 @@ resource "google_pubsub_subscription" "AntuJobQueue" {
   }
 }
 
-resource "google_pubsub_topic" "AntuXmlSchemaValidationAggregationQueue" {
-  name = "AntuXmlSchemaValidationAggregationQueue"
-  project = var.gcp_resources_project
-  labels = var.labels
-}
-
-resource "google_pubsub_subscription" "AntuXmlSchemaValidationAggregationQueue" {
-  name = "AntuXmlSchemaValidationAggregationQueue"
-  topic = google_pubsub_topic.AntuXmlSchemaValidationAggregationQueue.name
-  project = var.gcp_resources_project
-  labels = var.labels
-  message_retention_duration = "3600s"
-  retry_policy {
-    minimum_backoff = "10s"
-  }
-}
-
 resource "google_pubsub_topic" "AntuReportAggregationQueue" {
   name = "AntuReportAggregationQueue"
   project = var.gcp_resources_project

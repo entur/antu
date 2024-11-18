@@ -18,7 +18,11 @@
 
 package no.entur.antu.routes.validation;
 
-import static no.entur.antu.Constants.*;
+import static no.entur.antu.Constants.DATASET_CODESPACE;
+import static no.entur.antu.Constants.FILE_HANDLE;
+import static no.entur.antu.Constants.NETEX_FILE_NAME;
+import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
+import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static no.entur.antu.routes.memorystore.MemoryStoreRoute.MEMORY_STORE_FILE_NAME;
 
 import no.entur.antu.Constants;
@@ -31,6 +35,10 @@ import no.entur.antu.validation.ValidationReportTransformer;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.util.StopWatch;
 import org.entur.netex.validation.exception.RetryableNetexValidationException;
+import org.entur.netex.validation.validator.DataLocation;
+import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,6 +46,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
+
+  private static final String PROP_ALL_NETEX_FILE_NAMES =
+    "ALL_NETEX_FILE_NAMES";
+  private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
+  private static final String PROP_NETEX_VALIDATION_CALLBACK =
+    "PROP_NETEX_VALIDATION_CALLBACK";
 
   @Override
   public void configure() throws Exception {
@@ -50,7 +64,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       )
       .process(this::extendAckDeadline)
       .setProperty(PROP_STOP_WATCH, StopWatch::new)
-      .setProperty(PROP_DATASET_NETEX_FILE_NAMES_STRING, body())
+      .setProperty(PROP_ALL_NETEX_FILE_NAMES, body())
       .doTry()
       .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_FILE_NAME))
       .to("direct:downloadSingleNetexFileFromMemoryStore")
@@ -126,8 +140,8 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         )
       )
       .bean(
-        "netexValidationWorkflow",
-        "runNetexValidators(${header." +
+        "netexValidationProfile",
+        "validate(${header." +
         VALIDATION_PROFILE_HEADER +
         "}, ${header." +
         DATASET_CODESPACE +
@@ -136,14 +150,40 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         "},${header." +
         NETEX_FILE_NAME +
         "},${exchangeProperty." +
-        PROP_NETEX_FILE_CONTENT +
-        "}, " +
-        "${exchangeProperty." +
+        Constants.PROP_NETEX_FILE_CONTENT +
+        "},${exchangeProperty." +
         PROP_NETEX_VALIDATION_CALLBACK +
         "})"
       )
       .log(LoggingLevel.DEBUG, correlation() + "Completed all NeTEx validators")
       .routeId("run-netex-validators");
+
+    from("direct:reportSystemError")
+      .process(exchange -> {
+        String codespace = exchange
+          .getIn()
+          .getHeader(DATASET_CODESPACE, String.class);
+        String validationReportId = exchange
+          .getIn()
+          .getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
+        ValidationReport validationReport = new ValidationReport(
+          codespace,
+          validationReportId
+        );
+        String fileName = exchange
+          .getIn()
+          .getHeader(NETEX_FILE_NAME, String.class);
+        ValidationReportEntry validationReportEntry = new ValidationReportEntry(
+          "System error while validating the file " +
+          exchange.getIn().getHeader(NETEX_FILE_NAME),
+          "SYSTEM_ERROR",
+          ValidationReportEntrySeverity.ERROR,
+          new DataLocation(null, fileName, null, null)
+        );
+        validationReport.addValidationReportEntry(validationReportEntry);
+        exchange.getIn().setBody(validationReport, ValidationReport.class);
+      })
+      .routeId("report-system-error");
 
     from("direct:truncateReport")
       .log(LoggingLevel.DEBUG, correlation() + "Truncating validation report")
@@ -162,7 +202,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.DEBUG,
         correlation() + "Notifying common files aggregator"
       )
-      .setBody(exchangeProperty(PROP_DATASET_NETEX_FILE_NAMES_STRING))
+      .setBody(exchangeProperty(PROP_ALL_NETEX_FILE_NAMES))
       .to(
         "google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue"
       )
