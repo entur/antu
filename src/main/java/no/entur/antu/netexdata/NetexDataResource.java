@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.FromToScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceLinkId;
 import org.rutebanken.netex.model.PassengerStopAssignment;

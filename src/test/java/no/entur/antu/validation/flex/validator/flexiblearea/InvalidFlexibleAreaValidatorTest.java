@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -26,7 +26,7 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   @Test
   void testDataSetWithoutFlexibleStopPlacesShouldBeIgnoredGracefully() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex().create()
@@ -177,10 +177,10 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   @Test
   void testMissingFlexibleStopAreaShouldIgnoreValidationGracefully() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     FlexibleStopPlace flexibleStopPlace =
-      new NetexTestFragment.CreateFlexibleStopPlace().create();
+      new NetexEntitiesTestFactory.CreateFlexibleStopPlace().create();
 
     ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex(flexibleStopPlace).create()
@@ -191,7 +191,7 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   @Test
   void testMissingPolygonShouldIgnoreValidationGracefully2() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     FlexibleArea flexibleArea = testData.flexibleArea().create();
 
@@ -209,7 +209,7 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
   private ValidationReport runTestWithGivenCoordinates(
     List<Double> coordinates
   ) {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     FlexibleArea flexibleArea = testData
       .flexibleArea()

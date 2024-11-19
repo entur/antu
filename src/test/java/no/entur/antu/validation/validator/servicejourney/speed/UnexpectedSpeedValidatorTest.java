@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.util.List;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -141,7 +141,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
 
   @Test
   void testSameDepartureArrivalTimeErrorThrown() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData
       .journeyPattern()
       .withNumberOfStopPointInJourneyPattern(2)
@@ -189,14 +189,14 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       new QuayCoordinates(6.632312, 60.491548)
     );
 
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
       .create();
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
 
     mockNoQuayIdsInNetexDataRepository();
@@ -228,14 +228,14 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
 
   @Test
   void testNoPassengerStopAssignmentsFoundShouldIgnoreValidationGracefully() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
       .create();
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
 
     mockNoQuayIdsInNetexDataRepository();
@@ -250,7 +250,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
   private ValidationReport runTestWithQuayCoordinates(
     List<QuayCoordinates> quayCoordinates
   ) {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)

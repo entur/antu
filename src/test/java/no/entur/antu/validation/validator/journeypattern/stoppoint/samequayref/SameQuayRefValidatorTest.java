@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.util.List;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -26,7 +26,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
 
   @Test
   void testNoStopPointsInJourneyPattern() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
 
     JourneyPattern journeyPattern = testFragment
       .journeyPattern()
@@ -46,7 +46,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
 
   @Test
   void testNoSameQuayRefOnStopPoints() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
 
     JourneyPattern journeyPattern = testFragment
       .journeyPattern()
@@ -89,7 +89,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
 
   @Test
   void testSameQuayRefOnStopPoints() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
 
     JourneyPattern journeyPattern = testFragment
       .journeyPattern()

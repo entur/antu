@@ -62,17 +62,13 @@ public class LineInfoCollector extends NetexDataCollector {
 
   private SimpleLine lineInfo(JAXBValidationContext validationContext) {
     return validationContext
-      .getNetexEntitiesIndex()
-      .getLineIndex()
-      .getAll()
+      .lines()
       .stream()
       .findFirst()
       .map(line -> SimpleLine.of(line, validationContext.getFileName()))
       .orElse(
         validationContext
-          .getNetexEntitiesIndex()
-          .getFlexibleLineIndex()
-          .getAll()
+          .flexibleLines()
           .stream()
           .filter(FlexibleLineUtils::isFixedFlexibleLine)
           .findFirst()

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Optional;
 import net.opengis.gml._3.DirectPositionType;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -363,7 +363,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
 
   @Test
   void datasetWithoutServiceLinksShouldBeIgnored() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     ValidationReport validationReport = runValidation(
       testData.netexEntitiesIndex().create()
@@ -384,7 +384,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:2"
     );
 
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     ServiceLink serviceLink = testData
       .serviceLink(fromStopPointId.id(), toStopPointId.id())
       .withLineStringPositions(lineStringCoordinates)
@@ -416,7 +416,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:2"
     );
 
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     ServiceLink serviceLink = testData
       .serviceLink(fromStopPointId.id(), toStopPointId.id())
       .withLineStringList(lineStringCoordinates)

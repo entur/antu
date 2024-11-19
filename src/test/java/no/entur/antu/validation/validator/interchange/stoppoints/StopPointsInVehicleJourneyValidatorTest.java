@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
@@ -97,7 +97,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
   @Test
   void interchangeWithMissingAttributes() {
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
       .serviceJourneyInterchange()
       .create();
@@ -157,7 +157,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
     assert fromServiceJourneyId != toServiceJourneyId;
     assert fromPointRefId != toPointRefId;
 
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     ScheduledStopPointId fromPointRef = new ScheduledStopPointId(
       "TST:ScheduledStopPoint:" + fromPointRefId

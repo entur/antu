@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,10 +27,8 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.rutebanken.netex.model.*;
 
-public class NetexTestFragment {
+public class NetexEntitiesTestFactory {
 
-  private static final DateTimeFormatter DATE_FORMATTER =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final DayType EVERYDAY = new DayType()
     .withId("EVERYDAY")
     .withName(new MultilingualString().withValue("everyday"));
@@ -1086,34 +1083,6 @@ public class NetexTestFragment {
         netexEntitiesIndex.getRouteIndex().put(route.getId(), route);
       }
 
-      serviceJourneys.forEach(journey ->
-        netexEntitiesIndex
-          .getServiceJourneyIndex()
-          .put(journey.getId(), journey)
-      );
-      datedServiceJourneys.forEach(dsj ->
-        netexEntitiesIndex.getDatedServiceJourneyIndex().put(dsj.getId(), dsj)
-      );
-      deadRuns.forEach(deadRun ->
-        netexEntitiesIndex.getDeadRunIndex().put(deadRun.getId(), deadRun)
-      );
-
-      interchanges.forEach(interchange ->
-        netexEntitiesIndex
-          .getServiceJourneyInterchangeIndex()
-          .put(interchange.getId(), interchange)
-      );
-      serviceLinks.forEach(serviceLink ->
-        netexEntitiesIndex
-          .getServiceLinkIndex()
-          .put(serviceLink.getId(), serviceLink)
-      );
-      flexibleStopPlaces.forEach(flexibleStopPlace ->
-        netexEntitiesIndex
-          .getFlexibleStopPlaceIndex()
-          .put(flexibleStopPlace.getId(), flexibleStopPlace)
-      );
-
       fillIndexes(netexEntitiesIndex);
       return netexEntitiesIndex;
     }
@@ -1165,6 +1134,21 @@ public class NetexTestFragment {
         netexEntitiesIndex
           .getDatedServiceJourneyIndex()
           .put(journey.getId(), journey)
+      );
+
+      deadRuns.forEach(deadRun ->
+        netexEntitiesIndex.getDeadRunIndex().put(deadRun.getId(), deadRun)
+      );
+
+      serviceLinks.forEach(serviceLink ->
+        netexEntitiesIndex
+          .getServiceLinkIndex()
+          .put(serviceLink.getId(), serviceLink)
+      );
+      flexibleStopPlaces.forEach(flexibleStopPlace ->
+        netexEntitiesIndex
+          .getFlexibleStopPlaceIndex()
+          .put(flexibleStopPlace.getId(), flexibleStopPlace)
       );
     }
 

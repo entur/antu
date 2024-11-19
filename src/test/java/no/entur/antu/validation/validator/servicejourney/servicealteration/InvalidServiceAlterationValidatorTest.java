@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -27,7 +27,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testCorrectServiceAlterationExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     DatedServiceJourney datedServiceJourneyReplaced = testData
       .datedServiceJourney(1)
@@ -56,9 +56,9 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testCorrectServiceAlterationExistsForMultipleDSJs() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex();
 
     IntStream
@@ -92,7 +92,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testServiceAlterationMissing() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     DatedServiceJourney datedServiceJourneyReplaced = testData
       .datedServiceJourney(1)
@@ -129,9 +129,9 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testServiceAlterationMissingForMultipleDSJs() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex();
 
     IntStream
@@ -168,7 +168,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testUnexpectedServiceAlteration() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     DatedServiceJourney datedServiceJourneyReplaced = testData
       .datedServiceJourney(1)

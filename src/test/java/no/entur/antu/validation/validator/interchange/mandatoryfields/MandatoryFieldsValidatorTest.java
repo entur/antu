@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.util.List;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -36,13 +36,15 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:2"
     );
 
-    NetexTestFragment netexFragment = new NetexTestFragment();
-    List<ServiceJourney> serviceJourneys = netexFragment.createServiceJourneys(
-      netexFragment.journeyPattern().create(),
-      2
-    );
+    NetexEntitiesTestFactory netexEntitiesFactory =
+      new NetexEntitiesTestFactory();
+    List<ServiceJourney> serviceJourneys =
+      netexEntitiesFactory.createServiceJourneys(
+        netexEntitiesFactory.journeyPattern().create(),
+        2
+      );
 
-    ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
+    ServiceJourneyInterchange serviceJourneyInterchange = netexEntitiesFactory
       .serviceJourneyInterchange()
       .withId(1)
       .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourneys.get(0)))
@@ -59,7 +61,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     mockGetQuayId(scheduledStopPointId2, new QuayId("TST:Quay:2"));
 
     ValidationReport validationReport = runValidation(
-      netexFragment
+      netexEntitiesFactory
         .netexEntitiesIndex()
         .addServiceJourneys(serviceJourneys.toArray(ServiceJourney[]::new))
         .addInterchanges(serviceJourneyInterchange)
@@ -78,13 +80,14 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:2"
     );
 
-    NetexTestFragment netexFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory netexEntitiesFactory =
+      new NetexEntitiesTestFactory();
 
-    ServiceJourney serviceJourney = netexFragment
-      .serviceJourney(netexFragment.journeyPattern().create())
+    ServiceJourney serviceJourney = netexEntitiesFactory
+      .serviceJourney(netexEntitiesFactory.journeyPattern().create())
       .create();
 
-    ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
+    ServiceJourneyInterchange serviceJourneyInterchange = netexEntitiesFactory
       .serviceJourneyInterchange()
       .withId(1)
       .withToJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
@@ -97,7 +100,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     mockGetQuayId(scheduledStopPointId2, new QuayId("TST:Quay:2"));
 
     ValidationReport validationReport = runValidation(
-      netexFragment
+      netexEntitiesFactory
         .netexEntitiesIndex()
         .addServiceJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
@@ -127,13 +130,14 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:2"
     );
 
-    NetexTestFragment netexFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory netexEntitiesFactory =
+      new NetexEntitiesTestFactory();
 
-    ServiceJourney serviceJourney = netexFragment
-      .serviceJourney(netexFragment.journeyPattern().create())
+    ServiceJourney serviceJourney = netexEntitiesFactory
+      .serviceJourney(netexEntitiesFactory.journeyPattern().create())
       .create();
 
-    ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
+    ServiceJourneyInterchange serviceJourneyInterchange = netexEntitiesFactory
       .serviceJourneyInterchange()
       .withId(1)
       .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
@@ -149,7 +153,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     );
 
     ValidationReport validationReport = runValidation(
-      netexFragment
+      netexEntitiesFactory
         .netexEntitiesIndex()
         .addServiceJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
@@ -176,13 +180,14 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:1"
     );
 
-    NetexTestFragment netexFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory netexEntitiesFactory =
+      new NetexEntitiesTestFactory();
 
-    ServiceJourney serviceJourney = netexFragment
-      .serviceJourney(netexFragment.journeyPattern().create())
+    ServiceJourney serviceJourney = netexEntitiesFactory
+      .serviceJourney(netexEntitiesFactory.journeyPattern().create())
       .create();
 
-    ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
+    ServiceJourneyInterchange serviceJourneyInterchange = netexEntitiesFactory
       .serviceJourneyInterchange()
       .withId(1)
       .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
@@ -193,7 +198,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     mockGetQuayId(scheduledStopPointId, new QuayId("TST:Quay:1"));
 
     ValidationReport validationReport = runValidation(
-      netexFragment
+      netexEntitiesFactory
         .netexEntitiesIndex()
         .addServiceJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
@@ -220,13 +225,14 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:1"
     );
 
-    NetexTestFragment netexFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory netexEntitiesFactory =
+      new NetexEntitiesTestFactory();
 
-    ServiceJourney serviceJourney = netexFragment
-      .serviceJourney(netexFragment.journeyPattern().create())
+    ServiceJourney serviceJourney = netexEntitiesFactory
+      .serviceJourney(netexEntitiesFactory.journeyPattern().create())
       .create();
 
-    ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
+    ServiceJourneyInterchange serviceJourneyInterchange = netexEntitiesFactory
       .serviceJourneyInterchange()
       .withId(1)
       .withFromJourneyRef(ServiceJourneyId.ofValidId(serviceJourney))
@@ -237,7 +243,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     mockGetQuayId(scheduledStopPointId, new QuayId("TST:Quay:1"));
 
     ValidationReport validationReport = runValidation(
-      netexFragment
+      netexEntitiesFactory
         .netexEntitiesIndex()
         .addServiceJourneys(serviceJourney)
         .addInterchanges(serviceJourneyInterchange)
@@ -268,13 +274,13 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:2"
     );
 
-    NetexTestFragment netexFragment = new NetexTestFragment();
-    List<ServiceJourney> serviceJourneys = netexFragment.createServiceJourneys(
-      netexFragment.journeyPattern().create(),
+    NetexTestFragment netexEntitiesFactory = new NetexTestFragment();
+    List<ServiceJourney> serviceJourneys = netexEntitiesFactory.createServiceJourneys(
+      netexEntitiesFactory.journeyPattern().create(),
       2
     );
 
-    ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
+    ServiceJourneyInterchange serviceJourneyInterchange = netexEntitiesFactory
       .serviceJourneyInterchange()
       .withId(1)
       .withFromJourneyRef(serviceJourneys.get(0).getId())
@@ -289,7 +295,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     );
 
     ValidationReport validationReport = runValidation(
-      netexFragment
+      netexEntitiesFactory
         .netexEntitiesIndex()
         .addServiceJourneys(
           serviceJourneys.toArray(Journey_VersionStructure[]::new)
@@ -321,13 +327,13 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       "TST:ScheduledStopPoint:2"
     );
 
-    NetexTestFragment netexFragment = new NetexTestFragment();
-    List<ServiceJourney> serviceJourneys = netexFragment.createServiceJourneys(
-      netexFragment.journeyPattern().create(),
+    NetexTestFragment netexEntitiesFactory = new NetexTestFragment();
+    List<ServiceJourney> serviceJourneys = netexEntitiesFactory.createServiceJourneys(
+      netexEntitiesFactory.journeyPattern().create(),
       2
     );
 
-    ServiceJourneyInterchange serviceJourneyInterchange = netexFragment
+    ServiceJourneyInterchange serviceJourneyInterchange = netexEntitiesFactory
       .serviceJourneyInterchange()
       .withId(1)
       .withFromJourneyRef(serviceJourneys.get(0).getId())
@@ -342,7 +348,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
     );
 
     ValidationReport validationReport = runValidation(
-      netexFragment
+      netexEntitiesFactory
         .netexEntitiesIndex()
         .addServiceJourneys(
           serviceJourneys.toArray(Journey_VersionStructure[]::new)

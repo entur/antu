@@ -3,7 +3,6 @@ package no.entur.antu.validation.validator.interchange.stoppoints;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import no.entur.antu.netexdata.DefaultNetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;

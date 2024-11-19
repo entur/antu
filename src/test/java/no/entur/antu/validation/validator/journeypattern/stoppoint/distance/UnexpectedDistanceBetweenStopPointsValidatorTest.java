@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -167,16 +167,14 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
     AllVehicleModesOfTransportEnumeration transportMode,
     List<QuayCoordinates> coordinates
   ) {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
 
     Line line = testFragment.line().withTransportMode(transportMode).create();
 
     Route route = testFragment.route().withLine(line).create();
 
-    NetexTestFragment.CreateJourneyPattern createJourneyPattern = testFragment
-      .journeyPattern()
-      .withId(123)
-      .withRoute(route);
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
+      testFragment.journeyPattern().withId(123).withRoute(route);
 
     if (coordinates.isEmpty()) {
       createJourneyPattern.withNumberOfStopPointInJourneyPattern(0);

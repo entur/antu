@@ -8,7 +8,8 @@ import no.entur.antu.validation.validator.servicejourney.servicealteration.suppo
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+import org.entur.netex.validation.validator.jaxb.support.DatedServiceJourneyUtils;
+import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 /**
  * Validates that the replacement for the service alteration exists.
@@ -34,15 +35,16 @@ public class MissingReplacementValidator extends AntuNetexValidator {
   ) {
     List<String> datedServiceJourneyRefsToReplacedDatedServiceJourneys =
       ServiceAlterationUtils
-        .datedServiceJourneysWithReferenceToReplaced(validationContext)
+        .datedServiceJourneysWithReferenceToOriginal(validationContext)
         .stream()
-        .map(ServiceAlterationUtils::datedServiceJourneyRef)
-        .map(VersionOfObjectRefStructure::getRef)
+        .map(DatedServiceJourneyUtils::originalDatedServiceJourneyRef)
         .toList();
 
     // Validate that those DSJs that got replaced have a replacement.
-    ServiceAlterationUtils
-      .replacedDatedServiceJourneys(validationContext)
+    validationContext
+      .datedServiceJourneysByServiceAlteration(
+        ServiceAlterationEnumeration.REPLACED
+      )
       .stream()
       .filter(
         Predicate.not(dsj ->

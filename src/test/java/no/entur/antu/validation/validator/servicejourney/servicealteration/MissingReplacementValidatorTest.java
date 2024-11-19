@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -27,7 +27,7 @@ class MissingReplacementValidatorTest extends ValidationTest {
 
   @Test
   void testCorrectReplacementExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     DatedServiceJourney datedServiceJourneyReplaced = testData
       .datedServiceJourney(1)
@@ -56,7 +56,7 @@ class MissingReplacementValidatorTest extends ValidationTest {
 
   @Test
   void testReplacementDoesNotExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
     DatedServiceJourney datedServiceJourneyReplaced = testData
       .datedServiceJourney(1)
@@ -93,9 +93,9 @@ class MissingReplacementValidatorTest extends ValidationTest {
 
   @Test
   void testReplacementMissingForMultipleDSJs() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex();
 
     IntStream
