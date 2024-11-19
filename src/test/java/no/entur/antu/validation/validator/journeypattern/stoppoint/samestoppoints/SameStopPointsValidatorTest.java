@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -25,9 +25,9 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testAllJourneyPatternsHaveDifferentStopPoints() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testFragment.netexEntitiesIndex();
 
     IntStream
@@ -55,10 +55,10 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testAllJourneyPatternsHaveSameStopPoints() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
     int sameStopPointId = 987;
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testFragment.netexEntitiesIndex();
 
     IntStream
@@ -89,7 +89,7 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testMultiplePairsOfJourneyPatternsHaveSameStopPoints() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
     int sameStopPointId1 = 987;
     int sameStopPointId2 = 988;
 
@@ -162,7 +162,7 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testAllJourneyPatternsWithMultipleStopPointsHaveSameStopPoints() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternId = 987;
     JourneyPattern journeyPattern1 = testFragment
       .journeyPattern()
@@ -208,10 +208,10 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testTwoJourneyPatternsOutOfTenHaveSameStopPoints() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternId = 987;
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testFragment.netexEntitiesIndex();
 
     IntStream
@@ -273,7 +273,7 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testJourneyPatternsWithUnSortedSameStopPoints() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternId = 987;
 
     List<Integer> stopPointsOrder1 = List.of(8, 3, 5, 2, 4, 10, 9, 1, 7, 6);

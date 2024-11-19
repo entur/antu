@@ -1,7 +1,6 @@
 package no.entur.antu.validation.validator.support;
 
 import java.util.Map;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
@@ -9,6 +8,8 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 
 public class JourneyPatternUtils {
+
+  private JourneyPatternUtils() {}
 
   public static Map.Entry<ScheduledStopPointId, QuayCoordinates> coordinatesPerQuayId(
     StopPointInJourneyPattern stopPointInJourneyPattern,

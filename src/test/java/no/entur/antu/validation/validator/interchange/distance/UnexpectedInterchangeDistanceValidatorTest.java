@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -169,7 +169,7 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
   ) {
     assert coordinates.length % 2 == 0;
 
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     List<ServiceJourneyInterchange> serviceJourneyInterchanges = IntStream
       .rangeClosed(1, coordinates.length / 2)

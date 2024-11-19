@@ -12,7 +12,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -40,7 +40,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     List<ServiceJourneyInterchange> serviceJourneyInterchanges =
       createServiceJourneyInterchanges(5);
 
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     ValidationReport validationReport = runValidation(
       testData
         .netexEntitiesIndex()
@@ -58,7 +58,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     List<ServiceJourneyInterchange> serviceJourneyInterchanges =
       createServiceJourneyInterchanges(5, 0, 0, 1, 2, 3, 4);
 
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     ValidationReport validationReport = runValidation(
       testData
         .netexEntitiesIndex()
@@ -76,8 +76,8 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
       .map(ValidationReportEntry::getMessage)
       .orElseThrow();
 
-    // assert that 4 distinct interchanges are reported among the 4 identical ones.
-    // TODO the validator should report all 4 identical interchanges
+    // assert that 4 distinct interchanges are reported among the 5 identical ones.
+    // TODO the validator should report all 5 identical interchanges
 
     Pattern pattern = Pattern.compile("TST:ServiceJourneyInterchange:[0-4]*");
     assertEquals(
@@ -96,7 +96,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     List<ServiceJourneyInterchange> serviceJourneyInterchanges =
       createServiceJourneyInterchanges(5, 1, 2, 3);
 
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     ValidationReport validationReport = runValidation(
       testData
         .netexEntitiesIndex()
@@ -130,7 +130,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     List<ServiceJourneyInterchange> serviceJourneyInterchanges2 =
       createServiceJourneyInterchanges(5, 6, 7, 8);
 
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     NetexEntitiesIndex netexEntitiesIndex = testData
       .netexEntitiesIndex()
       .addInterchanges(
@@ -193,7 +193,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     int startIndex,
     int... duplicateIndexes
   ) {
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     int maxStartIndex = Math.max(startIndex, 0);
 
@@ -207,7 +207,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
       .boxed()
       .toList();
 
-    List<NetexTestFragment.CreateServiceJourneyInterchange> createServiceJourneyInterchanges =
+    List<NetexEntitiesTestFactory.CreateServiceJourneyInterchange> createServiceJourneyInterchanges =
       IntStream
         .range(
           maxStartIndex,
@@ -217,7 +217,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
           duplicateIndexesList.contains(index) ? maxStartIndex : index
         )
         .mapToObj(index ->
-          new NetexTestFragment.CreateServiceJourneyInterchange()
+          new NetexEntitiesTestFactory.CreateServiceJourneyInterchange()
             .withFromJourneyRef(
               ServiceJourneyId.ofValidId(serviceJourneys.get(index * 2))
             )

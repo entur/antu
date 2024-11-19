@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -33,7 +33,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
 
   @Test
   void testAllStopPlaceAssignmentsExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -65,7 +65,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
 
   @Test
   void testMissingStopPlaceAssignmentsButServiceJourneyExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -101,13 +101,13 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
    * Missing SPA -> No DeadRun -> Yes SJ -> Error
    */
   void testMissingSingleStopPlaceAssignmentsUsedInMultipleJourneyPatternsButServiceJourneyExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     List<JourneyPattern> journeyPatterns = testData.createJourneyPatterns(4);
     Line line = testData.line().create();
     List<ServiceJourney> serviceJourneys = journeyPatterns
       .stream()
       .map(journeyPattern -> testData.serviceJourney(line, journeyPattern))
-      .map(NetexTestFragment.CreateServiceJourney::create)
+      .map(NetexEntitiesTestFactory.CreateServiceJourney::create)
       .map(ServiceJourney.class::cast)
       .toList();
 
@@ -127,7 +127,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
    * Missing SPA -> No DeadRun -> No SJ -> Error
    */
   void testMissingStopPlaceAssignmentsAndNoServiceJourneyExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
 
     NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
@@ -145,7 +145,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
    * Missing SPA -> Yes DeadRun -> No SJ -> OK
    */
   void testMissingStopPlaceAssignmentsAndDeadRunExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     DeadRun deadRun = testData.deadRun(journeyPattern).create();
 
@@ -165,7 +165,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
    * Missing SPA -> Yes DeadRun -> Yes SJ -> Error
    */
   void testMissingStopPlaceAssignmentsAndBothDeadRunAndServiceJourneyExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     Line line = testData.line().create();
     DeadRun deadRun = testData.deadRun(line, journeyPattern).create();
@@ -187,7 +187,7 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
 
   @Test
   void testMissingMultipleStopPlaceAssignmentsButServiceJourneyExists() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -220,13 +220,13 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidationTest {
 
   @Test
   void testPassengerStopAssignmentsInLineFileAndNotOnCommonFileShouldBeOk() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
       .create();
 
-    NetexTestFragment.CreateNetexEntitiesIndex createNetexEntitiesIndex =
+    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
 
     IntStream

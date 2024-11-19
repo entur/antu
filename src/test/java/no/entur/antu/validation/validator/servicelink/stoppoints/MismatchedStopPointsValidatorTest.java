@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collector;
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -32,7 +32,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testStopPointsInServiceLinkMatchesJourneyPattern() {
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     int numberOfJourneyPatterns = 1;
     int numberOfStopPointsInJourneyPattern = 2;
@@ -56,7 +56,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testStopPointsInAllServiceLinkMatchesAllJourneyPattern() {
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     int numberOfJourneyPatterns = 5;
     int numberOfStopPointsInJourneyPattern = 5;
@@ -80,7 +80,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testServiceLinkMissing() {
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     int numberOfJourneyPatterns = 5;
     int numberOfServiceLinks = 4;
@@ -106,7 +106,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testFromStopPointInServiceLinkDoesNotMatchesJourneyPattern() {
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     int journeyPatternId = 1;
     StopPointInJourneyPattern fromStopPointInJourneyPattern = fragment
@@ -169,7 +169,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testToStopPointInServiceLinkDoesNotMatchesJourneyPattern() {
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     int journeyPatternId = 1;
     StopPointInJourneyPattern fromStopPoint = fragment
@@ -230,14 +230,14 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
     );
   }
 
-  private static @NotNull Collector<JourneyPattern, NetexTestFragment.CreateNetexEntitiesIndex, NetexEntitiesIndex> collectToNetexEntitiesIndex(
-    NetexTestFragment fragment
+  private static @NotNull Collector<JourneyPattern, NetexEntitiesTestFactory.CreateNetexEntitiesIndex, NetexEntitiesIndex> collectToNetexEntitiesIndex(
+    NetexEntitiesTestFactory fragment
   ) {
     return Collector.of(
       fragment::netexEntitiesIndex,
-      NetexTestFragment.CreateNetexEntitiesIndex::addJourneyPatterns,
+      NetexEntitiesTestFactory.CreateNetexEntitiesIndex::addJourneyPatterns,
       (createLeft, createRight) -> createLeft,
-      NetexTestFragment.CreateNetexEntitiesIndex::create
+      NetexEntitiesTestFactory.CreateNetexEntitiesIndex::create
     );
   }
 
@@ -274,7 +274,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
     int numberOfJourneyPatterns,
     int numberOfStopPointsInJourneyPattern
   ) {
-    NetexTestFragment fragment = new NetexTestFragment();
+    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     BiFunction<Integer, Integer, StopPointInJourneyPattern> stopPoint = (
         journeyPatternId,

@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.time.LocalTime;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeError.RuleCode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -30,7 +30,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithRegularStop() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -45,7 +45,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithRegularStopMissingTime() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -75,7 +75,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithRegularStopInconsistentTime() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -107,7 +107,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithAreaStop() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -135,7 +135,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithAreaStopMissingTimeWindow() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -170,7 +170,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithAreaStopInconsistentTimeWindow() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -210,7 +210,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithRegularStopFollowedByRegularStopNonIncreasingTime() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -251,7 +251,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
    */
   @Test
   void testValidateWithRegularStopFollowedByRegularStopWithMissingTime() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -282,7 +282,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithRegularStopFollowedByStopArea() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -315,7 +315,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithRegularStopFollowedByStopAreaNonIncreasingTime() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -362,7 +362,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByRegularStop() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -393,7 +393,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByStopArea() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -439,7 +439,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByStopAreaNonIncreasingTime() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)
@@ -502,7 +502,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByRegularStopNonIncreasingTime() {
-    NetexTestFragment testData = new NetexTestFragment();
+    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     JourneyPattern journeyPattern = testData.journeyPattern().create();
     ServiceJourney serviceJourney = testData
       .serviceJourney(journeyPattern)

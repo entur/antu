@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -44,7 +44,7 @@ class StopPointsCountValidatorTest extends ValidationTest {
 
   @Test
   void testJourneyPatternWithNoServiceLinks() {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternIdOffset = 123;
 
     JourneyPattern journeyPattern = testFragment
@@ -75,7 +75,7 @@ class StopPointsCountValidatorTest extends ValidationTest {
   }
 
   private ValidationReport runWith10StopPoints(int numberOfServiceLinks) {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternIdOffset = 123;
     int linksInJourneyPatternIdOffset = 234;
 

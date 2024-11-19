@@ -6,8 +6,8 @@ import static org.hamcrest.Matchers.is;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexTestFragment;
-import no.entur.antu.netextestdata.NetexTestFragment.CreateStopPointInJourneyPattern;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
+import no.entur.antu.netextestdata.NetexEntitiesTestFactory.CreateStopPointInJourneyPattern;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -143,9 +143,9 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
     int numberOfStopPoints,
     UnaryOperator<CreateStopPointInJourneyPatternContext> customizeStopPoint
   ) {
-    NetexTestFragment testFragment = new NetexTestFragment();
+    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
 
-    List<NetexTestFragment.CreateJourneyPattern> createJourneyPatterns =
+    List<NetexEntitiesTestFactory.CreateJourneyPattern> createJourneyPatterns =
       IntStream
         .rangeClosed(1, numberOfJourneyPatterns)
         .mapToObj(journeyPatternId ->
@@ -199,7 +199,7 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
         .addJourneyPatterns(
           createJourneyPatterns
             .stream()
-            .map(NetexTestFragment.CreateJourneyPattern::create)
+            .map(NetexEntitiesTestFactory.CreateJourneyPattern::create)
             .toArray(JourneyPattern[]::new)
         )
         .create()
