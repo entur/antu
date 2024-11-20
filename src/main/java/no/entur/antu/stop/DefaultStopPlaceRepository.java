@@ -17,7 +17,6 @@ package no.entur.antu.stop;
 
 import java.util.*;
 import no.entur.antu.stop.fetcher.NetexEntityFetcher;
-import org.entur.netex.validation.validator.jaxb.*;
 import org.entur.netex.validation.validator.model.*;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * StopPlaceRepository implementation using the new API exposed in Tiamat.
  */
-public class DefaultStopPlaceRepository implements StopPlaceRepository {
+public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     DefaultStopPlaceRepository.class

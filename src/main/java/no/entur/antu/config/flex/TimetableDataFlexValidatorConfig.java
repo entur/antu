@@ -32,6 +32,7 @@ import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
+import org.entur.netex.validation.validator.jaxb.CommonDataRepositoryLoader;
 import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
@@ -143,6 +144,7 @@ public class TimetableDataFlexValidatorConfig {
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
     InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
+    CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
@@ -165,6 +167,7 @@ public class TimetableDataFlexValidatorConfig {
       .withNetexSchemaValidator(netexSchemaValidator)
       .withXPathValidators(xpathValidators)
       .withJaxbValidators(jaxbValidators)
+      .withCommonDataRepository(commonDataRepository)
       .withNetexDataRepository(netexDataRepository)
       .withStopPlaceRepository(stopPlaceRepository)
       .build();
@@ -189,6 +192,7 @@ public class TimetableDataFlexValidatorConfig {
     NetexReferenceValidator netexReferenceValidator,
     FileNameValidator fileNameValidator,
     InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
+    CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
@@ -213,6 +217,7 @@ public class TimetableDataFlexValidatorConfig {
       .withNetexSchemaValidator(netexSchemaValidator)
       .withXPathValidators(xpathValidators)
       .withJaxbValidators(jaxbValidators)
+      .withCommonDataRepository(commonDataRepository)
       .withNetexDataRepository(netexDataRepository)
       .withStopPlaceRepository(stopPlaceRepository)
       .build();

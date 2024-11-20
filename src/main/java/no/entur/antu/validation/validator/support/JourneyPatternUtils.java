@@ -36,9 +36,8 @@ public class JourneyPatternUtils {
       return null;
     }
 
-    QuayCoordinates coordinatesForQuayId = validationContext
-      .getStopPlaceRepository()
-      .getCoordinatesForQuayId(quayId);
+    QuayCoordinates coordinatesForQuayId =
+      validationContext.coordinatesForQuayId(quayId);
     return coordinatesForQuayId == null
       ? null
       : Map.entry(scheduledStopPointId, coordinatesForQuayId);

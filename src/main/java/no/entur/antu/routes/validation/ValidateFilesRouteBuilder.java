@@ -69,9 +69,6 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_FILE_NAME))
       .to("direct:downloadSingleNetexFileFromMemoryStore")
       .setProperty(Constants.PROP_NETEX_FILE_CONTENT, body())
-      // TODO we should not parse NeTEx data before the file is validated against the XSD
-      //      and the XPath validators are run.
-      .to("direct:storeCommonData")
       .to("direct:runNetexValidators")
       // Duplicated PubSub messages are detected when trying to download the NeTEx file:
       // it does not exist anymore after the report is generated and all temporary files are deleted

@@ -27,6 +27,7 @@ public class ValidationTest {
 
   private static final String VALIDATION_REPORT_ID = "Test1122";
   private static final String VALIDATION_REPORT_CODEBASE = "TST";
+  protected CommonDataRepository commonDataRepositoryMock;
   protected NetexDataRepository netexDataRepositoryMock;
   protected StopPlaceRepository stopPlaceRepositoryMock;
 
@@ -34,24 +35,25 @@ public class ValidationTest {
 
   @BeforeEach
   void resetMocks() {
-    this.netexDataRepositoryMock = mock(NetexDataRepository.class);
+    this.commonDataRepositoryMock = mock(CommonDataRepository.class);
     Mockito
-      .when(netexDataRepositoryMock.hasQuayIds(anyString()))
+      .when(commonDataRepositoryMock.hasSharedScheduledStopPoints(anyString()))
       .thenReturn(true);
 
+    this.netexDataRepositoryMock = mock(NetexDataRepository.class);
     this.stopPlaceRepositoryMock = mock(StopPlaceRepository.class);
   }
 
   protected void mockNoQuayIdsInNetexDataRepository() {
     Mockito
-      .when(netexDataRepositoryMock.hasQuayIds(anyString()))
+      .when(commonDataRepositoryMock.hasSharedScheduledStopPoints(anyString()))
       .thenReturn(false);
   }
 
   protected void mockGetStopName(ScheduledStopPointId scheduledStopPointId) {
     QuayId quayId = new QuayId("TST:Quay:007");
     when(
-      netexDataRepositoryMock.quayIdForScheduledStopPoint(
+      commonDataRepositoryMock.quayIdForScheduledStopPoint(
         scheduledStopPointId,
         VALIDATION_REPORT_ID
       )
@@ -76,7 +78,7 @@ public class ValidationTest {
   ) {
     Mockito
       .when(
-        netexDataRepositoryMock.quayIdForScheduledStopPoint(
+        commonDataRepositoryMock.quayIdForScheduledStopPoint(
           eq(scheduledStopPointId),
           anyString()
         )
@@ -99,7 +101,7 @@ public class ValidationTest {
   ) {
     Mockito
       .when(
-        netexDataRepositoryMock.fromToScheduledStopPointIdForServiceLink(
+        commonDataRepositoryMock.fromToScheduledStopPointIdForServiceLink(
           eq(serviceLinkId),
           anyString()
         )
@@ -199,7 +201,7 @@ public class ValidationTest {
     JAXBValidationContext validationContext = new JAXBValidationContext(
       VALIDATION_REPORT_ID,
       netexEntitiesIndex,
-      netexDataRepositoryMock,
+      commonDataRepositoryMock,
       stopPlaceRepositoryMock,
       TEST_CODESPACE,
       mockAsCommonFile ? TEST_COMMON_XML_FILE : TEST_LINE_XML_FILE,

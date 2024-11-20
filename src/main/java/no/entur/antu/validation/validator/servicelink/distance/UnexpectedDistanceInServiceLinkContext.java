@@ -61,12 +61,8 @@ public record UnexpectedDistanceInServiceLinkContext(
         return null;
       }
 
-      QuayCoordinates from = validationContext
-        .getStopPlaceRepository()
-        .getCoordinatesForQuayId(fromQuayId);
-      QuayCoordinates to = validationContext
-        .getStopPlaceRepository()
-        .getCoordinatesForQuayId(toQuayId);
+      QuayCoordinates from = validationContext.coordinatesForQuayId(fromQuayId);
+      QuayCoordinates to = validationContext.coordinatesForQuayId(toQuayId);
 
       if (from == null || to == null) {
         LOGGER.warn(

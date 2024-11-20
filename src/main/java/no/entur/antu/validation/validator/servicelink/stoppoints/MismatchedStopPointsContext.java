@@ -61,25 +61,14 @@ public record MismatchedStopPointsContext(
           .map(serviceLinkId ->
             new AbstractMap.SimpleEntry<>(
               serviceLinkId,
-              scheduledStopPointsForServiceLinkId(serviceLinkId)
+              validationContext.fromToScheduledStopPointIdForServiceLink(
+                serviceLinkId
+              )
             )
           )
           .filter(entry -> entry.getValue() != null)
           .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
       );
-    }
-
-    public FromToScheduledStopPointId scheduledStopPointsForServiceLinkId(
-      ServiceLinkId serviceLinkId
-    ) {
-      // Should extend this function to check line file if we don't find the
-      // service links in common file. Same as findQuayIdForScheduledStopPoint.
-      return validationContext
-        .getNetexDataRepository()
-        .fromToScheduledStopPointIdForServiceLink(
-          serviceLinkId,
-          validationContext.getValidationReportId()
-        );
     }
   }
 }
