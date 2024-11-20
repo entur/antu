@@ -11,8 +11,8 @@ import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -49,17 +49,17 @@ class UnexpectedSpeedValidatorIntegrationTest {
         testDatasetAsStream
       );
 
-      NetexDataRepository netexDataRepository = Mockito.mock(
-        NetexDataRepository.class
+      CommonDataRepository commonDataRepository = Mockito.mock(
+        CommonDataRepository.class
       );
       Mockito
-        .when(netexDataRepository.hasQuayIds(anyString()))
+        .when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
         .thenReturn(false);
 
       JAXBValidationContext validationContext = new JAXBValidationContext(
         validationReportId,
         netexEntitiesIndex,
-        netexDataRepository,
+        commonDataRepository,
         null,
         TEST_CODESPACE,
         testFile,

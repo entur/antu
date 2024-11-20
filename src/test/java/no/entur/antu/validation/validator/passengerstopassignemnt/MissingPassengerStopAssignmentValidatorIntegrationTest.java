@@ -16,8 +16,8 @@ import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -41,17 +41,19 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndNoDeadRunShouldFail()
     throws IOException {
-    NetexDataRepository netexDataRepository = Mockito.mock(
-      NetexDataRepository.class
+    CommonDataRepository commonDataRepository = Mockito.mock(
+      CommonDataRepository.class
     );
 
     // Mocking that the quay ids are not present in the common data repository.
     // Validator will try to fetch quay ids from the line file instead.
-    Mockito.when(netexDataRepository.hasQuayIds(anyString())).thenReturn(false);
+    Mockito
+      .when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
+      .thenReturn(false);
 
     ValidationReport validationReport = getValidationReport(
       TEST_FILE_WITH_NO_COMPOSITE_FRAME,
-      netexDataRepository
+      commonDataRepository
     );
 
     assertFalse(validationReport.getValidationReportEntries().isEmpty());
@@ -64,17 +66,19 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndWithAllDeadRun()
     throws IOException {
-    NetexDataRepository netexDataRepository = Mockito.mock(
-      NetexDataRepository.class
+    CommonDataRepository commonDataRepository = Mockito.mock(
+      CommonDataRepository.class
     );
 
     // Mocking that the quay ids are not present in the common data repository.
     // Validator will try to fetch quay ids from the line file instead.
-    Mockito.when(netexDataRepository.hasQuayIds(anyString())).thenReturn(false);
+    Mockito
+      .when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
+      .thenReturn(false);
 
     ValidationReport validationReport = getValidationReport(
       TEST_FILE_WITH_NO_COMPOSITE_FRAME_DEAD_RUN,
-      netexDataRepository
+      commonDataRepository
     );
 
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
@@ -82,7 +86,7 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
 
   private ValidationReport getValidationReport(
     String testFile,
-    NetexDataRepository netexDataRepository
+    CommonDataRepository commonDataRepository
   ) throws IOException {
     String validationReportId = "Test1122";
     ValidationReport testValidationReport = new ValidationReport(
@@ -108,7 +112,7 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       JAXBValidationContext validationContext = new JAXBValidationContext(
         validationReportId,
         netexEntitiesIndex,
-        netexDataRepository,
+        commonDataRepository,
         stopPlaceRepository,
         TEST_CODESPACE,
         TEST_LINE_XML_FILE,

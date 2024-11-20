@@ -44,14 +44,6 @@ class ReferenceToNsrValidatorTest {
       public String getStopPlaceNameForQuayId(QuayId quayId) {
         return null;
       }
-
-      @Override
-      public void refreshCache() {}
-
-      @Override
-      public boolean isEmpty() {
-        return false;
-      }
     };
 
     referenceToNsrValidator = new ReferenceToNsrValidator(stopPlaceRepository);

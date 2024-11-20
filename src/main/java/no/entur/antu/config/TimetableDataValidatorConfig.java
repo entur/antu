@@ -47,6 +47,7 @@ import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
 import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
+import org.entur.netex.validation.validator.jaxb.CommonDataRepositoryLoader;
 import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
@@ -285,6 +286,7 @@ public class TimetableDataValidatorConfig {
     LineInfoCollector lineInfoCollector,
     ServiceJourneyStopsCollector serviceJourneyStopsCollector,
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
+    CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
@@ -338,6 +340,7 @@ public class TimetableDataValidatorConfig {
       .withJaxbValidators(jaxbValidators)
       .withDatasetValidators(netexTimetableDatasetValidators)
       .withNetexDataCollectors(commonDataCollectors)
+      .withCommonDataRepository(commonDataRepository)
       .withNetexDataRepository(netexDataRepository)
       .withStopPlaceRepository(stopPlaceRepository)
       .build();
