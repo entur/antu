@@ -177,6 +177,9 @@ public class ValidatorConfig {
       "swedenTimetableDataSwedenValidatorsRunner"
     ) NetexValidatorsRunner timetableSwedenDataValidatorsRunner,
     @Qualifier(
+      "finlandTimetableDataValidatorsRunner"
+    ) NetexValidatorsRunner timetableFinlandDataValidatorsRunner,
+    @Qualifier(
       "stopPlaceDataValidatorsRunner"
     ) NetexValidatorsRunner stopDataValidatorsRunner,
     @Value(
@@ -198,6 +201,8 @@ public class ValidatorConfig {
         flexMergingTimetableDataValidatorsRunner,
         TIMETABLE_SWEDEN,
         timetableSwedenDataValidatorsRunner,
+        TIMETABLE_FINLAND,
+        timetableFinlandDataValidatorsRunner,
         STOP,
         stopDataValidatorsRunner
       ),

@@ -35,6 +35,11 @@ public enum ValidationProfile {
   TIMETABLE_SWEDEN("TimetableSweden"),
 
   /**
+   * Profile for validating swedish timetable data.
+   */
+  TIMETABLE_FINLAND("TimetableFinland"),
+
+  /**
    * Profile for stop dataset.
    */
   STOP("Stop");
