@@ -202,7 +202,7 @@ public class ValidationTest {
       VALIDATION_REPORT_ID,
       netexEntitiesIndex,
       commonDataRepositoryMock,
-      stopPlaceRepositoryMock,
+      v -> stopPlaceRepositoryMock,
       TEST_CODESPACE,
       mockAsCommonFile ? TEST_COMMON_XML_FILE : TEST_LINE_XML_FILE,
       Map.of()

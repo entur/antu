@@ -113,7 +113,7 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
         validationReportId,
         netexEntitiesIndex,
         commonDataRepository,
-        stopPlaceRepository,
+        v -> stopPlaceRepository,
         TEST_CODESPACE,
         TEST_LINE_XML_FILE,
         Map.of()
