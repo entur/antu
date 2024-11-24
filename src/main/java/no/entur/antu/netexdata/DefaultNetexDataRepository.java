@@ -7,7 +7,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.validation.validator.model.ActiveDates;
+import org.entur.netex.validation.validator.model.ActiveDatesId;
 import org.entur.netex.validation.validator.model.DayTypeId;
+import org.entur.netex.validation.validator.model.OperatingDayId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
@@ -88,7 +90,16 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   }
 
   @Override
-  public Map<DayTypeId, ActiveDates> activeDates(String validationReportId) {
+  public Map<ActiveDatesId, ActiveDates> activeDates(
+    String validationReportId
+  ) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Map<ServiceJourneyId, List<OperatingDayId>> serviceJourneyOperatingDays(
+    String validationReportId
+  ) {
     throw new UnsupportedOperationException();
   }
 

@@ -124,7 +124,16 @@ public class TestConfig {
     }
 
     @Override
-    public Map<DayTypeId, ActiveDates> activeDates(String validationReportId) {
+    public Map<ActiveDatesId, ActiveDates> activeDates(
+      String validationReportId
+    ) {
+      return Map.of();
+    }
+
+    @Override
+    public Map<ServiceJourneyId, List<OperatingDayId>> serviceJourneyOperatingDays(
+      String validationReportId
+    ) {
       return Map.of();
     }
 
