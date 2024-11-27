@@ -27,12 +27,18 @@ class MissingReplacementValidatorTest extends ValidationTest {
 
   private NetexEntitiesTestFactory.CreateDatedServiceJourney datedServiceJourneyDraft(
     int id,
-    NetexEntitiesTestFactory testData
+    NetexEntitiesTestFactory netexEntitiesTestFactory
   ) {
-    return testData.createDatedServiceJourney(
+    return netexEntitiesTestFactory.createDatedServiceJourney(
       id,
-      testData.createServiceJourney(id, testData.createJourneyPattern(id)),
-      testData.createOperatingDay(id, LocalDate.parse("2024-12-01"))
+      netexEntitiesTestFactory.createServiceJourney(
+        id,
+        netexEntitiesTestFactory.createJourneyPattern(id)
+      ),
+      new NetexEntitiesTestFactory.CreateOperatingDay(
+        id,
+        LocalDate.parse("2024-12-01")
+      )
     );
   }
 
