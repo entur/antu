@@ -11,18 +11,13 @@ import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
 class DuplicateInterchangesValidatorTest extends ValidationTest {
 
@@ -37,17 +32,12 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
 
   @Test
   void testNoDuplicateInterchanges() {
-    List<ServiceJourneyInterchange> serviceJourneyInterchanges =
-      createServiceJourneyInterchanges(5);
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+    createServiceJourneyInterchanges(netexEntitiesTestFactory, 5);
 
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     ValidationReport validationReport = runValidation(
-      testData
-        .netexEntitiesIndex()
-        .addInterchanges(
-          serviceJourneyInterchanges.toArray(ServiceJourneyInterchange[]::new)
-        )
-        .create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -55,17 +45,21 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
 
   @Test
   void testAllDuplicate() {
-    List<ServiceJourneyInterchange> serviceJourneyInterchanges =
-      createServiceJourneyInterchanges(5, 0, 0, 1, 2, 3, 4);
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+    createServiceJourneyInterchanges(
+      netexEntitiesTestFactory,
+      5,
+      0,
+      0,
+      1,
+      2,
+      3,
+      4
+    );
 
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     ValidationReport validationReport = runValidation(
-      testData
-        .netexEntitiesIndex()
-        .addInterchanges(
-          serviceJourneyInterchanges.toArray(ServiceJourneyInterchange[]::new)
-        )
-        .create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -92,17 +86,12 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
 
   @Test
   void testSomeDuplicateInterchanges() {
-    List<ServiceJourneyInterchange> serviceJourneyInterchanges =
-      createServiceJourneyInterchanges(5, 1, 2, 3);
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+    createServiceJourneyInterchanges(netexEntitiesTestFactory, 5, 1, 2, 3);
 
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
     ValidationReport validationReport = runValidation(
-      testData
-        .netexEntitiesIndex()
-        .addInterchanges(
-          serviceJourneyInterchanges.toArray(ServiceJourneyInterchange[]::new)
-        )
-        .create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -124,23 +113,13 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
 
   @Test
   void testMultiplePairsOfDuplicateInterchanges() {
-    List<ServiceJourneyInterchange> serviceJourneyInterchanges1 =
-      createServiceJourneyInterchanges(5, 1, 2, 3);
-    List<ServiceJourneyInterchange> serviceJourneyInterchanges2 =
-      createServiceJourneyInterchanges(5, 6, 7, 8);
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+    createServiceJourneyInterchanges(netexEntitiesTestFactory, 5, 1, 2, 3);
+    createServiceJourneyInterchanges(netexEntitiesTestFactory, 5, 6, 7, 8);
 
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
-    NetexEntitiesIndex netexEntitiesIndex = testData
-      .netexEntitiesIndex()
-      .addInterchanges(
-        Stream
-          .concat(
-            serviceJourneyInterchanges1.stream(),
-            serviceJourneyInterchanges2.stream()
-          )
-          .toArray(ServiceJourneyInterchange[]::new)
-      )
-      .create();
+    NetexEntitiesIndex netexEntitiesIndex = netexEntitiesTestFactory.create();
+
     ValidationReport validationReport = runValidation(netexEntitiesIndex);
 
     assertThat(validationReport.getValidationReportEntries().size(), is(2));
@@ -178,68 +157,50 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     );
   }
 
-  public List<ServiceJourneyInterchange> createServiceJourneyInterchanges(
+  public void createServiceJourneyInterchanges(
+    NetexEntitiesTestFactory netexEntitiesTestFactory,
     int numberOfServiceJourneyInterchanges
   ) {
-    return createServiceJourneyInterchanges(
+    createServiceJourneyInterchanges(
+      netexEntitiesTestFactory,
       numberOfServiceJourneyInterchanges,
       -1
     );
   }
 
-  private List<ServiceJourneyInterchange> createServiceJourneyInterchanges(
+  private void createServiceJourneyInterchanges(
+    NetexEntitiesTestFactory netexEntitiesTestFactory,
     int numberOfServiceJourneyInterchanges,
     int startIndex,
     int... duplicateIndexes
   ) {
-    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
-
     int maxStartIndex = Math.max(startIndex, 0);
 
-    List<ServiceJourney> serviceJourneys = fragment.createServiceJourneys(
-      fragment.journeyPattern().create(),
-      (numberOfServiceJourneyInterchanges + maxStartIndex) * 2
-    );
+    List<NetexEntitiesTestFactory.CreateServiceJourney> serviceJourneys =
+      netexEntitiesTestFactory.createServiceJourneys(
+        netexEntitiesTestFactory.createJourneyPattern(),
+        (numberOfServiceJourneyInterchanges + maxStartIndex) * 2
+      );
 
     List<Integer> duplicateIndexesList = Arrays
       .stream(duplicateIndexes)
       .boxed()
       .toList();
 
-    List<NetexEntitiesTestFactory.CreateServiceJourneyInterchange> createServiceJourneyInterchanges =
-      IntStream
-        .range(
-          maxStartIndex,
-          numberOfServiceJourneyInterchanges + maxStartIndex
-        )
-        .map(index ->
-          duplicateIndexesList.contains(index) ? maxStartIndex : index
-        )
-        .mapToObj(index ->
-          new NetexEntitiesTestFactory.CreateServiceJourneyInterchange()
-            .withFromJourneyRef(
-              ServiceJourneyId.ofValidId(serviceJourneys.get(index * 2))
-            )
-            .withToJourneyRef(
-              ServiceJourneyId.ofValidId(serviceJourneys.get((index * 2) + 1))
-            )
-            .withFromPointRef(
-              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 1))
-            )
-            .withToPointRef(
-              new ScheduledStopPointId("TST:ScheduledStopPoint:" + (index + 2))
-            )
-        )
-        .toList();
-
-    return IntStream
-      .range(0, createServiceJourneyInterchanges.size())
-      .mapToObj(index ->
-        createServiceJourneyInterchanges
-          .get(index)
-          .withId(maxStartIndex + index)
-          .create()
-      )
-      .toList();
+    IntStream
+      .range(maxStartIndex, numberOfServiceJourneyInterchanges + maxStartIndex)
+      .forEach(index -> {
+        int id = duplicateIndexesList.contains(index) ? maxStartIndex : index;
+        netexEntitiesTestFactory
+          .createServiceJourneyInterchange(index)
+          .withFromJourneyRef(serviceJourneys.get(id * 2).refObject())
+          .withToJourneyRef(serviceJourneys.get((id * 2) + 1).refObject())
+          .withFromPointRef(
+            NetexEntitiesTestFactory.createScheduledStopPointRef(id + 1)
+          )
+          .withToPointRef(
+            NetexEntitiesTestFactory.createScheduledStopPointRef(id + 2)
+          );
+      });
   }
 }
