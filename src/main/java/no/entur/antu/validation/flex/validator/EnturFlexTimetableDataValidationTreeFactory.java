@@ -3,8 +3,8 @@ package no.entur.antu.validation.flex.validator;
 import java.util.List;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
+import org.entur.netex.validation.validator.xpath.XPathValidationRule;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 /**
@@ -29,12 +29,12 @@ public class EnturFlexTimetableDataValidationTreeFactory
   }
 
   @Override
-  protected List<ValidationRule> getCompositeFrameBaseValidationRules() {
-    List<ValidationRule> compositeFrameBaseValidationRules =
+  protected List<XPathValidationRule> getCompositeFrameBaseValidationRules() {
+    List<XPathValidationRule> compositeFrameBaseValidationRules =
       super.getCompositeFrameBaseValidationRules();
     // allow common files that contain a SiteFrame
     compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.getCode().equals("COMPOSITE_SITE_FRAME_IN_COMMON_FILE")
+      validationRule.rule().code().equals("COMPOSITE_SITE_FRAME_IN_COMMON_FILE")
     );
 
     return compositeFrameBaseValidationRules;

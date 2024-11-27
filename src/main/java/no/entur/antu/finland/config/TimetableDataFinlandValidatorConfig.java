@@ -80,14 +80,14 @@ public class TimetableDataFinlandValidatorConfig {
     ) ValidationTreeFactory validationTreeFactory,
     ValidationReportEntryFactory validationReportEntryFactory
   ) {
-    return new XPathRuleValidator(
-      validationTreeFactory,
-      validationReportEntryFactory
-    );
+    return new XPathRuleValidator(validationTreeFactory);
   }
 
   @Bean
   public NetexValidatorsRunner finlandTimetableDataValidatorsRunner(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
     NetexSchemaValidator netexSchemaValidator,
     @Qualifier(
       "finlandTimetableDataXPathValidator"
@@ -177,6 +177,7 @@ public class TimetableDataFinlandValidatorConfig {
       .withCommonDataRepository(commonDataRepository)
       .withNetexDataRepository(netexDataRepository)
       .withStopPlaceRepository(SiteFrameStopPlaceRepository::new)
+      .withValidationReportEntryFactory(validationReportEntryFactory)
       .build();
   }
 }

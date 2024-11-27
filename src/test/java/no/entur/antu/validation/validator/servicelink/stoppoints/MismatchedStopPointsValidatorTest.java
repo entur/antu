@@ -153,17 +153,14 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
     );
 
     assertEquals(1, validationReport.getValidationReportEntries().size());
-    assertTrue(
+    assertEquals(
+      MismatchedStopPointsValidator.RULE.name(),
       validationReport
         .getValidationReportEntries()
         .stream()
-        .allMatch(entry ->
-          entry
-            .getName()
-            .equals(
-              MismatchedStopPointsError.RuleCode.STOP_POINTS_IN_SERVICE_LINK_DOES_NOT_MATCH_THE_JOURNEY_PATTERN.name()
-            )
-        )
+        .findFirst()
+        .orElseThrow()
+        .getName()
     );
   }
 
@@ -216,17 +213,14 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
     );
 
     assertEquals(1, validationReport.getValidationReportEntries().size());
-    assertTrue(
+    assertEquals(
+      MismatchedStopPointsValidator.RULE.name(),
       validationReport
         .getValidationReportEntries()
         .stream()
-        .allMatch(entry ->
-          entry
-            .getName()
-            .equals(
-              MismatchedStopPointsError.RuleCode.STOP_POINTS_IN_SERVICE_LINK_DOES_NOT_MATCH_THE_JOURNEY_PATTERN.name()
-            )
-        )
+        .findFirst()
+        .orElseThrow()
+        .getName()
     );
   }
 

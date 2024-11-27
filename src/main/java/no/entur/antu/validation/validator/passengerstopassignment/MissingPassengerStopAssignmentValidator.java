@@ -2,16 +2,15 @@ package no.entur.antu.validation.validator.passengerstopassignment;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.rutebanken.netex.model.DeadRun;
 import org.rutebanken.netex.model.ServiceJourney;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Validates that StopPointInJourneyPattern has a ScheduledStopAssignment.
@@ -24,35 +23,23 @@ import org.slf4j.LoggerFactory;
  * Missing SPA -> Yes DeadRun -> No SJ -> OK
  * Chouette reference: rutebanken_3-StopPoint-1
  */
-public class MissingPassengerStopAssignmentValidator
-  extends AntuNetexValidator {
+public class MissingPassengerStopAssignmentValidator implements JAXBValidator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    MissingPassengerStopAssignmentValidator.class
+  static final ValidationRule RULE = new ValidationRule(
+    "MISSING_SCHEDULED_STOP_ASSIGNMENT",
+    "Missing ScheduledStopAssignment for StopPointInJourneyPattern",
+    "Missing ScheduledStopAssignment for StopPoint: %s",
+    Severity.ERROR
   );
 
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return MissingPassengerStopAssignmentError.RuleCode.values();
-  }
-
-  public MissingPassengerStopAssignmentValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
-  @Override
-  public void validateLineFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
-    LOGGER.debug("Validating Stop place in journey pattern");
-
     MissingPassengerStopAssignmentContext.Builder builder =
       new MissingPassengerStopAssignmentContext.Builder(validationContext);
 
-    validationContext
+    return validationContext
       .journeyPatterns()
       .stream()
       .map(builder::build)
@@ -65,25 +52,21 @@ public class MissingPassengerStopAssignmentValidator
       .filter(context ->
         !validateStopPointInJourneyPattern(validationContext, context)
       )
-      .forEach(context ->
-        addValidationReportEntry(
-          validationReport,
-          validationContext,
-          new MissingPassengerStopAssignmentError(
-            context.stopPointInJourneyPatternRef(),
-            validationContext.stopPointName(context.scheduledStopPointId()),
-            MissingPassengerStopAssignmentError.RuleCode.MISSING_SCHEDULED_STOP_ASSIGNMENT
-          )
+      .map(context ->
+        new ValidationIssue(
+          RULE,
+          validationContext.dataLocation(
+            context.stopPointInJourneyPatternRef()
+          ),
+          validationContext.stopPointName(context.scheduledStopPointId())
         )
-      );
+      )
+      .toList();
   }
 
   @Override
-  protected void validateCommonFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext
-  ) {
-    // StopPoints and JourneyPatterns only appear in the Line file.
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
   }
 
   private boolean validateStopPointInJourneyPattern(

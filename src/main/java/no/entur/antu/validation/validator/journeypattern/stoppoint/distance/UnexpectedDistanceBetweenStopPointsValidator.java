@@ -1,14 +1,15 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 
-import java.util.function.Consumer;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import no.entur.antu.validation.ValidationError;
-import no.entur.antu.validation.utilities.Comparison;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import no.entur.antu.validation.utilities.SphericalDistanceLibrary;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,26 +21,30 @@ import org.slf4j.LoggerFactory;
  * Chouette Reference: 3-JourneyPattern-rutebanken-1
  */
 public class UnexpectedDistanceBetweenStopPointsValidator
-  extends AntuNetexValidator {
+  implements JAXBValidator {
+
+  static final ValidationRule RULE_DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED =
+    new ValidationRule(
+      "DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED",
+      "Distance between stop points is less than expected",
+      "Distance between stop points (%s - %s) is less than expected. Expected: %s, actual: %s.",
+      Severity.WARNING
+    );
+
+  static final ValidationRule RULE_DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED =
+    new ValidationRule(
+      "DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED",
+      "Distance between stop points is more than expected",
+      "Distance between stop points (%s - %s) is more than expected. Expected: %s, actual: %s.",
+      Severity.WARNING
+    );
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     UnexpectedDistanceBetweenStopPointsValidator.class
   );
 
-  public UnexpectedDistanceBetweenStopPointsValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return UnexpectedDistanceBetweenStopPointsError.RuleCode.values();
-  }
-
-  @Override
-  public void validateLineFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating distance between stops in journey patterns");
@@ -47,38 +52,30 @@ public class UnexpectedDistanceBetweenStopPointsValidator
     UnexpectedDistanceBetweenStopPointsContext.Builder builder =
       new UnexpectedDistanceBetweenStopPointsContext.Builder(validationContext);
 
-    validationContext
+    return validationContext
       .journeyPatterns()
       .stream()
       .map(builder::build)
       .filter(UnexpectedDistanceBetweenStopPointsContext::isValid)
-      .forEach(context ->
-        validateDistance(
-          validationContext,
-          context,
-          validationError ->
-            addValidationReportEntry(
-              validationReport,
-              validationContext,
-              validationError
-            )
-        )
-      );
+      .map(context -> validateDistance(validationContext, context))
+      .flatMap(Collection::stream)
+      .toList();
   }
 
   @Override
-  protected void validateCommonFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext
-  ) {
-    // JourneyPatterns only appear in the Line file.
+  public Set<ValidationRule> getRules() {
+    return Set.of(
+      RULE_DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED,
+      RULE_DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED
+    );
   }
 
-  private void validateDistance(
+  private List<ValidationIssue> validateDistance(
     JAXBValidationContext validationContext,
-    UnexpectedDistanceBetweenStopPointsContext distanceContext,
-    Consumer<ValidationError> reportError
+    UnexpectedDistanceBetweenStopPointsContext distanceContext
   ) {
+    List<ValidationIssue> issues = new ArrayList<>();
+
     ExpectedDistance expectedDistance = ExpectedDistance.of(
       distanceContext.transportMode()
     );
@@ -93,33 +90,36 @@ public class UnexpectedDistanceBetweenStopPointsValidator
     ) {
       var current = distanceContext.scheduledStopPointCoordinates().get(i);
 
-      double distance = SphericalDistanceLibrary.distance(
+      long distance = (long) SphericalDistanceLibrary.distance(
         previous.quayCoordinates(),
         current.quayCoordinates()
       );
 
       if (distance < expectedDistance.minDistance()) {
-        reportError.accept(
-          new UnexpectedDistanceBetweenStopPointsError(
-            UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED,
-            distanceContext.journeyPatternRef(),
+        issues.add(
+          new ValidationIssue(
+            RULE_DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED,
+            validationContext.dataLocation(distanceContext.journeyPatternRef()),
             validationContext.stopPointName(previous.scheduledStopPointId()),
             validationContext.stopPointName(current.scheduledStopPointId()),
-            Comparison.of(expectedDistance.minDistance(), distance)
+            expectedDistance.minDistance(),
+            distance
           )
         );
       } else if (distance > expectedDistance.maxDistance()) {
-        reportError.accept(
-          new UnexpectedDistanceBetweenStopPointsError(
-            UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED,
-            distanceContext.journeyPatternRef(),
+        issues.add(
+          new ValidationIssue(
+            RULE_DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED,
+            validationContext.dataLocation(distanceContext.journeyPatternRef()),
             validationContext.stopPointName(previous.scheduledStopPointId()),
             validationContext.stopPointName(current.scheduledStopPointId()),
-            Comparison.of(expectedDistance.maxDistance(), distance)
+            expectedDistance.maxDistance(),
+            distance
           )
         );
       }
       previous = current;
     }
+    return issues;
   }
 }

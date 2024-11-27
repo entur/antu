@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
+import org.entur.netex.validation.validator.xpath.XPathValidationRule;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
@@ -54,21 +54,21 @@ public class EnturTimetableDataSwedenValidationTreeFactory
   }
 
   @Override
-  protected List<ValidationRule> getCompositeFrameBaseValidationRules() {
-    List<ValidationRule> compositeFrameBaseValidationRules =
+  protected List<XPathValidationRule> getCompositeFrameBaseValidationRules() {
+    List<XPathValidationRule> compositeFrameBaseValidationRules =
       super.getCompositeFrameBaseValidationRules();
     // remove check on NSR codespace
     compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.getCode().equals("NSR_CODESPACE")
+      validationRule.rule().code().equals("NSR_CODESPACE")
     );
     // allow common files that contain only a SiteFrame
     compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.getCode().equals("SITE_FRAME_IN_COMMON_FILE")
+      validationRule.rule().code().equals("SITE_FRAME_IN_COMMON_FILE")
     );
 
     // accept ValidBetween syntax in addition to validityConditions syntax
     compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.getCode().equals("COMPOSITE_FRAME_1")
+      validationRule.rule().code().equals("COMPOSITE_FRAME_1")
     );
     compositeFrameBaseValidationRules.add(
       new ValidateNotExist(
@@ -91,12 +91,12 @@ public class EnturTimetableDataSwedenValidationTreeFactory
   }
 
   @Override
-  protected List<ValidationRule> getServiceFrameBaseValidationRules() {
-    List<ValidationRule> serviceFrameBaseValidationRules =
+  protected List<XPathValidationRule> getServiceFrameBaseValidationRules() {
+    List<XPathValidationRule> serviceFrameBaseValidationRules =
       super.getServiceFrameBaseValidationRules();
     // remove time-consuming rule
     serviceFrameBaseValidationRules.removeIf(validationRule ->
-      "PASSENGER_STOP_ASSIGNMENT_3".equals(validationRule.getCode())
+      "PASSENGER_STOP_ASSIGNMENT_3".equals(validationRule.rule().code())
     );
     return serviceFrameBaseValidationRules;
   }

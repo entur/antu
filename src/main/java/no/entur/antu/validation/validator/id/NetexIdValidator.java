@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import no.entur.antu.validation.NetexCodespace;
 import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.DataLocation;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
@@ -23,10 +23,34 @@ import org.slf4j.LoggerFactory;
  */
 public class NetexIdValidator extends AbstractXPathValidator {
 
-  static final String RULE_CODE_NETEX_ID_2 = "NETEX_ID_2";
-  static final String RULE_CODE_NETEX_ID_3 = "NETEX_ID_3";
-  static final String RULE_CODE_NETEX_ID_4 = "NETEX_ID_4";
-  static final String RULE_CODE_NETEX_ID_4W = "NETEX_ID_4W";
+  static final ValidationRule RULE_INVALID_ID_STRUCTURE = new ValidationRule(
+    "NETEX_ID_2",
+    "NeTEx ID invalid structure",
+    "Invalid id structure on element",
+    Severity.ERROR
+  );
+
+  static final ValidationRule RULE_INVALID_ID_NAME = new ValidationRule(
+    "NETEX_ID_3",
+    "NeTEx ID invalid element name inside structure",
+    "Invalid structure on id %s. Expected %s",
+    Severity.ERROR
+  );
+
+  static final ValidationRule RULE_UNAPPROVED_CODESPACE = new ValidationRule(
+    "NETEX_ID_4",
+    "NeTEx ID with unapproved codespace",
+    "Use of unapproved codespace. Approved codespaces are %s",
+    Severity.ERROR
+  );
+
+  static final ValidationRule RULE_UNAPPROVED_CODESPACE_WARNING =
+    new ValidationRule(
+      "NETEX_ID_4W",
+      "NeTEx ID with unapproved codespace",
+      "Use of unapproved codespace. Approved codespaces are %s",
+      Severity.WARNING
+    );
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     NetexIdValidator.class
@@ -37,26 +61,16 @@ public class NetexIdValidator extends AbstractXPathValidator {
   private static final Pattern PATTERN_VALID_ID = Pattern.compile(
     REGEXP_VALID_ID
   );
-  private static final String MESSAGE_FORMAT_INVALID_ID_STRUCTURE =
-    "Invalid id structure on element";
-  private static final String MESSAGE_FORMAT_INVALID_ID_NAME =
-    "Invalid structure on id %s. Expected %s";
-  private static final String MESSAGE_FORMAT_UNAPPROVED_CODESPACE =
-    "Use of unapproved codespace. Approved codespaces are %s";
 
   private final Set<String> entityTypesReportedAsWarningForUnapprovedCodespace;
 
-  public NetexIdValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    this(validationReportEntryFactory, Set.of());
+  public NetexIdValidator() {
+    this(Set.of());
   }
 
   public NetexIdValidator(
-    ValidationReportEntryFactory validationReportEntryFactory,
     Set<String> entityTypesReportedAsWarningForUnapprovedCodespace
   ) {
-    super(validationReportEntryFactory);
     this.entityTypesReportedAsWarningForUnapprovedCodespace =
       Objects.requireNonNull(
         entityTypesReportedAsWarningForUnapprovedCodespace
@@ -64,17 +78,10 @@ public class NetexIdValidator extends AbstractXPathValidator {
   }
 
   @Override
-  public void validate(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     XPathValidationContext validationContext
   ) {
-    validationReport.addAllValidationReportEntries(validate(validationContext));
-  }
-
-  protected List<ValidationReportEntry> validate(
-    XPathValidationContext validationContext
-  ) {
-    List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
+    List<ValidationIssue> validationIssues = new ArrayList<>();
 
     Set<String> validNetexCodespaces = NetexCodespace
       .getValidNetexCodespacesFor(validationContext.getCodespace())
@@ -87,12 +94,8 @@ public class NetexIdValidator extends AbstractXPathValidator {
       Matcher m = PATTERN_VALID_ID.matcher(id.getId());
       DataLocation dataLocation = getIdVersionLocation(id);
       if (!m.matches()) {
-        validationReportEntries.add(
-          createValidationReportEntry(
-            RULE_CODE_NETEX_ID_2,
-            dataLocation,
-            MESSAGE_FORMAT_INVALID_ID_STRUCTURE
-          )
+        validationIssues.add(
+          new ValidationIssue(RULE_INVALID_ID_STRUCTURE, dataLocation)
         );
         LOGGER.debug(
           "Id {} has an invalid format. Valid format is {}",
@@ -103,16 +106,12 @@ public class NetexIdValidator extends AbstractXPathValidator {
         if (!m.group(2).equals(id.getElementName())) {
           String expectedId =
             m.group(1) + ":" + id.getElementName() + ":" + m.group(3);
-          String validationReportEntryMessage = String.format(
-            MESSAGE_FORMAT_INVALID_ID_NAME,
-            id.getId(),
-            expectedId
-          );
-          validationReportEntries.add(
-            createValidationReportEntry(
-              RULE_CODE_NETEX_ID_3,
+          validationIssues.add(
+            new ValidationIssue(
+              RULE_INVALID_ID_NAME,
               dataLocation,
-              validationReportEntryMessage
+              id.getId(),
+              expectedId
             )
           );
           LOGGER.debug(
@@ -124,10 +123,6 @@ public class NetexIdValidator extends AbstractXPathValidator {
 
         String prefix = m.group(1);
         if (!validNetexCodespaces.contains(prefix)) {
-          String validationReportEntryMessage = String.format(
-            MESSAGE_FORMAT_UNAPPROVED_CODESPACE,
-            validNetexCodespaceList
-          );
           LOGGER.debug(
             "Id {} uses an unapproved codespace prefix. Approved codespaces are: {}",
             id,
@@ -138,47 +133,35 @@ public class NetexIdValidator extends AbstractXPathValidator {
               id.getElementName()
             )
           ) {
-            validationReportEntries.add(
-              createValidationReportEntry(
-                RULE_CODE_NETEX_ID_4W,
+            validationIssues.add(
+              new ValidationIssue(
+                RULE_UNAPPROVED_CODESPACE_WARNING,
                 dataLocation,
-                validationReportEntryMessage
+                validNetexCodespaceList
               )
             );
           } else {
-            validationReportEntries.add(
-              createValidationReportEntry(
-                RULE_CODE_NETEX_ID_4,
+            validationIssues.add(
+              new ValidationIssue(
+                RULE_UNAPPROVED_CODESPACE,
                 dataLocation,
-                validationReportEntryMessage
+                validNetexCodespaceList
               )
             );
           }
         }
       }
     }
-    return validationReportEntries;
+    return validationIssues;
   }
 
   @Override
-  public Set<String> getRuleDescriptions() {
+  public Set<ValidationRule> getRules() {
     return Set.of(
-      createRuleDescription(
-        RULE_CODE_NETEX_ID_2,
-        MESSAGE_FORMAT_INVALID_ID_STRUCTURE
-      ),
-      createRuleDescription(
-        RULE_CODE_NETEX_ID_3,
-        MESSAGE_FORMAT_INVALID_ID_NAME
-      ),
-      createRuleDescription(
-        (RULE_CODE_NETEX_ID_4),
-        MESSAGE_FORMAT_UNAPPROVED_CODESPACE
-      ),
-      createRuleDescription(
-        (RULE_CODE_NETEX_ID_4W),
-        MESSAGE_FORMAT_UNAPPROVED_CODESPACE
-      )
+      RULE_INVALID_ID_STRUCTURE,
+      RULE_INVALID_ID_NAME,
+      RULE_UNAPPROVED_CODESPACE,
+      RULE_UNAPPROVED_CODESPACE_WARNING
     );
   }
 }

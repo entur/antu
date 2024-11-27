@@ -87,15 +87,9 @@ public class TimetableDataSwedenValidatorConfig {
   public XPathRuleValidator swedenTimetableDataXPathValidator(
     @Qualifier(
       "swedenTimetableDataValidationTreeFactory"
-    ) ValidationTreeFactory validationTreeFactory,
-    @Qualifier(
-      "swedenValidationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationTreeFactory validationTreeFactory
   ) {
-    return new XPathRuleValidator(
-      validationTreeFactory,
-      validationReportEntryFactory
-    );
+    return new XPathRuleValidator(validationTreeFactory);
   }
 
   @Bean
@@ -115,8 +109,7 @@ public class TimetableDataSwedenValidatorConfig {
     externalReferenceValidators.add(referenceToNsrValidator);
     return new NetexReferenceValidator(
       netexIdRepository,
-      externalReferenceValidators,
-      validationReportEntryFactory
+      externalReferenceValidators
     );
   }
 
@@ -129,19 +122,16 @@ public class TimetableDataSwedenValidatorConfig {
 
   @Bean
   public SwedenStopPlaceValidator swedenStopPlaceValidator(
-    SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository,
-    @Qualifier(
-      "swedenValidationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
+    SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository
   ) {
-    return new SwedenStopPlaceValidator(
-      swedenStopPlaceNetexIdRepository,
-      validationReportEntryFactory
-    );
+    return new SwedenStopPlaceValidator(swedenStopPlaceNetexIdRepository);
   }
 
   @Bean
   public NetexValidatorsRunner swedenTimetableDataSwedenValidatorsRunner(
+    @Qualifier(
+      "swedenValidationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
     NetexSchemaValidator netexSchemaValidator,
     @Qualifier(
       "swedenTimetableDataXPathValidator"
@@ -176,6 +166,7 @@ public class TimetableDataSwedenValidatorConfig {
       .withNetexXMLParser(netexXMLParser)
       .withNetexSchemaValidator(netexSchemaValidator)
       .withXPathValidators(netexValidators)
+      .withValidationReportEntryFactory(validationReportEntryFactory)
       .build();
   }
 }

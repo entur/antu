@@ -1,13 +1,15 @@
 package no.entur.antu.validation.flex.validator.flexiblearea;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
+import java.util.Set;
+import javax.annotation.Nullable;
 import no.entur.antu.validation.utilities.GeometryUtilities;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.operation.valid.IsValidOp;
 import org.slf4j.Logger;
@@ -23,74 +25,59 @@ import org.slf4j.LoggerFactory;
  *    Incomplete coordinates.
  *    etc.
  */
-public class InvalidFlexibleAreaValidator extends AntuNetexValidator {
+public class InvalidFlexibleAreaValidator implements JAXBValidator {
+
+  static final ValidationRule RULE = new ValidationRule(
+    "INVALID_FLEXIBLE_AREA",
+    "Invalid flexible area",
+    "Invalid flexible area: %s",
+    Severity.ERROR
+  );
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     InvalidFlexibleAreaValidator.class
   );
 
-  public InvalidFlexibleAreaValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return InvalidFlexibleAreaError.RuleCode.values();
-  }
-
-  @Override
-  public void validateCommonFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating flexible area");
 
-    validationContext
+    return validationContext
       .flexibleStopPlaces()
       .stream()
       .map(InvalidFlexibleAreaContext::of)
       .filter(Objects::nonNull)
-      .forEach(invalidFlexibleAreaContext ->
-        validateFlexibleArea(
-          invalidFlexibleAreaContext,
-          invalidFlexibleAreaError ->
-            addValidationReportEntry(
-              validationReport,
-              validationContext,
-              invalidFlexibleAreaError
-            )
-        )
-      );
+      .map(invalidFlexibleAreaContext ->
+        validateFlexibleArea(validationContext, invalidFlexibleAreaContext)
+      )
+      .filter(Objects::nonNull)
+      .toList();
   }
 
   @Override
-  protected void validateLineFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext
-  ) {
-    // Flexible areas only appear in the Common file.
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
   }
 
-  private void validateFlexibleArea(
-    InvalidFlexibleAreaContext invalidFlexibleAreaContext,
-    Consumer<InvalidFlexibleAreaError> flexibleAreaError
+  @Nullable
+  private ValidationIssue validateFlexibleArea(
+    JAXBValidationContext validationContext,
+    InvalidFlexibleAreaContext invalidFlexibleAreaContext
   ) {
     if (
       !GeometryUtilities.isValidCoordinatesList(
         invalidFlexibleAreaContext.coordinates()
       )
     ) {
-      flexibleAreaError.accept(
-        new InvalidFlexibleAreaError(
-          InvalidFlexibleAreaError.RuleCode.INVALID_FLEXIBLE_AREA,
-          invalidFlexibleAreaContext.flexibleAreaId(),
-          invalidFlexibleAreaContext.flexibleStopPlaceId(),
-          "Incomplete coordinates"
-        )
+      return new ValidationIssue(
+        RULE,
+        validationContext.dataLocation(
+          invalidFlexibleAreaContext.flexibleAreaId()
+        ),
+        "Incomplete coordinates"
       );
-      return;
     }
 
     try {
@@ -100,24 +87,23 @@ public class InvalidFlexibleAreaValidator extends AntuNetexValidator {
 
       IsValidOp isValidOp = new IsValidOp(linearRing);
       if (!isValidOp.isValid()) {
-        flexibleAreaError.accept(
-          new InvalidFlexibleAreaError(
-            InvalidFlexibleAreaError.RuleCode.INVALID_FLEXIBLE_AREA,
-            invalidFlexibleAreaContext.flexibleAreaId(),
-            invalidFlexibleAreaContext.flexibleStopPlaceId(),
-            isValidOp.getValidationError().toString()
-          )
+        return new ValidationIssue(
+          RULE,
+          validationContext.dataLocation(
+            invalidFlexibleAreaContext.flexibleAreaId()
+          ),
+          isValidOp.getValidationError().toString()
         );
       }
     } catch (Exception ex) {
-      flexibleAreaError.accept(
-        new InvalidFlexibleAreaError(
-          InvalidFlexibleAreaError.RuleCode.INVALID_FLEXIBLE_AREA,
-          invalidFlexibleAreaContext.flexibleAreaId(),
-          invalidFlexibleAreaContext.flexibleStopPlaceId(),
-          ex.getMessage()
-        )
+      return new ValidationIssue(
+        RULE,
+        validationContext.dataLocation(
+          invalidFlexibleAreaContext.flexibleAreaId()
+        ),
+        ex.getMessage()
       );
     }
+    return null;
   }
 }

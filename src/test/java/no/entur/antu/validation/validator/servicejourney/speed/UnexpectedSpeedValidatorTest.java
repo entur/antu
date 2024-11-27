@@ -62,7 +62,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName)
         .findFirst()
         .orElse(null),
-      is(UnexpectedSpeedError.RuleCode.LOW_SPEED.name())
+      is(UnexpectedSpeedValidator.RULE_LOW_SPEED.name())
     );
   }
 
@@ -85,7 +85,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName)
         .findFirst()
         .orElse(null),
-      is(UnexpectedSpeedError.RuleCode.HIGH_SPEED.name())
+      is(UnexpectedSpeedValidator.RULE_HIGH_SPEED.name())
     );
   }
 
@@ -108,7 +108,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName)
         .findFirst()
         .orElse(null),
-      is(UnexpectedSpeedError.RuleCode.WARNING_SPEED.name())
+      is(UnexpectedSpeedValidator.RULE_WARNING_SPEED.name())
     );
   }
 
@@ -132,49 +132,8 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
         .toList(),
       is(
         List.of(
-          UnexpectedSpeedError.RuleCode.LOW_SPEED.name(),
-          UnexpectedSpeedError.RuleCode.HIGH_SPEED.name()
-        )
-      )
-    );
-  }
-
-  @Test
-  void testSameDepartureArrivalTimeErrorThrown() {
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
-    JourneyPattern journeyPattern = testData
-      .journeyPattern()
-      .withNumberOfStopPointInJourneyPattern(2)
-      .create();
-
-    // Setting departureTimeOffset to 0, for making the departure time same for both passingTimes.
-    ServiceJourney serviceJourney = testData
-      .serviceJourney(journeyPattern)
-      .withCreateTimetabledPassingTimes(
-        testData.timetabledPassingTimes().withDepartureTimeOffset(0)
-      )
-      .create();
-
-    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
-
-    ValidationReport validationReport = runTestWith(
-      List.of(
-        new QuayCoordinates(6.622312, 60.481548),
-        new QuayCoordinates(6.632312, 60.491548)
-      ),
-      testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
-    );
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getValidationReportEntries()
-        .stream()
-        .map(ValidationReportEntry::getName)
-        .toList(),
-      is(
-        List.of(
-          SameDepartureArrivalTimeError.RuleCode.SAME_DEPARTURE_ARRIVAL_TIME.name()
+          UnexpectedSpeedValidator.RULE_LOW_SPEED.name(),
+          UnexpectedSpeedValidator.RULE_HIGH_SPEED.name()
         )
       )
     );

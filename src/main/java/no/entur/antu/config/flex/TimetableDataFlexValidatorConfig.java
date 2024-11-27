@@ -72,57 +72,34 @@ public class TimetableDataFlexValidatorConfig {
   public XPathRuleValidator flexTimetableDataXPathValidator(
     @Qualifier(
       "flexTimetableDataValidationTreeFactory"
-    ) ValidationTreeFactory validationTreeFactory,
-    ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationTreeFactory validationTreeFactory
   ) {
-    return new XPathRuleValidator(
-      validationTreeFactory,
-      validationReportEntryFactory
-    );
+    return new XPathRuleValidator(validationTreeFactory);
   }
 
   @Bean
   public XPathRuleValidator importFlexTimetableDataXPathValidator(
     @Qualifier(
       "importFlexTimetableDataValidationTreeFactory"
-    ) ValidationTreeFactory validationTreeFactory,
-    ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationTreeFactory validationTreeFactory
   ) {
-    return new XPathRuleValidator(
-      validationTreeFactory,
-      validationReportEntryFactory
-    );
+    return new XPathRuleValidator(validationTreeFactory);
   }
 
   @Bean
-  public NetexIdValidator flexNetexIdValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
+  public NetexIdValidator flexNetexIdValidator() {
     // TODO temporarily ignore unapproved codespace for Operator
-    return new NetexIdValidator(
-      validationReportEntryFactory,
-      Set.of("Operator")
-    );
+    return new NetexIdValidator(Set.of("Operator"));
   }
 
   @Bean
-  public FileNameValidator fileNameValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new FileNameValidator(validationReportEntryFactory);
+  public FileNameValidator fileNameValidator() {
+    return new FileNameValidator();
   }
 
   @Bean
-  public InvalidFlexibleAreaValidator flexibleAreaValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new InvalidFlexibleAreaValidator(validationReportEntryFactory);
+  public InvalidFlexibleAreaValidator flexibleAreaValidator() {
+    return new InvalidFlexibleAreaValidator();
   }
 
   /**
@@ -130,6 +107,9 @@ public class TimetableDataFlexValidatorConfig {
    */
   @Bean
   public NetexValidatorsRunner flexTimetableDataValidatorsRunner(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
     @Qualifier(
       "flexTimetableDataXPathValidator"
     ) XPathRuleValidator flexXPathValidator,
@@ -170,6 +150,7 @@ public class TimetableDataFlexValidatorConfig {
       .withCommonDataRepository(commonDataRepository)
       .withNetexDataRepository(netexDataRepository)
       .withStopPlaceRepository(stopPlaceRepository)
+      .withValidationReportEntryFactory(validationReportEntryFactory)
       .build();
   }
 
@@ -178,6 +159,9 @@ public class TimetableDataFlexValidatorConfig {
    */
   @Bean
   public NetexValidatorsRunner importFlexTimetableDataValidatorsRunner(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
     @Qualifier(
       "importFlexTimetableDataXPathValidator"
     ) XPathRuleValidator flexXPathValidator,
@@ -220,6 +204,7 @@ public class TimetableDataFlexValidatorConfig {
       .withCommonDataRepository(commonDataRepository)
       .withNetexDataRepository(netexDataRepository)
       .withStopPlaceRepository(stopPlaceRepository)
+      .withValidationReportEntryFactory(validationReportEntryFactory)
       .build();
   }
 }

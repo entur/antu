@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.is;
 import java.time.LocalTime;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
-import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeError.RuleCode;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
@@ -67,7 +66,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
         ),
       is(true)
     );
@@ -99,7 +98,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_INCONSISTENT_TIME.name()
         ),
       is(true)
     );
@@ -162,7 +161,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
         ),
       is(true)
     );
@@ -202,7 +201,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_INCONSISTENT_TIME.name()
         ),
       is(true)
     );
@@ -239,7 +238,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_NON_INCREASING_TIME.name()
         ),
       is(true)
     );
@@ -274,7 +273,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
         ),
       is(true)
     );
@@ -354,7 +353,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
         ),
       is(true)
     );
@@ -494,7 +493,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
         ),
       is(true)
     );
@@ -545,7 +544,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       validationReport
         .getNumberOfValidationEntriesPerRule()
         .containsKey(
-          RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME.toString()
+          NonIncreasingPassingTimeValidator.RULE_NON_INCREASING_TIME.name()
         ),
       is(true)
     );

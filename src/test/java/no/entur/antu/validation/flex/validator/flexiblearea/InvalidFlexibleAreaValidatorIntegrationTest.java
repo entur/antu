@@ -4,12 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.junit.jupiter.api.Test;
 
@@ -22,22 +21,18 @@ class InvalidFlexibleAreaValidatorIntegrationTest {
 
   @Test
   void testSelfIntersectingRingShouldBeReported() throws IOException {
-    ValidationReport validationReport = getValidationReport(
+    List<ValidationIssue> validationIssues = getValidationIssues(
       _ATB_FLEXIBLE_SHARED_DATA,
       "ATB"
     );
-    assertEquals(2, validationReport.getValidationReportEntries().size());
+    assertEquals(2, validationIssues.size());
   }
 
-  private ValidationReport getValidationReport(
+  private List<ValidationIssue> getValidationIssues(
     String testFile,
     String codeSpace
   ) throws IOException {
     String validationReportId = "Test1122";
-    ValidationReport testValidationReport = new ValidationReport(
-      codeSpace,
-      validationReportId
-    );
 
     try (
       InputStream testDatasetAsStream = getClass()
@@ -60,20 +55,9 @@ class InvalidFlexibleAreaValidatorIntegrationTest {
       );
 
       InvalidFlexibleAreaValidator invalidFlexibleAreaValidator =
-        new InvalidFlexibleAreaValidator((code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          )
-        );
+        new InvalidFlexibleAreaValidator();
 
-      invalidFlexibleAreaValidator.validate(
-        testValidationReport,
-        validationContext
-      );
+      return invalidFlexibleAreaValidator.validate(validationContext);
     }
-
-    return testValidationReport;
   }
 }

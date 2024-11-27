@@ -10,10 +10,10 @@ import java.util.Map;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.DatasetValidator;
+import org.entur.netex.validation.validator.SimpleValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.entur.netex.validation.validator.jaxb.*;
 import org.entur.netex.validation.validator.model.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +30,8 @@ public class ValidationTest {
   protected CommonDataRepository commonDataRepositoryMock;
   protected NetexDataRepository netexDataRepositoryMock;
   protected StopPlaceRepository stopPlaceRepositoryMock;
+  private final ValidationReportEntryFactory validationReportEntryFactory =
+    new SimpleValidationEntryFactory();
 
   protected ValidationTest() {}
 
@@ -126,7 +128,7 @@ public class ValidationTest {
   }
 
   protected <
-    V extends AntuNetexValidator
+    V extends JAXBValidator
   > ValidationReport runValidationOnCommonFile(
     NetexEntitiesIndex netexEntitiesIndex,
     Class<V> validatorClass
@@ -137,17 +139,6 @@ public class ValidationTest {
   protected <V extends DatasetValidator> ValidationReport runDatasetValidation(
     Class<V> validatorClass
   ) {
-    ValidationReportEntryFactory validationReportEntryFactory = (
-        code,
-        message,
-        dataLocation
-      ) ->
-      new ValidationReportEntry(
-        message,
-        code,
-        ValidationReportEntrySeverity.ERROR
-      );
-
     ValidationReport testValidationReport = new ValidationReport(
       VALIDATION_REPORT_CODEBASE,
       VALIDATION_REPORT_ID
@@ -168,31 +159,18 @@ public class ValidationTest {
     }
   }
 
-  protected <
-    V extends AntuNetexValidator
-  > ValidationReport runValidationOnLineFile(
+  protected <V extends JAXBValidator> ValidationReport runValidationOnLineFile(
     NetexEntitiesIndex netexEntitiesIndex,
     Class<V> validatorClass
   ) {
     return runValidation(netexEntitiesIndex, validatorClass, false);
   }
 
-  private <V extends AntuNetexValidator> ValidationReport runValidation(
+  private <V extends JAXBValidator> ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex,
     Class<V> validatorClass,
     boolean mockAsCommonFile
   ) {
-    ValidationReportEntryFactory validationReportEntryFactory = (
-        code,
-        message,
-        dataLocation
-      ) ->
-      new ValidationReportEntry(
-        message,
-        code,
-        ValidationReportEntrySeverity.ERROR
-      );
-
     ValidationReport testValidationReport = new ValidationReport(
       VALIDATION_REPORT_CODEBASE,
       VALIDATION_REPORT_ID
@@ -209,10 +187,15 @@ public class ValidationTest {
     );
 
     try {
-      V validator = validatorClass
-        .getDeclaredConstructor(ValidationReportEntryFactory.class)
-        .newInstance(validationReportEntryFactory);
-      validator.validate(testValidationReport, validationContext);
+      V validator = validatorClass.getDeclaredConstructor().newInstance();
+      List<ValidationReportEntry> validationReportEntries = validator
+        .validate(validationContext)
+        .stream()
+        .map(validationReportEntryFactory::createValidationReportEntry)
+        .toList();
+      testValidationReport.addAllValidationReportEntries(
+        validationReportEntries
+      );
 
       return testValidationReport;
     } catch (Exception ex) {

@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.List;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.netextestdata.NetexXmlTestFragment;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class NoAlightingAtFirstStopPointTest {
       )
       .create();
 
-    List<XPathValidationReportEntry> xPathValidationReportEntries = runTestWith(
+    List<ValidationIssue> xPathValidationReportEntries = runTestWith(
       journeyPatterns
     );
 
@@ -64,7 +64,7 @@ class NoAlightingAtFirstStopPointTest {
       )
       .create();
 
-    List<XPathValidationReportEntry> xPathValidationReportEntries = runTestWith(
+    List<ValidationIssue> xPathValidationReportEntries = runTestWith(
       journeyPatterns
     );
 
@@ -95,7 +95,7 @@ class NoAlightingAtFirstStopPointTest {
       )
       .create();
 
-    List<XPathValidationReportEntry> xPathValidationReportEntries = runTestWith(
+    List<ValidationIssue> xPathValidationReportEntries = runTestWith(
       journeyPatterns
     );
 
@@ -124,7 +124,7 @@ class NoAlightingAtFirstStopPointTest {
       )
       .create();
 
-    List<XPathValidationReportEntry> xPathValidationReportEntries = runTestWith(
+    List<ValidationIssue> xPathValidationReportEntries = runTestWith(
       journeyPatterns
     );
 
@@ -145,7 +145,7 @@ class NoAlightingAtFirstStopPointTest {
       )
       .create();
 
-    List<XPathValidationReportEntry> xPathValidationReportEntries = runTestWith(
+    List<ValidationIssue> xPathValidationReportEntries = runTestWith(
       journeyPatterns
     );
 
@@ -168,7 +168,7 @@ class NoAlightingAtFirstStopPointTest {
       )
       .create();
 
-    List<XPathValidationReportEntry> xPathValidationReportEntries = runTestWith(
+    List<ValidationIssue> xPathValidationReportEntries = runTestWith(
       journeyPatterns
     );
 
@@ -176,7 +176,7 @@ class NoAlightingAtFirstStopPointTest {
     Assertions.assertFalse(xPathValidationReportEntries.isEmpty());
   }
 
-  private List<XPathValidationReportEntry> runTestWith(String journeyPatterns) {
+  private List<ValidationIssue> runTestWith(String journeyPatterns) {
     XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(journeyPatterns);
 
     XPathRuleValidationContext xpathValidationContext =

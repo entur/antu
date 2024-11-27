@@ -67,9 +67,7 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
     validationReportEntries.forEach(entry ->
       assertThat(
         entry.getName(),
-        is(
-          UnexpectedInterchangeDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_WARNING_LIMIT.name()
-        )
+        is(UnexpectedInterchangeDistanceValidator.RULE_WARN_LIMIT.name())
       )
     );
   }
@@ -95,7 +93,7 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              UnexpectedInterchangeDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_WARNING_LIMIT.name()
+              UnexpectedInterchangeDistanceValidator.RULE_WARN_LIMIT.name()
             )
         )
     );
@@ -114,9 +112,7 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
     validationReportEntries.forEach(entry ->
       assertThat(
         entry.getName(),
-        is(
-          UnexpectedInterchangeDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_MAX_LIMIT.name()
-        )
+        is(UnexpectedInterchangeDistanceValidator.RULE_MAX_LIMIT.name())
       )
     );
   }
@@ -142,7 +138,7 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              UnexpectedInterchangeDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_MAX_LIMIT.name()
+              UnexpectedInterchangeDistanceValidator.RULE_MAX_LIMIT.name()
             )
         )
     );

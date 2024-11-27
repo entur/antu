@@ -1,38 +1,35 @@
 package no.entur.antu.validation.validator.servicejourney.servicealteration;
 
+import java.util.List;
 import java.util.Objects;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
+import java.util.Set;
 import no.entur.antu.validation.validator.servicejourney.servicealteration.support.ServiceAlterationUtils;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 /**
  * Validates that the service alteration of a service journey is correct.
  * This means that the service alteration of a service journey that got replaced must be 'replaced'.
  */
-public class InvalidServiceAlterationValidator extends AntuNetexValidator {
+public class InvalidServiceAlterationValidator implements JAXBValidator {
 
-  public InvalidServiceAlterationValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
-  @Override
-  protected RuleCode[] getRuleCodes() {
-    return InvalidServiceAlterationError.RuleCode.values();
-  }
+  static final ValidationRule RULE = new ValidationRule(
+    "INVALID_SERVICE_ALTERATION",
+    "Invalid/Missing ServiceAlteration",
+    "Invalid ServiceAlteration. . Expected 'replaced', but was %s",
+    Severity.WARNING
+  );
 
   @Override
-  protected void validateLineFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
     // Validate that those DSJs that got replaced have the 'replaced' service alteration.
-    ServiceAlterationUtils
+    return ServiceAlterationUtils
       .datedServiceJourneysWithReferenceToOriginal(validationContext)
       .stream()
       .map(validationContext::originalDatedServiceJourney)
@@ -40,16 +37,20 @@ public class InvalidServiceAlterationValidator extends AntuNetexValidator {
       .filter(dsj ->
         dsj.getServiceAlteration() != ServiceAlterationEnumeration.REPLACED
       )
-      .forEach(dsj ->
-        addValidationReportEntry(
-          validationReport,
-          validationContext,
-          new InvalidServiceAlterationError(
-            dsj.getId(),
-            InvalidServiceAlterationError.RuleCode.INVALID_SERVICE_ALTERATION,
-            dsj.getServiceAlteration()
-          )
+      .map(dsj ->
+        new ValidationIssue(
+          RULE,
+          validationContext.dataLocation(dsj.getId()),
+          dsj.getServiceAlteration() == null
+            ? "not provided"
+            : dsj.getServiceAlteration().value()
         )
-      );
+      )
+      .toList();
+  }
+
+  @Override
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
   }
 }

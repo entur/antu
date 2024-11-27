@@ -1,12 +1,14 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,55 +18,46 @@ import org.slf4j.LoggerFactory;
  * the journey pattern.
  * Chouette reference: 3-JourneyPattern-2
  */
-public class StopPointsCountValidator extends AntuNetexValidator {
+public class StopPointsCountValidator implements JAXBValidator {
+
+  static final ValidationRule RULE = new ValidationRule(
+    "INVALID_NUMBER_OF_STOP_POINTS_OR_LINKS_IN_JOURNEY_PATTERN",
+    "Invalid number of stop points or links in JourneyPattern",
+    "Invalid number of Stop points or links in JourneyPattern, Number of stop points = %d, Number of links = %d",
+    Severity.ERROR
+  );
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     StopPointsCountValidator.class
   );
 
-  public StopPointsCountValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return StopPointsCountError.RuleCode.values();
-  }
-
-  @Override
-  public void validateLineFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
     LOGGER.debug("Validating Stop points or service links In Journey Patterns");
 
-    validationContext
+    return validationContext
       .journeyPatterns()
       .stream()
       .map(StopPointsCountContext::of)
       .filter(Objects::nonNull)
       .filter(Predicate.not(StopPointsCountContext::isValid))
-      .forEach(stopPointsCountContext ->
-        addValidationReportEntry(
-          validationReport,
-          validationContext,
-          new StopPointsCountError(
-            StopPointsCountError.RuleCode.INVALID_NUMBER_OF_STOP_POINTS_OR_LINKS_IN_JOURNEY_PATTERN,
-            stopPointsCountContext.journeyPatternId(),
-            stopPointsCountContext.stopPointsCount(),
-            stopPointsCountContext.serviceLinksCount()
-          )
+      .map(stopPointsCountContext ->
+        new ValidationIssue(
+          RULE,
+          validationContext.dataLocation(
+            stopPointsCountContext.journeyPatternId()
+          ),
+          stopPointsCountContext.stopPointsCount(),
+          stopPointsCountContext.serviceLinksCount()
         )
-      );
+      )
+      .toList();
   }
 
   @Override
-  protected void validateCommonFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext
-  ) {
-    // JourneyPatterns only appear in the Line file.
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
   }
 }

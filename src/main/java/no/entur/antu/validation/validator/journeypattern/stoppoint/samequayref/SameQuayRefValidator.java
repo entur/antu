@@ -1,14 +1,16 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref;
 
+import static org.entur.netex.validation.validator.Severity.WARNING;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Set;
 import java.util.stream.IntStream;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import no.entur.antu.validation.ValidationError;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,26 +19,21 @@ import org.slf4j.LoggerFactory;
  * does not assigned to same quay.
  * Chouette reference: 3-JourneyPattern-rutebanken-2
  */
-public class SameQuayRefValidator extends AntuNetexValidator {
+public class SameQuayRefValidator implements JAXBValidator {
+
+  static final ValidationRule RULE = new ValidationRule(
+    "SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN",
+    "Same quay refs in consecutive stop points",
+    "Same quay refs in consecutive stop points [%s, %s] in journey pattern %s",
+    WARNING
+  );
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     SameQuayRefValidator.class
   );
 
-  public SameQuayRefValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return SameQuayRefError.RuleCode.values();
-  }
-
-  @Override
-  public void validateLineFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
     LOGGER.debug(
@@ -47,33 +44,28 @@ public class SameQuayRefValidator extends AntuNetexValidator {
       validationContext
     );
 
-    validationContext
+    return validationContext
       .journeyPatterns()
       .stream()
       .map(builder::build)
-      .forEach(sameQuayRefContexts ->
-        validateSameQuayRefs(
-          validationContext,
-          sameQuayRefContexts,
-          error ->
-            addValidationReportEntry(validationReport, validationContext, error)
-        )
-      );
+      .map(sameQuayRefContexts ->
+        validateSameQuayRefs(validationContext, sameQuayRefContexts)
+      )
+      .flatMap(Collection::stream)
+      .toList();
   }
 
   @Override
-  protected void validateCommonFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext
-  ) {
-    // JourneyPatterns only appear in the Line file.
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
   }
 
-  private void validateSameQuayRefs(
+  private List<ValidationIssue> validateSameQuayRefs(
     JAXBValidationContext validationContext,
-    List<SameQuayRefContext> contextForJourneyPattern,
-    Consumer<ValidationError> reportError
+    List<SameQuayRefContext> contextForJourneyPattern
   ) {
+    List<ValidationIssue> issues = new ArrayList<>();
+
     IntStream
       .range(1, contextForJourneyPattern.size())
       .forEach(i -> {
@@ -90,19 +82,21 @@ public class SameQuayRefValidator extends AntuNetexValidator {
         }
 
         if (currentContext.quayId().equals(previousContext.quayId())) {
-          reportError.accept(
-            new SameQuayRefError(
-              SameQuayRefError.RuleCode.SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN,
-              currentContext.journeyPatternId(),
+          issues.add(
+            new ValidationIssue(
+              RULE,
+              validationContext.dataLocation(currentContext.journeyPatternId()),
               validationContext.stopPointName(
                 previousContext.scheduledStopPointId()
               ),
               validationContext.stopPointName(
                 currentContext.scheduledStopPointId()
-              )
+              ),
+              currentContext.journeyPatternId()
             )
           );
         }
       });
+    return issues;
   }
 }

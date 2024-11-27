@@ -36,9 +36,9 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.util.StopWatch;
 import org.entur.netex.validation.exception.RetryableNetexValidationException;
 import org.entur.netex.validation.validator.DataLocation;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.springframework.stereotype.Component;
 
 /**
@@ -174,7 +174,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
           "System error while validating the file " +
           exchange.getIn().getHeader(NETEX_FILE_NAME),
           "SYSTEM_ERROR",
-          ValidationReportEntrySeverity.ERROR,
+          Severity.ERROR,
           new DataLocation(null, fileName, null, null)
         );
         validationReport.addValidationReportEntry(validationReportEntry);

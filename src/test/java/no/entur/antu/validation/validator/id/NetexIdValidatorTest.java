@@ -2,10 +2,7 @@ package no.entur.antu.validation.validator.id;
 
 import java.util.List;
 import java.util.Set;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.junit.jupiter.api.Assertions;
@@ -35,22 +32,11 @@ class NetexIdValidatorTest {
   private static final String TEST_ID_VALID =
     TEST_CODESPACE + ":" + TEST_NETEX_ELEMENT_NAME + ":ZZZ";
 
-  private ValidationReportEntryFactory validationReportEntryFactory;
   private NetexIdValidator netexIdValidator;
-  private ValidationReport validationReport;
 
   @BeforeEach
   void setUpTest() {
-    validationReportEntryFactory =
-      (code, validationReportEntryMessage, dataLocation) ->
-        new ValidationReportEntry(
-          validationReportEntryMessage,
-          code,
-          ValidationReportEntrySeverity.INFO
-        );
-    netexIdValidator = new NetexIdValidator(validationReportEntryFactory);
-    validationReport =
-      new ValidationReport(TEST_CODESPACE, TEST_VALIDATION_REPORT_ID);
+    netexIdValidator = new NetexIdValidator();
   }
 
   @Test
@@ -65,26 +51,21 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    XPathValidationContext validationContext = new XPathValidationContext(
-      null,
-      null,
-      TEST_CODESPACE,
-      null,
-      localIds,
-      List.of()
+    XPathValidationContext validationContext = createValidationContext(
+      localIds
     );
-    netexIdValidator.validate(validationReport, validationContext);
-    Assertions.assertFalse(
-      validationReport.getValidationReportEntries().isEmpty()
+    List<ValidationIssue> validationIssues = netexIdValidator.validate(
+      validationContext
     );
+    Assertions.assertFalse(validationIssues.isEmpty());
     Assertions.assertTrue(
-      validationReport
-        .getValidationReportEntries()
+      validationIssues
         .stream()
         .anyMatch(validationReportEntry ->
           validationReportEntry
-            .getName()
-            .equals(NetexIdValidator.RULE_CODE_NETEX_ID_2)
+            .rule()
+            .code()
+            .equals(NetexIdValidator.RULE_INVALID_ID_STRUCTURE.code())
         )
     );
   }
@@ -101,26 +82,21 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    XPathValidationContext validationContext = new XPathValidationContext(
-      null,
-      null,
-      TEST_CODESPACE,
-      null,
-      localIds,
-      List.of()
+    XPathValidationContext validationContext = createValidationContext(
+      localIds
     );
-    netexIdValidator.validate(validationReport, validationContext);
-    Assertions.assertFalse(
-      validationReport.getValidationReportEntries().isEmpty()
+    List<ValidationIssue> validationIssues = netexIdValidator.validate(
+      validationContext
     );
+    Assertions.assertFalse(validationIssues.isEmpty());
     Assertions.assertTrue(
-      validationReport
-        .getValidationReportEntries()
+      validationIssues
         .stream()
         .anyMatch(validationReportEntry ->
           validationReportEntry
-            .getName()
-            .equals(NetexIdValidator.RULE_CODE_NETEX_ID_3)
+            .rule()
+            .code()
+            .equals(NetexIdValidator.RULE_INVALID_ID_NAME.code())
         )
     );
   }
@@ -137,26 +113,21 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    XPathValidationContext validationContext = new XPathValidationContext(
-      null,
-      null,
-      TEST_CODESPACE,
-      null,
-      localIds,
-      List.of()
+    XPathValidationContext validationContext = createValidationContext(
+      localIds
     );
-    netexIdValidator.validate(validationReport, validationContext);
-    Assertions.assertFalse(
-      validationReport.getValidationReportEntries().isEmpty()
+    List<ValidationIssue> validationIssues = netexIdValidator.validate(
+      validationContext
     );
+    Assertions.assertFalse(validationIssues.isEmpty());
     Assertions.assertTrue(
-      validationReport
-        .getValidationReportEntries()
+      validationIssues
         .stream()
-        .anyMatch(validationReportEntry ->
-          validationReportEntry
-            .getName()
-            .equals(NetexIdValidator.RULE_CODE_NETEX_ID_4)
+        .anyMatch(validationIssue ->
+          validationIssue
+            .rule()
+            .code()
+            .equals(NetexIdValidator.RULE_UNAPPROVED_CODESPACE.code())
         )
     );
   }
@@ -165,7 +136,6 @@ class NetexIdValidatorTest {
   void testUnapprovedCodespaceWarning() {
     netexIdValidator =
       new NetexIdValidator(
-        validationReportEntryFactory,
         Set.of(TEST_ENTITY_TYPE_REPORTED_AS_WARNING_FOR_UNAPPROVED_CODESPACE)
       );
 
@@ -179,26 +149,21 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    XPathValidationContext validationContext = new XPathValidationContext(
-      null,
-      null,
-      TEST_CODESPACE,
-      null,
-      localIds,
-      List.of()
+    XPathValidationContext validationContext = createValidationContext(
+      localIds
     );
-    netexIdValidator.validate(validationReport, validationContext);
-    Assertions.assertFalse(
-      validationReport.getValidationReportEntries().isEmpty()
+    List<ValidationIssue> validationIssues = netexIdValidator.validate(
+      validationContext
     );
+    Assertions.assertFalse(validationIssues.isEmpty());
     Assertions.assertTrue(
-      validationReport
-        .getValidationReportEntries()
+      validationIssues
         .stream()
-        .anyMatch(validationReportEntry ->
-          validationReportEntry
-            .getName()
-            .equals(NetexIdValidator.RULE_CODE_NETEX_ID_4W)
+        .anyMatch(validationIssue ->
+          validationIssue
+            .rule()
+            .code()
+            .equals(NetexIdValidator.RULE_UNAPPROVED_CODESPACE_WARNING.code())
         )
     );
   }
@@ -215,17 +180,26 @@ class NetexIdValidatorTest {
       0
     );
     Set<IdVersion> localIds = Set.of(idVersion1);
-    XPathValidationContext validationContext = new XPathValidationContext(
+    XPathValidationContext validationContext = createValidationContext(
+      localIds
+    );
+    List<ValidationIssue> validationIssues = netexIdValidator.validate(
+      validationContext
+    );
+    Assertions.assertTrue(validationIssues.isEmpty());
+  }
+
+  private static XPathValidationContext createValidationContext(
+    Set<IdVersion> localIds
+  ) {
+    return new XPathValidationContext(
       null,
       null,
       TEST_CODESPACE,
       null,
       localIds,
-      List.of()
-    );
-    netexIdValidator.validate(validationReport, validationContext);
-    Assertions.assertTrue(
-      validationReport.getValidationReportEntries().isEmpty()
+      List.of(),
+      TEST_VALIDATION_REPORT_ID
     );
   }
 }

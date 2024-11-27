@@ -91,7 +91,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+          UnexpectedDistanceInServiceLinkValidator.RULE_DISTANCE_TO_END_ABOVE_WARNING.name()
         )
       )
     );
@@ -119,7 +119,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+          UnexpectedDistanceInServiceLinkValidator.RULE_DISTANCE_TO_START_ABOVE_WARNING.name()
         )
       )
     );
@@ -151,7 +151,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+          UnexpectedDistanceInServiceLinkValidator.RULE_DISTANCE_TO_END_ABOVE_LIMIT.name()
         )
       )
     );
@@ -179,7 +179,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName),
       is(
         Optional.of(
-          UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+          UnexpectedDistanceInServiceLinkValidator.RULE_DISTANCE_TO_START_ABOVE_LIMIT.name()
         )
       )
     );
@@ -211,7 +211,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+              UnexpectedDistanceInServiceLinkValidator.RULE_DISTANCE_TO_START_ABOVE_WARNING.name()
             )
         )
     );
@@ -223,7 +223,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT.name()
+              UnexpectedDistanceInServiceLinkValidator.RULE_DISTANCE_TO_END_ABOVE_WARNING.name()
             )
         )
     );
@@ -251,7 +251,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+              UnexpectedDistanceInServiceLinkValidator.RULE_DISTANCE_TO_START_ABOVE_LIMIT.name()
             )
         )
     );
@@ -263,7 +263,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
           entry
             .getName()
             .equals(
-              UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT.name()
+              UnexpectedDistanceInServiceLinkValidator.RULE_DISTANCE_TO_END_ABOVE_LIMIT.name()
             )
         )
     );

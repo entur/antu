@@ -3,9 +3,9 @@ package no.entur.antu.validation.validator.xpath;
 import java.util.Collection;
 import java.util.List;
 import no.entur.antu.validation.ValidationReportTransformer;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,12 +18,12 @@ class ValidationReportTransformerTest {
   @Test
   void testTruncate() {
     Collection<ValidationReportEntry> entries = List.of(
-      new ValidationReportEntry("", RULE_1, ValidationReportEntrySeverity.INFO),
-      new ValidationReportEntry("", RULE_2, ValidationReportEntrySeverity.INFO),
-      new ValidationReportEntry("", RULE_2, ValidationReportEntrySeverity.INFO),
-      new ValidationReportEntry("", RULE_3, ValidationReportEntrySeverity.INFO),
-      new ValidationReportEntry("", RULE_3, ValidationReportEntrySeverity.INFO),
-      new ValidationReportEntry("", RULE_3, ValidationReportEntrySeverity.INFO)
+      new ValidationReportEntry("", RULE_1, Severity.INFO),
+      new ValidationReportEntry("", RULE_2, Severity.INFO),
+      new ValidationReportEntry("", RULE_2, Severity.INFO),
+      new ValidationReportEntry("", RULE_3, Severity.INFO),
+      new ValidationReportEntry("", RULE_3, Severity.INFO),
+      new ValidationReportEntry("", RULE_3, Severity.INFO)
     );
     ValidationReport validationReport = new ValidationReport(
       "codespace",

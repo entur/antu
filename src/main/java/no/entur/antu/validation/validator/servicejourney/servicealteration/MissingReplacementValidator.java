@@ -1,13 +1,14 @@
 package no.entur.antu.validation.validator.servicejourney.servicealteration;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
 import no.entur.antu.validation.validator.servicejourney.servicealteration.support.ServiceAlterationUtils;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.entur.netex.validation.validator.jaxb.support.DatedServiceJourneyUtils;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
@@ -15,22 +16,17 @@ import org.rutebanken.netex.model.ServiceAlterationEnumeration;
  * Validates that the replacement for the service alteration exists.
  * This means that the service alteration of a service journey that got replaced must have a replacement.
  */
-public class MissingReplacementValidator extends AntuNetexValidator {
+public class MissingReplacementValidator implements JAXBValidator {
 
-  public MissingReplacementValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
-  @Override
-  protected RuleCode[] getRuleCodes() {
-    return InvalidServiceAlterationError.RuleCode.values();
-  }
+  static final ValidationRule RULE = new ValidationRule(
+    "MISSING_REPLACEMENT",
+    "Missing replacement for ServiceAlteration",
+    "No replacement found",
+    Severity.WARNING
+  );
 
   @Override
-  protected void validateLineFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
     List<String> datedServiceJourneyRefsToReplacedDatedServiceJourneys =
@@ -41,7 +37,7 @@ public class MissingReplacementValidator extends AntuNetexValidator {
         .toList();
 
     // Validate that those DSJs that got replaced have a replacement.
-    validationContext
+    return validationContext
       .datedServiceJourneysByServiceAlteration(
         ServiceAlterationEnumeration.REPLACED
       )
@@ -53,15 +49,14 @@ public class MissingReplacementValidator extends AntuNetexValidator {
           )
         )
       )
-      .forEach(dsj ->
-        addValidationReportEntry(
-          validationReport,
-          validationContext,
-          new MissingReplacementError(
-            dsj.getId(),
-            MissingReplacementError.RuleCode.MISSING_REPLACEMENT
-          )
-        )
-      );
+      .map(dsj ->
+        new ValidationIssue(RULE, validationContext.dataLocation(dsj.getId()))
+      )
+      .toList();
+  }
+
+  @Override
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
   }
 }

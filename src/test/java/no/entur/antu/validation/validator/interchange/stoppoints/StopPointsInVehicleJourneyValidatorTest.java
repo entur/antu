@@ -80,7 +80,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       assertThat(
         entry.getName(),
         is(
-          StopPointsInVehicleJourneyError.RuleCode.FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF.name()
+          StopPointsInVehicleJourneyValidator.RULE_FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF.name()
         )
       )
     );
@@ -142,7 +142,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       assertThat(
         entry.getName(),
         is(
-          StopPointsInVehicleJourneyError.RuleCode.TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF.name()
+          StopPointsInVehicleJourneyValidator.RULE_TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF.name()
         )
       )
     );

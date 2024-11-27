@@ -121,9 +121,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .map(ValidationReportEntry::getName)
-        .allMatch(
-          InvalidServiceAlterationError.RuleCode.INVALID_SERVICE_ALTERATION.name()::equals
-        )
+        .allMatch(InvalidServiceAlterationValidator.RULE.name()::equals)
     );
   }
 
@@ -160,9 +158,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .map(ValidationReportEntry::getName)
-        .allMatch(
-          InvalidServiceAlterationError.RuleCode.INVALID_SERVICE_ALTERATION.name()::equals
-        )
+        .allMatch(InvalidServiceAlterationValidator.RULE.name()::equals)
     );
   }
 
@@ -198,9 +194,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .map(ValidationReportEntry::getName)
-        .allMatch(
-          InvalidServiceAlterationError.RuleCode.INVALID_SERVICE_ALTERATION.name()::equals
-        )
+        .allMatch(InvalidServiceAlterationValidator.RULE.name()::equals)
     );
   }
 }

@@ -2,10 +2,7 @@ package no.entur.antu.validation.flex.validator;
 
 import java.util.List;
 import java.util.Set;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,85 +14,51 @@ class FileNameValidatorTest {
   private static final String TEST_VALIDATION_REPORT_ID =
     "TEST_VALIDATION_REPORT_ID";
   private FileNameValidator fileNameValidator;
-  private ValidationReport validationReport;
 
   @BeforeEach
   void setUpTest() {
-    ValidationReportEntryFactory validationReportEntryFactory = (
-        code,
-        validationReportEntryMessage,
-        dataLocation
-      ) ->
-      new ValidationReportEntry(
-        validationReportEntryMessage,
-        code,
-        ValidationReportEntrySeverity.INFO
-      );
-    fileNameValidator = new FileNameValidator(validationReportEntryFactory);
-    validationReport =
-      new ValidationReport(TEST_CODESPACE, TEST_VALIDATION_REPORT_ID);
+    fileNameValidator = new FileNameValidator();
   }
 
   @Test
   void nonXmlFileShouldBeIgnored() {
     String fileName = "_TST_flexible_shared_data.txt";
-    XPathValidationContext validationContext = new XPathValidationContext(
-      null,
-      null,
-      TEST_CODESPACE,
-      fileName,
-      Set.of(),
-      List.of()
+    XPathValidationContext validationContext = createValidationContext(
+      fileName
     );
-    fileNameValidator.validate(validationReport, validationContext);
-
-    Assertions.assertTrue(
-      validationReport.getValidationReportEntries().isEmpty()
+    List<ValidationIssue> validationIssues = fileNameValidator.validate(
+      validationContext
     );
+    Assertions.assertTrue(validationIssues.isEmpty());
   }
 
   @Test
   void sharedFileShouldBeValidated() {
     String fileName = "_TST_flexible_shared_data.xml";
-    XPathValidationContext validationContext = new XPathValidationContext(
-      null,
-      null,
-      TEST_CODESPACE,
-      fileName,
-      Set.of(),
-      List.of()
+    XPathValidationContext validationContext = createValidationContext(
+      fileName
     );
-    fileNameValidator.validate(validationReport, validationContext);
-
-    Assertions.assertTrue(
-      validationReport.getValidationReportEntries().isEmpty()
+    List<ValidationIssue> validationIssues = fileNameValidator.validate(
+      validationContext
     );
+    Assertions.assertTrue(validationIssues.isEmpty());
   }
 
   @Test
   void sharedFileShouldBeInvalidated() {
     String fileName = "_TST.xml";
-    XPathValidationContext validationContext = new XPathValidationContext(
-      null,
-      null,
-      TEST_CODESPACE,
-      fileName,
-      Set.of(),
-      List.of()
+    XPathValidationContext validationContext = createValidationContext(
+      fileName
     );
-    fileNameValidator.validate(validationReport, validationContext);
-
-    Assertions.assertFalse(
-      validationReport.getValidationReportEntries().isEmpty()
+    List<ValidationIssue> validationIssues = fileNameValidator.validate(
+      validationContext
     );
+    Assertions.assertFalse(validationIssues.isEmpty());
     Assertions.assertTrue(
-      validationReport
-        .getValidationReportEntries()
+      validationIssues
         .stream()
-        .anyMatch(validationReportEntry ->
-          validationReportEntry
-            .getName()
-            .equals(FileNameValidator.RULE_CODE_NETEX_FILE_NAME_1)
+        .anyMatch(validationIssue ->
+          validationIssue.rule().code().equals(FileNameValidator.RULE.code())
         )
     );
   }
@@ -103,46 +66,45 @@ class FileNameValidatorTest {
   @Test
   void lineFileShouldBeValidated() {
     String fileName = "TST_34234234.xml";
-    XPathValidationContext validationContext = new XPathValidationContext(
-      null,
-      null,
-      TEST_CODESPACE,
-      fileName,
-      Set.of(),
-      List.of()
+    XPathValidationContext validationContext = createValidationContext(
+      fileName
     );
-    fileNameValidator.validate(validationReport, validationContext);
-
-    Assertions.assertTrue(
-      validationReport.getValidationReportEntries().isEmpty()
+    List<ValidationIssue> validationIssues = fileNameValidator.validate(
+      validationContext
     );
+    Assertions.assertTrue(validationIssues.isEmpty());
   }
 
   @Test
   void lineFileShouldBeInvalidated() {
     String fileName = "TST.xml";
-    XPathValidationContext validationContext = new XPathValidationContext(
+    XPathValidationContext validationContext = createValidationContext(
+      fileName
+    );
+    List<ValidationIssue> validationIssues = fileNameValidator.validate(
+      validationContext
+    );
+    Assertions.assertFalse(validationIssues.isEmpty());
+    Assertions.assertTrue(
+      validationIssues
+        .stream()
+        .anyMatch(validationIssue ->
+          validationIssue.rule().code().equals(FileNameValidator.RULE.code())
+        )
+    );
+  }
+
+  private static XPathValidationContext createValidationContext(
+    String fileName
+  ) {
+    return new XPathValidationContext(
       null,
       null,
       TEST_CODESPACE,
       fileName,
       Set.of(),
-      List.of()
-    );
-    fileNameValidator.validate(validationReport, validationContext);
-
-    Assertions.assertFalse(
-      validationReport.getValidationReportEntries().isEmpty()
-    );
-    Assertions.assertTrue(
-      validationReport
-        .getValidationReportEntries()
-        .stream()
-        .anyMatch(validationReportEntry ->
-          validationReportEntry
-            .getName()
-            .equals(FileNameValidator.RULE_CODE_NETEX_FILE_NAME_1)
-        )
+      List.of(),
+      TEST_VALIDATION_REPORT_ID
     );
   }
 }

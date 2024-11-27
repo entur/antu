@@ -78,43 +78,23 @@ public class ValidatorConfig {
   }
 
   @Bean
-  public NetexIdValidator netexIdValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new NetexIdValidator(validationReportEntryFactory);
+  public NetexIdValidator netexIdValidator() {
+    return new NetexIdValidator();
   }
 
   @Bean
-  public VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new VersionOnLocalNetexIdValidator(validationReportEntryFactory);
+  public VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator() {
+    return new VersionOnLocalNetexIdValidator();
   }
 
   @Bean
-  public VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new VersionOnRefToLocalNetexIdValidator(
-      validationReportEntryFactory
-    );
+  public VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator() {
+    return new VersionOnRefToLocalNetexIdValidator();
   }
 
   @Bean
-  public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new ReferenceToValidEntityTypeValidator(
-      validationReportEntryFactory
-    );
+  public ReferenceToValidEntityTypeValidator refToValidEntityTypeValidator() {
+    return new ReferenceToValidEntityTypeValidator();
   }
 
   @Bean
@@ -127,10 +107,7 @@ public class ValidatorConfig {
   @Bean
   public NetexReferenceValidator netexReferenceValidator(
     NetexIdRepository netexIdRepository,
-    ReferenceToNsrValidator referenceToNsrValidator,
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
+    ReferenceToNsrValidator referenceToNsrValidator
   ) {
     List<ExternalReferenceValidator> externalReferenceValidators =
       new ArrayList<>();
@@ -141,22 +118,15 @@ public class ValidatorConfig {
     externalReferenceValidators.add(referenceToNsrValidator);
     return new NetexReferenceValidator(
       netexIdRepository,
-      externalReferenceValidators,
-      validationReportEntryFactory
+      externalReferenceValidators
     );
   }
 
   @Bean
   public NetexIdUniquenessValidator netexIdUniquenessValidator(
-    NetexIdRepository netexIdRepository,
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
+    NetexIdRepository netexIdRepository
   ) {
-    return new NetexIdUniquenessValidator(
-      netexIdRepository,
-      validationReportEntryFactory
-    );
+    return new NetexIdUniquenessValidator(netexIdRepository);
   }
 
   @Bean
