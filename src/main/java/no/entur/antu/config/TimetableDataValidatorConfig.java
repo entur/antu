@@ -18,15 +18,19 @@ package no.entur.antu.config;
 
 import java.util.List;
 import java.util.Set;
+import no.entur.antu.netexdata.collectors.DatedServiceJourneysCollector;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
+import no.entur.antu.netexdata.collectors.ServiceJourneyDayTypesCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
+import no.entur.antu.netexdata.collectors.activedatecollector.ActiveDatesCollector;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterchangeDistanceValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
 import no.entur.antu.validation.validator.interchange.stoppoints.StopPointsInVehicleJourneyValidator;
+import no.entur.antu.validation.validator.interchange.waittime.UnexpectedWaitTimeAndActiveDatesValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.identicalstoppoints.IdenticalStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRefValidator;
@@ -42,7 +46,10 @@ import no.entur.antu.validation.validator.servicejourney.transportmode.Mismatche
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import org.entur.netex.validation.validator.*;
+import org.entur.netex.validation.validator.DatasetValidator;
+import org.entur.netex.validation.validator.NetexValidatorsRunner;
+import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.NetexReferenceValidator;
 import org.entur.netex.validation.validator.id.ReferenceToValidEntityTypeValidator;
@@ -107,6 +114,19 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public UnexpectedWaitTimeAndActiveDatesValidator unexpectedWaitTimeValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    NetexDataRepository netexDataRepository
+  ) {
+    return new UnexpectedWaitTimeAndActiveDatesValidator(
+      validationReportEntryFactory,
+      netexDataRepository
+    );
+  }
+
+  @Bean
   public NetexValidatorsRunner timetableDataValidatorsRunner(
     @Qualifier(
       "validationReportEntryFactory"
@@ -125,10 +145,14 @@ public class TimetableDataValidatorConfig {
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
+    UnexpectedWaitTimeAndActiveDatesValidator unexpectedWaitTimeAndActiveDatesValidator,
     LineInfoCollector lineInfoCollector,
     ServiceJourneyStopsCollector serviceJourneyStopsCollector,
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
-    CommonDataRepositoryLoader commonDataRepository,
+    ActiveDatesCollector activeDatesCollector,
+    ServiceJourneyDayTypesCollector serviceJourneyDayTypesCollector,
+    DatedServiceJourneysCollector datedServiceJourneysCollector,
+    CommonDataRepositoryLoader commonDataRepositoryLoader,
     NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
@@ -165,13 +189,17 @@ public class TimetableDataValidatorConfig {
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
       duplicateLineNameValidator,
-      stopPointsInVehicleJourneyValidator
+      stopPointsInVehicleJourneyValidator,
+      unexpectedWaitTimeAndActiveDatesValidator
     );
 
     List<NetexDataCollector> commonDataCollectors = List.of(
       lineInfoCollector,
       serviceJourneyInterchangeInfoCollector,
-      serviceJourneyStopsCollector
+      serviceJourneyStopsCollector,
+      activeDatesCollector,
+      serviceJourneyDayTypesCollector,
+      datedServiceJourneysCollector
     );
 
     return NetexValidatorsRunner
@@ -182,7 +210,7 @@ public class TimetableDataValidatorConfig {
       .withJaxbValidators(jaxbValidators)
       .withDatasetValidators(netexTimetableDatasetValidators)
       .withNetexDataCollectors(commonDataCollectors)
-      .withCommonDataRepository(commonDataRepository)
+      .withCommonDataRepository(commonDataRepositoryLoader)
       .withNetexDataRepository(netexDataRepository)
       .withStopPlaceRepository(stopPlaceRepository)
       .withValidationReportEntryFactory(validationReportEntryFactory)

@@ -1,6 +1,6 @@
 package no.entur.antu.validation.validator.xpath.rules;
 
-import static org.entur.netex.validation.xml.NetexXMLParser.*;
+import static org.entur.netex.validation.xml.NetexXMLParser.NETEX_NAMESPACE;
 
 import java.util.ArrayList;
 import java.util.List;

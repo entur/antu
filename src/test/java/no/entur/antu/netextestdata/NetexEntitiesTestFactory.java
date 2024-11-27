@@ -8,12 +8,14 @@ import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
@@ -24,13 +26,10 @@ import net.opengis.gml._3.ObjectFactory;
 import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
+import org.entur.netex.validation.test.jaxb.support.JAXBUtils;
 import org.rutebanken.netex.model.*;
 
 public class NetexEntitiesTestFactory {
-
-  private static final DayType EVERYDAY = new DayType()
-    .withId("EVERYDAY")
-    .withName(new MultilingualString().withValue("everyday"));
 
   private CreateGenericLine<? extends Line_VersionStructure> line;
 
@@ -50,6 +49,9 @@ public class NetexEntitiesTestFactory {
   private final List<CreatePassengerStopAssignment> passengerStopAssignments =
     new ArrayList<>();
 
+  private CreateCompositeFrame compositeFrame;
+  private List<CreateServiceCalendarFrame> serviceCalendarFrames;
+
   public NetexEntitiesIndex create() {
     NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
 
@@ -65,6 +67,18 @@ public class NetexEntitiesTestFactory {
 
     if (route != null) {
       netexEntitiesIndex.getRouteIndex().put(route.ref(), route.create());
+    }
+
+    if (compositeFrame != null) {
+      netexEntitiesIndex.getCompositeFrames().add(compositeFrame.create());
+    }
+
+    if (serviceCalendarFrames != null) {
+      serviceCalendarFrames.forEach(serviceCalendarFrame ->
+        netexEntitiesIndex
+          .getServiceCalendarFrames()
+          .add(serviceCalendarFrame.create())
+      );
     }
 
     fillIndexes(netexEntitiesIndex);
@@ -179,8 +193,7 @@ public class NetexEntitiesTestFactory {
    * @return CreateLine
    */
   public CreateLine createLine() {
-    line = new CreateLine(1);
-    return (CreateLine) line;
+    return createLine(1);
   }
 
   /**
@@ -202,8 +215,7 @@ public class NetexEntitiesTestFactory {
    * @return CreateFlexibleLine
    */
   public CreateFlexibleLine createFlexibleLine() {
-    line = new CreateFlexibleLine(1);
-    return (CreateFlexibleLine) line;
+    return createFlexibleLine(1);
   }
 
   /**
@@ -229,12 +241,7 @@ public class NetexEntitiesTestFactory {
    * @return CreateRoute
    */
   public CreateRoute createRoute() {
-    if (line == null) {
-      line = new CreateLine(1);
-    }
-
-    route = new CreateRoute(1, line);
-    return route;
+    return createRoute(1);
   }
 
   /**
@@ -255,9 +262,7 @@ public class NetexEntitiesTestFactory {
    * @return CreateJourneyPattern
    */
   public CreateJourneyPattern createJourneyPattern() {
-    CreateJourneyPattern createJourneyPattern = new CreateJourneyPattern(1);
-    journeyPatterns.add(createJourneyPattern);
-    return createJourneyPattern;
+    return createJourneyPattern(1);
   }
 
   /**
@@ -295,17 +300,29 @@ public class NetexEntitiesTestFactory {
   public CreateServiceJourney createServiceJourney(
     CreateJourneyPattern journeyPattern
   ) {
+    return createServiceJourney(1, journeyPattern);
+  }
+
+  /**
+   * Adds numberOfServiceJourneys new service journeys with the given journey pattern.
+   * The line will be created if it does not exist, with id 1
+   * The service journeys will have ids from 1 to numberOfServiceJourneys
+   *
+   * @param createJourneyPattern the journey pattern ref for the service journeys
+   * @param numberOfServiceJourneys the number of service journeys to create
+   * @return List of CreateServiceJourney created
+   */
+  public List<CreateServiceJourney> createServiceJourneys(
+    CreateJourneyPattern createJourneyPattern,
+    int numberOfServiceJourneys
+  ) {
     if (line == null) {
       line = new CreateLine(1);
     }
-
-    CreateServiceJourney createServiceJourney = new CreateServiceJourney(
-      1,
-      line,
-      journeyPattern
-    );
-    serviceJourneys.add(createServiceJourney);
-    return createServiceJourney;
+    return IntStream
+      .rangeClosed(1, numberOfServiceJourneys)
+      .mapToObj(index -> createServiceJourney(index, createJourneyPattern))
+      .toList();
   }
 
   /**
@@ -336,12 +353,7 @@ public class NetexEntitiesTestFactory {
    * @return CreateDeadRun
    */
   public CreateDeadRun createDeadRun(CreateJourneyPattern journeyPattern) {
-    if (line == null) {
-      line = new CreateLine(1);
-    }
-    CreateDeadRun deadRun = new CreateDeadRun(1, line, journeyPattern);
-    deadRuns.add(deadRun);
-    return deadRun;
+    return createDeadRun(1, journeyPattern);
   }
 
   /**
@@ -374,36 +386,7 @@ public class NetexEntitiesTestFactory {
     CreateServiceJourney serviceJourneyRef,
     CreateOperatingDay operatingDayRef
   ) {
-    CreateDatedServiceJourney createDatedServiceJourney =
-      new CreateDatedServiceJourney(1, serviceJourneyRef, operatingDayRef);
-    datedServiceJourneys.add(createDatedServiceJourney);
-    return createDatedServiceJourney;
-  }
-
-  /**
-   * Adds numberOfServiceJourneys new service journeys with the given journey pattern.
-   * The line will be created if it does not exist, with id 1
-   * The service journeys will have ids from 1 to numberOfServiceJourneys
-   *
-   * @param createJourneyPattern the journey pattern ref for the service journeys
-   * @param numberOfServiceJourneys the number of service journeys to create
-   * @return List of CreateServiceJourney created
-   */
-  public List<CreateServiceJourney> createServiceJourneys(
-    CreateJourneyPattern createJourneyPattern,
-    int numberOfServiceJourneys
-  ) {
-    if (line == null) {
-      line = new CreateLine(1);
-    }
-    List<CreateServiceJourney> createServiceJourneys = IntStream
-      .rangeClosed(1, numberOfServiceJourneys)
-      .mapToObj(index ->
-        new CreateServiceJourney(index, line, createJourneyPattern)
-      )
-      .toList();
-    serviceJourneys.addAll(createServiceJourneys);
-    return createServiceJourneys;
+    return createDatedServiceJourney(1, serviceJourneyRef, operatingDayRef);
   }
 
   /**
@@ -427,10 +410,7 @@ public class NetexEntitiesTestFactory {
    * @return CreateServiceJourneyInterchange
    */
   public CreateServiceJourneyInterchange createServiceJourneyInterchange() {
-    CreateServiceJourneyInterchange createServiceJourneyInterchange =
-      new CreateServiceJourneyInterchange(1);
-    interchanges.add(createServiceJourneyInterchange);
-    return createServiceJourneyInterchange;
+    return createServiceJourneyInterchange(1);
   }
 
   /**
@@ -460,11 +440,11 @@ public class NetexEntitiesTestFactory {
     ScheduledStopPointRefStructure fromScheduledStopPointRef,
     ScheduledStopPointRefStructure toScheduledStopPointRef
   ) {
-    CreateServiceLink createServiceLink = new CreateServiceLink(1)
-      .withFromScheduledStopPointRef(fromScheduledStopPointRef)
-      .withToScheduledStopPointRef(toScheduledStopPointRef);
-    serviceLinks.add(createServiceLink);
-    return createServiceLink;
+    return createServiceLink(
+      1,
+      fromScheduledStopPointRef,
+      toScheduledStopPointRef
+    );
   }
 
   /**
@@ -486,10 +466,7 @@ public class NetexEntitiesTestFactory {
    * @return CreateFlexibleStopPlace
    */
   public CreateFlexibleStopPlace createFlexibleStopPlace() {
-    CreateFlexibleStopPlace createFlexibleStopPlace =
-      new CreateFlexibleStopPlace(1);
-    flexibleStopPlaces.add(createFlexibleStopPlace);
-    return createFlexibleStopPlace;
+    return createFlexibleStopPlace(1);
   }
 
   /**
@@ -511,29 +488,56 @@ public class NetexEntitiesTestFactory {
    * @return CreatePassengerStopAssignment
    */
   public CreatePassengerStopAssignment createPassengerStopAssignment() {
-    CreatePassengerStopAssignment createPassengerStopAssignment =
-      new CreatePassengerStopAssignment(1);
-    passengerStopAssignments.add(createPassengerStopAssignment);
-    return createPassengerStopAssignment;
+    return createPassengerStopAssignment(1);
   }
 
   /**
-   * Adds a new day type with the given id
+   * Create a new CompositeFrame with the given id
    *
-   * @param id the id of the day type
-   * @return CreateDayType
+   * @param id the id of the CompositeFrame
+   * @return CreateCompositeFrame
    */
-  public CreateOperatingDay createOperatingDay(int id, LocalDate date) {
-    return new CreateOperatingDay(id, date);
+  public CreateCompositeFrame createCompositeFrame(int id) {
+    compositeFrame = new CreateCompositeFrame(id);
+    return compositeFrame;
   }
 
   /**
-   * Adds a new day type with id 1
+   * Create a new CompositeFrame with id 1
    *
-   * @return CreateDayType
+   * @return CreateCompositeFrame
    */
-  public CreateOperatingDay createOperatingDay(LocalDate date) {
-    return new CreateOperatingDay(1, date);
+  public CreateCompositeFrame createCompositeFrame() {
+    return createCompositeFrame(1);
+  }
+
+  /**
+   * Adds new service calendar frame with the given id
+   * The existing service calendar frame will be overwritten.
+   * The service calendar frame will be added outside the composite frame.
+   *
+   * @param id the id of the service calendar frame
+   * @return CreateServiceCalendarFrame
+   */
+  public CreateServiceCalendarFrame createServiceCalendarFrame(int id) {
+    if (serviceCalendarFrames == null) {
+      serviceCalendarFrames = new ArrayList<>();
+    }
+    CreateServiceCalendarFrame serviceCalendarFrame =
+      new CreateServiceCalendarFrame(id);
+    serviceCalendarFrames.add(serviceCalendarFrame);
+    return serviceCalendarFrame;
+  }
+
+  /**
+   * Adds new service calendar frame with id 1
+   * The existing service calendar frame will be overwritten.
+   * The service calendar frame will be added outside the composite frame.
+   *
+   * @return CreateServiceCalendarFrame
+   */
+  public CreateServiceCalendarFrame createServiceCalendarFrame() {
+    return createServiceCalendarFrame(1);
   }
 
   /**
@@ -633,6 +637,570 @@ public class NetexEntitiesTestFactory {
     }
 
     public abstract T create();
+  }
+
+  public static class CreateCompositeFrame
+    extends CreateEntity<CompositeFrame> {
+
+    private CreateValidBetween validBetween;
+    private List<CreateServiceCalendarFrame> serviceCalendarFrames;
+
+    public CreateCompositeFrame(int id) {
+      super(id);
+    }
+
+    /**
+     * Adds new service calendar frame with the given id
+     * The existing service calendar frame will be overwritten.
+     * The service calendar frame will be added in the composite frame.
+     *
+     * @param id the id of the service calendar frame
+     * @return CreateServiceCalendarFrame
+     */
+    public CreateServiceCalendarFrame createServiceCalendarFrame(int id) {
+      if (serviceCalendarFrames == null) {
+        serviceCalendarFrames = new ArrayList<>();
+      }
+      CreateServiceCalendarFrame serviceCalendarFrame =
+        new CreateServiceCalendarFrame(id);
+      serviceCalendarFrames.add(serviceCalendarFrame);
+      return serviceCalendarFrame;
+    }
+
+    /**
+     * Adds new service calendar frame with id 1
+     * The existing service calendar frame will be overwritten.
+     * The service calendar frame will be added in the composite frame.
+     *
+     * @return CreateServiceCalendarFrame
+     */
+    public CreateServiceCalendarFrame createServiceCalendarFrame() {
+      return createServiceCalendarFrame(1);
+    }
+
+    public CompositeFrame create() {
+      CompositeFrame compositeFrame = new CompositeFrame().withId(ref());
+
+      if (validBetween != null) {
+        compositeFrame.withValidBetween(validBetween.create());
+      }
+
+      if (serviceCalendarFrames != null) {
+        compositeFrame.setFrames(
+          new Frames_RelStructure()
+            .withCommonFrame(
+              serviceCalendarFrames
+                .stream()
+                .map(CreateServiceCalendarFrame::create)
+                .map(JAXBUtils::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            )
+        );
+      }
+      return compositeFrame;
+    }
+  }
+
+  public static class CreateValidBetween extends CreateEntity<ValidBetween> {
+
+    private LocalDateTime fromDateTime;
+    private LocalDateTime localDateTime;
+
+    public CreateValidBetween(int id) {
+      super(id);
+    }
+
+    public CreateValidBetween withFromDate(LocalDateTime fromDateTime) {
+      this.fromDateTime = fromDateTime;
+      return this;
+    }
+
+    public CreateValidBetween withToDate(LocalDateTime localDateTime) {
+      this.localDateTime = localDateTime;
+      return this;
+    }
+
+    @Override
+    public ValidBetween create() {
+      return new ValidBetween()
+        .withFromDate(fromDateTime)
+        .withToDate(localDateTime);
+    }
+  }
+
+  protected abstract static class CreateGenericCalender<
+    T extends EntityStructure
+  >
+    extends CreateEntity<T> {
+
+    protected CreateValidBetween validBetween;
+    protected List<CreateDayTypeAssignment> dayTypeAssignments;
+    protected List<CreateDayType> dayTypes;
+    protected List<CreateOperatingDay> operatingDays;
+    protected List<CreateOperatingPeriod> operatingPeriods;
+
+    public CreateGenericCalender(int id) {
+      super(id);
+    }
+
+    public void withValidBetween(CreateValidBetween validBetween) {
+      this.validBetween = validBetween;
+    }
+
+    public CreateValidBetween createValidBetween(
+      LocalDateTime fromDateTime,
+      LocalDateTime toDateTime
+    ) {
+      validBetween =
+        new CreateValidBetween(1)
+          .withFromDate(fromDateTime)
+          .withToDate(toDateTime);
+      return validBetween;
+    }
+
+    /**
+     * Adds a new operating day with the given id
+     *
+     * @param id the id of the operating day
+     * @return CreateOperatingDay
+     */
+    public CreateOperatingDay createOperatingDay(int id, LocalDate date) {
+      if (operatingDays == null) {
+        operatingDays = new ArrayList<>();
+      }
+      CreateOperatingDay operatingDay = new CreateOperatingDay(id, date);
+      operatingDays.add(operatingDay);
+      return operatingDay;
+    }
+
+    /**
+     * Adds a new operating day with id 1
+     *
+     * @return CreateOperatingDay
+     */
+    public CreateOperatingDay createOperatingDay(LocalDate date) {
+      return createOperatingDay(1, date);
+    }
+
+    /**
+     * Adds numberOfOperatingDays new operating days starting from the given date, adding one day for each operating day.
+     *
+     * @param numberOfOperatingDays the number of operating days to create
+     * @param date the start date for the first operating day
+     * @return List of CreateOperatingDay
+     */
+    public List<CreateOperatingDay> createOperatingDays(
+      int numberOfOperatingDays,
+      LocalDate date
+    ) {
+      return IntStream
+        .rangeClosed(1, numberOfOperatingDays)
+        .mapToObj(i -> createOperatingDay(i, date.plusDays(i - 1)))
+        .toList();
+    }
+
+    /**
+     * Adds a new operating period with the given id
+     *
+     * @param id the id of the operating period
+     * @return CreateOperatingPeriod
+     */
+    public CreateOperatingPeriod createOperatingPeriod(
+      int id,
+      LocalDate fromDate,
+      LocalDate toDate
+    ) {
+      if (operatingPeriods == null) {
+        operatingPeriods = new ArrayList<>();
+      }
+      CreateOperatingPeriod operatingPeriod = new CreateOperatingPeriod(
+        id,
+        fromDate,
+        toDate
+      );
+      operatingPeriods.add(operatingPeriod);
+      return operatingPeriod;
+    }
+
+    /**
+     * Adds a new operating period with id 1
+     *
+     * @return CreateOperatingPeriod
+     */
+    public CreateOperatingPeriod createOperatingPeriod(
+      LocalDate fromDate,
+      LocalDate toDate
+    ) {
+      return createOperatingPeriod(1, fromDate, toDate);
+    }
+
+    /**
+     * Adds numberOfOperatingPeriods new operating periods starting from the given dates, adding one day for both from and to dates.
+     *
+     * @param numberOfOperatingPeriods the number of operating periods to create
+     * @param fromDate the start date for the first operating period
+     * @param toDate the end date for the first operating period
+     * @return List of CreateOperatingPeriod
+     */
+    public List<CreateOperatingPeriod> createOperatingPeriods(
+      int numberOfOperatingPeriods,
+      LocalDate fromDate,
+      LocalDate toDate
+    ) {
+      return IntStream
+        .rangeClosed(1, numberOfOperatingPeriods)
+        .mapToObj(i ->
+          createOperatingPeriod(
+            i,
+            fromDate.plusDays(i - 1),
+            toDate.plusDays(i - 1)
+          )
+        )
+        .toList();
+    }
+
+    public List<CreateOperatingPeriod> createOperatingPeriods(
+      int numberOfOperatingPeriods,
+      LocalDate fromDate,
+      LocalDate toDate,
+      int numberOfDaysBetweenPeriods
+    ) {
+      return IntStream
+        .rangeClosed(1, numberOfOperatingPeriods)
+        .mapToObj(i ->
+          createOperatingPeriod(
+            i,
+            fromDate.plusDays((long) (i - 1) * numberOfDaysBetweenPeriods),
+            toDate.plusDays((long) (i - 1) * numberOfDaysBetweenPeriods)
+          )
+        )
+        .toList();
+    }
+
+    /**
+     * Adds a new day type with the given id
+     *
+     * @param id the id of the day type
+     * @return CreateDayType
+     */
+    public CreateDayType createDayType(int id) {
+      if (dayTypes == null) {
+        dayTypes = new ArrayList<>();
+      }
+      CreateDayType dayType = new CreateDayType(id);
+      dayTypes.add(dayType);
+      return dayType;
+    }
+
+    /**
+     * Adds a new day type with id 1
+     *
+     * @return CreateDayType
+     */
+    public CreateDayType createDayType() {
+      return createDayType(1);
+    }
+
+    /**
+     * Adds numberOfDayTypes new day types with the given ids
+     * The day types will be created with the given dayOfWeeks in circular fashion.
+     * If no dayOfWeeks are provided, the day types will be created without daysOfWeek.
+     *
+     * @param numberOfDayTypes the number of day types to create
+     * @param dayOfWeeks the day of weeks to assign to the day types
+     * @return List of CreateDayType
+     */
+    public List<CreateDayType> createDayTypes(
+      int numberOfDayTypes,
+      DayOfWeekEnumeration... dayOfWeeks
+    ) {
+      List<CreateDayType> createDayTypes = IntStream
+        .rangeClosed(1, numberOfDayTypes)
+        .mapToObj(this::createDayType)
+        .toList();
+
+      if (dayOfWeeks.length > 0) {
+        return createDayTypes
+          .stream()
+          .map(createDayType ->
+            createDayType.withDaysOfWeek(
+              dayOfWeeks[(createDayType.id - 1) % dayOfWeeks.length]
+            )
+          )
+          .toList();
+      }
+
+      return createDayTypes;
+    }
+
+    /**
+     * Adds a new day type assignment with the given id
+     *
+     * @param id the id of the day type assignment
+     * @return CreateDayTypeAssignment
+     */
+    public CreateDayTypeAssignment createDayTypeAssignment(
+      int id,
+      CreateDayType dayTypeRef
+    ) {
+      if (dayTypeAssignments == null) {
+        dayTypeAssignments = new ArrayList<>();
+      }
+      CreateDayTypeAssignment dayTypeAssignment = new CreateDayTypeAssignment(
+        id,
+        dayTypeRef
+      );
+      dayTypeAssignments.add(dayTypeAssignment);
+      return dayTypeAssignment;
+    }
+
+    /**
+     * Adds a new day type assignment with id 1
+     *
+     * @return CreateDayTypeAssignment
+     */
+    public CreateDayTypeAssignment createDayTypeAssignment(
+      CreateDayType dayTypeRef
+    ) {
+      return createDayTypeAssignment(1, dayTypeRef);
+    }
+
+    /**
+     * Creates the dayTypes.size() number of day type assignments with dates starting from startDate, adding one day for each day type assignment.
+     *
+     * @param dayTypes the day types to create day type assignments for
+     * @param startDate the start date for the first day type assignment
+     * @return List of CreateDayTypeAssignment
+     */
+    public List<CreateDayTypeAssignment> createDayTypeAssignmentsWithDates(
+      List<CreateDayType> dayTypes,
+      LocalDate startDate
+    ) {
+      return IntStream
+        .range(0, dayTypes.size())
+        .mapToObj(i ->
+          createDayTypeAssignment(i + 1, dayTypes.get(i))
+            .withDate(startDate.plusDays(i))
+        )
+        .toList();
+    }
+
+    /**
+     * Creates the dayTypes.size() number of day type assignments with operating days, by traversing the operatingDays list in circular fashion.
+     *
+     * @param dayTypes the day types to create day type assignments for
+     * @param operatingDays the operating days to assign to the day type assignments
+     * @return List of CreateDayTypeAssignment
+     */
+    public List<CreateDayTypeAssignment> createDayTypeAssignmentsWithOperatingDays(
+      List<CreateDayType> dayTypes,
+      List<CreateOperatingDay> operatingDays
+    ) {
+      List<CreateDayTypeAssignment> createDayTypeAssignments = IntStream
+        .range(0, dayTypes.size())
+        .mapToObj(i -> createDayTypeAssignment(i + 1, dayTypes.get(i)))
+        .toList();
+
+      if (operatingDays != null && !operatingDays.isEmpty()) {
+        return IntStream
+          .range(0, createDayTypeAssignments.size())
+          .mapToObj(i ->
+            createDayTypeAssignments
+              .get(i)
+              .withOperatingDayRef(operatingDays.get(i % operatingDays.size()))
+          )
+          .toList();
+      }
+
+      return createDayTypeAssignments;
+    }
+
+    /**
+     * Creates the dayTypes.size() number of day type assignments with operating periods, by traversing the operatingPeriods list in circular fashion.
+     *
+     * @param dayTypes the day types to create day type assignments for
+     * @param operatingPeriods the operating periods to assign to the day type assignments
+     * @return List of CreateDayTypeAssignment
+     */
+    public List<CreateDayTypeAssignment> createDayTypeAssignmentsWithOperatingPeriods(
+      List<CreateDayType> dayTypes,
+      List<CreateOperatingPeriod> operatingPeriods
+    ) {
+      List<CreateDayTypeAssignment> dayTypeAssignments = IntStream
+        .range(0, dayTypes.size())
+        .mapToObj(i -> createDayTypeAssignment(i + 1, dayTypes.get(i)))
+        .toList();
+
+      if (operatingPeriods != null && !operatingPeriods.isEmpty()) {
+        return IntStream
+          .range(0, dayTypeAssignments.size())
+          .mapToObj(i ->
+            dayTypeAssignments
+              .get(i)
+              .withOperatingPeriodRef(
+                operatingPeriods.get(i % operatingPeriods.size())
+              )
+          )
+          .toList();
+      }
+
+      return dayTypeAssignments;
+    }
+  }
+
+  public static class CreateServiceCalendarFrame
+    extends CreateGenericCalender<ServiceCalendarFrame> {
+
+    private CreateServiceCalendar serviceCalendar;
+
+    public CreateServiceCalendarFrame(int id) {
+      super(id);
+    }
+
+    public CreateServiceCalendar createServiceCalendar(int id) {
+      serviceCalendar = new CreateServiceCalendar(id);
+      return serviceCalendar;
+    }
+
+    public CreateServiceCalendar createServiceCalendar() {
+      return createServiceCalendar(1);
+    }
+
+    @Override
+    public ServiceCalendarFrame create() {
+      ServiceCalendarFrame serviceCalendarFrame = new ServiceCalendarFrame()
+        .withId(ref());
+
+      if (validBetween != null) {
+        serviceCalendarFrame.withValidBetween(validBetween.create());
+      }
+
+      if (serviceCalendar != null) {
+        serviceCalendarFrame.withServiceCalendar(serviceCalendar.create());
+      }
+
+      if (dayTypeAssignments != null) {
+        DayTypeAssignmentsInFrame_RelStructure dayTypeAssignmentsInFrameRelStructure =
+          new DayTypeAssignmentsInFrame_RelStructure()
+            .withDayTypeAssignment(
+              dayTypeAssignments
+                .stream()
+                .map(CreateDayTypeAssignment::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendarFrame.setDayTypeAssignments(
+          dayTypeAssignmentsInFrameRelStructure
+        );
+      }
+
+      if (dayTypes != null) {
+        DayTypesInFrame_RelStructure dayTypesInFrameRelStructure =
+          new DayTypesInFrame_RelStructure()
+            .withDayType_(
+              dayTypes
+                .stream()
+                .map(CreateDayType::create)
+                .map(JAXBUtils::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendarFrame.setDayTypes(dayTypesInFrameRelStructure);
+      }
+
+      if (operatingDays != null) {
+        OperatingDaysInFrame_RelStructure operatingDaysInFrameRelStructure =
+          new OperatingDaysInFrame_RelStructure()
+            .withOperatingDay(
+              operatingDays
+                .stream()
+                .map(CreateOperatingDay::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendarFrame.setOperatingDays(operatingDaysInFrameRelStructure);
+      }
+
+      if (operatingPeriods != null) {
+        OperatingPeriodsInFrame_RelStructure operatingPeriodsInFrameRelStructure =
+          new OperatingPeriodsInFrame_RelStructure()
+            .withOperatingPeriodOrUicOperatingPeriod(
+              operatingPeriods
+                .stream()
+                .map(CreateOperatingPeriod::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendarFrame.setOperatingPeriods(
+          operatingPeriodsInFrameRelStructure
+        );
+      }
+
+      return serviceCalendarFrame;
+    }
+  }
+
+  public static class CreateServiceCalendar
+    extends CreateGenericCalender<ServiceCalendar> {
+
+    public CreateServiceCalendar(int id) {
+      super(id);
+    }
+
+    @Override
+    public ServiceCalendar create() {
+      ServiceCalendar serviceCalendar = new ServiceCalendar().withId(ref());
+
+      if (validBetween != null) {
+        serviceCalendar.withValidBetween(validBetween.create());
+      }
+
+      if (dayTypeAssignments != null) {
+        DayTypeAssignments_RelStructure dayTypeAssignmentsRelStructure =
+          new DayTypeAssignments_RelStructure()
+            .withDayTypeAssignment(
+              dayTypeAssignments
+                .stream()
+                .map(CreateDayTypeAssignment::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendar.setDayTypeAssignments(dayTypeAssignmentsRelStructure);
+      }
+      if (dayTypes != null) {
+        DayTypes_RelStructure dayTypesRelStructure = new DayTypes_RelStructure()
+          .withDayTypeRefOrDayType_(
+            dayTypes
+              .stream()
+              .map(CreateDayType::create)
+              .map(JAXBUtils::createJaxbElement)
+              .collect(Collectors.toCollection(ArrayList::new))
+          );
+        serviceCalendar.setDayTypes(dayTypesRelStructure);
+      }
+
+      if (operatingDays != null) {
+        OperatingDays_RelStructure operatingDaysRelStructure =
+          new OperatingDays_RelStructure()
+            .withOperatingDayRefOrOperatingDay(
+              operatingDays
+                .stream()
+                .map(CreateOperatingDay::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendar.setOperatingDays(operatingDaysRelStructure);
+      }
+
+      if (operatingPeriods != null) {
+        OperatingPeriods_RelStructure operatingPeriodsRelStructure =
+          new OperatingPeriods_RelStructure()
+            .withOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod(
+              operatingPeriods
+                .stream()
+                .map(CreateOperatingPeriod::create)
+                .map(JAXBUtils::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendar.setOperatingPeriods(operatingPeriodsRelStructure);
+      }
+
+      return serviceCalendar;
+    }
   }
 
   public static class CreateFlexibleArea extends CreateEntity<FlexibleArea> {
@@ -821,6 +1389,26 @@ public class NetexEntitiesTestFactory {
     }
   }
 
+  public static class CreateOperatingPeriod
+    extends CreateEntity<OperatingPeriod> {
+
+    private final LocalDate fromDate;
+    private final LocalDate toDate;
+
+    public CreateOperatingPeriod(int id, LocalDate fromDate, LocalDate toDate) {
+      super(id);
+      this.fromDate = fromDate;
+      this.toDate = toDate;
+    }
+
+    public OperatingPeriod create() {
+      return new OperatingPeriod()
+        .withId(ref())
+        .withFromDate(fromDate.atStartOfDay())
+        .withToDate(toDate.atStartOfDay());
+    }
+  }
+
   public static class CreateOperatingDay extends CreateEntity<OperatingDay> {
 
     private final LocalDate calendarDate;
@@ -839,26 +1427,42 @@ public class NetexEntitiesTestFactory {
 
   public static class CreateDayType extends CreateEntity<DayType> {
 
+    private Collection<DayOfWeekEnumeration> daysOfWeek;
+    private boolean asSinglePropertyOfDay;
+
     public CreateDayType(int id) {
       super(id);
     }
 
+    public CreateDayType withDaysOfWeek(DayOfWeekEnumeration... daysOfWeek) {
+      this.daysOfWeek = Arrays.asList(daysOfWeek);
+      return this;
+    }
+
     public DayType create() {
-      return new DayType().withId(ref());
+      DayType dayType = new DayType().withId(ref());
+
+      if (daysOfWeek != null && !daysOfWeek.isEmpty()) {
+        return dayType.withProperties(
+          new PropertiesOfDay_RelStructure()
+            .withPropertyOfDay(new PropertyOfDay().withDaysOfWeek(daysOfWeek))
+        );
+      }
+      return dayType;
     }
   }
 
   public static class CreateDayTypeAssignment
     extends CreateEntity<DayTypeAssignment> {
 
-    private CreateDayType DayTypeRef;
     private LocalDate date;
+    private final CreateDayType dayTypeRef;
     private CreateOperatingDay operatingDayRef;
-    // TODO: create CreateOperatingPeriod
-    private String operatingPeriodRef;
+    private CreateOperatingPeriod operatingPeriodRef;
 
-    public CreateDayTypeAssignment(int id) {
+    public CreateDayTypeAssignment(int id, CreateDayType DayTypeRef) {
       super(id);
+      this.dayTypeRef = DayTypeRef;
     }
 
     public CreateDayTypeAssignment withDate(LocalDate date) {
@@ -878,7 +1482,7 @@ public class NetexEntitiesTestFactory {
     }
 
     public CreateDayTypeAssignment withOperatingPeriodRef(
-      String operatingPeriodRef
+      CreateOperatingPeriod operatingPeriodRef
     ) {
       this.operatingPeriodRef = operatingPeriodRef;
       this.date = null;
@@ -888,7 +1492,10 @@ public class NetexEntitiesTestFactory {
 
     public DayTypeAssignment create() {
       DayTypeAssignment dayTypeAssignment = new DayTypeAssignment()
-        .withId(ref());
+        .withId(ref())
+        .withDayTypeRef(
+          createJaxbElement(new DayTypeRefStructure().withRef(dayTypeRef.ref()))
+        );
 
       Optional
         .ofNullable(date)
@@ -896,14 +1503,16 @@ public class NetexEntitiesTestFactory {
 
       Optional
         .ofNullable(operatingDayRef)
+        .map(CreateOperatingDay::ref)
         .ifPresent(ref ->
           dayTypeAssignment.withOperatingDayRef(
-            new OperatingDayRefStructure().withRef(ref.ref())
+            new OperatingDayRefStructure().withRef(ref)
           )
         );
 
       Optional
         .ofNullable(operatingPeriodRef)
+        .map(CreateOperatingPeriod::ref)
         .ifPresent(ref ->
           dayTypeAssignment.withOperatingPeriodRef(
             createJaxbElement(new OperatingPeriodRefStructure().withRef(ref))
@@ -1261,79 +1870,17 @@ public class NetexEntitiesTestFactory {
     }
   }
 
-  public static class CreateDeadRun extends CreateEntity<DeadRun> {
+  public abstract static class CreateJourney<T extends Journey_VersionStructure>
+    extends CreateEntity<T> {
 
-    private final CreateGenericLine<? extends Line_VersionStructure> lineRef;
-    private final CreateJourneyPattern journeyPattern;
-    private final List<CreateTimetabledPassingTime> timetabledPassingTimes =
-      new ArrayList<>();
+    protected final CreateGenericLine<? extends Line_VersionStructure> line;
+    protected final CreateJourneyPattern journeyPattern;
+    protected List<CreateTimetabledPassingTime> timetabledPassingTimes;
+    protected List<DayTypeRefStructure> dayTypes;
+    protected AllVehicleModesOfTransportEnumeration transportMode;
+    protected TransportSubmodeStructure transportSubmode;
 
-    public CreateDeadRun(
-      int id,
-      CreateGenericLine<? extends Line_VersionStructure> lineRef,
-      CreateJourneyPattern journeyPattern
-    ) {
-      super(id);
-      this.lineRef = lineRef;
-      this.journeyPattern = journeyPattern;
-    }
-
-    /**
-     * Adds a new timetabled passing time with the given id
-     *
-     * @param id the id of the timetabled passing time
-     * @param createStopPointInJourneyPattern the stop point in the journey pattern ref for the timetabled passing time
-     * @return CreateTimetabledPassingTime
-     */
-    public CreateTimetabledPassingTime createTimetabledPassingTime(
-      int id,
-      CreateStopPointInJourneyPattern createStopPointInJourneyPattern
-    ) {
-      CreateTimetabledPassingTime createTimetabledPassingTime =
-        new CreateTimetabledPassingTime(id, createStopPointInJourneyPattern);
-      timetabledPassingTimes.add(createTimetabledPassingTime);
-      return createTimetabledPassingTime;
-    }
-
-    public DeadRun create() {
-      DeadRun deadRun = new DeadRun()
-        .withId(ref())
-        .withLineRef(
-          createJaxbElement(new LineRefStructure().withRef(lineRef.ref()))
-        )
-        .withDayTypes(createEveryDayRefs())
-        .withJourneyPatternRef(
-          createJaxbElement(
-            new JourneyPatternRefStructure().withRef(journeyPattern.ref())
-          )
-        );
-
-      deadRun.withPassingTimes(
-        new TimetabledPassingTimes_RelStructure()
-          .withTimetabledPassingTime(
-            timetabledPassingTimes
-              .stream()
-              .map(CreateTimetabledPassingTime::create)
-              .toList()
-          )
-      );
-
-      return deadRun;
-    }
-  }
-
-  public static class CreateServiceJourney
-    extends CreateEntity<ServiceJourney>
-    implements CreateRef<VersionOfObjectRefStructure> {
-
-    private final CreateGenericLine<? extends Line_VersionStructure> line;
-    private final CreateJourneyPattern journeyPattern;
-    private final List<CreateTimetabledPassingTime> timetabledPassingTimes =
-      new ArrayList<>();
-    private AllVehicleModesOfTransportEnumeration transportMode;
-    private TransportSubmodeStructure transportSubmode;
-
-    public CreateServiceJourney(
+    public CreateJourney(
       int id,
       CreateGenericLine<? extends Line_VersionStructure> line,
       CreateJourneyPattern journeyPattern
@@ -1343,10 +1890,6 @@ public class NetexEntitiesTestFactory {
       this.journeyPattern = journeyPattern;
     }
 
-    public VehicleJourneyRefStructure refObject() {
-      return NetexEntitiesTestFactory.createServiceJourneyRef(id);
-    }
-
     /**
      * Adds a new timetabled passing time with the given id
      *
@@ -1358,24 +1901,136 @@ public class NetexEntitiesTestFactory {
       int id,
       CreateStopPointInJourneyPattern createStopPointInJourneyPattern
     ) {
+      if (timetabledPassingTimes == null) {
+        timetabledPassingTimes = new ArrayList<>();
+      }
       CreateTimetabledPassingTime createTimetabledPassingTime =
         new CreateTimetabledPassingTime(id, createStopPointInJourneyPattern);
       timetabledPassingTimes.add(createTimetabledPassingTime);
       return createTimetabledPassingTime;
     }
 
-    public CreateServiceJourney withTransportMode(
+    /**
+     * Creates timetabled passing times for the given stop points in the journey pattern
+     *
+     * @param stopPointsInJourneyPattern the stop points in the journey pattern
+     * @return List of CreateTimetabledPassingTime
+     */
+    public List<CreateTimetabledPassingTime> createTimetabledPassingTimes(
+      List<CreateStopPointInJourneyPattern> stopPointsInJourneyPattern
+    ) {
+      return IntStream
+        .range(0, stopPointsInJourneyPattern.size())
+        .mapToObj(i ->
+          createTimetabledPassingTime(i + 1, stopPointsInJourneyPattern.get(i))
+        )
+        .toList();
+    }
+
+    public CreateJourney<T> addDayTypeRef(DayTypeRefStructure dayTypeRef) {
+      if (dayTypes == null) {
+        dayTypes = new ArrayList<>();
+      }
+      dayTypes.add(dayTypeRef);
+      return this;
+    }
+
+    public CreateJourney<T> addDayTypeRef(CreateDayType dayType) {
+      return addDayTypeRef(new DayTypeRefStructure().withRef(dayType.ref()));
+    }
+
+    public CreateJourney<T> addDayTypeRefs(List<CreateDayType> dayTypes) {
+      dayTypes.forEach(this::addDayTypeRef);
+      return this;
+    }
+
+    public CreateJourney<T> withTransportMode(
       AllVehicleModesOfTransportEnumeration transportMode
     ) {
       this.transportMode = transportMode;
       return this;
     }
 
-    public CreateServiceJourney withTransportSubmode(
+    public CreateJourney<T> withTransportSubmode(
       TransportSubmodeStructure transportSubmode
     ) {
       this.transportSubmode = transportSubmode;
       return this;
+    }
+  }
+
+  public static class CreateDeadRun extends CreateJourney<DeadRun> {
+
+    public CreateDeadRun(
+      int id,
+      CreateGenericLine<? extends Line_VersionStructure> lineRef,
+      CreateJourneyPattern journeyPattern
+    ) {
+      super(id, lineRef, journeyPattern);
+    }
+
+    public DeadRun create() {
+      DeadRun deadRun = new DeadRun()
+        .withId(ref())
+        .withLineRef(
+          createJaxbElement(new LineRefStructure().withRef(line.ref()))
+        )
+        .withJourneyPatternRef(
+          createJaxbElement(
+            new JourneyPatternRefStructure().withRef(journeyPattern.ref())
+          )
+        );
+
+      if (dayTypes != null) {
+        deadRun.withDayTypes(
+          new DayTypeRefs_RelStructure()
+            .withDayTypeRef(
+              dayTypes
+                .stream()
+                .map(JAXBUtils::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            )
+        );
+      }
+
+      if (timetabledPassingTimes != null) {
+        deadRun.withPassingTimes(
+          new TimetabledPassingTimes_RelStructure()
+            .withTimetabledPassingTime(
+              timetabledPassingTimes
+                .stream()
+                .map(CreateTimetabledPassingTime::create)
+                .toList()
+            )
+        );
+      }
+
+      if (transportMode != null) {
+        deadRun.withTransportMode(transportMode);
+      }
+
+      if (transportSubmode != null) {
+        deadRun.withTransportSubmode(transportSubmode);
+      }
+
+      return deadRun;
+    }
+  }
+
+  public static class CreateServiceJourney
+    extends CreateJourney<ServiceJourney>
+    implements CreateRef<VersionOfObjectRefStructure> {
+
+    public CreateServiceJourney(
+      int id,
+      CreateGenericLine<? extends Line_VersionStructure> lineRef,
+      CreateJourneyPattern journeyPattern
+    ) {
+      super(id, lineRef, journeyPattern);
+    }
+
+    public VehicleJourneyRefStructure refObject() {
+      return NetexEntitiesTestFactory.createServiceJourneyRef(id);
     }
 
     public ServiceJourney create() {
@@ -1384,22 +2039,35 @@ public class NetexEntitiesTestFactory {
         .withLineRef(
           createJaxbElement(new LineRefStructure().withRef(line.ref()))
         )
-        .withDayTypes(createEveryDayRefs())
         .withJourneyPatternRef(
           createJaxbElement(
             new JourneyPatternRefStructure().withRef(journeyPattern.ref())
           )
         );
 
-      serviceJourney.withPassingTimes(
-        new TimetabledPassingTimes_RelStructure()
-          .withTimetabledPassingTime(
-            timetabledPassingTimes
-              .stream()
-              .map(CreateTimetabledPassingTime::create)
-              .toList()
-          )
-      );
+      if (dayTypes != null) {
+        serviceJourney.withDayTypes(
+          new DayTypeRefs_RelStructure()
+            .withDayTypeRef(
+              dayTypes
+                .stream()
+                .map(JAXBUtils::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            )
+        );
+      }
+
+      if (timetabledPassingTimes != null) {
+        serviceJourney.withPassingTimes(
+          new TimetabledPassingTimes_RelStructure()
+            .withTimetabledPassingTime(
+              timetabledPassingTimes
+                .stream()
+                .map(CreateTimetabledPassingTime::create)
+                .toList()
+            )
+        );
+      }
 
       if (transportMode != null) {
         serviceJourney.withTransportMode(transportMode);
@@ -1619,16 +2287,5 @@ public class NetexEntitiesTestFactory {
             )
         );
     }
-  }
-
-  private static DayTypeRefs_RelStructure createEveryDayRefs() {
-    return new DayTypeRefs_RelStructure()
-      .withDayTypeRef(Collections.singleton(createEveryDayRef()));
-  }
-
-  private static JAXBElement<DayTypeRefStructure> createEveryDayRef() {
-    return createJaxbElement(
-      new DayTypeRefStructure().withRef(EVERYDAY.getId())
-    );
   }
 }

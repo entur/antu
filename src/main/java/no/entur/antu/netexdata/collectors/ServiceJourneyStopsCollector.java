@@ -13,9 +13,7 @@ import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.redisson.api.RLock;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
-import org.springframework.stereotype.Component;
 
-@Component
 public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
   private final RedissonClient redissonClient;
@@ -38,8 +36,8 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
     //  service journeys in them?
     // if (validationContext.serviceJourneyInterchanges().findAny().isPresent()) {}
 
-    Map<String, List<String>> serviceJourneyStops = validationContext
-      .serviceJourneys()
+    Map<String, List<String>> serviceJourneyStops = NetexUtils
+      .validServiceJourneys(validationContext)
       .stream()
       .map(serviceJourney -> {
         Map<String, ScheduledStopPointId> scheduledStopPointIdMap =

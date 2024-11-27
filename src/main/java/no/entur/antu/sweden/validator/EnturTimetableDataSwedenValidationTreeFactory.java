@@ -33,7 +33,9 @@ public class EnturTimetableDataSwedenValidationTreeFactory
 
   @Override
   public ValidationTreeBuilder builder() {
-    // accept SiteFrame, they are part of Finnish datasets
+    ValidationTreeBuilder builder = super.builder();
+
+    // accept SiteFrame, they are part of swedish datasets
     siteFrameValidationTreeBuilder()
       .removeRuleForCommonFile(
         DefaultSiteFrameValidationTreeFactory.CODE_SITE_FRAME_IN_COMMON_FILE
@@ -62,7 +64,7 @@ public class EnturTimetableDataSwedenValidationTreeFactory
       .removeRule(
         DefaultCompositeFrameTreeFactory.CODE_COMPOSITE_FRAME_SITE_FRAME
       )
-      .removeRuleForCommonFile(CODE_COMPOSITE_FRAME_1)
+      .removeRule(CODE_COMPOSITE_FRAME_1)
       .withRule(
         new ValidateNotExist(
           ".[not(validityConditions or ValidBetween)]",
@@ -80,6 +82,6 @@ public class EnturTimetableDataSwedenValidationTreeFactory
       .removeRule(
         DefaultServiceFrameValidationTreeFactory.CODE_PASSENGER_STOP_ASSIGNMENT_3
       );
-    return super.builder();
+    return builder;
   }
 }

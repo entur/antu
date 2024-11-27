@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.validation.validator.model.ActiveDates;
 import org.entur.netex.validation.validator.model.ActiveDatesId;
@@ -23,15 +24,24 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
 
   private final Map<String, List<String>> lineInfoCache;
   private final Map<String, Map<String, List<String>>> serviceJourneyStopsCache;
+  private final Map<String, Map<String, String>> serviceJourneyDayTypesCache;
+  private final Map<String, Map<String, String>> activeDatesCache;
+  private final Map<String, Map<String, String>> serviceJourneyOperatingDaysCache;
   private final Map<String, List<String>> serviceJourneyInterchangeInfoCache;
 
   public DefaultNetexDataRepository(
     Map<String, List<String>> lineInfoCache,
     Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
+    Map<String, Map<String, String>> serviceJourneyDayTypesCache,
+    Map<String, Map<String, String>> activeDatesCache,
+    Map<String, Map<String, String>> serviceJourneyOperatingDaysCache,
     Map<String, List<String>> serviceJourneyInterchangeInfoCache
   ) {
     this.lineInfoCache = lineInfoCache;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
+    this.serviceJourneyDayTypesCache = serviceJourneyDayTypesCache;
+    this.activeDatesCache = activeDatesCache;
+    this.serviceJourneyOperatingDaysCache = serviceJourneyOperatingDaysCache;
     this.serviceJourneyInterchangeInfoCache =
       serviceJourneyInterchangeInfoCache;
   }
@@ -67,6 +77,66 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
       );
   }
 
+  public Map<ServiceJourneyId, List<DayTypeId>> serviceJourneyDayTypes(
+    String validationReportId
+  ) {
+    return serviceJourneyDayTypesCache
+      .keySet()
+      .stream()
+      .filter(k -> k.startsWith(validationReportId))
+      .map(serviceJourneyDayTypesCache::get)
+      .flatMap(m -> m.entrySet().stream())
+      .collect(
+        Collectors.toMap(
+          entry -> ServiceJourneyId.ofValidId(entry.getKey()),
+          entry ->
+            Stream.of(entry.getValue().split(",")).map(DayTypeId::new).toList(),
+          (p, n) -> n
+        )
+      );
+  }
+
+  @Override
+  public Map<ServiceJourneyId, List<OperatingDayId>> serviceJourneyOperatingDays(
+    String validationReportId
+  ) {
+    return serviceJourneyOperatingDaysCache
+      .keySet()
+      .stream()
+      .filter(k -> k.startsWith(validationReportId))
+      .map(serviceJourneyOperatingDaysCache::get)
+      .flatMap(m -> m.entrySet().stream())
+      .collect(
+        Collectors.toMap(
+          entry -> ServiceJourneyId.ofValidId(entry.getKey()),
+          entry ->
+            Stream
+              .of(entry.getValue().split(","))
+              .map(OperatingDayId::new)
+              .toList(),
+          (p, n) -> n
+        )
+      );
+  }
+
+  public Map<ActiveDatesId, ActiveDates> activeDates(
+    String validationReportId
+  ) {
+    return activeDatesCache
+      .keySet()
+      .stream()
+      .filter(k -> k.startsWith(validationReportId))
+      .map(activeDatesCache::get)
+      .flatMap(m -> m.entrySet().stream())
+      .collect(
+        Collectors.toMap(
+          entry -> ActiveDatesId.of(entry.getKey()),
+          entry -> ActiveDates.fromString(entry.getValue()),
+          (p, n) -> n
+        )
+      );
+  }
+
   @Override
   public List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos(
     String validationReportId
@@ -80,27 +150,6 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
       .flatMap(entry -> entry.getValue().stream())
       .map(ServiceJourneyInterchangeInfo::fromString)
       .toList();
-  }
-
-  @Override
-  public Map<ServiceJourneyId, List<DayTypeId>> serviceJourneyDayTypes(
-    String validationReportId
-  ) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Map<ActiveDatesId, ActiveDates> activeDates(
-    String validationReportId
-  ) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Map<ServiceJourneyId, List<OperatingDayId>> serviceJourneyOperatingDays(
-    String validationReportId
-  ) {
-    throw new UnsupportedOperationException();
   }
 
   @Override

@@ -17,6 +17,7 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
+import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 
 class UnexpectedSpeedValidatorTest extends ValidationTest {
@@ -224,7 +225,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
     List<NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> stopPointInJourneyPatterns =
       createJourneyPattern.createStopPointsInJourneyPattern(4);
 
-    NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
+    NetexEntitiesTestFactory.CreateJourney<ServiceJourney> createServiceJourney =
       netexEntitiesTestFactory
         .createServiceJourney(createJourneyPattern)
         .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)

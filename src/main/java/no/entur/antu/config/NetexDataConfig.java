@@ -1,7 +1,10 @@
 package no.entur.antu.config;
 
+import static no.entur.antu.config.cache.CacheConfig.ACTIVE_DATES_CACHE;
 import static no.entur.antu.config.cache.CacheConfig.LINE_INFO_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_DAY_TYPES_CACHE;
 import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_OPERATING_DAYS_CACHE;
 import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_STOPS_CACHE;
 
 import java.util.List;
@@ -26,6 +29,15 @@ public class NetexDataConfig {
       SERVICE_JOURNEY_STOPS_CACHE
     ) Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
     @Qualifier(
+      SERVICE_JOURNEY_DAY_TYPES_CACHE
+    ) Map<String, Map<String, String>> serviceJourneyDayTypesCache,
+    @Qualifier(
+      ACTIVE_DATES_CACHE
+    ) Map<String, Map<String, String>> activeDatesCache,
+    @Qualifier(
+      SERVICE_JOURNEY_OPERATING_DAYS_CACHE
+    ) Map<String, Map<String, String>> serviceJourneyOperatingDaysCache,
+    @Qualifier(
       SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE
     ) Map<String, List<String>> serviceJourneyInterchangeInfoCache
   ) {
@@ -33,6 +45,9 @@ public class NetexDataConfig {
       redissonClient,
       lineInfoCache,
       serviceJourneyStopsCache,
+      serviceJourneyDayTypesCache,
+      activeDatesCache,
+      serviceJourneyOperatingDaysCache,
       serviceJourneyInterchangeInfoCache
     );
   }
