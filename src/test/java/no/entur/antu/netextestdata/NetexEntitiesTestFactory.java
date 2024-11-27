@@ -556,6 +556,14 @@ public class NetexEntitiesTestFactory {
    * @param id the id of the ScheduledStopPoint
    * @return ScheduledStopPointRefStructure
    */
+  public CreateOperatingPeriod operatingPeriod(
+    int id,
+    LocalDate fromDate,
+    LocalDate toDate
+  ) {
+    return new CreateOperatingPeriod(id, fromDate, toDate);
+  }
+
   public static ScheduledStopPointRefStructure createScheduledStopPointRef(
     int id
   ) {
@@ -614,6 +622,18 @@ public class NetexEntitiesTestFactory {
   ) {
     return new DestinationDisplayRefStructure()
       .withRef("TST:DestinationDisplay:" + id);
+  }
+
+  public CreateDayType dayType(int dayTypeId) {
+    return new CreateDayType(dayTypeId);
+  }
+
+  public CreateDayTypeAssignment dayTypeAssignment(int id) {
+    return new CreateDayTypeAssignment(id);
+  }
+
+  public CreateServiceCalendarFrame serviceCalendarFrame(int id) {
+    return new CreateServiceCalendarFrame(id);
   }
 
   /**
@@ -892,26 +912,6 @@ public class NetexEntitiesTestFactory {
     }
   }
 
-  public static class CreateOperatingPeriod
-    extends CreateEntity<OperatingPeriod> {
-
-    private final LocalDate fromDate;
-    private final LocalDate toDate;
-
-    public CreateOperatingPeriod(int id, LocalDate fromDate, LocalDate toDate) {
-      super(id);
-      this.fromDate = fromDate;
-      this.toDate = toDate;
-    }
-
-    public OperatingPeriod create() {
-      return new OperatingPeriod()
-        .withId(ref())
-        .withFromDate(fromDate.atStartOfDay())
-        .withToDate(toDate.atStartOfDay());
-    }
-  }
-
   public static class CreateFlexibleArea extends CreateEntity<FlexibleArea> {
 
     private List<Double> coordinates;
@@ -1095,6 +1095,26 @@ public class NetexEntitiesTestFactory {
           new OperatingDayRefStructure().withRef(operatingDayRef.ref())
         )
         .withServiceAlteration(serviceAlteration);
+    }
+  }
+
+  public static class CreateOperatingPeriod
+    extends CreateEntity<OperatingPeriod> {
+
+    private final LocalDate fromDate;
+    private final LocalDate toDate;
+
+    public CreateOperatingPeriod(int id, LocalDate fromDate, LocalDate toDate) {
+      super(id);
+      this.fromDate = fromDate;
+      this.toDate = toDate;
+    }
+
+    public OperatingPeriod create() {
+      return new OperatingPeriod()
+        .withId(ref())
+        .withFromDate(fromDate.atStartOfDay())
+        .withToDate(toDate.atStartOfDay());
     }
   }
 
