@@ -10,10 +10,12 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
@@ -50,6 +52,10 @@ public class NetexEntitiesTestFactory {
   private final List<CreatePassengerStopAssignment> passengerStopAssignments =
     new ArrayList<>();
 
+  private CreateCompositeFrame compositeFrame;
+  private CreateServiceCalendarFrame serviceCalendarFrame;
+
+
   public NetexEntitiesIndex create() {
     NetexEntitiesIndex netexEntitiesIndex = new NetexEntitiesIndexImpl();
 
@@ -65,6 +71,14 @@ public class NetexEntitiesTestFactory {
 
     if (route != null) {
       netexEntitiesIndex.getRouteIndex().put(route.ref(), route.create());
+    }
+
+    if (compositeFrame != null) {
+      netexEntitiesIndex.getCompositeFrames().add(compositeFrame.create());
+    }
+
+    if (serviceCalendarFrame != null) {
+      netexEntitiesIndex.getServiceCalendarFrames().add(serviceCalendarFrame.create());
     }
 
     fillIndexes(netexEntitiesIndex);
@@ -635,6 +649,269 @@ public class NetexEntitiesTestFactory {
     public abstract T create();
   }
 
+  public static class CreateCompositeFrame extends CreateEntity<CompositeFrame> {
+
+    private List<CreateServiceCalendarFrame> serviceCalendarFrames;
+
+    public CreateCompositeFrame(int id) {
+      super(id);
+    }
+
+    public CreateCompositeFrame withServiceCalendarFrames(
+      CreateServiceCalendarFrame... serviceCalendarFrames
+    ) {
+      this.serviceCalendarFrames = Arrays.asList(serviceCalendarFrames);
+      return this;
+    }
+
+    public CompositeFrame create() {
+      CompositeFrame compositeFrame = new CompositeFrame().withId(ref());
+      if (serviceCalendarFrames != null) {
+        compositeFrame.setFrames(
+          new Frames_RelStructure()
+            .withCommonFrame(
+              serviceCalendarFrames
+                .stream()
+                .map(CreateServiceCalendarFrame::create)
+                .map(MappingSupport::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            )
+        );
+      }
+      return compositeFrame;
+    }
+  }
+
+  public static class CreateServiceCalendarFrame
+    extends CreateEntity<ServiceCalendarFrame> {
+
+    private List<CreateDayTypeAssignment> dayTypeAssignments;
+    private List<CreateDayType> dayTypes;
+    private List<CreateOperatingDay> operatingDays;
+    private List<CreateOperatingPeriod> operatingPeriods;
+    private ServiceCalendar serviceCalendar;
+
+    public CreateServiceCalendarFrame(int id) {
+      super(id);
+    }
+
+    public CreateServiceCalendarFrame withServiceCalendar(
+      ServiceCalendar serviceCalendar
+    ) {
+      this.serviceCalendar = serviceCalendar;
+      return this;
+    }
+
+    public CreateServiceCalendarFrame withDayTypeAssignments(
+      CreateDayTypeAssignment... dayTypeAssignments
+    ) {
+      this.dayTypeAssignments = Arrays.asList(dayTypeAssignments);
+      return this;
+    }
+
+    public CreateServiceCalendarFrame withDayTypes(
+      CreateDayType... dayTypes
+    ) {
+      this.dayTypes = Arrays.asList(dayTypes);
+      return this;
+    }
+
+    public CreateServiceCalendarFrame withOperatingDays(
+      CreateOperatingDay... operatingDays
+    ) {
+      this.operatingDays = Arrays.asList(operatingDays);
+      return this;
+    }
+
+    public CreateServiceCalendarFrame withOperatingPeriods(
+      CreateOperatingPeriod... operatingPeriods
+    ) {
+      this.operatingPeriods = Arrays.asList(operatingPeriods);
+      return this;
+    }
+
+    @Override
+    public ServiceCalendarFrame create() {
+      ServiceCalendarFrame serviceCalendarFrame = new ServiceCalendarFrame()
+        .withId(ref());
+
+      if (serviceCalendar != null) {
+        serviceCalendarFrame.withServiceCalendar(serviceCalendar);
+      }
+
+      if (dayTypeAssignments != null) {
+        DayTypeAssignmentsInFrame_RelStructure dayTypeAssignmentsInFrameRelStructure =
+          new DayTypeAssignmentsInFrame_RelStructure()
+            .withDayTypeAssignment(
+              dayTypeAssignments
+                .stream()
+                .map(CreateDayTypeAssignment::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendarFrame.setDayTypeAssignments(dayTypeAssignmentsInFrameRelStructure);
+      }
+
+      if (dayTypes != null) {
+        DayTypesInFrame_RelStructure dayTypesInFrameRelStructure =
+          new DayTypesInFrame_RelStructure()
+            .withDayType_(
+              dayTypes
+                .stream()
+                .map(CreateDayType::create)
+                .map(MappingSupport::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendarFrame.setDayTypes(dayTypesInFrameRelStructure);
+      }
+
+      if (operatingDays != null) {
+        OperatingDaysInFrame_RelStructure operatingDaysInFrameRelStructure =
+          new OperatingDaysInFrame_RelStructure()
+            .withOperatingDay(
+              operatingDays
+                .stream()
+                .map(CreateOperatingDay::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendarFrame.setOperatingDays(operatingDaysInFrameRelStructure);
+      }
+
+      if (operatingPeriods != null) {
+        OperatingPeriodsInFrame_RelStructure operatingPeriodsInFrameRelStructure =
+          new OperatingPeriodsInFrame_RelStructure()
+            .withOperatingPeriodOrUicOperatingPeriod(
+              operatingPeriods
+                .stream()
+                .map(CreateOperatingPeriod::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendarFrame.setOperatingPeriods(
+          operatingPeriodsInFrameRelStructure
+        );
+      }
+
+      return serviceCalendarFrame;
+    }
+  }
+
+  public static class CreateServiceCalendar extends CreateEntity<ServiceCalendar> {
+
+    private List<CreateDayTypeAssignment> dayTypeAssignments;
+    private List<CreateDayType> dayTypes;
+    private List<CreateOperatingDay> operatingDays;
+    private List<CreateOperatingPeriod> operatingPeriods;
+
+    public CreateServiceCalendar(int id) {
+      super(id);
+    }
+
+    public CreateServiceCalendar withDayTypeAssignments(
+      CreateDayTypeAssignment... dayTypeAssignments
+    ) {
+      this.dayTypeAssignments = Arrays.asList(dayTypeAssignments);
+      return this;
+    }
+
+    public CreateServiceCalendar withDayTypes(
+      CreateDayType... dayTypes
+    ) {
+      this.dayTypes = Arrays.asList(dayTypes);
+      return this;
+    }
+
+    public CreateServiceCalendar withOperatingDays(
+      CreateOperatingDay... operatingDays
+    ) {
+      this.operatingDays = Arrays.asList(operatingDays);
+      return this;
+    }
+
+    public CreateServiceCalendar withOperatingPeriods(
+      CreateOperatingPeriod... operatingPeriods
+    ) {
+      this.operatingPeriods = Arrays.asList(operatingPeriods);
+      return this;
+    }
+
+    @Override
+    public ServiceCalendar create() {
+      ServiceCalendar serviceCalendar = new ServiceCalendar().withId(ref());
+
+      if (dayTypeAssignments != null) {
+        DayTypeAssignments_RelStructure dayTypeAssignmentsRelStructure =
+          new DayTypeAssignments_RelStructure()
+            .withDayTypeAssignment(
+              dayTypeAssignments
+                .stream()
+                .map(CreateDayTypeAssignment::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendar.setDayTypeAssignments(dayTypeAssignmentsRelStructure);
+      }
+      if (dayTypes != null) {
+        DayTypes_RelStructure dayTypesRelStructure =
+          new DayTypes_RelStructure()
+            .withDayTypeRefOrDayType_(
+              dayTypes
+                .stream()
+                .map(CreateDayType::create)
+                .map(MappingSupport::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendar.setDayTypes(dayTypesRelStructure);
+      }
+
+      if (operatingDays != null) {
+        OperatingDays_RelStructure operatingDaysRelStructure =
+          new OperatingDays_RelStructure()
+            .withOperatingDayRefOrOperatingDay(
+              operatingDays
+                .stream()
+                .map(CreateOperatingDay::create)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendar.setOperatingDays(operatingDaysRelStructure);
+      }
+
+      if (operatingPeriods != null) {
+        OperatingPeriods_RelStructure operatingPeriodsRelStructure =
+          new OperatingPeriods_RelStructure()
+            .withOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod(
+              operatingPeriods
+                .stream()
+                .map(CreateOperatingPeriod::create)
+                .map(MappingSupport::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            );
+        serviceCalendar.setOperatingPeriods(
+          operatingPeriodsRelStructure
+        );
+      }
+
+      return serviceCalendar;
+    }
+  }
+
+  public static class CreateOperatingPeriod
+    extends CreateEntity<OperatingPeriod> {
+
+    private final LocalDate fromDate;
+    private final LocalDate toDate;
+
+    public CreateOperatingPeriod(int id, LocalDate fromDate, LocalDate toDate) {
+      super(id);
+      this.fromDate = fromDate;
+      this.toDate = toDate;
+    }
+
+    public OperatingPeriod create() {
+      return new OperatingPeriod()
+        .withId(ref())
+        .withFromDate(fromDate.atStartOfDay())
+        .withToDate(toDate.atStartOfDay());
+    }
+  }
+
   public static class CreateFlexibleArea extends CreateEntity<FlexibleArea> {
 
     private List<Double> coordinates;
@@ -839,23 +1116,38 @@ public class NetexEntitiesTestFactory {
 
   public static class CreateDayType extends CreateEntity<DayType> {
 
+    private Collection<DayOfWeekEnumeration> daysOfWeek;
+    private boolean asSinglePropertyOfDay;
+
     public CreateDayType(int id) {
       super(id);
     }
 
+    public CreateDayType withDaysOfWeek(DayOfWeekEnumeration... daysOfWeek) {
+      this.daysOfWeek = Arrays.asList(daysOfWeek);
+      return this;
+    }
+
     public DayType create() {
-      return new DayType().withId(ref());
+      DayType dayType = new DayType().withId(ref());
+
+      if (daysOfWeek != null && !daysOfWeek.isEmpty()) {
+        return dayType.withProperties(
+          new PropertiesOfDay_RelStructure()
+            .withPropertyOfDay(new PropertyOfDay().withDaysOfWeek(daysOfWeek))
+        );
+      }
+      return dayType;
     }
   }
 
   public static class CreateDayTypeAssignment
     extends CreateEntity<DayTypeAssignment> {
 
-    private CreateDayType DayTypeRef;
     private LocalDate date;
+    private CreateDayType DayTypeRef;
     private CreateOperatingDay operatingDayRef;
-    // TODO: create CreateOperatingPeriod
-    private String operatingPeriodRef;
+    private CreateOperatingPeriod operatingPeriodRef;
 
     public CreateDayTypeAssignment(int id) {
       super(id);
@@ -878,7 +1170,7 @@ public class NetexEntitiesTestFactory {
     }
 
     public CreateDayTypeAssignment withOperatingPeriodRef(
-      String operatingPeriodRef
+      CreateOperatingPeriod operatingPeriodRef
     ) {
       this.operatingPeriodRef = operatingPeriodRef;
       this.date = null;
@@ -896,18 +1188,20 @@ public class NetexEntitiesTestFactory {
 
       Optional
         .ofNullable(operatingDayRef)
+        .map(CreateOperatingDay::ref)
         .ifPresent(ref ->
-          dayTypeAssignment.withOperatingDayRef(
-            new OperatingDayRefStructure().withRef(ref.ref())
-          )
+                     dayTypeAssignment.withOperatingDayRef(
+                       new OperatingDayRefStructure().withRef(ref)
+                     )
         );
 
       Optional
         .ofNullable(operatingPeriodRef)
+        .map(CreateOperatingPeriod::ref)
         .ifPresent(ref ->
-          dayTypeAssignment.withOperatingPeriodRef(
-            createJaxbElement(new OperatingPeriodRefStructure().withRef(ref))
-          )
+                     dayTypeAssignment.withOperatingPeriodRef(
+                       createJaxbElement(new OperatingPeriodRefStructure().withRef(ref))
+                     )
         );
 
       return dayTypeAssignment;
