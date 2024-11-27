@@ -16,6 +16,7 @@ import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
+import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.ServiceLink;
 
 class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
@@ -363,10 +364,11 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
 
   @Test
   void datasetWithoutServiceLinksShouldBeIgnored() {
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
     ValidationReport validationReport = runValidation(
-      testData.netexEntitiesIndex().create()
+      netexEntitiesTestFactory.create()
     );
 
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
@@ -377,31 +379,31 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
     QuayCoordinates fromQuayCoordinates,
     QuayCoordinates toQuayCoordinates
   ) {
-    ScheduledStopPointId fromStopPointId = new ScheduledStopPointId(
-      "TST:ScheduledStopPoint:1"
-    );
-    ScheduledStopPointId toStopPointId = new ScheduledStopPointId(
-      "TST:ScheduledStopPoint:2"
-    );
+    ScheduledStopPointRefStructure fromStopPointId =
+      NetexEntitiesTestFactory.createScheduledStopPointRef(1);
+    ScheduledStopPointRefStructure toStopPointId =
+      NetexEntitiesTestFactory.createScheduledStopPointRef(2);
 
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
-    ServiceLink serviceLink = testData
-      .serviceLink(fromStopPointId.id(), toStopPointId.id())
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    netexEntitiesTestFactory
+      .serviceLink(1, fromStopPointId, toStopPointId)
       .withLineStringPositions(lineStringCoordinates)
       .create();
 
     mockGetCoordinates(
-      fromStopPointId,
+      ScheduledStopPointId.of(fromStopPointId),
       new QuayId("TST:Quay:1"),
       fromQuayCoordinates
     );
     mockGetCoordinates(
-      toStopPointId,
+      ScheduledStopPointId.of(toStopPointId),
       new QuayId("TST:Quay:2"),
       toQuayCoordinates
     );
 
-    return runValidation(testData.netexEntitiesIndex(serviceLink).create());
+    return runValidation(netexEntitiesTestFactory.create());
   }
 
   private ValidationReport runTestWith(
@@ -409,30 +411,30 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
     QuayCoordinates fromQuayCoordinates,
     QuayCoordinates toQuayCoordinates
   ) {
-    ScheduledStopPointId fromStopPointId = new ScheduledStopPointId(
-      "TST:ScheduledStopPoint:1"
-    );
-    ScheduledStopPointId toStopPointId = new ScheduledStopPointId(
-      "TST:ScheduledStopPoint:2"
-    );
+    ScheduledStopPointRefStructure fromStopPointId =
+      NetexEntitiesTestFactory.createScheduledStopPointRef(1);
+    ScheduledStopPointRefStructure toStopPointId =
+      NetexEntitiesTestFactory.createScheduledStopPointRef(2);
 
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
-    ServiceLink serviceLink = testData
-      .serviceLink(fromStopPointId.id(), toStopPointId.id())
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    netexEntitiesTestFactory
+      .serviceLink(1, fromStopPointId, toStopPointId)
       .withLineStringList(lineStringCoordinates)
       .create();
 
     mockGetCoordinates(
-      fromStopPointId,
+      ScheduledStopPointId.of(fromStopPointId),
       new QuayId("TST:Quay:1"),
       fromQuayCoordinates
     );
     mockGetCoordinates(
-      toStopPointId,
+      ScheduledStopPointId.of(toStopPointId),
       new QuayId("TST:Quay:2"),
       toQuayCoordinates
     );
 
-    return runValidation(testData.netexEntitiesIndex(serviceLink).create());
+    return runValidation(netexEntitiesTestFactory.create());
   }
 }
