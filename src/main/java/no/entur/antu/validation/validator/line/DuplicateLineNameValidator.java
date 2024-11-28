@@ -14,6 +14,7 @@ public class DuplicateLineNameValidator extends AbstractDatasetValidator {
   static final ValidationRule RULE = new ValidationRule(
     "DUPLICATE_LINE_NAME",
     "Duplicate line names found",
+    "%s is used in line files %s",
     Severity.WARNING
   );
 
@@ -55,8 +56,7 @@ public class DuplicateLineNameValidator extends AbstractDatasetValidator {
               0,
               0
             ),
-            entry.getKey().lineName() +
-            " is used in line files " +
+            entry.getKey().lineName(),
             entry
               .getValue()
               .stream()
