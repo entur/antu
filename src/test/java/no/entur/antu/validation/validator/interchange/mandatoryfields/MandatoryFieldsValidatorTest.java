@@ -116,7 +116,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE.getErrorMessage()
+        MandatoryFieldsValidator.RULE_MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE.message()
       )
     );
   }
@@ -169,7 +169,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE.getErrorMessage()
+        MandatoryFieldsValidator.RULE_MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE.message()
       )
     );
   }
@@ -214,7 +214,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_FROM_STOP_POINT_IN_INTERCHANGE.getErrorMessage()
+        MandatoryFieldsValidator.RULE_MISSING_FROM_STOP_POINT_IN_INTERCHANGE.message()
       )
     );
   }
@@ -259,7 +259,7 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getMessage)
         .orElse(null),
       is(
-        MandatoryFieldsError.RuleCode.MISSING_TO_STOP_POINT_IN_INTERCHANGE.getErrorMessage()
+        MandatoryFieldsValidator.RULE_MISSING_TO_STOP_POINT_IN_INTERCHANGE.message()
       )
     );
   }

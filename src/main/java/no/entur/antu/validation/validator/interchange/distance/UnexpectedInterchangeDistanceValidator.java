@@ -1,40 +1,43 @@
 package no.entur.antu.validation.validator.interchange.distance;
 
-import java.util.function.Consumer;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import no.entur.antu.validation.ValidationError;
-import no.entur.antu.validation.utilities.Comparison;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import javax.annotation.Nullable;
 import no.entur.antu.validation.utilities.SphericalDistanceLibrary;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 
 /**
  * Validates that the distance between stop points in interchange is within the expected range.
  * Chouette reference: 3-Interchange-7-1, 3-Interchange-7-2
  */
-public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
+public class UnexpectedInterchangeDistanceValidator implements JAXBValidator {
+
+  static final ValidationRule RULE_MAX_LIMIT = new ValidationRule(
+    "DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_MAX_LIMIT",
+    "Distance between stop points in interchange is more than maximum limit",
+    "Distance between stop points (%s - %s) is more than expected. Expected: %s, actual: %s.",
+    Severity.WARNING
+  );
+
+  static final ValidationRule RULE_WARN_LIMIT = new ValidationRule(
+    "DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_WARNING_LIMIT",
+    "Distance between stop points in interchange is more than warning limit",
+    "Distance between stop points (%s - %s) is more than expected. Expected: %s, actual: %s.",
+    Severity.WARNING
+  );
 
   private static final double INTERCHANGE_EXPECTED_DISTANCE = 1000;
 
-  public UnexpectedInterchangeDistanceValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return UnexpectedInterchangeDistanceError.RuleCode.values();
-  }
-
-  @Override
-  protected void validateLineFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
-    validationContext
+    return validationContext
       .serviceJourneyInterchanges()
       .stream()
       .map(serviceJourneyInterchange ->
@@ -44,24 +47,20 @@ public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
         )
       )
       .filter(UnexpectedInterchangeDistanceContext::isValid)
-      .forEach(context ->
-        validateDistance(
-          validationContext,
-          context,
-          validationError ->
-            addValidationReportEntry(
-              validationReport,
-              validationContext,
-              validationError
-            )
-        )
-      );
+      .map(context -> validateDistance(validationContext, context))
+      .filter(Objects::nonNull)
+      .toList();
   }
 
-  private void validateDistance(
+  @Override
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE_MAX_LIMIT, RULE_WARN_LIMIT);
+  }
+
+  @Nullable
+  private ValidationIssue validateDistance(
     JAXBValidationContext validationContext,
-    UnexpectedInterchangeDistanceContext distanceContext,
-    Consumer<ValidationError> reportError
+    UnexpectedInterchangeDistanceContext distanceContext
   ) {
     double distance = SphericalDistanceLibrary.distance(
       distanceContext.fromStopPointCoordinates().quayCoordinates(),
@@ -70,34 +69,33 @@ public class UnexpectedInterchangeDistanceValidator extends AntuNetexValidator {
 
     if (distance > INTERCHANGE_EXPECTED_DISTANCE) {
       if (distance > (3 * INTERCHANGE_EXPECTED_DISTANCE)) {
-        reportError.accept(
-          new UnexpectedInterchangeDistanceError(
-            UnexpectedInterchangeDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_MAX_LIMIT,
-            distanceContext.interchangeId(),
-            validationContext.stopPointName(
-              distanceContext.fromStopPointCoordinates().scheduledStopPointId()
-            ),
-            validationContext.stopPointName(
-              distanceContext.toStopPointCoordinates().scheduledStopPointId()
-            ),
-            Comparison.of(3 * INTERCHANGE_EXPECTED_DISTANCE, distance)
-          )
+        return new ValidationIssue(
+          RULE_MAX_LIMIT,
+          validationContext.dataLocation(distanceContext.interchangeId()),
+          validationContext.stopPointName(
+            distanceContext.fromStopPointCoordinates().scheduledStopPointId()
+          ),
+          validationContext.stopPointName(
+            distanceContext.toStopPointCoordinates().scheduledStopPointId()
+          ),
+          3 * INTERCHANGE_EXPECTED_DISTANCE,
+          distance
         );
       } else {
-        reportError.accept(
-          new UnexpectedInterchangeDistanceError(
-            UnexpectedInterchangeDistanceError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_WARNING_LIMIT,
-            distanceContext.interchangeId(),
-            validationContext.stopPointName(
-              distanceContext.fromStopPointCoordinates().scheduledStopPointId()
-            ),
-            validationContext.stopPointName(
-              distanceContext.toStopPointCoordinates().scheduledStopPointId()
-            ),
-            Comparison.of(INTERCHANGE_EXPECTED_DISTANCE, distance)
-          )
+        return new ValidationIssue(
+          RULE_WARN_LIMIT,
+          validationContext.dataLocation(distanceContext.interchangeId()),
+          validationContext.stopPointName(
+            distanceContext.fromStopPointCoordinates().scheduledStopPointId()
+          ),
+          validationContext.stopPointName(
+            distanceContext.toStopPointCoordinates().scheduledStopPointId()
+          ),
+          INTERCHANGE_EXPECTED_DISTANCE,
+          distance
         );
       }
     }
+    return null;
   }
 }

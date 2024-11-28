@@ -1,23 +1,25 @@
 package no.entur.antu.validation.flex.validator;
 
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
 import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.DataLocation;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FileNameValidator extends AbstractXPathValidator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    FileNameValidator.class
+  static final ValidationRule RULE = new ValidationRule(
+    "NETEX_FILE_NAME_1",
+    "Invalid file name",
+    "Invalid filename: %s",
+    Severity.ERROR
   );
-  protected static final String RULE_CODE_NETEX_FILE_NAME_1 =
-    "NETEX_FILE_NAME_1";
+
   private static final Pattern SHARED_FILE_PATTERN = Pattern.compile(
     "_(\\w{3})(_flexible)?_shared_data.xml"
   );
@@ -25,15 +27,8 @@ public class FileNameValidator extends AbstractXPathValidator {
     "(\\w{3})_.*\\.xml"
   );
 
-  public FileNameValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
   @Override
-  public void validate(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     XPathValidationContext validationContext
   ) {
     String fileName = validationContext.getFileName();
@@ -44,22 +39,20 @@ public class FileNameValidator extends AbstractXPathValidator {
       boolean isLineFile = LINE_FILE_PATTERN.matcher(fileName).matches();
 
       if (!isSharedFile && !isLineFile) {
-        validationReport.addValidationReportEntry(
-          createValidationReportEntry(
-            RULE_CODE_NETEX_FILE_NAME_1,
+        return List.of(
+          new ValidationIssue(
+            RULE,
             new DataLocation(null, fileName, 0, 0),
-            String.format("Invalid filename: %s", fileName)
+            fileName
           )
         );
-        LOGGER.debug("Filename has invalid pattern");
       }
     }
+    return List.of();
   }
 
   @Override
-  public Set<String> getRuleDescriptions() {
-    return Set.of(
-      createRuleDescription(RULE_CODE_NETEX_FILE_NAME_1, "Invalid filename")
-    );
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
   }
 }

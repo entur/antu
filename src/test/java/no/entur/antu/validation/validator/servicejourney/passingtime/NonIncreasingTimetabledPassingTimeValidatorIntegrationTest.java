@@ -8,12 +8,11 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.junit.jupiter.api.Test;
@@ -31,26 +30,23 @@ class NonIncreasingTimetabledPassingTimeValidatorIntegrationTest {
 
   @Test
   void testValidIncreasingPassingTime() throws IOException {
-    ValidationReport validationReport = getValidationReport(TEST_FILE_VALID);
-    assertTrue(validationReport.getValidationReportEntries().isEmpty());
+    List<ValidationIssue> validationIssues = getValidationIssues(
+      TEST_FILE_VALID
+    );
+    assertTrue(validationIssues.isEmpty());
   }
 
   @Test
   void testInValidIncreasingPassingTime() throws IOException {
-    ValidationReport validationReport = getValidationReport(
+    List<ValidationIssue> validationIssues = getValidationIssues(
       TEST_FILE_VALID_INVALID
     );
-    assertEquals(3, validationReport.getValidationReportEntries().size());
+    assertEquals(3, validationIssues.size());
   }
 
-  private ValidationReport getValidationReport(String testFile)
+  private List<ValidationIssue> getValidationIssues(String testFile)
     throws IOException {
     String validationReportId = "Test1122";
-
-    ValidationReport testValidationReport = new ValidationReport(
-      TEST_CODESPACE,
-      validationReportId
-    );
 
     try (
       InputStream testDatasetAsStream = getClass()
@@ -78,20 +74,9 @@ class NonIncreasingTimetabledPassingTimeValidatorIntegrationTest {
       );
 
       NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator =
-        new NonIncreasingPassingTimeValidator((code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          )
-        );
+        new NonIncreasingPassingTimeValidator();
 
-      nonIncreasingPassingTimeValidator.validate(
-        testValidationReport,
-        validationContext
-      );
+      return nonIncreasingPassingTimeValidator.validate(validationContext);
     }
-
-    return testValidationReport;
   }
 }

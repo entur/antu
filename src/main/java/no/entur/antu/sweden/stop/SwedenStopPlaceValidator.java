@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.AbstractXPathValidator;
-import org.entur.netex.validation.validator.DataLocation;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
@@ -19,10 +18,12 @@ import org.slf4j.LoggerFactory;
  */
 public class SwedenStopPlaceValidator extends AbstractXPathValidator {
 
-  private static final String MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE_TO_STOP_OR_QUAY =
-    "Unresolved reference to stop place or quay";
-  private static final String RULE_CODE_STOP_PLACE_REF_SE_1 =
-    "STOP_PLACE_REF_SE_1";
+  static final ValidationRule RULE = new ValidationRule(
+    "STOP_PLACE_REF_SE_1",
+    "SE/Missing reference to stop place or quay",
+    "Unresolved reference to stop place or quay",
+    Severity.ERROR
+  );
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     SwedenStopPlaceValidator.class
@@ -31,39 +32,34 @@ public class SwedenStopPlaceValidator extends AbstractXPathValidator {
   private final SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository;
 
   public SwedenStopPlaceValidator(
-    SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository,
-    ValidationReportEntryFactory validationReportEntryFactory
+    SwedenStopPlaceNetexIdRepository swedenStopPlaceNetexIdRepository
   ) {
-    super(validationReportEntryFactory);
     this.swedenStopPlaceNetexIdRepository = swedenStopPlaceNetexIdRepository;
   }
 
   @Override
-  public void validate(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     XPathValidationContext validationContext
   ) {
     LOGGER.debug(
       "Validating file {} in report {}",
       validationContext.getFileName(),
-      validationReport.getValidationReportId()
+      validationContext.getValidationReportId()
     );
-    validationReport.addAllValidationReportEntries(
-      validate(
-        validationReport.getValidationReportId(),
-        validationContext.getFileName(),
-        validationContext.getLocalIds(),
-        validationContext.getLocalRefs()
-      )
-    );
-    LOGGER.debug(
-      "Validated file {} in report {}",
+    return validate(
+      validationContext.getValidationReportId(),
       validationContext.getFileName(),
-      validationReport.getValidationReportId()
+      validationContext.getLocalIds(),
+      validationContext.getLocalRefs()
     );
   }
 
-  protected List<ValidationReportEntry> validate(
+  @Override
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
+  }
+
+  protected List<ValidationIssue> validate(
     String reportId,
     String fileName,
     Set<IdVersion> netexFileLocalIds,
@@ -72,13 +68,13 @@ public class SwedenStopPlaceValidator extends AbstractXPathValidator {
     return validateStopPlace(reportId, fileName, netexFileLocalIds, netexRefs);
   }
 
-  private List<ValidationReportEntry> validateStopPlace(
+  private List<ValidationIssue> validateStopPlace(
     String reportId,
     String fileName,
     Set<IdVersion> netexFileLocalIds,
     List<IdVersion> netexRefs
   ) {
-    List<ValidationReportEntry> validationReportEntries = new ArrayList<>();
+    List<ValidationIssue> validationIssues = new ArrayList<>();
     Set<IdVersion> referencesToStopAndQuay = netexRefs
       .stream()
       .filter(idVersion ->
@@ -110,7 +106,9 @@ public class SwedenStopPlaceValidator extends AbstractXPathValidator {
             id,
             fileName
           );
-          validationReportEntries.add(createValidationReportEntry(id));
+          validationIssues.add(
+            new ValidationIssue(RULE, getIdVersionLocation(id))
+          );
         }
       }
     }
@@ -129,25 +127,6 @@ public class SwedenStopPlaceValidator extends AbstractXPathValidator {
       stopPlaceIds
     );
 
-    return validationReportEntries;
-  }
-
-  private ValidationReportEntry createValidationReportEntry(IdVersion id) {
-    DataLocation location = getIdVersionLocation(id);
-    return createValidationReportEntry(
-      RULE_CODE_STOP_PLACE_REF_SE_1,
-      location,
-      MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE_TO_STOP_OR_QUAY
-    );
-  }
-
-  @Override
-  public Set<String> getRuleDescriptions() {
-    return Set.of(
-      createRuleDescription(
-        RULE_CODE_STOP_PLACE_REF_SE_1,
-        MESSAGE_FORMAT_UNRESOLVED_EXTERNAL_REFERENCE_TO_STOP_OR_QUAY
-      )
-    );
+    return validationIssues;
   }
 }

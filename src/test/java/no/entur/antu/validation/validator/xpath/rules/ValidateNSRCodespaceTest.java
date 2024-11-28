@@ -3,8 +3,8 @@ package no.entur.antu.validation.validator.xpath.rules;
 import java.util.List;
 import java.util.Set;
 import net.sf.saxon.s9api.XdmNode;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class ValidateNSRCodespaceTest {
         TEST_CODESPACE,
         null
       );
-    List<XPathValidationReportEntry> xPathValidationReportEntries =
+    List<ValidationIssue> xPathValidationReportEntries =
       validateNSRCodespace.validate(xpathValidationContext);
     Assertions.assertNotNull(xPathValidationReportEntries);
     Assertions.assertFalse(xPathValidationReportEntries.isEmpty());
@@ -66,7 +66,7 @@ class ValidateNSRCodespaceTest {
         TEST_CODESPACE,
         null
       );
-    List<XPathValidationReportEntry> xPathValidationReportEntries =
+    List<ValidationIssue> xPathValidationReportEntries =
       validateNSRCodespace.validate(xpathValidationContext);
     Assertions.assertNotNull(xPathValidationReportEntries);
     Assertions.assertTrue(xPathValidationReportEntries.isEmpty());

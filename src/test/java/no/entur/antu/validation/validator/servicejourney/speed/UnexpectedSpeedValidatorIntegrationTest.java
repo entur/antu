@@ -9,8 +9,6 @@ import java.util.Map;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.junit.jupiter.api.Test;
@@ -67,18 +65,9 @@ class UnexpectedSpeedValidatorIntegrationTest {
       );
 
       UnexpectedSpeedValidator unexpectedSpeedValidator =
-        new UnexpectedSpeedValidator((code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          )
-        );
+        new UnexpectedSpeedValidator();
 
-      unexpectedSpeedValidator.validate(
-        testValidationReport,
-        validationContext
-      );
+      unexpectedSpeedValidator.validate(validationContext);
     }
 
     return testValidationReport;

@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Objects;
 import org.entur.netex.validation.validator.AbstractDatasetValidator;
 import org.entur.netex.validation.validator.DataLocation;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
@@ -21,6 +24,22 @@ import org.slf4j.LoggerFactory;
  */
 public class StopPointsInVehicleJourneyValidator
   extends AbstractDatasetValidator {
+
+  static final ValidationRule RULE_FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF =
+    new ValidationRule(
+      "FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF",
+      "FromPointRef in interchange is not a part of FromJourneyRef",
+      "Stop point (%s) is not a part of journey ref (%s).",
+      Severity.WARNING
+    );
+
+  static final ValidationRule RULE_TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF =
+    new ValidationRule(
+      "TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF",
+      "ToPointRef in interchange is not a part of FromJourneyRef",
+      "Stop point (%s) is not a part of journey ref (%s).",
+      Severity.WARNING
+    );
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     StopPointsInVehicleJourneyValidator.class
@@ -89,7 +108,7 @@ public class StopPointsInVehicleJourneyValidator
         )
     ) {
       return createValidationReportEntry(
-        "FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF",
+        RULE_FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF,
         context.serviceJourneyInterchangeInfo().interchangeId(),
         context.serviceJourneyInterchangeInfo().filename(),
         context.serviceJourneyInterchangeInfo().fromStopPoint(),
@@ -111,7 +130,7 @@ public class StopPointsInVehicleJourneyValidator
         )
     ) {
       return createValidationReportEntry(
-        "TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF",
+        RULE_TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF,
         context.serviceJourneyInterchangeInfo().interchangeId(),
         context.serviceJourneyInterchangeInfo().filename(),
         context.serviceJourneyInterchangeInfo().toStopPoint(),
@@ -122,17 +141,16 @@ public class StopPointsInVehicleJourneyValidator
   }
 
   private ValidationReportEntry createValidationReportEntry(
-    String ruleCode,
+    ValidationRule rule,
     String interchangeId,
     String filename,
     ScheduledStopPointId stopPoint,
     ServiceJourneyId journeyRef
   ) {
     return createValidationReportEntry(
-      ruleCode,
-      new DataLocation(interchangeId, filename, 0, 0),
-      String.format(
-        "Stop point (%s) is not a part of journey ref (%s).",
+      new ValidationIssue(
+        rule,
+        new DataLocation(interchangeId, filename, 0, 0),
         stopPoint.id(),
         journeyRef.id()
       )

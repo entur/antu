@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,12 +28,11 @@ class ValidateAllowedCodespacesIntegrationTest {
   void testValidCodeSpace() throws IOException {
     ValidateAllowedCodespaces validateAllowedCodespaces =
       new ValidateAllowedCodespaces();
-    List<XPathValidationReportEntry> validationReportEntries =
-      getValidationReportEntries(
-        TEST_FILE_VALID_CODESPACE,
-        TEST_CODESPACE,
-        validateAllowedCodespaces
-      );
+    List<ValidationIssue> validationReportEntries = getValidationReportEntries(
+      TEST_FILE_VALID_CODESPACE,
+      TEST_CODESPACE,
+      validateAllowedCodespaces
+    );
     Assertions.assertTrue(validationReportEntries.isEmpty());
   }
 
@@ -41,16 +40,15 @@ class ValidateAllowedCodespacesIntegrationTest {
   void testInValidCodeSpace() throws IOException {
     ValidateAllowedCodespaces validateAllowedCodespaces =
       new ValidateAllowedCodespaces();
-    List<XPathValidationReportEntry> validationReportEntries =
-      getValidationReportEntries(
-        TEST_FILE_VALID_INVALID_CODESPACE,
-        TEST_CODESPACE,
-        validateAllowedCodespaces
-      );
+    List<ValidationIssue> validationReportEntries = getValidationReportEntries(
+      TEST_FILE_VALID_INVALID_CODESPACE,
+      TEST_CODESPACE,
+      validateAllowedCodespaces
+    );
     Assertions.assertFalse(validationReportEntries.isEmpty());
   }
 
-  private List<XPathValidationReportEntry> getValidationReportEntries(
+  private List<ValidationIssue> getValidationReportEntries(
     String testFileValidCodespace,
     String testCodespace,
     ValidateAllowedCodespaces validateAllowedCodespaces

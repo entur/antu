@@ -8,8 +8,6 @@ import java.util.Map;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.junit.jupiter.api.Test;
 
@@ -57,19 +55,9 @@ class UnexpectedDistanceInServiceLinkValidatorIntegrationTest {
       );
 
       UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator =
-        new UnexpectedDistanceInServiceLinkValidator(
-            (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          )
-        );
+        new UnexpectedDistanceInServiceLinkValidator();
 
-      unexpectedDistanceInServiceLinkValidator.validate(
-        testValidationReport,
-        validationContext
-      );
+      unexpectedDistanceInServiceLinkValidator.validate(validationContext);
     }
 
     return testValidationReport;

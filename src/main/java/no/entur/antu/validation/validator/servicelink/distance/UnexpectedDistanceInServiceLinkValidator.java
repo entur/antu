@@ -1,18 +1,17 @@
 package no.entur.antu.validation.validator.servicelink.distance;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import no.entur.antu.validation.ValidationError;
-import no.entur.antu.validation.utilities.Comparison;
+import java.util.Set;
 import no.entur.antu.validation.utilities.SphericalDistanceLibrary;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.locationtech.jts.geom.Coordinate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Validates ServiceLinks, by checking the distance between the stop points and the line string.
@@ -21,71 +20,74 @@ import org.slf4j.LoggerFactory;
  * a warning or an error is added to the validation report.
  * Chouette references: 3-RouteSection-2-1, 3-RouteSection-2-11, 3-RouteSection-2-2, 3-RouteSection-2-22
  */
-public class UnexpectedDistanceInServiceLinkValidator
-  extends AntuNetexValidator {
+public class UnexpectedDistanceInServiceLinkValidator implements JAXBValidator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    UnexpectedDistanceInServiceLinkValidator.class
-  );
+  static final ValidationRule RULE_DISTANCE_TO_START_ABOVE_LIMIT =
+    new ValidationRule(
+      "DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT",
+      "Distance between stop point and start of linestring, exceeds max limit, in LinkSequenceProjection",
+      "ScheduledStopPoint = %s, expected = %s, actual = %s",
+      Severity.ERROR
+    );
 
-  private static final double DISTANCE_WARNING = 20;
-  private static final double DISTANCE_MAX = 100;
+  static final ValidationRule RULE_DISTANCE_TO_START_ABOVE_WARNING =
+    new ValidationRule(
+      "DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT",
+      "Distance between stop point and start of linestring, exceeds warning limit, in LinkSequenceProjection",
+      "ScheduledStopPoint = %s, expected = %s, actual = %s",
+      Severity.WARNING
+    );
 
-  public UnexpectedDistanceInServiceLinkValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
+  static final ValidationRule RULE_DISTANCE_TO_END_ABOVE_LIMIT =
+    new ValidationRule(
+      "DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT",
+      "Distance between stop point and end of linestring, exceeds max limit, in LinkSequenceProjection",
+      "ScheduledStopPoint = %s, expected = %s, actual = %s",
+      Severity.ERROR
+    );
+
+  static final ValidationRule RULE_DISTANCE_TO_END_ABOVE_WARNING =
+    new ValidationRule(
+      "DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT",
+      "Distance between stop point and end of linestring, exceeds warning limit, in LinkSequenceProjection",
+      "ScheduledStopPoint = %s, expected = %s, actual = %s",
+      Severity.WARNING
+    );
+
+  private static final long DISTANCE_WARNING = 20;
+  private static final long DISTANCE_MAX = 100;
 
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return UnexpectedDistanceInServiceLinkError.RuleCode.values();
-  }
-
-  @Override
-  public void validateCommonFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
-    LOGGER.debug("Validating ServiceLinks");
-
     UnexpectedDistanceInServiceLinkContext.Builder contextBuilder =
       new UnexpectedDistanceInServiceLinkContext.Builder(validationContext);
 
-    validationContext
+    return validationContext
       .serviceLinks()
       .stream()
       .map(contextBuilder::build)
       .filter(Objects::nonNull)
-      .forEach(unexpectedDistanceInServiceLinkContext ->
+      .map(unexpectedDistanceInServiceLinkContext ->
         validateServiceLink(
           validationContext,
-          unexpectedDistanceInServiceLinkContext,
-          error ->
-            addValidationReportEntry(validationReport, validationContext, error)
+          unexpectedDistanceInServiceLinkContext
         )
-      );
+      )
+      .flatMap(Collection::stream)
+      .filter(Objects::nonNull)
+      .toList();
   }
 
   @Override
-  protected void validateLineFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext
-  ) {
-    /*
-    No validation needed for line file
-
-    We are validating service links only in the common file, but it's not the rule.
-    They can also appear in line file, but they need to refer to the StopPlaceAssignments.
-
-    But, what if the StopPlaceAssignments appears in the LineFile:
-      The common file does not refer to the line file, so the StopPlaceAssignments
-      will not appear in the line file, when the Service links are in the common file.
-
-    We may need the implement the case where both the Service links and StopPlaceAssignments
-    appear in the line file, OR the Service links in the line file and the StopPlaceAssignments
-    in the common file.
-    */
+  public Set<ValidationRule> getRules() {
+    return Set.of(
+      RULE_DISTANCE_TO_START_ABOVE_WARNING,
+      RULE_DISTANCE_TO_START_ABOVE_LIMIT,
+      RULE_DISTANCE_TO_END_ABOVE_WARNING,
+      RULE_DISTANCE_TO_END_ABOVE_LIMIT
+    );
   }
 
   /**
@@ -93,11 +95,12 @@ public class UnexpectedDistanceInServiceLinkValidator
    * If the distance exceeds the warning limit, a warning is added to the validation report.
    * If the distance exceeds the max limit, an error is added to the validation report.
    */
-  private void validateServiceLink(
+  private List<ValidationIssue> validateServiceLink(
     JAXBValidationContext validationContext,
-    UnexpectedDistanceInServiceLinkContext context,
-    Consumer<ValidationError> reportError
+    UnexpectedDistanceInServiceLinkContext context
   ) {
+    List<ValidationIssue> issues = new ArrayList<>();
+
     Coordinate startCoordinate = context
       .fromQuayCoordinates()
       .asJtsCoordinate();
@@ -112,70 +115,69 @@ public class UnexpectedDistanceInServiceLinkValidator
       .getEndPoint()
       .getCoordinate();
 
-    double distanceFromStart = SphericalDistanceLibrary.fastDistance(
+    long distanceFromStart = (long) SphericalDistanceLibrary.fastDistance(
       startCoordinate,
       geometryStartCoordinate
     );
-    double distanceFromEnd = SphericalDistanceLibrary.fastDistance(
+    long distanceFromEnd = (long) SphericalDistanceLibrary.fastDistance(
       endCoordinate,
       geometryEndCoordinate
     );
 
-    checkDistanceAndReportError(
-      validationContext,
-      distanceFromStart,
-      true,
-      context,
-      reportError
+    issues.add(
+      checkDistanceAndReportError(
+        validationContext,
+        distanceFromStart,
+        true,
+        context
+      )
     );
-    checkDistanceAndReportError(
-      validationContext,
-      distanceFromEnd,
-      false,
-      context,
-      reportError
+
+    issues.add(
+      checkDistanceAndReportError(
+        validationContext,
+        distanceFromEnd,
+        false,
+        context
+      )
     );
+    return issues;
   }
 
-  private void checkDistanceAndReportError(
+  private ValidationIssue checkDistanceAndReportError(
     JAXBValidationContext validationContext,
-    double distance,
+    long distance,
     boolean isStart,
-    UnexpectedDistanceInServiceLinkContext context,
-    Consumer<ValidationError> reportError
+    UnexpectedDistanceInServiceLinkContext context
   ) {
     if (distance > DISTANCE_MAX) {
-      reportError.accept(
-        new UnexpectedDistanceInServiceLinkError(
-          isStart
-            ? UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_MAX_LIMIT
-            : UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_MAX_LIMIT,
-          Comparison.of(DISTANCE_MAX, distance),
-          isStart
-            ? validationContext.stopPointName(
-              context.fromScheduledStopPointId()
-            )
-            : validationContext.stopPointName(context.toScheduledStopPointId()),
-          context.serviceLinkId()
-        )
+      ValidationRule rule = isStart
+        ? RULE_DISTANCE_TO_START_ABOVE_LIMIT
+        : RULE_DISTANCE_TO_END_ABOVE_LIMIT;
+      return new ValidationIssue(
+        rule,
+        validationContext.dataLocation(context.serviceLinkId()),
+        isStart
+          ? validationContext.stopPointName(context.fromScheduledStopPointId())
+          : validationContext.stopPointName(context.toScheduledStopPointId()),
+        DISTANCE_MAX,
+        distance
       );
-      return;
     }
     if (distance > DISTANCE_WARNING) {
-      reportError.accept(
-        new UnexpectedDistanceInServiceLinkError(
-          isStart
-            ? UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_START_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT
-            : UnexpectedDistanceInServiceLinkError.RuleCode.DISTANCE_BETWEEN_STOP_POINT_AND_END_OF_LINE_STRING_EXCEEDS_WARNING_LIMIT,
-          Comparison.of(DISTANCE_WARNING, distance),
-          isStart
-            ? validationContext.stopPointName(
-              context.fromScheduledStopPointId()
-            )
-            : validationContext.stopPointName(context.toScheduledStopPointId()),
-          context.serviceLinkId()
-        )
+      ValidationRule rule = isStart
+        ? RULE_DISTANCE_TO_START_ABOVE_WARNING
+        : RULE_DISTANCE_TO_END_ABOVE_WARNING;
+      return new ValidationIssue(
+        rule,
+        validationContext.dataLocation(context.serviceLinkId()),
+        isStart
+          ? validationContext.stopPointName(context.fromScheduledStopPointId())
+          : validationContext.stopPointName(context.toScheduledStopPointId()),
+        DISTANCE_MAX,
+        distance
       );
     }
+    return null;
   }
 }

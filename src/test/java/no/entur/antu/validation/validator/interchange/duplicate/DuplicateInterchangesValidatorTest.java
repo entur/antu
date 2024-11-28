@@ -77,7 +77,6 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
       .orElseThrow();
 
     // assert that 4 distinct interchanges are reported among the 5 identical ones.
-    // TODO the validator should report all 5 identical interchanges
 
     Pattern pattern = Pattern.compile("TST:ServiceJourneyInterchange:[0-4]*");
     assertEquals(

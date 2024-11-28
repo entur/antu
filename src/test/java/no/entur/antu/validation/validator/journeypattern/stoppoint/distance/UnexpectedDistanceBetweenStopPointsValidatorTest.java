@@ -88,7 +88,7 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
       assertThat(
         entry.getName(),
         is(
-          UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED.name()
+          UnexpectedDistanceBetweenStopPointsValidator.RULE_DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED.name()
         )
       )
     );
@@ -111,7 +111,7 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
       assertThat(
         entry.getName(),
         is(
-          UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED.name()
+          UnexpectedDistanceBetweenStopPointsValidator.RULE_DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED.name()
         )
       )
     );
@@ -138,7 +138,7 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName)
         .anyMatch(name ->
           name.equals(
-            UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED.name()
+            UnexpectedDistanceBetweenStopPointsValidator.RULE_DISTANCE_BETWEEN_STOP_POINTS_LESS_THAN_EXPECTED.name()
           )
         )
     );
@@ -148,7 +148,7 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
         .map(ValidationReportEntry::getName)
         .anyMatch(name ->
           name.equals(
-            UnexpectedDistanceBetweenStopPointsError.RuleCode.DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED.name()
+            UnexpectedDistanceBetweenStopPointsValidator.RULE_DISTANCE_BETWEEN_STOP_POINTS_MORE_THAN_EXPECTED.name()
           )
         )
     );

@@ -8,12 +8,11 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.junit.jupiter.api.Test;
@@ -29,24 +28,19 @@ class InvalidServiceAlterationValidatorIntegrationTest {
 
   @Test
   void testMissingServiceAlterationOnReplacedDSJs() throws IOException {
-    ValidationReport validationReport = getValidationReport(TEST_FILE_INVALID);
-    assertEquals(2, validationReport.getValidationReportEntries().size());
+    List<ValidationIssue> issues = getValidationIssues(TEST_FILE_INVALID);
+    assertEquals(2, issues.size());
   }
 
   @Test
   void testCorrectServiceAlterationOnReplacedDSJs() throws IOException {
-    ValidationReport validationReport = getValidationReport(TEST_FILE_VALID);
-    assertTrue(validationReport.getValidationReportEntries().isEmpty());
+    List<ValidationIssue> issues = getValidationIssues(TEST_FILE_VALID);
+    assertTrue(issues.isEmpty());
   }
 
-  private ValidationReport getValidationReport(String testFile)
+  private List<ValidationIssue> getValidationIssues(String testFile)
     throws IOException {
     String validationReportId = "Test1122";
-
-    ValidationReport testValidationReport = new ValidationReport(
-      TEST_CODESPACE,
-      validationReportId
-    );
 
     try (
       InputStream testDatasetAsStream = getClass()
@@ -74,20 +68,9 @@ class InvalidServiceAlterationValidatorIntegrationTest {
       );
 
       InvalidServiceAlterationValidator invalidServiceAlterationValidator =
-        new InvalidServiceAlterationValidator((code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          )
-        );
+        new InvalidServiceAlterationValidator();
 
-      invalidServiceAlterationValidator.validate(
-        testValidationReport,
-        validationContext
-      );
+      return invalidServiceAlterationValidator.validate(validationContext);
     }
-
-    return testValidationReport;
   }
 }

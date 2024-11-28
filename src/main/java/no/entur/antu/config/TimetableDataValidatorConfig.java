@@ -74,156 +74,84 @@ public class TimetableDataValidatorConfig {
   public XPathRuleValidator timetableDataXPathValidator(
     @Qualifier(
       "timetableDataValidationTreeFactory"
-    ) ValidationTreeFactory validationTreeFactory,
-    ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationTreeFactory validationTreeFactory
   ) {
-    return new XPathRuleValidator(
-      validationTreeFactory,
-      validationReportEntryFactory
-    );
+    return new XPathRuleValidator(validationTreeFactory);
   }
 
   @Bean
-  public UnexpectedDistanceBetweenStopPointsValidator unexpectedDistanceBetweenStopPointsValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new UnexpectedDistanceBetweenStopPointsValidator(
-      validationReportEntryFactory
-    );
+  public UnexpectedDistanceBetweenStopPointsValidator unexpectedDistanceBetweenStopPointsValidator() {
+    return new UnexpectedDistanceBetweenStopPointsValidator();
   }
 
   @Bean
-  public IdenticalStopPointsValidator identicalStopPointsValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new IdenticalStopPointsValidator(validationReportEntryFactory);
+  public IdenticalStopPointsValidator identicalStopPointsValidator() {
+    return new IdenticalStopPointsValidator();
   }
 
   @Bean
-  public SameQuayRefValidator sameQuayRefValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new SameQuayRefValidator(validationReportEntryFactory);
+  public SameQuayRefValidator sameQuayRefValidator() {
+    return new SameQuayRefValidator();
   }
 
   @Bean
-  public SameStopPointsValidator sameStopPointsValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new SameStopPointsValidator(validationReportEntryFactory);
+  public SameStopPointsValidator sameStopPointsValidator() {
+    return new SameStopPointsValidator();
   }
 
   @Bean
-  public StopPointsCountValidator stopPointsCountValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new StopPointsCountValidator(validationReportEntryFactory);
+  public StopPointsCountValidator stopPointsCountValidator() {
+    return new StopPointsCountValidator();
   }
 
   @Bean
-  public MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new MissingPassengerStopAssignmentValidator(
-      validationReportEntryFactory
-    );
+  public MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator() {
+    return new MissingPassengerStopAssignmentValidator();
   }
 
   @Bean
-  public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new NonIncreasingPassingTimeValidator(validationReportEntryFactory);
+  public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator() {
+    return new NonIncreasingPassingTimeValidator();
   }
 
   @Bean
-  public UnexpectedSpeedValidator unexpectedSpeedValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new UnexpectedSpeedValidator(validationReportEntryFactory);
+  public UnexpectedSpeedValidator unexpectedSpeedValidator() {
+    return new UnexpectedSpeedValidator();
   }
 
   @Bean
-  public UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new UnexpectedDistanceInServiceLinkValidator(
-      validationReportEntryFactory
-    );
+  public UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator() {
+    return new UnexpectedDistanceInServiceLinkValidator();
   }
 
   @Bean
-  public MismatchedStopPointsValidator mismatchedStopPointsValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new MismatchedStopPointsValidator(validationReportEntryFactory);
+  public MismatchedStopPointsValidator mismatchedStopPointsValidator() {
+    return new MismatchedStopPointsValidator();
   }
 
   @Bean
-  public MandatoryFieldsValidator mandatoryFieldsValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new MandatoryFieldsValidator(validationReportEntryFactory);
+  public MandatoryFieldsValidator mandatoryFieldsValidator() {
+    return new MandatoryFieldsValidator();
   }
 
   @Bean
-  public DuplicateInterchangesValidator duplicateInterchangesValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new DuplicateInterchangesValidator(validationReportEntryFactory);
+  public DuplicateInterchangesValidator duplicateInterchangesValidator() {
+    return new DuplicateInterchangesValidator();
   }
 
   @Bean
-  public InvalidServiceAlterationValidator missingServiceAlterationValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new InvalidServiceAlterationValidator(validationReportEntryFactory);
+  public InvalidServiceAlterationValidator missingServiceAlterationValidator() {
+    return new InvalidServiceAlterationValidator();
   }
 
   @Bean
-  public MissingReplacementValidator missingReplacementValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new MissingReplacementValidator(validationReportEntryFactory);
+  public MissingReplacementValidator missingReplacementValidator() {
+    return new MissingReplacementValidator();
   }
 
   @Bean
-  public UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator(
-    @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    return new UnexpectedInterchangeDistanceValidator(
-      validationReportEntryFactory
-    );
+  public UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator() {
+    return new UnexpectedInterchangeDistanceValidator();
   }
 
   @Bean
@@ -254,6 +182,9 @@ public class TimetableDataValidatorConfig {
 
   @Bean
   public NetexValidatorsRunner timetableDataValidatorsRunner(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
     NetexSchemaValidator netexSchemaValidator,
     @Qualifier(
       "timetableDataXPathValidator"
@@ -343,6 +274,7 @@ public class TimetableDataValidatorConfig {
       .withCommonDataRepository(commonDataRepository)
       .withNetexDataRepository(netexDataRepository)
       .withStopPlaceRepository(stopPlaceRepository)
+      .withValidationReportEntryFactory(validationReportEntryFactory)
       .build();
   }
 }

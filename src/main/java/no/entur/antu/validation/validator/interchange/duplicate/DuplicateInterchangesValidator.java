@@ -1,12 +1,14 @@
 package no.entur.antu.validation.validator.interchange.duplicate;
 
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 
 /**
  * Validate and warn for the duplicate interchanges.
@@ -15,37 +17,22 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
  * <p>
  * Chouette reference: 3-Interchange-5
  *
- * TODO: the validator should report the two identical interchanges, not only the extra one.
  *
  */
-public class DuplicateInterchangesValidator extends AntuNetexValidator {
+public class DuplicateInterchangesValidator implements JAXBValidator {
 
-  public DuplicateInterchangesValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
-
-  @Override
-  protected RuleCode[] getRuleCodes() {
-    return DuplicateInterchangesError.RuleCode.values();
-  }
+  static final ValidationRule RULE = new ValidationRule(
+    "DUPLICATE_INTERCHANGES",
+    "Duplicate Interchanges found",
+    "Duplicate interchanges found at %s",
+    Severity.WARNING
+  );
 
   @Override
-  protected void validateCommonFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
-    // ServiceJourneyInterchanges exists only in line files,
-    // as they have reference to serviceJourneys.
-  }
-
-  @Override
-  protected void validateLineFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext
-  ) {
-    validationContext
+    return validationContext
       .serviceJourneyInterchanges()
       .stream()
       .map(DuplicateInterchangesContext::of)
@@ -56,23 +43,30 @@ public class DuplicateInterchangesValidator extends AntuNetexValidator {
       .entrySet()
       .stream()
       .filter(entry -> entry.getValue().size() > 1)
-      .forEach(duplicateContexts ->
-        addValidationReportEntry(
-          validationReport,
-          validationContext,
-          new DuplicateInterchangesError(
-            DuplicateInterchangesError.RuleCode.DUPLICATE_INTERCHANGES,
-            duplicateContexts.getKey().interchangeId(),
-            duplicateContexts
+      .map(duplicateContext ->
+        new ValidationIssue(
+          RULE,
+          validationContext.dataLocation(
+            duplicateContext.getKey().interchangeId()
+          ),
+          String.join(
+            ", ",
+            duplicateContext
               .getValue()
               .stream()
               .map(DuplicateInterchangesContext::interchangeId)
               .filter(id ->
-                !id.equals(duplicateContexts.getKey().interchangeId())
+                !id.equals(duplicateContext.getKey().interchangeId())
               )
               .toList()
           )
         )
-      );
+      )
+      .toList();
+  }
+
+  @Override
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE);
   }
 }

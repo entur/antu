@@ -9,13 +9,12 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntry;
-import org.entur.netex.validation.validator.ValidationReportEntrySeverity;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
@@ -51,13 +50,13 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       .when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
       .thenReturn(false);
 
-    ValidationReport validationReport = getValidationReport(
+    List<ValidationIssue> validationIssues = getValidationIssues(
       TEST_FILE_WITH_NO_COMPOSITE_FRAME,
       commonDataRepository
     );
 
-    assertFalse(validationReport.getValidationReportEntries().isEmpty());
-    assertEquals(18, validationReport.getValidationReportEntries().size());
+    assertFalse(validationIssues.isEmpty());
+    assertEquals(18, validationIssues.size());
   }
 
   /**
@@ -76,23 +75,19 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       .when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
       .thenReturn(false);
 
-    ValidationReport validationReport = getValidationReport(
+    List<ValidationIssue> validationIssues = getValidationIssues(
       TEST_FILE_WITH_NO_COMPOSITE_FRAME_DEAD_RUN,
       commonDataRepository
     );
 
-    assertTrue(validationReport.getValidationReportEntries().isEmpty());
+    assertTrue(validationIssues.isEmpty());
   }
 
-  private ValidationReport getValidationReport(
+  private List<ValidationIssue> getValidationIssues(
     String testFile,
     CommonDataRepository commonDataRepository
   ) throws IOException {
     String validationReportId = "Test1122";
-    ValidationReport testValidationReport = new ValidationReport(
-      TEST_CODESPACE,
-      validationReportId
-    );
 
     try (
       InputStream testDatasetAsStream = getClass()
@@ -120,21 +115,11 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
       );
 
       MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator =
-        new MissingPassengerStopAssignmentValidator(
-            (code, message, dataLocation) ->
-          new ValidationReportEntry(
-            message,
-            code,
-            ValidationReportEntrySeverity.ERROR
-          )
-        );
+        new MissingPassengerStopAssignmentValidator();
 
-      missingPassengerStopAssignmentValidator.validate(
-        testValidationReport,
+      return missingPassengerStopAssignmentValidator.validate(
         validationContext
       );
     }
-
-    return testValidationReport;
   }
 }

@@ -27,8 +27,9 @@
         <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
         <camel.version>4.4.4</camel.version>
         <entur.helpers.version>3.0</entur.helpers.version>
-        <netex-validator-java.version>6.0.2</netex-validator-java.version>
+        <netex-validator-java.version>7.0.0</netex-validator-java.version>
         <netex-parser-java.version>3.1.29</netex-parser-java.version>
+        <jts-core.version>1.20.0</jts-core.version>
         <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.17</zt-zip.version>
         <redisson.version>3.39.0</redisson.version>
@@ -41,6 +42,7 @@
 
         <!-- empty argLine property, the value is set up by Jacoco during unit tests execution -->
         <argLine/>
+
     </properties>
 
     <dependencyManagement>
@@ -202,6 +204,13 @@
         </dependency>
 
         <!-- Other -->
+
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>${jts-core.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
@@ -296,6 +305,13 @@
             </plugin>
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>osgeo</id>
+            <name>Open Source Geospatial Foundation Repository</name>
+            <url>https://repo.osgeo.org/repository/release/</url>
+        </repository>
+    </repositories>
 
     <profiles>
         <profile>

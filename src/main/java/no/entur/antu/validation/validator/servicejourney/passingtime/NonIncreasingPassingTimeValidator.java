@@ -1,149 +1,129 @@
 package no.entur.antu.validation.validator.servicejourney.passingtime;
 
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Objects;
+import java.util.Set;
+import javax.annotation.Nullable;
 import no.entur.antu.stoptime.SortStopTimesUtil;
 import no.entur.antu.stoptime.StopTime;
-import no.entur.antu.validation.AntuNetexValidator;
-import no.entur.antu.validation.RuleCode;
-import no.entur.antu.validation.ValidationError;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.ValidationReportEntryFactory;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.model.ServiceJourneyId;
+import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.rutebanken.netex.model.ServiceJourney;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Validates that the passing times of a service journey are non-decreasing.
  * This means that the time between each stop must be greater than or equal to zero.
  * Chouette reference: 3-VehicleJourney-5
  */
-public class NonIncreasingPassingTimeValidator extends AntuNetexValidator {
+public class NonIncreasingPassingTimeValidator implements JAXBValidator {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    NonIncreasingPassingTimeValidator.class
+  static final ValidationRule RULE_NON_INCREASING_TIME = new ValidationRule(
+    "TIMETABLED_PASSING_TIME_NON_INCREASING_TIME",
+    "ServiceJourney has non-increasing TimetabledPassingTime",
+    "ServiceJourney has non-increasing TimetabledPassingTime at: %s",
+    Severity.ERROR
   );
 
-  public NonIncreasingPassingTimeValidator(
-    ValidationReportEntryFactory validationReportEntryFactory
-  ) {
-    super(validationReportEntryFactory);
-  }
+  static final ValidationRule RULE_INCOMPLETE_TIME = new ValidationRule(
+    "TIMETABLED_PASSING_TIME_INCOMPLETE_TIME",
+    "ServiceJourney has incomplete TimetabledPassingTime",
+    "ServiceJourney has incomplete TimetabledPassingTime at: %s",
+    Severity.ERROR
+  );
+
+  static final ValidationRule RULE_INCONSISTENT_TIME = new ValidationRule(
+    "TIMETABLED_PASSING_TIME_INCONSISTENT_TIME",
+    "ServiceJourney has inconsistent TimetabledPassingTime",
+    "ServiceJourney has inconsistent TimetabledPassingTime at: %s",
+    Severity.ERROR
+  );
 
   @Override
-  protected RuleCode[] getRuleCodes() {
-    return NonIncreasingPassingTimeError.RuleCode.values();
-  }
-
-  @Override
-  public void validateLineFile(
-    ValidationReport validationReport,
+  public List<ValidationIssue> validate(
     JAXBValidationContext validationContext
   ) {
-    LOGGER.debug("Validating ServiceJourney non-increasing passing time");
-
-    validationContext
+    return validationContext
       .serviceJourneys()
-      .forEach(serviceJourney ->
-        validateServiceJourney(
-          serviceJourney,
-          validationContext,
-          validationError ->
-            addValidationReportEntry(
-              validationReport,
-              validationContext,
-              validationError
-            )
-        )
-      );
+      .stream()
+      .map(serviceJourney ->
+        validateServiceJourney(serviceJourney, validationContext)
+      )
+      .filter(Objects::nonNull)
+      .toList();
   }
 
   @Override
-  protected void validateCommonFile(
-    ValidationReport validationReport,
-    JAXBValidationContext validationContext
-  ) {
-    // ServiceJourneys and Line only appear in the Line file.
+  public Set<ValidationRule> getRules() {
+    return Set.of(RULE_NON_INCREASING_TIME);
   }
 
-  public void validateServiceJourney(
+  @Nullable
+  public ValidationIssue validateServiceJourney(
     ServiceJourney serviceJourney,
-    JAXBValidationContext validationContext,
-    Consumer<ValidationError> reportError
+    JAXBValidationContext validationContext
   ) {
     List<StopTime> sortedTimetabledPassingTime =
       SortStopTimesUtil.getSortedStopTimes(serviceJourney, validationContext);
-
     var previousPassingTime = sortedTimetabledPassingTime.get(0);
-    if (
-      validateStopTime(
-        serviceJourney,
-        validationContext,
-        previousPassingTime,
-        reportError
-      )
-    ) return;
+    ValidationIssue issueOnFirstStop = validateStopTime(
+      serviceJourney,
+      validationContext,
+      previousPassingTime
+    );
+    if (issueOnFirstStop != null) {
+      return issueOnFirstStop;
+    }
 
     for (int i = 1; i < sortedTimetabledPassingTime.size(); i++) {
       var currentPassingTime = sortedTimetabledPassingTime.get(i);
 
-      if (
-        validateStopTime(
-          serviceJourney,
-          validationContext,
-          currentPassingTime,
-          reportError
-        )
-      ) return;
+      ValidationIssue issue = validateStopTime(
+        serviceJourney,
+        validationContext,
+        currentPassingTime
+      );
+      if (issue != null) {
+        return issue;
+      }
 
       if (!previousPassingTime.isStopTimesIncreasing(currentPassingTime)) {
-        reportError.accept(
-          new NonIncreasingPassingTimeError(
-            NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_NON_INCREASING_TIME,
-            validationContext.stopPointName(
-              previousPassingTime.scheduledStopPointId()
-            ),
-            ServiceJourneyId.ofValidId(serviceJourney)
+        return new ValidationIssue(
+          RULE_NON_INCREASING_TIME,
+          validationContext.dataLocation(serviceJourney.getId()),
+          validationContext.stopPointName(
+            previousPassingTime.scheduledStopPointId()
           )
         );
-        return;
       }
 
       previousPassingTime = currentPassingTime;
     }
+    return null;
   }
 
-  private static boolean validateStopTime(
+  @Nullable
+  private static ValidationIssue validateStopTime(
     ServiceJourney serviceJourney,
     JAXBValidationContext validationContext,
-    StopTime stopTime,
-    Consumer<ValidationError> reportError
+    StopTime stopTime
   ) {
-    ServiceJourneyId serviceJourneyId = ServiceJourneyId.ofValidId(
-      serviceJourney
-    );
     if (!stopTime.isComplete()) {
-      reportError.accept(
-        new NonIncreasingPassingTimeError(
-          NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCOMPLETE_TIME,
-          validationContext.stopPointName(stopTime.scheduledStopPointId()),
-          serviceJourneyId
-        )
+      return new ValidationIssue(
+        RULE_INCOMPLETE_TIME,
+        validationContext.dataLocation(serviceJourney.getId()),
+        validationContext.stopPointName(stopTime.scheduledStopPointId())
       );
-      return true;
     }
     if (!stopTime.isConsistent()) {
-      reportError.accept(
-        new NonIncreasingPassingTimeError(
-          NonIncreasingPassingTimeError.RuleCode.TIMETABLED_PASSING_TIME_INCONSISTENT_TIME,
-          validationContext.stopPointName(stopTime.scheduledStopPointId()),
-          serviceJourneyId
-        )
+      return new ValidationIssue(
+        RULE_INCONSISTENT_TIME,
+        validationContext.dataLocation(serviceJourney.getId()),
+        validationContext.stopPointName(stopTime.scheduledStopPointId())
       );
-      return true;
     }
-    return false;
+    return null;
   }
 }

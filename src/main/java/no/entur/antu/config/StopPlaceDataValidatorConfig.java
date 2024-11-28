@@ -47,17 +47,16 @@ public class StopPlaceDataValidatorConfig {
   public XPathRuleValidator stopPlaceDataXPathValidator(
     @Qualifier(
       "stopPlaceDataValidationTreeFactory"
-    ) ValidationTreeFactory validationTreeFactory,
-    ValidationReportEntryFactory validationReportEntryFactory
+    ) ValidationTreeFactory validationTreeFactory
   ) {
-    return new XPathRuleValidator(
-      validationTreeFactory,
-      validationReportEntryFactory
-    );
+    return new XPathRuleValidator(validationTreeFactory);
   }
 
   @Bean
   public NetexValidatorsRunner stopPlaceDataValidatorsRunner(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
     NetexSchemaValidator netexSchemaValidator,
     @Qualifier("stopPlaceDataXPathValidator") XPathRuleValidator xpathValidator,
     NetexIdValidator netexIdValidator,
@@ -82,6 +81,7 @@ public class StopPlaceDataValidatorConfig {
       .withNetexXMLParser(netexXMLParser)
       .withNetexSchemaValidator(netexSchemaValidator)
       .withXPathValidators(netexValidators)
+      .withValidationReportEntryFactory(validationReportEntryFactory)
       .build();
   }
 }

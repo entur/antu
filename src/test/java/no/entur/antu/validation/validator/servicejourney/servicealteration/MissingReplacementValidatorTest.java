@@ -85,9 +85,7 @@ class MissingReplacementValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .map(ValidationReportEntry::getName)
-        .allMatch(
-          MissingReplacementError.RuleCode.MISSING_REPLACEMENT.name()::equals
-        )
+        .allMatch(MissingReplacementValidator.RULE.name()::equals)
     );
   }
 
@@ -119,9 +117,7 @@ class MissingReplacementValidatorTest extends ValidationTest {
         .getValidationReportEntries()
         .stream()
         .map(ValidationReportEntry::getName)
-        .allMatch(
-          MissingReplacementError.RuleCode.MISSING_REPLACEMENT.name()::equals
-        )
+        .allMatch(MissingReplacementValidator.RULE.name()::equals)
     );
   }
 }

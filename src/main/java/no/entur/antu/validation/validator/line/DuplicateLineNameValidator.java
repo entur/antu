@@ -11,6 +11,12 @@ import org.slf4j.LoggerFactory;
 
 public class DuplicateLineNameValidator extends AbstractDatasetValidator {
 
+  static final ValidationRule RULE = new ValidationRule(
+    "DUPLICATE_LINE_NAME",
+    "Duplicate line names found",
+    Severity.WARNING
+  );
+
   private static final Logger LOGGER = LoggerFactory.getLogger(
     DuplicateLineNameValidator.class
   );
@@ -41,25 +47,27 @@ public class DuplicateLineNameValidator extends AbstractDatasetValidator {
       .filter(entry -> entry.getValue().size() > 1)
       .map(entry ->
         createValidationReportEntry(
-          "DUPLICATE_LINE_NAME",
-          new DataLocation(
-            entry.getKey().lineId(),
-            entry.getKey().fileName(),
-            0,
-            0
-          ),
-          entry.getKey().lineName() +
-          " is used in line files " +
-          entry
-            .getValue()
-            .stream()
-            .map(SimpleLine::fileName)
-            .filter(filename -> !filename.equals(entry.getKey().fileName()))
-            .map(filename -> "'" + filename + "'")
-            .collect(Collectors.joining(", "))
+          new ValidationIssue(
+            RULE,
+            new DataLocation(
+              entry.getKey().lineId(),
+              entry.getKey().fileName(),
+              0,
+              0
+            ),
+            entry.getKey().lineName() +
+            " is used in line files " +
+            entry
+              .getValue()
+              .stream()
+              .map(SimpleLine::fileName)
+              .filter(filename -> !filename.equals(entry.getKey().fileName()))
+              .map(filename -> "'" + filename + "'")
+              .collect(Collectors.joining(", "))
+          )
         )
       )
-      .collect(Collectors.toList());
+      .toList();
 
     validationReport.addAllValidationReportEntries(duplicateEntries);
     return validationReport;

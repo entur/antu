@@ -46,15 +46,14 @@ public class TimetableDataFlexMergingValidatorConfig {
     );
     ignorableElements.add("Authority");
     ignorableElements.add("Operator");
-    return new NetexIdUniquenessValidator(
-      netexIdRepository,
-      validationReportEntryFactory,
-      ignorableElements
-    );
+    return new NetexIdUniquenessValidator(netexIdRepository, ignorableElements);
   }
 
   @Bean
   public NetexValidatorsRunner flexMergingTimetableDataValidatorsRunner(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
     @Qualifier(
       "flexMergingNetexIdUniquenessValidator"
     ) NetexIdUniquenessValidator netexIdUniquenessValidator
@@ -66,6 +65,7 @@ public class TimetableDataFlexMergingValidatorConfig {
       .of()
       .withNetexXMLParser(netexXMLParser)
       .withXPathValidators(netexValidators)
+      .withValidationReportEntryFactory(validationReportEntryFactory)
       .build();
   }
 }

@@ -9,8 +9,8 @@ import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.xpath.DefaultValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.ValidationRule;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
+import org.entur.netex.validation.validator.xpath.XPathValidationRule;
 
 /**
  * Build the tree of XPath validation rules with Entur-specific rules.
@@ -38,8 +38,8 @@ public class EnturTimetableDataValidationTreeFactory
   }
 
   @Override
-  protected List<ValidationRule> getCompositeFrameBaseValidationRules() {
-    List<ValidationRule> validationRules =
+  protected List<XPathValidationRule> getCompositeFrameBaseValidationRules() {
+    List<XPathValidationRule> validationRules =
       super.getCompositeFrameBaseValidationRules();
     validationRules.add(new ValidateNSRCodespace());
     return validationRules;

@@ -14,26 +14,30 @@ import no.entur.antu.validation.NetexCodespace;
 import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.exception.NetexValidationException;
 import org.entur.netex.validation.validator.DataLocation;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.entur.netex.validation.validator.xpath.XPathValidationReportEntry;
 
 /**
  * Validate that the dataset references only the codespace it has access to.
  */
 public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
 
-  private static final String MESSAGE_FORMAT =
-    "Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s";
-  public static final String RULE_CODE = "CODESPACE";
+  static final ValidationRule RULE = new ValidationRule(
+    "CODESPACE",
+    "Codespace unknown",
+    "Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s",
+    Severity.ERROR
+  );
 
   @Override
-  public List<XPathValidationReportEntry> validate(
+  public List<ValidationIssue> validate(
     XPathRuleValidationContext validationContext
   ) {
     Objects.requireNonNull(validationContext);
-    List<XPathValidationReportEntry> validationReportEntries =
-      new ArrayList<>();
+    List<ValidationIssue> validationReportEntries = new ArrayList<>();
     Set<NetexCodespace> validCodespaces =
       NetexCodespace.getValidNetexCodespacesFor(
         validationContext.getCodespace()
@@ -71,16 +75,16 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
             validationContext.getFileName(),
             codespaceNode
           );
-          String message = String.format(
-            MESSAGE_FORMAT,
-            netexCodespace,
-            validCodespaces
-              .stream()
-              .map(NetexCodespace::toString)
-              .collect(Collectors.joining())
-          );
           validationReportEntries.add(
-            new XPathValidationReportEntry(message, RULE_CODE, dataLocation)
+            new ValidationIssue(
+              RULE,
+              dataLocation,
+              netexCodespace,
+              validCodespaces
+                .stream()
+                .map(NetexCodespace::toString)
+                .collect(Collectors.joining())
+            )
           );
         }
       }
@@ -91,12 +95,7 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
   }
 
   @Override
-  public String getMessage() {
-    return MESSAGE_FORMAT;
-  }
-
-  @Override
-  public String getCode() {
-    return RULE_CODE;
+  public ValidationRule rule() {
+    return RULE;
   }
 }
