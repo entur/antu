@@ -18,7 +18,10 @@
         <Line id="ENT:Line:N600" version="1">
           <Name>Stockholm - Oslo</Name>
           <ShortName>FlixBus N600</ShortName>
-          <TransportMode>bus</TransportMode>
+          <TransportMode>coach</TransportMode>
+          <TransportSubmode>
+            <CoachSubmode>internationalCoach</CoachSubmode>
+          </TransportSubmode>
           <PublicCode>FlixBus N600</PublicCode>
           <OperatorRef ref="ENT:Operator:FLIXBUS-eu" versionRef="1"/>
           <Presentation>

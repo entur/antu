@@ -14,9 +14,11 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.TransportSubmodeStructure;
 
 class UnexpectedSpeedValidatorTest extends ValidationTest {
 
@@ -154,6 +156,10 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       .serviceJourney(journeyPattern)
       .create();
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+    serviceJourney.withTransportSubmode(
+      new TransportSubmodeStructure()
+        .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
+    );
 
     NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
@@ -193,6 +199,10 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       .serviceJourney(journeyPattern)
       .create();
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+    serviceJourney.withTransportSubmode(
+      new TransportSubmodeStructure()
+        .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
+    );
 
     NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
       testData.netexEntitiesIndex(journeyPattern, serviceJourney);
@@ -215,6 +225,10 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       .serviceJourney(journeyPattern)
       .create();
     serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+    serviceJourney.withTransportSubmode(
+      new TransportSubmodeStructure()
+        .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
+    );
 
     return runTestWith(
       quayCoordinates,

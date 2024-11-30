@@ -18,8 +18,10 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Route;
+import org.rutebanken.netex.model.TransportSubmodeStructure;
 
 class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
 
@@ -58,6 +60,7 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
   @Test
   void testMissingTransportModeOnLineShouldIgnoreValidationGracefully() {
     ValidationReport validationReport = runWithQuayCoordinates(
+      null,
       null, // Mocking missing transportMode
       List.of(
         new QuayCoordinates(6.621791, 60.424023),
@@ -159,17 +162,24 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
   ) {
     return runWithQuayCoordinates(
       AllVehicleModesOfTransportEnumeration.BUS,
+      new TransportSubmodeStructure()
+        .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS),
       coordinates
     );
   }
 
   private ValidationReport runWithQuayCoordinates(
     AllVehicleModesOfTransportEnumeration transportMode,
+    TransportSubmodeStructure submode,
     List<QuayCoordinates> coordinates
   ) {
     NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
 
-    Line line = testFragment.line().withTransportMode(transportMode).create();
+    Line line = testFragment
+      .line()
+      .withTransportMode(transportMode)
+      .create()
+      .withTransportSubmode(submode);
 
     Route route = testFragment.route().withLine(line).create();
 
