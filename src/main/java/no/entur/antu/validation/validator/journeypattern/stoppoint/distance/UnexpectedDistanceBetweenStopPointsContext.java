@@ -8,6 +8,7 @@ import no.entur.antu.validation.validator.support.NetexUtils;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 
@@ -45,9 +46,11 @@ public record UnexpectedDistanceBetweenStopPointsContext(
     public UnexpectedDistanceBetweenStopPointsContext build(
       JourneyPattern journeyPattern
     ) {
+      TransportModeAndSubMode transportModeAndSubMode =
+        validationContext.transportModeAndSubMode(journeyPattern);
       return new UnexpectedDistanceBetweenStopPointsContext(
         journeyPattern.getId(),
-        validationContext.transportMode(journeyPattern),
+        transportModeAndSubMode == null ? null : transportModeAndSubMode.mode(),
         NetexUtils
           .stopPointsInJourneyPattern(journeyPattern)
           .stream()

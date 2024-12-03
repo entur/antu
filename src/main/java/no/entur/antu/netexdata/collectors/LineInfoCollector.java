@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
-import org.entur.netex.validation.validator.jaxb.support.FlexibleLineUtils;
 import org.entur.netex.validation.validator.model.SimpleLine;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 
 public class LineInfoCollector extends NetexDataCollector {
 
@@ -70,7 +70,9 @@ public class LineInfoCollector extends NetexDataCollector {
         validationContext
           .flexibleLines()
           .stream()
-          .filter(FlexibleLineUtils::isFixedFlexibleLine)
+          .filter(f ->
+            f.getFlexibleLineType() == FlexibleLineTypeEnumeration.FIXED
+          )
           .findFirst()
           .map(line -> SimpleLine.of(line, validationContext.getFileName()))
           .orElse(null)

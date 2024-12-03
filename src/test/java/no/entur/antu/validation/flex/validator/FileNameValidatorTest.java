@@ -58,7 +58,7 @@ class FileNameValidatorTest {
       validationIssues
         .stream()
         .anyMatch(validationIssue ->
-          validationIssue.rule().code().equals(FileNameValidator.RULE.code())
+          validationIssue.rule().equals(FileNameValidator.RULE)
         )
     );
   }
@@ -89,7 +89,7 @@ class FileNameValidatorTest {
       validationIssues
         .stream()
         .anyMatch(validationIssue ->
-          validationIssue.rule().code().equals(FileNameValidator.RULE.code())
+          validationIssue.rule().equals(FileNameValidator.RULE)
         )
     );
   }

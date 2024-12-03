@@ -23,8 +23,12 @@ class DefaultStopPlaceResourceTest {
   private static final String NSR_STOP_PLACE_NAME_2 = "Stop Place 456";
   private static final AllVehicleModesOfTransportEnumeration NSR_STOP_PLACE_MODE_1 =
     AllVehicleModesOfTransportEnumeration.BUS;
+  private static final BusSubmodeEnumeration NSR_STOP_PLACE_SUBMODE_1 =
+    BusSubmodeEnumeration.LOCAL_BUS;
   private static final AllVehicleModesOfTransportEnumeration NSR_STOP_PLACE_MODE_2 =
     AllVehicleModesOfTransportEnumeration.RAIL;
+  private static final RailSubmodeEnumeration NSR_STOP_PLACE_SUBMODE_2 =
+    RailSubmodeEnumeration.LOCAL;
 
   private static final ObjectFactory netexFactory = new ObjectFactory();
 
@@ -61,6 +65,7 @@ class DefaultStopPlaceResourceTest {
             .withVersion("1")
             .withName(new MultilingualString().withValue(NSR_STOP_PLACE_NAME_1))
             .withTransportMode(NSR_STOP_PLACE_MODE_1)
+            .withBusSubmode(NSR_STOP_PLACE_SUBMODE_1)
         ),
         netexFactory.createStopPlace_(
           new StopPlace()
@@ -68,6 +73,7 @@ class DefaultStopPlaceResourceTest {
             .withVersion("1")
             .withName(new MultilingualString().withValue(NSR_STOP_PLACE_NAME_2))
             .withTransportMode(NSR_STOP_PLACE_MODE_2)
+            .withRailSubmode(NSR_STOP_PLACE_SUBMODE_2)
         )
       );
     netexEntitiesIndex
@@ -116,18 +122,22 @@ class DefaultStopPlaceResourceTest {
     DefaultStopPlaceResource defaultStopPlaceResource =
       new DefaultStopPlaceResource(() -> netexEntitiesIndex);
     Assertions.assertEquals(2, defaultStopPlaceResource.getStopPlaces().size());
+    TransportModeAndSubMode transportModeAndSubMode1 =
+      new TransportModeAndSubMode(
+        NSR_STOP_PLACE_MODE_1,
+        new TransportSubMode(NSR_STOP_PLACE_SUBMODE_1.value())
+      );
+    TransportModeAndSubMode transportModeAndSubMode2 =
+      new TransportModeAndSubMode(
+        NSR_STOP_PLACE_MODE_2,
+        new TransportSubMode(NSR_STOP_PLACE_SUBMODE_2.value())
+      );
     Assertions.assertEquals(
       Map.of(
         new StopPlaceId(NSR_STOP_PLACE_1),
-        new SimpleStopPlace(
-          NSR_STOP_PLACE_NAME_1,
-          new TransportModeAndSubMode(NSR_STOP_PLACE_MODE_1, null)
-        ),
+        new SimpleStopPlace(NSR_STOP_PLACE_NAME_1, transportModeAndSubMode1),
         new StopPlaceId(NSR_STOP_PLACE_2),
-        new SimpleStopPlace(
-          NSR_STOP_PLACE_NAME_2,
-          new TransportModeAndSubMode(NSR_STOP_PLACE_MODE_2, null)
-        )
+        new SimpleStopPlace(NSR_STOP_PLACE_NAME_2, transportModeAndSubMode2)
       ),
       defaultStopPlaceResource.getStopPlaces()
     );

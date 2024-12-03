@@ -88,7 +88,7 @@ public record UnexpectedSpeedContext(
 
       return new UnexpectedSpeedContext(
         serviceJourney,
-        validationContext.transportMode(serviceJourney),
+        validationContext.transportModeAndSubMode(serviceJourney).mode(),
         validationContext
           .timetabledPassingTimes(serviceJourney)
           .stream()
