@@ -18,8 +18,7 @@
 
 package no.entur.antu.services;
 
-import no.entur.antu.repository.BlobStoreRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.rutebanken.helper.storage.repository.BlobStoreRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class MardukBlobStoreService extends AbstractBlobStoreService {
 
   public MardukBlobStoreService(
     @Value("${blobstore.gcs.marduk.container.name}") String containerName,
-    @Autowired BlobStoreRepository repository
+    BlobStoreRepository repository
   ) {
     super(containerName, repository);
   }
