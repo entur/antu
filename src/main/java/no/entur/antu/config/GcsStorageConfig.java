@@ -20,10 +20,13 @@ package no.entur.antu.config;
 
 import com.google.cloud.storage.Storage;
 import org.rutebanken.helper.gcp.BlobStoreHelper;
+import org.rutebanken.helper.gcp.repository.GcsBlobStoreRepository;
+import org.rutebanken.helper.storage.repository.BlobStoreRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 @Profile("gcs-blobstore")
@@ -42,5 +45,14 @@ public class GcsStorageConfig {
     } else {
       return BlobStoreHelper.getStorage(credentialPath, projectId);
     }
+  }
+
+  @Bean
+  @Scope("prototype")
+  BlobStoreRepository blobStoreRepository(
+    @Value("${blobstore.gcs.project.id}") String projectId,
+    @Value("${blobstore.gcs.credential.path:#{null}}") String credentialPath
+  ) {
+    return new GcsBlobStoreRepository(projectId, credentialPath);
   }
 }

@@ -34,13 +34,13 @@ package no.entur.antu;/*
 
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import jakarta.annotation.PostConstruct;
-import no.entur.antu.repository.InMemoryBlobStoreRepository;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.apache.camel.test.spring.junit5.UseAdviceWith;
 import org.junit.jupiter.api.AfterEach;
+import org.rutebanken.helper.storage.repository.InMemoryBlobStoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.DirtiesContext;
