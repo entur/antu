@@ -20,8 +20,8 @@ package no.entur.antu.services;
 
 import java.io.InputStream;
 import no.entur.antu.Constants;
-import no.entur.antu.repository.BlobStoreRepository;
 import org.apache.camel.Header;
+import org.rutebanken.helper.storage.repository.BlobStoreRepository;
 
 public abstract class AbstractBlobStoreService {
 
@@ -36,7 +36,7 @@ public abstract class AbstractBlobStoreService {
   }
 
   public boolean existBlob(@Header(value = Constants.FILE_HANDLE) String name) {
-    return repository.existBlob(name);
+    return repository.exist(name);
   }
 
   public InputStream getBlob(
