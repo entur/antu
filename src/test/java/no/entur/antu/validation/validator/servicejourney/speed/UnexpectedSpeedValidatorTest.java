@@ -153,10 +153,10 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern();
 
     netexEntitiesTestFactory
-      .createServiceJourney(1, createJourneyPattern)
+      .createServiceJourney(createJourneyPattern)
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
@@ -193,10 +193,10 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern();
 
     NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
-      netexEntitiesTestFactory.createServiceJourney(1, createJourneyPattern);
+      netexEntitiesTestFactory.createServiceJourney(createJourneyPattern);
 
     createServiceJourney
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
@@ -220,13 +220,13 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern();
     List<NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> stopPointInJourneyPatterns =
-      createJourneyPattern.stopPointsInJourneyPattern(4);
+      createJourneyPattern.createStopPointsInJourneyPattern(4);
 
     NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
       netexEntitiesTestFactory
-        .createServiceJourney(1, createJourneyPattern)
+        .createServiceJourney(createJourneyPattern)
         .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
         .withTransportSubmode(
           new TransportSubmodeStructure()
@@ -237,7 +237,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       .rangeClosed(1, stopPointInJourneyPatterns.size())
       .forEach(index ->
         createServiceJourney
-          .timetabledPassingTime(
+          .createTimetabledPassingTime(
             index,
             stopPointInJourneyPatterns.get(index - 1)
           )

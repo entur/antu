@@ -55,7 +55,7 @@ class StopPointsCountValidatorTest extends ValidationTest {
     IntStream
       .rangeClosed(1, 10)
       .forEach(i ->
-        createJourneyPattern123.stopPointInJourneyPattern(
+        createJourneyPattern123.createStopPointInJourneyPattern(
           stopPointInJourneyPatternIdOffset + 1
         )
       );
@@ -78,7 +78,7 @@ class StopPointsCountValidatorTest extends ValidationTest {
     IntStream
       .rangeClosed(1, 10)
       .forEach(i ->
-        createJourneyPattern123.stopPointInJourneyPattern(
+        createJourneyPattern123.createStopPointInJourneyPattern(
           stopPointInJourneyPatternIdOffset + 1
         )
       );
@@ -86,7 +86,7 @@ class StopPointsCountValidatorTest extends ValidationTest {
     IntStream
       .rangeClosed(1, numberOfServiceLinks)
       .forEach(i ->
-        createJourneyPattern123.serviceLinkInJourneyPattern(
+        createJourneyPattern123.createServiceLinkInJourneyPattern(
           linksInJourneyPatternIdOffset + 1
         )
       );

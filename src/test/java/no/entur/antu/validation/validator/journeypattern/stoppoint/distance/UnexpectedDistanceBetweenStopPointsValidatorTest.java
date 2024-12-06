@@ -175,24 +175,23 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     netexEntitiesTestFactory
-      .createLine(1)
+      .createLine()
       .withTransportMode(transportMode)
       .withTransportSubmode(submode);
 
-    NetexEntitiesTestFactory.CreateRoute route =
-      netexEntitiesTestFactory.createRoute(1);
-
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(123).withRoute(route);
+      netexEntitiesTestFactory
+        .createJourneyPattern(123)
+        .withRoute(netexEntitiesTestFactory.createRoute());
 
     if (coordinates.isEmpty()) {
-      createJourneyPattern.stopPointsInJourneyPattern(0);
+      createJourneyPattern.createStopPointsInJourneyPattern(0);
     } else {
       IntStream
         .rangeClosed(1, coordinates.size())
         .forEach(i ->
           createJourneyPattern
-            .stopPointInJourneyPattern(i)
+            .createStopPointInJourneyPattern(i)
             .withScheduledStopPointRef(
               NetexEntitiesTestFactory.createScheduledStopPointRef(i)
             )

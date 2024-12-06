@@ -37,12 +37,12 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
 
     List<NetexEntitiesTestFactory.CreateServiceJourney> serviceJourneys =
       netexEntitiesTestFactory.createServiceJourneys(
-        netexEntitiesTestFactory.createJourneyPattern(1),
+        netexEntitiesTestFactory.createJourneyPattern(),
         2
       );
 
     netexEntitiesTestFactory
-      .createServiceJourneyInterchange(1)
+      .createServiceJourneyInterchange()
       .withFromJourneyRef(serviceJourneys.get(0).refObject())
       .withToJourneyRef(serviceJourneys.get(1).refObject())
       .withFromPointRef(scheduledStopPointId1)
@@ -78,12 +78,11 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
 
     NetexEntitiesTestFactory.CreateServiceJourney serviceJourney =
       netexEntitiesTestFactory.createServiceJourney(
-        1,
-        netexEntitiesTestFactory.createJourneyPattern(1)
+        netexEntitiesTestFactory.createJourneyPattern()
       );
 
     netexEntitiesTestFactory
-      .createServiceJourneyInterchange(1)
+      .createServiceJourneyInterchange()
       .withToJourneyRef(serviceJourney.refObject())
       .withFromPointRef(scheduledStopPointId1)
       .withToPointRef(scheduledStopPointId2)
@@ -129,12 +128,11 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
 
     NetexEntitiesTestFactory.CreateServiceJourney serviceJourney =
       netexEntitiesTestFactory.createServiceJourney(
-        1,
-        netexEntitiesTestFactory.createJourneyPattern(1)
+        netexEntitiesTestFactory.createJourneyPattern()
       );
 
     netexEntitiesTestFactory
-      .createServiceJourneyInterchange(1)
+      .createServiceJourneyInterchange()
       .withFromJourneyRef(serviceJourney.refObject())
       .withFromPointRef(scheduledStopPointId1)
       .withToPointRef(scheduledStopPointId2)
@@ -178,12 +176,11 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
 
     NetexEntitiesTestFactory.CreateServiceJourney serviceJourney =
       netexEntitiesTestFactory.createServiceJourney(
-        1,
-        netexEntitiesTestFactory.createJourneyPattern(1)
+        netexEntitiesTestFactory.createJourneyPattern()
       );
 
     netexEntitiesTestFactory
-      .createServiceJourneyInterchange(1)
+      .createServiceJourneyInterchange()
       .withFromJourneyRef(serviceJourney.refObject())
       .withToJourneyRef(serviceJourney.refObject())
       .withToPointRef(scheduledStopPointId)
@@ -222,12 +219,11 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
 
     NetexEntitiesTestFactory.CreateServiceJourney serviceJourney =
       netexEntitiesFactory.createServiceJourney(
-        1,
-        netexEntitiesFactory.createJourneyPattern(1)
+        netexEntitiesFactory.createJourneyPattern()
       );
 
     netexEntitiesFactory
-      .createServiceJourneyInterchange(1)
+      .createServiceJourneyInterchange()
       .withFromJourneyRef(serviceJourney.refObject())
       .withToJourneyRef(serviceJourney.refObject())
       .withFromPointRef(scheduledStopPointId)
@@ -255,7 +251,6 @@ class MandatoryFieldsValidatorTest extends ValidationTest {
       )
     );
   }
-
   /*
    * Keeping these tests in comments for using them later in other validation rules.
   @Test

@@ -179,7 +179,7 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
     NetexEntitiesTestFactory netexEntitiesTestFactory =
       new NetexEntitiesTestFactory();
 
-    netexEntitiesTestFactory.createFlexibleStopPlace(1);
+    netexEntitiesTestFactory.createFlexibleStopPlace();
 
     ValidationReport validationReport = runValidation(
       netexEntitiesTestFactory.create()
@@ -194,7 +194,7 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     netexEntitiesTestFactory
-      .createFlexibleStopPlace(1)
+      .createFlexibleStopPlace()
       .flexibleArea(1)
       .withNullPolygon(true);
 
@@ -211,7 +211,7 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
     NetexEntitiesTestFactory netexEntitiesTestFactory =
       new NetexEntitiesTestFactory();
     netexEntitiesTestFactory
-      .createFlexibleStopPlace(1)
+      .createFlexibleStopPlace()
       .flexibleArea(1)
       .withCoordinates(coordinates);
 

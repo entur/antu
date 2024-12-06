@@ -182,7 +182,9 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
     if (numberOfStopPoints > 0) {
       createJourneyPatterns.forEach(createJourneyPattern -> {
         List<NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> stopPointsInJourneyPatterns =
-          createJourneyPattern.stopPointsInJourneyPattern(numberOfStopPoints);
+          createJourneyPattern.createStopPointsInJourneyPattern(
+            numberOfStopPoints
+          );
 
         stopPointsInJourneyPatterns.forEach(createStopPointInJourneyPattern ->
           customizeStopPoint.accept(

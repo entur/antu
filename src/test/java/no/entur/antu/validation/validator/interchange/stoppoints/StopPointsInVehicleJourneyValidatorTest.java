@@ -99,7 +99,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
   void interchangeWithMissingAttributes() {
     NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
-      .createServiceJourneyInterchange(1)
+      .createServiceJourneyInterchange()
       .create();
 
     mockGetServiceJourneyInterchangeInfo(
@@ -160,7 +160,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
     NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
-      .createServiceJourneyInterchange(1)
+      .createServiceJourneyInterchange()
       .withFromPointRef(
         NetexEntitiesTestFactory.createScheduledStopPointRef(fromPointRefId)
       )

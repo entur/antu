@@ -689,6 +689,13 @@ public class NetexEntitiesTestFactory {
       super(id);
     }
 
+    /**
+     * Creates a new flexible area with the given id,
+     * if it does not already exist.
+     *
+     * @param id the id of the flexible area
+     * @return CreateFlexibleArea
+     */
     public CreateFlexibleArea flexibleArea(int id) {
       if (flexibleArea == null) {
         flexibleArea = new CreateFlexibleArea(id);
@@ -1023,7 +1030,15 @@ public class NetexEntitiesTestFactory {
       return this;
     }
 
-    public CreateStopPointInJourneyPattern stopPointInJourneyPattern(int id) {
+    /**
+     * Adds a new stop point in the journey pattern with the given id
+     *
+     * @param id the id of the stop point in the journey pattern
+     * @return CreateStopPointInJourneyPattern
+     */
+    public CreateStopPointInJourneyPattern createStopPointInJourneyPattern(
+      int id
+    ) {
       CreateStopPointInJourneyPattern createStopPointInJourneyPattern =
         new CreateStopPointInJourneyPattern(id)
           .withOrder(id)
@@ -1032,14 +1047,29 @@ public class NetexEntitiesTestFactory {
       return createStopPointInJourneyPattern;
     }
 
-    public CreateLinkInJourneyPattern serviceLinkInJourneyPattern(int id) {
+    /**
+     * Adds a new service link in the journey pattern with the given id
+     *
+     * @param id the id of the service link in the journey pattern
+     * @return CreateLinkInJourneyPattern
+     */
+    public CreateLinkInJourneyPattern createServiceLinkInJourneyPattern(
+      int id
+    ) {
       CreateLinkInJourneyPattern createLinkInJourneyPattern =
         new CreateLinkInJourneyPattern(id);
       serviceLinksInJourneyPatterns.add(createLinkInJourneyPattern);
       return createLinkInJourneyPattern;
     }
 
-    public List<CreateStopPointInJourneyPattern> stopPointsInJourneyPattern(
+    /**
+     * Adds numberOfStopPointInJourneyPattern new stop points in the journey pattern
+     * The stop points will have ids from 1 to numberOfStopPointInJourneyPattern
+     *
+     * @param numberOfStopPointInJourneyPattern the number of stop points to create
+     * @return List of CreateStopPointInJourneyPattern created
+     */
+    public List<CreateStopPointInJourneyPattern> createStopPointsInJourneyPattern(
       int numberOfStopPointInJourneyPattern
     ) {
       List<CreateStopPointInJourneyPattern> stopPointsInJourneyPatterns =
@@ -1068,7 +1098,14 @@ public class NetexEntitiesTestFactory {
       return stopPointsInJourneyPatterns;
     }
 
-    public List<CreateLinkInJourneyPattern> serviceLinksInJourneyPattern(
+    /**
+     * Adds numberOfServiceLinksInJourneyPattern new service links in the journey pattern
+     * The service links will have ids from 1 to numberOfServiceLinksInJourneyPattern
+     *
+     * @param numberOfServiceLinksInJourneyPattern the number of service links to create
+     * @return List of CreateLinkInJourneyPattern created
+     */
+    public List<CreateLinkInJourneyPattern> createServiceLinksInJourneyPattern(
       int numberOfServiceLinksInJourneyPattern
     ) {
       List<CreateLinkInJourneyPattern> linksInJourneyPatterns = IntStream
@@ -1169,10 +1206,6 @@ public class NetexEntitiesTestFactory {
       return this;
     }
 
-    public ScheduledStopPointRefStructure getScheduledStopPointRef() {
-      return scheduledStopPointRef;
-    }
-
     public StopPointInJourneyPattern create() {
       StopPointInJourneyPattern stopPointInJourneyPattern =
         new StopPointInJourneyPattern()
@@ -1245,7 +1278,14 @@ public class NetexEntitiesTestFactory {
       this.journeyPattern = journeyPattern;
     }
 
-    public CreateTimetabledPassingTime timetabledPassingTime(
+    /**
+     * Adds a new timetabled passing time with the given id
+     *
+     * @param id the id of the timetabled passing time
+     * @param createStopPointInJourneyPattern the stop point in the journey pattern ref for the timetabled passing time
+     * @return CreateTimetabledPassingTime
+     */
+    public CreateTimetabledPassingTime createTimetabledPassingTime(
       int id,
       CreateStopPointInJourneyPattern createStopPointInJourneyPattern
     ) {
@@ -1307,7 +1347,14 @@ public class NetexEntitiesTestFactory {
       return NetexEntitiesTestFactory.createServiceJourneyRef(id);
     }
 
-    public CreateTimetabledPassingTime timetabledPassingTime(
+    /**
+     * Adds a new timetabled passing time with the given id
+     *
+     * @param id the id of the timetabled passing time
+     * @param createStopPointInJourneyPattern the stop point in the journey pattern ref for the timetabled passing time
+     * @return CreateTimetabledPassingTime
+     */
+    public CreateTimetabledPassingTime createTimetabledPassingTime(
       int id,
       CreateStopPointInJourneyPattern createStopPointInJourneyPattern
     ) {

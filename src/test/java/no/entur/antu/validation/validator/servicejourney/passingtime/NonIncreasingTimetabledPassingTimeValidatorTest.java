@@ -39,10 +39,10 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
         new NetexEntitiesTestFactory();
 
       NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-        netexEntitiesTestFactory.createJourneyPattern(1);
+        netexEntitiesTestFactory.createJourneyPattern();
 
       NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
-        netexEntitiesTestFactory.createServiceJourney(1, createJourneyPattern);
+        netexEntitiesTestFactory.createServiceJourney(createJourneyPattern);
 
       List<ScheduledStopPointRefStructure> scheduledStopPointRefs = IntStream
         .rangeClosed(1, numberOfStopPointsInJourneyPattern)
@@ -54,7 +54,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
           .rangeClosed(1, numberOfStopPointsInJourneyPattern)
           .mapToObj(index ->
             createJourneyPattern
-              .stopPointInJourneyPattern(index)
+              .createStopPointInJourneyPattern(index)
               .withScheduledStopPointRef(scheduledStopPointRefs.get(index - 1))
           )
           .toList();
@@ -69,7 +69,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
           .rangeClosed(1, numberOfStopPointsInJourneyPattern)
           .mapToObj(index ->
             createServiceJourney
-              .timetabledPassingTime(
+              .createTimetabledPassingTime(
                 index,
                 stopPointInJourneyPatterns.get(index - 1)
               )

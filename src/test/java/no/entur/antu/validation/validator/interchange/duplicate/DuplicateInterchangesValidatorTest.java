@@ -178,7 +178,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
 
     List<NetexEntitiesTestFactory.CreateServiceJourney> serviceJourneys =
       netexEntitiesTestFactory.createServiceJourneys(
-        netexEntitiesTestFactory.createJourneyPattern(1),
+        netexEntitiesTestFactory.createJourneyPattern(),
         (numberOfServiceJourneyInterchanges + maxStartIndex) * 2
       );
 

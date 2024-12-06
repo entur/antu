@@ -110,22 +110,22 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern();
 
     createJourneyPattern
-      .stopPointInJourneyPattern(1)
+      .createStopPointInJourneyPattern(1)
       .withScheduledStopPointRef(
         NetexEntitiesTestFactory.createScheduledStopPointRef(1)
       );
 
     createJourneyPattern
-      .stopPointInJourneyPattern(2)
+      .createStopPointInJourneyPattern(2)
       .withScheduledStopPointRef(
         NetexEntitiesTestFactory.createScheduledStopPointRef(2)
       );
 
     createJourneyPattern
-      .serviceLinkInJourneyPattern(1)
+      .createServiceLinkInJourneyPattern(1)
       .withServiceLinkRef(NetexEntitiesTestFactory.createServiceLinkRef(1));
 
     mockGetFromToScheduledStopPointId(
@@ -162,22 +162,22 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern();
 
     createJourneyPattern
-      .stopPointInJourneyPattern(1)
+      .createStopPointInJourneyPattern(1)
       .withScheduledStopPointRef(
         NetexEntitiesTestFactory.createScheduledStopPointRef(1)
       );
 
     createJourneyPattern
-      .stopPointInJourneyPattern(2)
+      .createStopPointInJourneyPattern(2)
       .withScheduledStopPointRef(
         NetexEntitiesTestFactory.createScheduledStopPointRef(2)
       );
 
     createJourneyPattern
-      .serviceLinkInJourneyPattern(1)
+      .createServiceLinkInJourneyPattern(1)
       .withServiceLinkRef(NetexEntitiesTestFactory.createServiceLinkRef(1));
 
     mockGetFromToScheduledStopPointId(
@@ -255,7 +255,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
           )
           .forEach(stopPointInJourneyPatternId ->
             createJourneyPattern
-              .stopPointInJourneyPattern(stopPointInJourneyPatternId)
+              .createStopPointInJourneyPattern(stopPointInJourneyPatternId)
               .withScheduledStopPointRef(
                 NetexEntitiesTestFactory.createScheduledStopPointRef(
                   stopPointInJourneyPatternId
@@ -271,7 +271,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
           )
           .forEach(serviceLinkInJourneyPatternId ->
             createJourneyPattern
-              .serviceLinkInJourneyPattern(1)
+              .createServiceLinkInJourneyPattern(1)
               .withServiceLinkRef(
                 NetexEntitiesTestFactory.createServiceLinkRef(
                   serviceLinkInJourneyPatternId

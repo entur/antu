@@ -29,9 +29,9 @@ class SameQuayRefValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern();
 
-    createJourneyPattern.stopPointsInJourneyPattern(0);
+    createJourneyPattern.createStopPointsInJourneyPattern(0);
 
     ValidationReport validationReport = runValidation(
       netexEntitiesTestFactory.create()
@@ -46,7 +46,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern();
 
     ScheduledStopPointRefStructure scheduledStopPointRef1 =
       NetexEntitiesTestFactory.createScheduledStopPointRef(1);
@@ -54,11 +54,11 @@ class SameQuayRefValidatorTest extends ValidationTest {
       NetexEntitiesTestFactory.createScheduledStopPointRef(2);
 
     createJourneyPattern
-      .stopPointInJourneyPattern(1)
+      .createStopPointInJourneyPattern(1)
       .withScheduledStopPointRef(scheduledStopPointRef1);
 
     createJourneyPattern
-      .stopPointInJourneyPattern(2)
+      .createStopPointInJourneyPattern(2)
       .withScheduledStopPointRef(scheduledStopPointRef2);
 
     mockGetQuayId(
@@ -84,7 +84,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern();
 
     ScheduledStopPointRefStructure scheduledStopPointRef1 =
       NetexEntitiesTestFactory.createScheduledStopPointRef(1);
@@ -92,11 +92,11 @@ class SameQuayRefValidatorTest extends ValidationTest {
       NetexEntitiesTestFactory.createScheduledStopPointRef(2);
 
     createJourneyPattern
-      .stopPointInJourneyPattern(1)
+      .createStopPointInJourneyPattern(1)
       .withScheduledStopPointRef(scheduledStopPointRef1);
 
     createJourneyPattern
-      .stopPointInJourneyPattern(2)
+      .createStopPointInJourneyPattern(2)
       .withScheduledStopPointRef(scheduledStopPointRef2);
 
     QuayId testQuayId1 = new QuayId("TST:Quay:1");
