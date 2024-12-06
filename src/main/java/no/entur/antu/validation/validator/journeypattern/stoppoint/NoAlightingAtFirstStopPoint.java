@@ -1,5 +1,6 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint;
 
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 /**
@@ -26,8 +27,10 @@ public class NoAlightingAtFirstStopPoint extends ValidateNotExist {
       """.formatted(
           path
         ),
+      "JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP",
+      "Journey Pattern - No alighting on first stop",
       "First StopPointInJourneyPattern must not allow alighting",
-      "JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP"
+      Severity.ERROR
     );
   }
 }

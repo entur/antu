@@ -1,6 +1,7 @@
 package no.entur.antu.validation.flex.validator;
 
 import no.entur.antu.organisation.OrganisationRepository;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
@@ -25,8 +26,10 @@ public class EnturImportFlexTimetableDataValidationTreeFactory
     serviceFrameValidationTreeForLineFile.addValidationRule(
       new ValidateNotExist(
         "lines/Line",
+        "LINE_10",
+        "Flexible line - Line not allowed",
         "Line not allowed in imported flexible line files",
-        "LINE_10"
+        Severity.ERROR
       )
     );
     return serviceFrameValidationTreeForLineFile;

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
 import org.entur.netex.validation.validator.xpath.XPathValidationRule;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
@@ -46,8 +47,10 @@ public class EnturTimetableDataSwedenValidationTreeFactory
     validationTree.addValidationRule(
       new ValidateAtLeastOne(
         "ServiceFrame[validityConditions or ValidBetween] | ServiceCalendarFrame[validityConditions or ValidBetween] | SiteFrame[validityConditions or ValidBetween]",
+        "VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1",
+        "SE/Validity condition on common frames",
         "Neither ServiceFrame nor ServiceCalendarFrame nor SiteFrame defines ValidityConditions",
-        "VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1"
+        Severity.ERROR
       )
     );
     return validationTree;
@@ -73,8 +76,10 @@ public class EnturTimetableDataSwedenValidationTreeFactory
     compositeFrameBaseValidationRules.add(
       new ValidateNotExist(
         ".[not(validityConditions or ValidBetween)]",
+        "COMPOSITE_FRAME_SE_1",
+        "SE/CompositeFrame missing ValidityCondition/ValidBetween",
         "A CompositeFrame must define a ValidityCondition valid for all data within the CompositeFrame",
-        "COMPOSITE_FRAME_SE_1"
+        Severity.ERROR
       )
     );
 

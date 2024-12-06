@@ -3,6 +3,7 @@ package no.entur.antu.validation.flex.validator;
 import java.util.List;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.ValidationTree;
 import org.entur.netex.validation.validator.xpath.XPathValidationRule;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
@@ -63,9 +64,11 @@ public class EnturFlexTimetableDataValidationTreeFactory
 
     siteFrameValidationTree.addValidationRule(
       new ValidateNotExist(
-        "stopPlaces",
-        "stopPlaces not allowed in flexible shared files",
-        "SITE_FRAME_IN_COMMON_FILE_1"
+        "SiteFrame/stopPlaces",
+        "STOP_PLACE_IN_FLEX_COMMON_FILE",
+        "Flexible Line stopPlaces not allowed",
+        "StopPlaces not allowed in flexible shared files",
+        Severity.ERROR
       )
     );
 

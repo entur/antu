@@ -3,6 +3,7 @@ package no.entur.antu.validation.validator.xpath.rules;
 import java.util.List;
 import java.util.Set;
 import net.sf.saxon.s9api.XdmNode;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
@@ -19,8 +20,10 @@ class ValidateNoLineInImportedFlexDatasetTest {
 
   private final ValidateNotExist validateLineNotExist = new ValidateNotExist(
     "ServiceFrame/lines/Line",
+    "LINE_10",
+    "Flexible line - Line not allowed",
     "Line not allowed in imported flexible line files",
-    "LINE_10"
+    Severity.ERROR
   );
 
   private static final String NETEX_FRAGMENT_LINE =

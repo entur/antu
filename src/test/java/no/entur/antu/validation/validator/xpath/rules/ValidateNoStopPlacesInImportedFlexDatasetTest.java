@@ -3,6 +3,7 @@ package no.entur.antu.validation.validator.xpath.rules;
 import java.util.List;
 import java.util.Set;
 import net.sf.saxon.s9api.XdmNode;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
@@ -20,8 +21,10 @@ class ValidateNoStopPlacesInImportedFlexDatasetTest {
   private final ValidateNotExist validateStopPlacesNotExist =
     new ValidateNotExist(
       "SiteFrame/stopPlaces",
-      "stopPlaces not allowed in flexible shared files",
-      "SITE_FRAME_IN_COMMON_FILE_1"
+      "STOP_PLACE_IN_FLEX_COMMON_FILE",
+      "Flexible Line stopPlaces not allowed",
+      "StopPlaces not allowed in flexible shared files",
+      Severity.ERROR
     );
 
   private static final String NETEX_SITE_FRAME_WITH_FLEXIBLE_STOP_PLACES =
