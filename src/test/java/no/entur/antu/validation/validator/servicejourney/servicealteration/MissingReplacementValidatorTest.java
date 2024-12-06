@@ -29,10 +29,10 @@ class MissingReplacementValidatorTest extends ValidationTest {
     int id,
     NetexEntitiesTestFactory testData
   ) {
-    return testData.datedServiceJourney(
+    return testData.createDatedServiceJourney(
       id,
-      testData.serviceJourney(id, testData.journeyPattern(id)),
-      testData.operatingDay(id, LocalDate.parse("2024-12-01"))
+      testData.createServiceJourney(id, testData.createJourneyPattern(id)),
+      testData.createOperatingDay(id, LocalDate.parse("2024-12-01"))
     );
   }
 

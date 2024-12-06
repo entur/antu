@@ -193,7 +193,7 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
         );
 
         netexEntitiesTestFactory
-          .serviceJourneyInterchange(i)
+          .createServiceJourneyInterchange(i)
           .withFromPointRef(fromPointRef)
           .withToPointRef(toPointRef)
           .withFromJourneyRef(

@@ -17,7 +17,6 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceLink;
 
 class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
 
@@ -388,7 +387,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     netexEntitiesTestFactory
-      .serviceLink(1, fromStopPointId, toStopPointId)
+      .createServiceLink(1, fromStopPointId, toStopPointId)
       .withLineStringPositions(lineStringCoordinates)
       .create();
 
@@ -420,7 +419,7 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     netexEntitiesTestFactory
-      .serviceLink(1, fromStopPointId, toStopPointId)
+      .createServiceLink(1, fromStopPointId, toStopPointId)
       .withLineStringList(lineStringCoordinates)
       .create();
 

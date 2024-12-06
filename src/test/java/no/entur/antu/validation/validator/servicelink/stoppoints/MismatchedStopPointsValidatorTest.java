@@ -110,7 +110,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.journeyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern(1);
 
     createJourneyPattern
       .stopPointInJourneyPattern(1)
@@ -162,7 +162,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.journeyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern(1);
 
     createJourneyPattern
       .stopPointInJourneyPattern(1)
@@ -246,7 +246,7 @@ class MismatchedStopPointsValidatorTest extends ValidationTest {
       .rangeClosed(1, numberOfJourneyPatterns)
       .forEach(journeyPatternId -> {
         NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-          netexEntitiesTestFactory.journeyPattern(journeyPatternId);
+          netexEntitiesTestFactory.createJourneyPattern(journeyPatternId);
 
         IntStream
           .rangeClosed(1, numberOfStopPointsInJourneyPattern)

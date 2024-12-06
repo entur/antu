@@ -177,8 +177,8 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
     int maxStartIndex = Math.max(startIndex, 0);
 
     List<NetexEntitiesTestFactory.CreateServiceJourney> serviceJourneys =
-      netexEntitiesTestFactory.serviceJourneys(
-        netexEntitiesTestFactory.journeyPattern(1),
+      netexEntitiesTestFactory.createServiceJourneys(
+        netexEntitiesTestFactory.createJourneyPattern(1),
         (numberOfServiceJourneyInterchanges + maxStartIndex) * 2
       );
 
@@ -192,7 +192,7 @@ class DuplicateInterchangesValidatorTest extends ValidationTest {
       .forEach(index -> {
         int id = duplicateIndexesList.contains(index) ? maxStartIndex : index;
         netexEntitiesTestFactory
-          .serviceJourneyInterchange(index)
+          .createServiceJourneyInterchange(index)
           .withFromJourneyRef(serviceJourneys.get(id * 2).refObject())
           .withToJourneyRef(serviceJourneys.get((id * 2) + 1).refObject())
           .withFromPointRef(

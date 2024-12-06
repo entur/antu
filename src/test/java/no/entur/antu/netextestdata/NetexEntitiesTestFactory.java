@@ -160,17 +160,60 @@ public class NetexEntitiesTestFactory {
       );
   }
 
-  public CreateLine line(int id) {
+  /**
+   * Create a line with the given id
+   * The existing line will be overwritten.
+   *
+   * @param id the id of the line
+   * @return CreateLine
+   */
+  public CreateLine createLine(int id) {
     line = new CreateLine(id);
     return (CreateLine) line;
   }
 
-  public CreateFlexibleLine flexibleLine(int id) {
+  /**
+   * Create a line with id 1.
+   * The existing line will be overwritten.
+   *
+   * @return CreateLine
+   */
+  public CreateLine createLine() {
+    line = new CreateLine(1);
+    return (CreateLine) line;
+  }
+
+  /**
+   * Create a flexible line with the given id
+   * The existing line will be overwritten.
+   *
+   * @param id the id of the line
+   * @return CreateFlexibleLine
+   */
+  public CreateFlexibleLine createFlexibleLine(int id) {
     line = new CreateFlexibleLine(id);
     return (CreateFlexibleLine) line;
   }
 
-  public CreateRoute route(int id) {
+  /**
+   * Create a flexible line with id 1.
+   * The existing line will be overwritten.
+   *
+   * @return CreateFlexibleLine
+   */
+  public CreateFlexibleLine createFlexibleLine() {
+    line = new CreateFlexibleLine(1);
+    return (CreateFlexibleLine) line;
+  }
+
+  /**
+   * Create a route with the given id
+   * The existing route will be overwritten.
+   *
+   * @param id the id of the route
+   * @return CreateRoute
+   */
+  public CreateRoute createRoute(int id) {
     if (line == null) {
       line = new CreateLine(1);
     }
@@ -179,13 +222,53 @@ public class NetexEntitiesTestFactory {
     return route;
   }
 
-  public CreateJourneyPattern journeyPattern(int id) {
+  /**
+   * Create a route with id 1.
+   * The existing route will be overwritten.
+   *
+   * @return CreateRoute
+   */
+  public CreateRoute createRoute() {
+    if (line == null) {
+      line = new CreateLine(1);
+    }
+
+    route = new CreateRoute(1, line);
+    return route;
+  }
+
+  /**
+   * Adds a new journey pattern with the given id
+   *
+   * @param id the id of the journey pattern
+   * @return CreateJourneyPattern
+   */
+  public CreateJourneyPattern createJourneyPattern(int id) {
     CreateJourneyPattern createJourneyPattern = new CreateJourneyPattern(id);
     journeyPatterns.add(createJourneyPattern);
     return createJourneyPattern;
   }
 
-  public CreateServiceJourney serviceJourney(
+  /**
+   * Adds a new journey pattern with id 1
+   *
+   * @return CreateJourneyPattern
+   */
+  public CreateJourneyPattern createJourneyPattern() {
+    CreateJourneyPattern createJourneyPattern = new CreateJourneyPattern(1);
+    journeyPatterns.add(createJourneyPattern);
+    return createJourneyPattern;
+  }
+
+  /**
+   * Adds a new service journey with the given id and the given journey pattern
+   * The line will be created if it does not exist, with id 1
+   *
+   * @param id the id of the journey pattern
+   * @param journeyPattern the journey pattern ref for the service journey
+   * @return CreateServiceJourney
+   */
+  public CreateServiceJourney createServiceJourney(
     int id,
     CreateJourneyPattern journeyPattern
   ) {
@@ -202,19 +285,74 @@ public class NetexEntitiesTestFactory {
     return createServiceJourney;
   }
 
-  public CreateDeadRun deadRun(
-    int id,
-    CreateJourneyPattern createJourneyPattern
+  /**
+   * Adds a new service journey with id 1 and the given journey pattern
+   * The line will be created if it does not exist, with id 1
+   *
+   * @param journeyPattern the journey pattern ref for the service journey
+   * @return CreateServiceJourney
+   */
+  public CreateServiceJourney createServiceJourney(
+    CreateJourneyPattern journeyPattern
   ) {
     if (line == null) {
       line = new CreateLine(1);
     }
-    CreateDeadRun deadRun = new CreateDeadRun(id, line, createJourneyPattern);
+
+    CreateServiceJourney createServiceJourney = new CreateServiceJourney(
+      1,
+      line,
+      journeyPattern
+    );
+    serviceJourneys.add(createServiceJourney);
+    return createServiceJourney;
+  }
+
+  /**
+   * Adds a new dead run with the given id and the given journey pattern
+   * The line will be created if it does not exist, with id 1
+   *
+   * @param id the id of the journey pattern
+   * @param journeyPattern the journey pattern ref for the dead run
+   * @return CreateDeadRun
+   */
+  public CreateDeadRun createDeadRun(
+    int id,
+    CreateJourneyPattern journeyPattern
+  ) {
+    if (line == null) {
+      line = new CreateLine(1);
+    }
+    CreateDeadRun deadRun = new CreateDeadRun(id, line, journeyPattern);
     deadRuns.add(deadRun);
     return deadRun;
   }
 
-  public CreateDatedServiceJourney datedServiceJourney(
+  /**
+   * Adds a new dead run with id 1 and the given journey pattern
+   * The line will be created if it does not exist, with id 1
+   *
+   * @param journeyPattern the journey pattern ref for the dead run
+   * @return CreateDeadRun
+   */
+  public CreateDeadRun createDeadRun(CreateJourneyPattern journeyPattern) {
+    if (line == null) {
+      line = new CreateLine(1);
+    }
+    CreateDeadRun deadRun = new CreateDeadRun(1, line, journeyPattern);
+    deadRuns.add(deadRun);
+    return deadRun;
+  }
+
+  /**
+   * Adds a new dated service journey with the given id, service journey and operating day
+   *
+   * @param id the id of the dated service journey
+   * @param serviceJourneyRef the service journey ref for the dated service journey
+   * @param operatingDayRef the operating day ref for the dated service journey
+   * @return CreateDatedServiceJourney
+   */
+  public CreateDatedServiceJourney createDatedServiceJourney(
     int id,
     CreateServiceJourney serviceJourneyRef,
     CreateOperatingDay operatingDayRef
@@ -225,7 +363,33 @@ public class NetexEntitiesTestFactory {
     return createDatedServiceJourney;
   }
 
-  public List<CreateServiceJourney> serviceJourneys(
+  /**
+   * Adds a new dated service journey with id 1, service journey and operating day
+   *
+   * @param serviceJourneyRef the service journey ref for the dated service journey
+   * @param operatingDayRef the operating day ref for the dated service journey
+   * @return CreateDatedServiceJourney
+   */
+  public CreateDatedServiceJourney createDatedServiceJourney(
+    CreateServiceJourney serviceJourneyRef,
+    CreateOperatingDay operatingDayRef
+  ) {
+    CreateDatedServiceJourney createDatedServiceJourney =
+      new CreateDatedServiceJourney(1, serviceJourneyRef, operatingDayRef);
+    datedServiceJourneys.add(createDatedServiceJourney);
+    return createDatedServiceJourney;
+  }
+
+  /**
+   * Adds numberOfServiceJourneys new service journeys with the given journey pattern.
+   * The line will be created if it does not exist, with id 1
+   * The service journeys will have ids from 1 to numberOfServiceJourneys
+   *
+   * @param createJourneyPattern the journey pattern ref for the service journeys
+   * @param numberOfServiceJourneys the number of service journeys to create
+   * @return List of CreateServiceJourney created
+   */
+  public List<CreateServiceJourney> createServiceJourneys(
     CreateJourneyPattern createJourneyPattern,
     int numberOfServiceJourneys
   ) {
@@ -242,14 +406,40 @@ public class NetexEntitiesTestFactory {
     return createServiceJourneys;
   }
 
-  public CreateServiceJourneyInterchange serviceJourneyInterchange(int id) {
+  /**
+   * Adds a new service journey interchange with the given id
+   *
+   * @param id the id of the service journey interchange
+   * @return CreateServiceJourneyInterchange
+   */
+  public CreateServiceJourneyInterchange createServiceJourneyInterchange(
+    int id
+  ) {
     CreateServiceJourneyInterchange createServiceJourneyInterchange =
       new CreateServiceJourneyInterchange(id);
     interchanges.add(createServiceJourneyInterchange);
     return createServiceJourneyInterchange;
   }
 
-  public CreateServiceLink serviceLink(
+  /**
+   * Adds a new service journey interchange with id 1
+   *
+   * @return CreateServiceJourneyInterchange
+   */
+  public CreateServiceJourneyInterchange createServiceJourneyInterchange() {
+    CreateServiceJourneyInterchange createServiceJourneyInterchange =
+      new CreateServiceJourneyInterchange(1);
+    interchanges.add(createServiceJourneyInterchange);
+    return createServiceJourneyInterchange;
+  }
+
+  /**
+   * Adds a new service link with the given id
+   *
+   * @param id the id of the service link
+   * @return CreateServiceLink
+   */
+  public CreateServiceLink createServiceLink(
     int id,
     ScheduledStopPointRefStructure fromScheduledStopPointRef,
     ScheduledStopPointRefStructure toScheduledStopPointRef
@@ -261,24 +451,97 @@ public class NetexEntitiesTestFactory {
     return createServiceLink;
   }
 
-  public CreateFlexibleStopPlace flexibleStopPlace(int id) {
+  /**
+   * Adds a new service link with id 1
+   *
+   * @return CreateServiceLink
+   */
+  public CreateServiceLink createServiceLink(
+    ScheduledStopPointRefStructure fromScheduledStopPointRef,
+    ScheduledStopPointRefStructure toScheduledStopPointRef
+  ) {
+    CreateServiceLink createServiceLink = new CreateServiceLink(1)
+      .withFromScheduledStopPointRef(fromScheduledStopPointRef)
+      .withToScheduledStopPointRef(toScheduledStopPointRef);
+    serviceLinks.add(createServiceLink);
+    return createServiceLink;
+  }
+
+  /**
+   * Adds a new flexible stop place with the given id
+   *
+   * @param id the id of the flexible stop place
+   * @return CreateFlexibleStopPlace
+   */
+  public CreateFlexibleStopPlace createFlexibleStopPlace(int id) {
     CreateFlexibleStopPlace createFlexibleStopPlace =
       new CreateFlexibleStopPlace(id);
     flexibleStopPlaces.add(createFlexibleStopPlace);
     return createFlexibleStopPlace;
   }
 
-  public CreatePassengerStopAssignment passengerStopAssignment(int id) {
+  /**
+   * Adds a new flexible stop place with id 1
+   *
+   * @return CreateFlexibleStopPlace
+   */
+  public CreateFlexibleStopPlace createFlexibleStopPlace() {
+    CreateFlexibleStopPlace createFlexibleStopPlace =
+      new CreateFlexibleStopPlace(1);
+    flexibleStopPlaces.add(createFlexibleStopPlace);
+    return createFlexibleStopPlace;
+  }
+
+  /**
+   * Adds a new passenger stop assignment with the given id
+   *
+   * @param id the id of the passenger stop assignment
+   * @return CreatePassengerStopAssignment
+   */
+  public CreatePassengerStopAssignment createPassengerStopAssignment(int id) {
     CreatePassengerStopAssignment createPassengerStopAssignment =
       new CreatePassengerStopAssignment(id);
     passengerStopAssignments.add(createPassengerStopAssignment);
     return createPassengerStopAssignment;
   }
 
-  public CreateOperatingDay operatingDay(int id, LocalDate date) {
+  /**
+   * Adds a new passenger stop assignment with id 1
+   *
+   * @return CreatePassengerStopAssignment
+   */
+  public CreatePassengerStopAssignment createPassengerStopAssignment() {
+    CreatePassengerStopAssignment createPassengerStopAssignment =
+      new CreatePassengerStopAssignment(1);
+    passengerStopAssignments.add(createPassengerStopAssignment);
+    return createPassengerStopAssignment;
+  }
+
+  /**
+   * Adds a new day type with the given id
+   *
+   * @param id the id of the day type
+   * @return CreateDayType
+   */
+  public CreateOperatingDay createOperatingDay(int id, LocalDate date) {
     return new CreateOperatingDay(id, date);
   }
 
+  /**
+   * Adds a new day type with id 1
+   *
+   * @return CreateDayType
+   */
+  public CreateOperatingDay createOperatingDay(LocalDate date) {
+    return new CreateOperatingDay(1, date);
+  }
+
+  /**
+   * Creates the new ScheduledStopPointRefStructure with the given id
+   *
+   * @param id the id of the ScheduledStopPoint
+   * @return ScheduledStopPointRefStructure
+   */
   public static ScheduledStopPointRefStructure createScheduledStopPointRef(
     int id
   ) {
@@ -286,22 +549,52 @@ public class NetexEntitiesTestFactory {
       .withRef("TST:ScheduledStopPoint:" + id);
   }
 
+  /**
+   * Creates the new QuayRefStructure with the given id
+   *
+   * @param id the id of the Quay
+   * @return QuayRefStructure
+   */
   public static QuayRefStructure createQuayRef(int id) {
     return new QuayRefStructure().withRef("TST:Quay:" + id);
   }
 
+  /**
+   * Creates the new StopPlaceRefStructure with the given id
+   *
+   * @param id the id of the StopPlace
+   * @return StopPlaceRefStructure
+   */
   public static StopPlaceRefStructure createStopPointRef(int id) {
     return new StopPlaceRefStructure().withRef("TST:StopPoint:" + id);
   }
 
+  /**
+   * Creates the new StopPlaceRefStructure with the given id
+   *
+   * @param id the id of the StopPlace
+   * @return StopPlaceRefStructure
+   */
   public static ServiceLinkRefStructure createServiceLinkRef(int id) {
     return new ServiceLinkRefStructure().withRef("TST:ServiceLink:" + id);
   }
 
+  /**
+   * Creates the new VehicleJourneyRefStructure with the given id
+   *
+   * @param id the id of the VehicleJourney
+   * @return VehicleJourneyRefStructure
+   */
   public static VehicleJourneyRefStructure createServiceJourneyRef(int id) {
     return new VehicleJourneyRefStructure().withRef("TST:ServiceJourney:" + id);
   }
 
+  /**
+   * Creates the new DatedServiceJourneyRefStructure with the given id
+   *
+   * @param id the id of the DatedServiceJourney
+   * @return DatedServiceJourneyRefStructure
+   */
   public static DestinationDisplayRefStructure createDestinationDisplayRef(
     int id
   ) {
@@ -309,6 +602,11 @@ public class NetexEntitiesTestFactory {
       .withRef("TST:DestinationDisplay:" + id);
   }
 
+  /**
+   * This interface enables the CreateEntity classes to the reference object of their ids.
+   *
+   * @param <R>
+   */
   public interface CreateRef<R extends VersionOfObjectRefStructure> {
     R refObject();
   }

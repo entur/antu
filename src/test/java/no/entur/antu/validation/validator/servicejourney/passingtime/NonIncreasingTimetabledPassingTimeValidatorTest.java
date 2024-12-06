@@ -39,10 +39,10 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
         new NetexEntitiesTestFactory();
 
       NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-        netexEntitiesTestFactory.journeyPattern(1);
+        netexEntitiesTestFactory.createJourneyPattern(1);
 
       NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
-        netexEntitiesTestFactory.serviceJourney(1, createJourneyPattern);
+        netexEntitiesTestFactory.createServiceJourney(1, createJourneyPattern);
 
       List<ScheduledStopPointRefStructure> scheduledStopPointRefs = IntStream
         .rangeClosed(1, numberOfStopPointsInJourneyPattern)

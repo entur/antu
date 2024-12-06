@@ -176,7 +176,7 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
     List<NetexEntitiesTestFactory.CreateJourneyPattern> createJourneyPatterns =
       IntStream
         .rangeClosed(1, numberOfJourneyPatterns)
-        .mapToObj(netexEntitiesTestFactory::journeyPattern)
+        .mapToObj(netexEntitiesTestFactory::createJourneyPattern)
         .toList();
 
     if (numberOfStopPoints > 0) {

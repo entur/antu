@@ -153,10 +153,10 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.journeyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern(1);
 
     netexEntitiesTestFactory
-      .serviceJourney(1, createJourneyPattern)
+      .createServiceJourney(1, createJourneyPattern)
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
@@ -172,7 +172,7 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       );
 
       netexEntitiesTestFactory
-        .passengerStopAssignment(i + 1)
+        .createPassengerStopAssignment(i + 1)
         .withScheduledStopPointRef(
           NetexEntitiesTestFactory.createScheduledStopPointRef(i + 1)
         )
@@ -193,10 +193,10 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.journeyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern(1);
 
     NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
-      netexEntitiesTestFactory.serviceJourney(1, createJourneyPattern);
+      netexEntitiesTestFactory.createServiceJourney(1, createJourneyPattern);
 
     createServiceJourney
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
@@ -220,13 +220,13 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.journeyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern(1);
     List<NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> stopPointInJourneyPatterns =
       createJourneyPattern.stopPointsInJourneyPattern(4);
 
     NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
       netexEntitiesTestFactory
-        .serviceJourney(1, createJourneyPattern)
+        .createServiceJourney(1, createJourneyPattern)
         .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
         .withTransportSubmode(
           new TransportSubmodeStructure()

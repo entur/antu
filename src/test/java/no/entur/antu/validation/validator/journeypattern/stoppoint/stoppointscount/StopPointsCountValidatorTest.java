@@ -49,7 +49,7 @@ class StopPointsCountValidatorTest extends ValidationTest {
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern123 =
       netexEntitiesTestFactory
-        .journeyPattern(123)
+        .createJourneyPattern(123)
         .withNoServiceLinksInJourneyPattern();
 
     IntStream
@@ -73,7 +73,7 @@ class StopPointsCountValidatorTest extends ValidationTest {
     int linksInJourneyPatternIdOffset = 234;
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern123 =
-      testFragment.journeyPattern(123);
+      testFragment.createJourneyPattern(123);
 
     IntStream
       .rangeClosed(1, 10)

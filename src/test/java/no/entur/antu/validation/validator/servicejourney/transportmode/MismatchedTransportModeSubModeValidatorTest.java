@@ -35,14 +35,14 @@ class MismatchedTransportModeSubModeValidatorTest {
   void setUp() {
     validator = new MismatchedTransportModeSubModeValidator();
     netexEntitiesTestFactory = new NetexEntitiesTestFactory();
-    line = netexEntitiesTestFactory.line(1);
-    NetexEntitiesTestFactory.CreateRoute route = netexEntitiesTestFactory.route(
-      1
-    );
+    line = netexEntitiesTestFactory.createLine(1);
+    NetexEntitiesTestFactory.CreateRoute route =
+      netexEntitiesTestFactory.createRoute(1);
     NetexEntitiesTestFactory.CreateJourneyPattern journeyPattern =
-      netexEntitiesTestFactory.journeyPattern(1).withRoute(route);
+      netexEntitiesTestFactory.createJourneyPattern(1).withRoute(route);
     journeyPattern.stopPointsInJourneyPattern(4);
-    serviceJourney = netexEntitiesTestFactory.serviceJourney(1, journeyPattern);
+    serviceJourney =
+      netexEntitiesTestFactory.createServiceJourney(1, journeyPattern);
   }
 
   @Test
@@ -448,20 +448,19 @@ class MismatchedTransportModeSubModeValidatorTest {
 
     NetexEntitiesTestFactory.CreateFlexibleLine createFlexibleLine =
       netexEntitiesTestFactory
-        .flexibleLine(1)
+        .createFlexibleLine(1)
         .withFlexibleLineType(FlexibleLineTypeEnumeration.MIXED_FLEXIBLE);
 
     configureFlexibleLine.accept(createFlexibleLine);
 
-    NetexEntitiesTestFactory.CreateRoute route = netexEntitiesTestFactory.route(
-      1
-    );
+    NetexEntitiesTestFactory.CreateRoute route =
+      netexEntitiesTestFactory.createRoute(1);
 
     NetexEntitiesTestFactory.CreateJourneyPattern journeyPattern =
-      netexEntitiesTestFactory.journeyPattern(1).withRoute(route);
+      netexEntitiesTestFactory.createJourneyPattern(1).withRoute(route);
     journeyPattern.stopPointsInJourneyPattern(4);
 
-    netexEntitiesTestFactory.serviceJourney(1, journeyPattern);
+    netexEntitiesTestFactory.createServiceJourney(1, journeyPattern);
 
     return netexEntitiesTestFactory.create();
   }

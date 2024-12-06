@@ -29,7 +29,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.journeyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern(1);
 
     createJourneyPattern.stopPointsInJourneyPattern(0);
 
@@ -46,7 +46,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.journeyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern(1);
 
     ScheduledStopPointRefStructure scheduledStopPointRef1 =
       NetexEntitiesTestFactory.createScheduledStopPointRef(1);
@@ -84,7 +84,7 @@ class SameQuayRefValidatorTest extends ValidationTest {
       new NetexEntitiesTestFactory();
 
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory.journeyPattern(1);
+      netexEntitiesTestFactory.createJourneyPattern(1);
 
     ScheduledStopPointRefStructure scheduledStopPointRef1 =
       NetexEntitiesTestFactory.createScheduledStopPointRef(1);

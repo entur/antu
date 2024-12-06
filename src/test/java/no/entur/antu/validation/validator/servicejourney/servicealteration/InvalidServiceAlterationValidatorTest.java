@@ -30,13 +30,13 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
     int id,
     NetexEntitiesTestFactory netexEntitiesTestFactory
   ) {
-    return netexEntitiesTestFactory.datedServiceJourney(
+    return netexEntitiesTestFactory.createDatedServiceJourney(
       id,
-      netexEntitiesTestFactory.serviceJourney(
+      netexEntitiesTestFactory.createServiceJourney(
         id,
-        netexEntitiesTestFactory.journeyPattern(id)
+        netexEntitiesTestFactory.createJourneyPattern(id)
       ),
-      netexEntitiesTestFactory.operatingDay(id, LocalDate.of(2024, 12, 1))
+      netexEntitiesTestFactory.createOperatingDay(id, LocalDate.of(2024, 12, 1))
     );
   }
 
