@@ -12,7 +12,6 @@ import org.entur.netex.validation.validator.ValidationReport;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.rutebanken.netex.model.JourneyPattern;
 
 class StopPointsCountValidatorTest extends ValidationTest {
 
@@ -44,31 +43,25 @@ class StopPointsCountValidatorTest extends ValidationTest {
 
   @Test
   void testJourneyPatternWithNoServiceLinks() {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternIdOffset = 123;
 
-    JourneyPattern journeyPattern = testFragment
-      .journeyPattern()
-      .withId(123)
-      .withStopPointsInJourneyPattern(
-        IntStream
-          .rangeClosed(1, 10)
-          .mapToObj(i ->
-            testFragment
-              .stopPointInJourneyPattern(123)
-              .withId(stopPointInJourneyPatternIdOffset + 1)
-              .create()
-          )
-          .toList()
-      )
-      .withNumberOfServiceLinksInJourneyPattern(0)
-      .create();
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern123 =
+      netexEntitiesTestFactory
+        .createJourneyPattern(123)
+        .withNoServiceLinksInJourneyPattern();
+
+    IntStream
+      .rangeClosed(1, 10)
+      .forEach(i ->
+        createJourneyPattern123.createStopPointInJourneyPattern(
+          stopPointInJourneyPatternIdOffset + 1
+        )
+      );
 
     ValidationReport validationReport = runValidation(
-      testFragment
-        .netexEntitiesIndex()
-        .addJourneyPatterns(journeyPattern)
-        .create()
+      netexEntitiesTestFactory.create()
     );
 
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
@@ -79,38 +72,25 @@ class StopPointsCountValidatorTest extends ValidationTest {
     int stopPointInJourneyPatternIdOffset = 123;
     int linksInJourneyPatternIdOffset = 234;
 
-    JourneyPattern journeyPattern = testFragment
-      .journeyPattern()
-      .withId(123)
-      .withStopPointsInJourneyPattern(
-        IntStream
-          .rangeClosed(1, 10)
-          .mapToObj(i ->
-            testFragment
-              .stopPointInJourneyPattern(123)
-              .withId(stopPointInJourneyPatternIdOffset + 1)
-              .create()
-          )
-          .toList()
-      )
-      .withServiceLinksInJourneyPattern(
-        IntStream
-          .rangeClosed(1, numberOfServiceLinks)
-          .mapToObj(i ->
-            testFragment
-              .linkInJourneyPattern(123)
-              .withId(linksInJourneyPatternIdOffset + 1)
-              .create()
-          )
-          .toList()
-      )
-      .create();
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern123 =
+      testFragment.createJourneyPattern(123);
 
-    return runValidation(
-      testFragment
-        .netexEntitiesIndex()
-        .addJourneyPatterns(journeyPattern)
-        .create()
-    );
+    IntStream
+      .rangeClosed(1, 10)
+      .forEach(i ->
+        createJourneyPattern123.createStopPointInJourneyPattern(
+          stopPointInJourneyPatternIdOffset + 1
+        )
+      );
+
+    IntStream
+      .rangeClosed(1, numberOfServiceLinks)
+      .forEach(i ->
+        createJourneyPattern123.createServiceLinkInJourneyPattern(
+          linksInJourneyPatternIdOffset + 1
+        )
+      );
+
+    return runValidation(testFragment.create());
   }
 }
