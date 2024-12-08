@@ -226,11 +226,27 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
       NetexEntitiesTestFactory factory = new NetexEntitiesTestFactory();
 
       ServiceJourneyInterchange serviceJourneyInterchange = factory
-        .serviceJourneyInterchange(1)
-        .withFromPointRef(fromServiceJourney.scheduledStopPointId())
-        .withToPointRef(toServiceJourney.scheduledStopPointId())
-        .withFromJourneyRef(fromServiceJourney.serviceJourneyId())
-        .withToJourneyRef(toServiceJourney.serviceJourneyId())
+        .createServiceJourneyInterchange(1)
+        .withFromPointRef(
+          NetexEntitiesTestFactory.createScheduledStopPointRef(
+            fromServiceJourney.scheduledStopPointId
+          )
+        )
+        .withToPointRef(
+          NetexEntitiesTestFactory.createScheduledStopPointRef(
+            toServiceJourney.scheduledStopPointId
+          )
+        )
+        .withFromJourneyRef(
+          NetexEntitiesTestFactory.createServiceJourneyRef(
+            fromServiceJourney.serviceJourneyId
+          )
+        )
+        .withToJourneyRef(
+          NetexEntitiesTestFactory.createServiceJourneyRef(
+            toServiceJourney.serviceJourneyId
+          )
+        )
         .create();
 
       mockGetServiceJourneyInterchangeInfo(

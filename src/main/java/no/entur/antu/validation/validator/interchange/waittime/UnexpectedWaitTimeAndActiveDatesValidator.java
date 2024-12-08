@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 public class UnexpectedWaitTimeAndActiveDatesValidator
   extends AbstractDatasetValidator {
 
-  static final ValidationRule RULE_NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE  =
+  static final ValidationRule RULE_NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE =
     new ValidationRule(
       "NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE",
       "No shared active date found in interchange",
@@ -40,7 +40,7 @@ public class UnexpectedWaitTimeAndActiveDatesValidator
       Severity.WARNING
     );
 
-  static final ValidationRule RULE_WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT  =
+  static final ValidationRule RULE_WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT =
     new ValidationRule(
       "WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT",
       "Wait time in interchange exceeds warning limit",
@@ -48,7 +48,7 @@ public class UnexpectedWaitTimeAndActiveDatesValidator
       Severity.WARNING
     );
 
-  static final ValidationRule RULE_WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT  =
+  static final ValidationRule RULE_WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT =
     new ValidationRule(
       "WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT",
       "Wait time in interchange exceeds maximum limit",
@@ -147,12 +147,10 @@ public class UnexpectedWaitTimeAndActiveDatesValidator
         new ValidationIssue(
           RULE_NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE,
           new DataLocation(
-            context
-              .serviceJourneyInterchangeInfo()
-              .interchangeId(),
-            context
-              .serviceJourneyInterchangeInfo()
-              .filename(), 0, 0
+            context.serviceJourneyInterchangeInfo().interchangeId(),
+            context.serviceJourneyInterchangeInfo().filename(),
+            0,
+            0
           ),
           context.fromServiceJourneyStop(),
           context.toServiceJourneyStop()
