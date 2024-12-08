@@ -40,8 +40,13 @@ public class CacheConfig {
   public static final String LINE_INFO_CACHE = "linesInfoCache";
   public static final String SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE =
     "serviceJourneyInterchangeInfoCache";
+  public static final String SERVICE_JOURNEY_DAY_TYPES_CACHE =
+    "serviceJourneyDayTypesCache";
   public static final String SERVICE_JOURNEY_STOPS_CACHE =
     "serviceJourneyStopsCache";
+  public static final String SERVICE_JOURNEY_OPERATING_DAYS_CACHE =
+    "serviceJourneyOperatingDaysCache";
+  public static final String ACTIVE_DATES_CACHE = "activeDatesCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
 
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
@@ -172,6 +177,17 @@ public class CacheConfig {
     );
   }
 
+  @Bean(name = SERVICE_JOURNEY_DAY_TYPES_CACHE)
+  public Map<String, Map<String, String>> serviceJourneyDayTypesCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      SERVICE_JOURNEY_DAY_TYPES_CACHE,
+      new CompositeCodec(new StringCodec(), new StringCodec())
+    );
+  }
+
   @Bean(name = SERVICE_JOURNEY_STOPS_CACHE)
   public Map<String, Map<String, List<String>>> serviceJourneyStopsCache(
     RedissonClient redissonClient
@@ -180,6 +196,28 @@ public class CacheConfig {
       redissonClient,
       SERVICE_JOURNEY_STOPS_CACHE,
       new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+    );
+  }
+
+  @Bean(name = ACTIVE_DATES_CACHE)
+  public Map<String, Map<String, String>> activeDatesCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      ACTIVE_DATES_CACHE,
+      new CompositeCodec(new StringCodec(), new StringCodec())
+    );
+  }
+
+  @Bean(name = SERVICE_JOURNEY_OPERATING_DAYS_CACHE)
+  public Map<String, Map<String, String>> serviceJourneyOperatingDaysCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      SERVICE_JOURNEY_OPERATING_DAYS_CACHE,
+      new CompositeCodec(new StringCodec(), new StringCodec())
     );
   }
 
