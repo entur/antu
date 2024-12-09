@@ -10,7 +10,6 @@ import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.JourneyPattern;
 
 class SameStopPointsValidatorTest extends ValidationTest {
 
@@ -25,29 +24,19 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testAllJourneyPatternsHaveDifferentStopPoints() {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
-
-    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
-      testFragment.netexEntitiesIndex();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
     IntStream
       .rangeClosed(1, 8)
       .forEach(i ->
-        createNetexEntitiesIndex.addJourneyPatterns(
-          testFragment
-            .journeyPattern()
-            .withId(i)
-            .withStopPointsInJourneyPattern(
-              List.of(
-                testFragment.stopPointInJourneyPattern(i).withId(i).create()
-              )
-            )
-            .create()
-        )
+        netexEntitiesTestFactory
+          .createJourneyPattern(i)
+          .createStopPointInJourneyPattern(i)
       );
 
     ValidationReport validationReport = runValidation(
-      createNetexEntitiesIndex.create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -55,33 +44,20 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testAllJourneyPatternsHaveSameStopPoints() {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
     int sameStopPointId = 987;
-
-    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
-      testFragment.netexEntitiesIndex();
 
     IntStream
       .rangeClosed(1, 8)
       .forEach(i ->
-        createNetexEntitiesIndex.addJourneyPatterns(
-          testFragment
-            .journeyPattern()
-            .withId(i)
-            .withStopPointsInJourneyPattern(
-              List.of(
-                testFragment
-                  .stopPointInJourneyPattern(1)
-                  .withId(sameStopPointId)
-                  .create()
-              )
-            )
-            .create()
-        )
+        netexEntitiesTestFactory
+          .createJourneyPattern(i)
+          .createStopPointInJourneyPattern(sameStopPointId)
       );
 
     ValidationReport validationReport = runValidation(
-      createNetexEntitiesIndex.create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -89,72 +65,27 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testMultiplePairsOfJourneyPatternsHaveSameStopPoints() {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
     int sameStopPointId1 = 987;
     int sameStopPointId2 = 988;
 
-    JourneyPattern journeyPatternWithSameStopPoints1_1 = testFragment
-      .journeyPattern()
-      .withId(123)
-      .withStopPointsInJourneyPattern(
-        List.of(
-          testFragment
-            .stopPointInJourneyPattern(123)
-            .withId(sameStopPointId1)
-            .create()
-        )
-      )
-      .create();
+    netexEntitiesTestFactory
+      .createJourneyPattern(123)
+      .createStopPointInJourneyPattern(sameStopPointId1);
+    netexEntitiesTestFactory
+      .createJourneyPattern(345)
+      .createStopPointInJourneyPattern(sameStopPointId1);
 
-    JourneyPattern journeyPatternWithSameStopPoints1_2 = testFragment
-      .journeyPattern()
-      .withId(345)
-      .withStopPointsInJourneyPattern(
-        List.of(
-          testFragment
-            .stopPointInJourneyPattern(123)
-            .withId(sameStopPointId1)
-            .create()
-        )
-      )
-      .create();
-
-    JourneyPattern journeyPatternWithSameStopPoints2_1 = testFragment
-      .journeyPattern()
-      .withId(567)
-      .withStopPointsInJourneyPattern(
-        List.of(
-          testFragment
-            .stopPointInJourneyPattern(567)
-            .withId(sameStopPointId2)
-            .create()
-        )
-      )
-      .create();
-
-    JourneyPattern journeyPatternWithSameStopPoints2_2 = testFragment
-      .journeyPattern()
-      .withId(789)
-      .withStopPointsInJourneyPattern(
-        List.of(
-          testFragment
-            .stopPointInJourneyPattern(567)
-            .withId(sameStopPointId2)
-            .create()
-        )
-      )
-      .create();
+    netexEntitiesTestFactory
+      .createJourneyPattern(567)
+      .createStopPointInJourneyPattern(sameStopPointId2);
+    netexEntitiesTestFactory
+      .createJourneyPattern(789)
+      .createStopPointInJourneyPattern(sameStopPointId2);
 
     ValidationReport validationReport = runValidation(
-      testFragment
-        .netexEntitiesIndex()
-        .addJourneyPatterns(
-          journeyPatternWithSameStopPoints1_1,
-          journeyPatternWithSameStopPoints1_2,
-          journeyPatternWithSameStopPoints2_1,
-          journeyPatternWithSameStopPoints2_2
-        )
-        .create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(2));
@@ -162,45 +93,34 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testAllJourneyPatternsWithMultipleStopPointsHaveSameStopPoints() {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternId = 987;
-    JourneyPattern journeyPattern1 = testFragment
-      .journeyPattern()
-      .withId(123)
-      .withStopPointsInJourneyPattern(
-        IntStream
-          .rangeClosed(1, 10)
-          .mapToObj(i ->
-            testFragment
-              .stopPointInJourneyPattern(123)
-              .withId(stopPointInJourneyPatternId + 1)
-              .create()
-          )
-          .toList()
-      )
-      .create();
 
-    JourneyPattern journeyPattern2 = testFragment
-      .journeyPattern()
-      .withId(345)
-      .withStopPointsInJourneyPattern(
-        IntStream
-          .rangeClosed(1, 10)
-          .mapToObj(i ->
-            testFragment
-              .stopPointInJourneyPattern(123)
-              .withId(stopPointInJourneyPatternId + 1)
-              .create()
-          )
-          .toList()
-      )
-      .create();
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern123 =
+      netexEntitiesTestFactory.createJourneyPattern(123);
+
+    IntStream
+      .rangeClosed(1, 10)
+      .forEach(i ->
+        createJourneyPattern123.createStopPointInJourneyPattern(
+          stopPointInJourneyPatternId + 1
+        )
+      );
+
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern345 =
+      netexEntitiesTestFactory.createJourneyPattern(345);
+
+    IntStream
+      .rangeClosed(1, 10)
+      .forEach(i ->
+        createJourneyPattern345.createStopPointInJourneyPattern(
+          stopPointInJourneyPatternId + 1
+        )
+      );
 
     ValidationReport validationReport = runValidation(
-      testFragment
-        .netexEntitiesIndex()
-        .addJourneyPatterns(journeyPattern1, journeyPattern2)
-        .create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -208,64 +128,27 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testTwoJourneyPatternsOutOfTenHaveSameStopPoints() {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternId = 987;
 
-    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
-      testFragment.netexEntitiesIndex();
+    netexEntitiesTestFactory
+      .createJourneyPattern(123)
+      .createStopPointInJourneyPattern(stopPointInJourneyPatternId);
+    netexEntitiesTestFactory
+      .createJourneyPattern(345)
+      .createStopPointInJourneyPattern(stopPointInJourneyPatternId);
 
     IntStream
       .rangeClosed(1, 8)
       .forEach(i ->
-        createNetexEntitiesIndex.addJourneyPatterns(
-          testFragment
-            .journeyPattern()
-            .withId(i)
-            .withStopPointsInJourneyPattern(
-              List.of(
-                testFragment
-                  .stopPointInJourneyPattern(123)
-                  .withId(stopPointInJourneyPatternId + i)
-                  .create()
-              )
-            )
-            .create()
-        )
+        netexEntitiesTestFactory
+          .createJourneyPattern(i)
+          .createStopPointInJourneyPattern(stopPointInJourneyPatternId + i)
       );
 
-    JourneyPattern journeyPatternWithSameStopPoints1 = testFragment
-      .journeyPattern()
-      .withId(123)
-      .withStopPointsInJourneyPattern(
-        List.of(
-          testFragment
-            .stopPointInJourneyPattern(123)
-            .withId(stopPointInJourneyPatternId)
-            .create()
-        )
-      )
-      .create();
-
-    JourneyPattern journeyPatternWithSameStopPoints2 = testFragment
-      .journeyPattern()
-      .withId(345)
-      .withStopPointsInJourneyPattern(
-        List.of(
-          testFragment
-            .stopPointInJourneyPattern(123)
-            .withId(stopPointInJourneyPatternId)
-            .create()
-        )
-      )
-      .create();
-
-    createNetexEntitiesIndex.addJourneyPatterns(
-      journeyPatternWithSameStopPoints1,
-      journeyPatternWithSameStopPoints2
-    );
-
     ValidationReport validationReport = runValidation(
-      createNetexEntitiesIndex.create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -273,50 +156,36 @@ class SameStopPointsValidatorTest extends ValidationTest {
 
   @Test
   void testJourneyPatternsWithUnSortedSameStopPoints() {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
     int stopPointInJourneyPatternId = 987;
 
     List<Integer> stopPointsOrder1 = List.of(8, 3, 5, 2, 4, 10, 9, 1, 7, 6);
 
-    JourneyPattern journeyPattern1 = testFragment
-      .journeyPattern()
-      .withId(123)
-      .withStopPointsInJourneyPattern(
-        IntStream
-          .rangeClosed(1, 10)
-          .mapToObj(i ->
-            testFragment
-              .stopPointInJourneyPattern(123)
-              .withId(stopPointInJourneyPatternId + 1)
-              .withOrder(stopPointsOrder1.get(i - 1)) // not in order, as appeared in the xml
-              .create()
-          )
-          .toList()
-      )
-      .create();
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern123 =
+      netexEntitiesTestFactory.createJourneyPattern(123);
 
-    JourneyPattern journeyPattern2 = testFragment
-      .journeyPattern()
-      .withId(345)
-      .withStopPointsInJourneyPattern(
-        IntStream
-          .rangeClosed(1, 10)
-          .mapToObj(i ->
-            testFragment
-              .stopPointInJourneyPattern(123)
-              .withId(stopPointInJourneyPatternId + 1)
-              .withOrder(i) // In correct order, also as appeared in xml
-              .create()
-          )
-          .toList()
-      )
-      .create();
+    IntStream
+      .rangeClosed(1, 10)
+      .forEach(i ->
+        createJourneyPattern123
+          .createStopPointInJourneyPattern(stopPointInJourneyPatternId + 1)
+          .withOrder(stopPointsOrder1.get(i - 1))
+      );
+
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern345 =
+      netexEntitiesTestFactory.createJourneyPattern(345);
+
+    IntStream
+      .rangeClosed(1, 10)
+      .forEach(i ->
+        createJourneyPattern345
+          .createStopPointInJourneyPattern(stopPointInJourneyPatternId + 1)
+          .withOrder(i)
+      );
 
     ValidationReport validationReport = runValidation(
-      testFragment
-        .netexEntitiesIndex()
-        .addJourneyPatterns(journeyPattern1, journeyPattern2)
-        .create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));

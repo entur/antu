@@ -3,7 +3,9 @@ package no.entur.antu.validation.validator.servicejourney.speed;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.IntStream;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -15,9 +17,6 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.PassengerStopAssignment;
-import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 
 class UnexpectedSpeedValidatorTest extends ValidationTest {
@@ -150,19 +149,19 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
       new QuayCoordinates(6.632312, 60.491548)
     );
 
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
-    JourneyPattern journeyPattern = testData.journeyPattern().create();
-    ServiceJourney serviceJourney = testData
-      .serviceJourney(journeyPattern)
-      .create();
-    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
-    serviceJourney.withTransportSubmode(
-      new TransportSubmodeStructure()
-        .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
-    );
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
-    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
-      testData.netexEntitiesIndex(journeyPattern, serviceJourney);
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
+      netexEntitiesTestFactory.createJourneyPattern();
+
+    netexEntitiesTestFactory
+      .createServiceJourney(createJourneyPattern)
+      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportSubmode(
+        new TransportSubmodeStructure()
+          .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
+      );
 
     mockNoQuayIdsInNetexDataRepository();
 
@@ -172,20 +171,17 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
         quayCoordinates.get(i)
       );
 
-      PassengerStopAssignment passengerStopAssignment = testData
-        .passengerStopAssignment()
-        .withScheduleStopPointId(i + 1)
-        .withStopPlaceId(i + 1)
-        .withQuayId(i + 1)
-        .create();
-
-      createNetexEntitiesIndex.addPassengerStopAssignment(
-        passengerStopAssignment
-      );
+      netexEntitiesTestFactory
+        .createPassengerStopAssignment(i + 1)
+        .withScheduledStopPointRef(
+          NetexEntitiesTestFactory.createScheduledStopPointRef(i + 1)
+        )
+        .withStopPlaceRef(NetexEntitiesTestFactory.createStopPointRef(i + 1))
+        .withQuayRef(NetexEntitiesTestFactory.createQuayRef(i + 1));
     }
 
     ValidationReport validationReport = runValidation(
-      createNetexEntitiesIndex.create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -193,24 +189,25 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
 
   @Test
   void testNoPassengerStopAssignmentsFoundShouldIgnoreValidationGracefully() {
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
-    JourneyPattern journeyPattern = testData.journeyPattern().create();
-    ServiceJourney serviceJourney = testData
-      .serviceJourney(journeyPattern)
-      .create();
-    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
-    serviceJourney.withTransportSubmode(
-      new TransportSubmodeStructure()
-        .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
-    );
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
-    NetexEntitiesTestFactory.CreateNetexEntitiesIndex createNetexEntitiesIndex =
-      testData.netexEntitiesIndex(journeyPattern, serviceJourney);
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
+      netexEntitiesTestFactory.createJourneyPattern();
 
+    NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
+      netexEntitiesTestFactory.createServiceJourney(createJourneyPattern);
+
+    createServiceJourney
+      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportSubmode(
+        new TransportSubmodeStructure()
+          .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
+      );
     mockNoQuayIdsInNetexDataRepository();
 
     ValidationReport validationReport = runValidation(
-      createNetexEntitiesIndex.create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -219,21 +216,35 @@ class UnexpectedSpeedValidatorTest extends ValidationTest {
   private ValidationReport runTestWithQuayCoordinates(
     List<QuayCoordinates> quayCoordinates
   ) {
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
-    JourneyPattern journeyPattern = testData.journeyPattern().create();
-    ServiceJourney serviceJourney = testData
-      .serviceJourney(journeyPattern)
-      .create();
-    serviceJourney.withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
-    serviceJourney.withTransportSubmode(
-      new TransportSubmodeStructure()
-        .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
-    );
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
-    return runTestWith(
-      quayCoordinates,
-      testData.netexEntitiesIndex(journeyPattern, serviceJourney).create()
-    );
+    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
+      netexEntitiesTestFactory.createJourneyPattern();
+    List<NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> stopPointInJourneyPatterns =
+      createJourneyPattern.createStopPointsInJourneyPattern(4);
+
+    NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
+      netexEntitiesTestFactory
+        .createServiceJourney(createJourneyPattern)
+        .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+        .withTransportSubmode(
+          new TransportSubmodeStructure()
+            .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
+        );
+
+    IntStream
+      .rangeClosed(1, stopPointInJourneyPatterns.size())
+      .forEach(index ->
+        createServiceJourney
+          .createTimetabledPassingTime(
+            index,
+            stopPointInJourneyPatterns.get(index - 1)
+          )
+          .withDepartureTime(LocalTime.of(5, index * 5))
+      );
+
+    return runTestWith(quayCoordinates, netexEntitiesTestFactory.create());
   }
 
   private ValidationReport runTestWith(
