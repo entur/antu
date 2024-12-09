@@ -35,7 +35,7 @@ public class LineInfoCollector extends NetexDataCollector {
 
   @Override
   protected void collectDataFromCommonFile(
-    JAXBValidationContext validationContext
+    JAXBValidationContext jaxbValidationContext
   ) {
     // No Lines in common files
   }
