@@ -373,7 +373,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
   }
 
   /*
-   * Test that the wait time between two service journeys is less than the warning limit.
+   * Test that the wait time between two service journeys is more than the warning limit.
    * Waiting Limit is 1 hour
    */
   @Test
@@ -407,7 +407,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT")
+      is("Wait time in interchange exceeds warning limit")
     );
   }
 
@@ -447,7 +447,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT")
+      is("Wait time in interchange exceeds warning limit")
     );
   }
 
@@ -486,12 +486,12 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT")
+      is("Wait time in interchange exceeds maximum limit")
     );
   }
 
   /*
-   * Test that the wait time between two service journeys is less than the maximum limit.
+   * Test that the wait time between two service journeys is more than the maximum limit.
    * Maximum Limit is 3 hours
    */
   @Test
@@ -527,7 +527,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT")
+      is("Wait time in interchange exceeds maximum limit")
     );
   }
 
@@ -563,7 +563,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE")
+      is("No shared active date found in interchange")
     );
   }
 
@@ -606,7 +606,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE")
+      is("No shared active date found in interchange")
     );
   }
 
@@ -722,7 +722,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
   }
 
   /*
-   * Test that the wait time between two service journeys is less than the warning limit.
+   * Test that the wait time between two service journeys is more than the warning limit.
    * Waiting Limit is 1 hour
    */
   @Test
@@ -756,12 +756,12 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT")
+      is("Wait time in interchange exceeds warning limit")
     );
   }
 
   /*
-   * Test that the wait time between two service journeys is less than the warning limit.
+   * Test that the wait time between two service journeys is more than the warning limit.
    * Waiting Limit is 1 hour
    */
   @Test
@@ -796,12 +796,12 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT")
+      is("Wait time in interchange exceeds warning limit")
     );
   }
 
   /*
-   * Test that the wait time between two service journeys is less than the maximum limit.
+   * Test that the wait time between two service journeys is more than the maximum limit.
    * Maximum Limit is 3 hours
    */
   @Test
@@ -835,7 +835,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT")
+      is("Wait time in interchange exceeds maximum limit")
     );
   }
 
@@ -876,7 +876,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT")
+      is("Wait time in interchange exceeds maximum limit")
     );
   }
 
@@ -912,7 +912,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE")
+      is("No shared active date found in interchange")
     );
   }
 
@@ -947,7 +947,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE")
+      is("No shared active date found in interchange")
     );
   }
 
@@ -982,7 +982,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE")
+      is("No shared active date found in interchange")
     );
   }
 
@@ -1016,7 +1016,7 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         .findFirst()
         .map(ValidationReportEntry::getName)
         .orElse(null),
-      is("NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE")
+      is("No shared active date found in interchange")
     );
   }
 }
