@@ -19,8 +19,6 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.Line;
-import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 
 class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
@@ -173,42 +171,34 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
     TransportSubmodeStructure submode,
     List<QuayCoordinates> coordinates
   ) {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
-    Line line = testFragment
-      .line()
+    netexEntitiesTestFactory
+      .createLine()
       .withTransportMode(transportMode)
-      .create()
       .withTransportSubmode(submode);
 
-    Route route = testFragment.route().withLine(line).create();
-
     NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      testFragment.journeyPattern().withId(123).withRoute(route);
+      netexEntitiesTestFactory
+        .createJourneyPattern(123)
+        .withRoute(netexEntitiesTestFactory.createRoute());
 
     if (coordinates.isEmpty()) {
-      createJourneyPattern.withNumberOfStopPointInJourneyPattern(0);
+      createJourneyPattern.createStopPointsInJourneyPattern(0);
     } else {
-      createJourneyPattern.withStopPointsInJourneyPattern(
-        IntStream
-          .rangeClosed(1, coordinates.size())
-          .mapToObj(i ->
-            testFragment
-              .stopPointInJourneyPattern(123)
-              .withId(i)
-              .withScheduledStopPointId(i)
-              .create()
-          )
-          .toList()
-      );
+      IntStream
+        .rangeClosed(1, coordinates.size())
+        .forEach(i ->
+          createJourneyPattern
+            .createStopPointInJourneyPattern(i)
+            .withScheduledStopPointRef(
+              NetexEntitiesTestFactory.createScheduledStopPointRef(i)
+            )
+        );
     }
 
-    NetexEntitiesIndex netexEntitiesIndex = testFragment
-      .netexEntitiesIndex()
-      .addJourneyPatterns(createJourneyPattern.create())
-      .addLine(line)
-      .addRoute(route)
-      .create();
+    NetexEntitiesIndex netexEntitiesIndex = netexEntitiesTestFactory.create();
 
     return runTestWith(coordinates, netexEntitiesIndex);
   }

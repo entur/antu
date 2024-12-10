@@ -99,7 +99,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
   void interchangeWithMissingAttributes() {
     NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
-      .serviceJourneyInterchange()
+      .createServiceJourneyInterchange()
       .create();
 
     mockGetServiceJourneyInterchangeInfo(
@@ -159,26 +159,20 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
     NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
-    ScheduledStopPointId fromPointRef = new ScheduledStopPointId(
-      "TST:ScheduledStopPoint:" + fromPointRefId
-    );
-    ScheduledStopPointId toPointRef = new ScheduledStopPointId(
-      "TST:ScheduledStopPoint:" + toPointRefId
-    );
-
-    ServiceJourneyId fromServiceJourneyRef = new ServiceJourneyId(
-      "TST:ServiceJourney:" + fromServiceJourneyId
-    );
-    ServiceJourneyId toServiceJourneyRef = new ServiceJourneyId(
-      "TST:ServiceJourney:" + toServiceJourneyId
-    );
-
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
-      .serviceJourneyInterchange()
-      .withFromPointRef(fromPointRef)
-      .withToPointRef(toPointRef)
-      .withFromJourneyRef(fromServiceJourneyRef)
-      .withToJourneyRef(toServiceJourneyRef)
+      .createServiceJourneyInterchange()
+      .withFromPointRef(
+        NetexEntitiesTestFactory.createScheduledStopPointRef(fromPointRefId)
+      )
+      .withToPointRef(
+        NetexEntitiesTestFactory.createScheduledStopPointRef(toPointRefId)
+      )
+      .withFromJourneyRef(
+        NetexEntitiesTestFactory.createServiceJourneyRef(fromServiceJourneyId)
+      )
+      .withToJourneyRef(
+        NetexEntitiesTestFactory.createServiceJourneyRef(toServiceJourneyId)
+      )
       .create();
 
     mockGetServiceJourneyInterchangeInfo(

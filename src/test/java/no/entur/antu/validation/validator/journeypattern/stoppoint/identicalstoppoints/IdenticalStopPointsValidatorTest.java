@@ -4,10 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.util.List;
-import java.util.function.UnaryOperator;
+import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory.CreateStopPointInJourneyPattern;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -15,7 +14,6 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.JourneyPattern;
 
 class IdenticalStopPointsValidatorTest extends ValidationTest {
 
@@ -36,7 +34,7 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
     ValidationReport validationReport = getValidationReport(
       numberOfJourneyPatterns,
       numberOfStopPoints,
-      UnaryOperator.identity()
+      (journeyPatternRef, stopPointInJourneyPatternRef) -> {}
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -50,7 +48,7 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
     ValidationReport validationReport = getValidationReport(
       numberOfJourneyPatterns,
       numberOfStopPoints,
-      UnaryOperator.identity()
+      (journeyPatternRef, stopPointInJourneyPatternRef) -> {}
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -67,14 +65,27 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
     ValidationReport validationReport = getValidationReport(
       numberOfJourneyPatterns,
       numberOfStopPoints,
-      create -> {
-        if (create.journeyPatternId() == 1 && create.stopPointId() == 1) {
-          create.createStopPointInJourneyPattern().withDestinationDisplayId(1);
+      (journeyPatternRef, stopPointInJourneyPatternRef) -> {
+        if (
+          journeyPatternRef.ref().equals("TST:JourneyPattern:1") &&
+          stopPointInJourneyPatternRef
+            .ref()
+            .equals("TST:StopPointInJourneyPattern:1")
+        ) {
+          stopPointInJourneyPatternRef.withDestinationDisplayId(
+            NetexEntitiesTestFactory.createDestinationDisplayRef(1)
+          );
         }
-        if (create.journeyPatternId() == 2 && create.stopPointId() == 1) {
-          create.createStopPointInJourneyPattern().withDestinationDisplayId(2);
+        if (
+          journeyPatternRef.ref().equals("TST:JourneyPattern:2") &&
+          stopPointInJourneyPatternRef
+            .ref()
+            .equals("TST:StopPointInJourneyPattern:1")
+        ) {
+          stopPointInJourneyPatternRef.withDestinationDisplayId(
+            NetexEntitiesTestFactory.createDestinationDisplayRef(2)
+          );
         }
-        return create;
       }
     );
 
@@ -92,14 +103,27 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
     ValidationReport validationReport = getValidationReport(
       numberOfJourneyPatterns,
       numberOfStopPoints,
-      create -> {
-        if (create.journeyPatternId() == 1 && create.stopPointId() == 1) {
-          create.createStopPointInJourneyPattern().withScheduledStopPointId(1);
+      (journeyPatternRef, stopPointInJourneyPatternRef) -> {
+        if (
+          journeyPatternRef.ref().equals("TST:JourneyPattern:1") &&
+          stopPointInJourneyPatternRef
+            .ref()
+            .equals("TST:StopPointInJourneyPattern:1")
+        ) {
+          stopPointInJourneyPatternRef.withScheduledStopPointRef(
+            NetexEntitiesTestFactory.createScheduledStopPointRef(1)
+          );
         }
-        if (create.journeyPatternId() == 2 && create.stopPointId() == 1) {
-          create.createStopPointInJourneyPattern().withScheduledStopPointId(2);
+        if (
+          journeyPatternRef.ref().equals("TST:JourneyPattern:2") &&
+          stopPointInJourneyPatternRef
+            .ref()
+            .equals("TST:StopPointInJourneyPattern:1")
+        ) {
+          stopPointInJourneyPatternRef.withScheduledStopPointRef(
+            NetexEntitiesTestFactory.createScheduledStopPointRef(2)
+          );
         }
-        return create;
       }
     );
 
@@ -117,71 +141,58 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
     ValidationReport validationReport = getValidationReport(
       numberOfJourneyPatterns,
       numberOfStopPoints,
-      create -> {
-        if (create.journeyPatternId() == 1 && create.stopPointId() == 2) {
-          create.createStopPointInJourneyPattern().withForBoarding(true);
+      (journeyPatternRef, stopPointInJourneyPatternRef) -> {
+        if (
+          journeyPatternRef.ref().equals("TST:JourneyPattern:1") &&
+          stopPointInJourneyPatternRef
+            .ref()
+            .equals("TST:StopPointInJourneyPattern:2")
+        ) {
+          stopPointInJourneyPatternRef.withForBoarding(true);
         }
-        if (create.journeyPatternId() == 2 && create.stopPointId() == 1) {
-          create.createStopPointInJourneyPattern().withForBoarding(false);
+        if (
+          journeyPatternRef.ref().equals("TST:JourneyPattern:2") &&
+          stopPointInJourneyPatternRef
+            .ref()
+            .equals("TST:StopPointInJourneyPattern:1")
+        ) {
+          stopPointInJourneyPatternRef.withForBoarding(false);
         }
-        return create;
       }
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
 
-  private record CreateStopPointInJourneyPatternContext(
-    int stopPointId,
-    int journeyPatternId,
-    CreateStopPointInJourneyPattern createStopPointInJourneyPattern
-  ) {}
-
   @NotNull
   private ValidationReport getValidationReport(
     int numberOfJourneyPatterns,
     int numberOfStopPoints,
-    UnaryOperator<CreateStopPointInJourneyPatternContext> customizeStopPoint
+    BiConsumer<NetexEntitiesTestFactory.CreateJourneyPattern, NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> customizeStopPoint
   ) {
-    NetexEntitiesTestFactory testFragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
     List<NetexEntitiesTestFactory.CreateJourneyPattern> createJourneyPatterns =
       IntStream
         .rangeClosed(1, numberOfJourneyPatterns)
-        .mapToObj(journeyPatternId ->
-          testFragment.journeyPattern().withId(journeyPatternId)
-        )
+        .mapToObj(netexEntitiesTestFactory::createJourneyPattern)
         .toList();
 
     if (numberOfStopPoints > 0) {
-      createJourneyPatterns.forEach(createJourneyPattern ->
-        createJourneyPattern.withStopPointsInJourneyPattern(
-          IntStream
-            .rangeClosed(1, numberOfStopPoints)
-            .mapToObj(stopPointId ->
-              new CreateStopPointInJourneyPatternContext(
-                stopPointId,
-                createJourneyPattern.id(),
-                new CreateStopPointInJourneyPattern(createJourneyPattern)
-                  .withId(stopPointId)
-                  .withScheduledStopPointId(stopPointId)
-                  .withDestinationDisplayId(stopPointId)
-                  .withForBoarding(stopPointId == 1) // first stop point
-                  .withForAlighting(stopPointId == numberOfStopPoints) // last stop point
-              )
-            )
-            .map(customizeStopPoint)
-            .map(
-              CreateStopPointInJourneyPatternContext::createStopPointInJourneyPattern
-            )
-            .map(CreateStopPointInJourneyPattern::create)
-            .toList()
-        )
-      );
-    } else {
-      createJourneyPatterns.forEach(createJourneyPattern ->
-        createJourneyPattern.withNumberOfStopPointInJourneyPattern(0)
-      );
+      createJourneyPatterns.forEach(createJourneyPattern -> {
+        List<NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> stopPointsInJourneyPatterns =
+          createJourneyPattern.createStopPointsInJourneyPattern(
+            numberOfStopPoints
+          );
+
+        stopPointsInJourneyPatterns.forEach(createStopPointInJourneyPattern ->
+          customizeStopPoint.accept(
+            createJourneyPattern,
+            createStopPointInJourneyPattern
+          )
+        );
+      });
     }
 
     IntStream
@@ -193,16 +204,6 @@ class IdenticalStopPointsValidatorTest extends ValidationTest {
         )
       );
 
-    return runValidation(
-      testFragment
-        .netexEntitiesIndex()
-        .addJourneyPatterns(
-          createJourneyPatterns
-            .stream()
-            .map(NetexEntitiesTestFactory.CreateJourneyPattern::create)
-            .toArray(JourneyPattern[]::new)
-        )
-        .create()
-    );
+    return runValidation(netexEntitiesTestFactory.create());
   }
 }

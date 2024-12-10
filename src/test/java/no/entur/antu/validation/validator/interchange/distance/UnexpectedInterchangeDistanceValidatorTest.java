@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.IntStream;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import no.entur.antu.validation.ValidationTest;
@@ -15,9 +14,8 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
+import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 
 class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
 
@@ -165,57 +163,47 @@ class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
   ) {
     assert coordinates.length % 2 == 0;
 
-    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
-    List<ServiceJourneyInterchange> serviceJourneyInterchanges = IntStream
+    IntStream
       .rangeClosed(1, coordinates.length / 2)
-      .mapToObj(i -> {
+      .forEach(i -> {
         int idx1 = (i - 1) * 2;
         int idx2 = (i - 1) * 2 + 1;
 
         QuayCoordinates fromCoordinates = coordinates[idx1];
         QuayCoordinates toCoordinates = coordinates[idx2];
 
-        ScheduledStopPointId fromPointRef = new ScheduledStopPointId(
-          "TST:ScheduledStopPoint:" + idx1
-        );
-        ScheduledStopPointId toPointRef = new ScheduledStopPointId(
-          "TST:ScheduledStopPoint:" + idx2
-        );
+        ScheduledStopPointRefStructure fromPointRef =
+          NetexEntitiesTestFactory.createScheduledStopPointRef(idx1);
+        ScheduledStopPointRefStructure toPointRef =
+          NetexEntitiesTestFactory.createScheduledStopPointRef(idx2);
 
         mockGetCoordinates(
-          fromPointRef,
+          ScheduledStopPointId.of(fromPointRef),
           new QuayId("TST:Quay:" + idx1),
           fromCoordinates
         );
+
         mockGetCoordinates(
-          toPointRef,
+          ScheduledStopPointId.of(toPointRef),
           new QuayId("TST:Quay:" + idx2),
           toCoordinates
         );
 
-        return fragment
-          .serviceJourneyInterchange()
-          .withId(i)
+        netexEntitiesTestFactory
+          .createServiceJourneyInterchange(i)
           .withFromPointRef(fromPointRef)
           .withToPointRef(toPointRef)
           .withFromJourneyRef(
-            ServiceJourneyId.ofValidId("TST:ServiceJourney:" + idx1)
+            NetexEntitiesTestFactory.createServiceJourneyRef(idx1)
           )
           .withToJourneyRef(
-            ServiceJourneyId.ofValidId("TST:ServiceJourney:" + idx2)
-          )
-          .create();
-      })
-      .toList();
+            NetexEntitiesTestFactory.createServiceJourneyRef(idx2)
+          );
+      });
 
-    return runValidation(
-      fragment
-        .netexEntitiesIndex()
-        .addInterchanges(
-          serviceJourneyInterchanges.toArray(ServiceJourneyInterchange[]::new)
-        )
-        .create()
-    );
+    return runValidation(netexEntitiesTestFactory.create());
   }
 }

@@ -10,8 +10,6 @@ import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.FlexibleArea;
-import org.rutebanken.netex.model.FlexibleStopPlace;
 
 class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
@@ -26,10 +24,11 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   @Test
   void testDataSetWithoutFlexibleStopPlacesShouldBeIgnoredGracefully() {
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
     ValidationReport validationReport = runValidation(
-      testData.netexEntitiesIndex().create()
+      netexEntitiesTestFactory.create()
     );
 
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
@@ -177,13 +176,13 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   @Test
   void testMissingFlexibleStopAreaShouldIgnoreValidationGracefully() {
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
-    FlexibleStopPlace flexibleStopPlace =
-      new NetexEntitiesTestFactory.CreateFlexibleStopPlace().create();
+    netexEntitiesTestFactory.createFlexibleStopPlace();
 
     ValidationReport validationReport = runValidation(
-      testData.netexEntitiesIndex(flexibleStopPlace).create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -191,16 +190,16 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   @Test
   void testMissingPolygonShouldIgnoreValidationGracefully2() {
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
 
-    FlexibleArea flexibleArea = testData.flexibleArea().create();
-
-    FlexibleStopPlace flexibleStopPlace = testData
-      .flexibleStopPlace(flexibleArea.withPolygon(null))
-      .create();
+    netexEntitiesTestFactory
+      .createFlexibleStopPlace()
+      .flexibleArea(1)
+      .withNullPolygon(true);
 
     ValidationReport validationReport = runValidation(
-      testData.netexEntitiesIndex(flexibleStopPlace).create()
+      netexEntitiesTestFactory.create()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -209,19 +208,13 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
   private ValidationReport runTestWithGivenCoordinates(
     List<Double> coordinates
   ) {
-    NetexEntitiesTestFactory testData = new NetexEntitiesTestFactory();
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+    netexEntitiesTestFactory
+      .createFlexibleStopPlace()
+      .flexibleArea(1)
+      .withCoordinates(coordinates);
 
-    FlexibleArea flexibleArea = testData
-      .flexibleArea()
-      .withCoordinates(coordinates)
-      .create();
-
-    FlexibleStopPlace flexibleStopPlace = testData
-      .flexibleStopPlace(flexibleArea)
-      .create();
-
-    return runValidation(
-      testData.netexEntitiesIndex(flexibleStopPlace).create()
-    );
+    return runValidation(netexEntitiesTestFactory.create());
   }
 }
