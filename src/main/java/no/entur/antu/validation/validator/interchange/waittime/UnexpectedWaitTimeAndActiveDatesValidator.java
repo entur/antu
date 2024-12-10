@@ -159,7 +159,7 @@ public class UnexpectedWaitTimeAndActiveDatesValidator
     } else if (msWait > INTERCHANGE_WARNING_WAIT_TIME_MILLIS) {
       if (msWait > INTERCHANGE_ERROR_WAIT_TIME_MILLIS) {
         return createValidationReportEntry(
-          RULE_WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT,
+          RULE_WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT,
           context.serviceJourneyInterchangeInfo().interchangeId(),
           context.serviceJourneyInterchangeInfo().filename(),
           context.fromServiceJourneyStop(),
@@ -171,7 +171,7 @@ public class UnexpectedWaitTimeAndActiveDatesValidator
         );
       } else {
         return createValidationReportEntry(
-          RULE_WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT,
+          RULE_WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT,
           context.serviceJourneyInterchangeInfo().interchangeId(),
           context.serviceJourneyInterchangeInfo().filename(),
           context.fromServiceJourneyStop(),
