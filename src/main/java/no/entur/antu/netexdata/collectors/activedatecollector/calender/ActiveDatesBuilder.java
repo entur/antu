@@ -177,7 +177,7 @@ public class ActiveDatesBuilder {
       if (activeDatesForDayTypeRef.containsKey(dayTypeId)) {
         Optional
           .ofNullable(includedAndExcludedDates.get(Boolean.TRUE))
-          .map(activeDatesForDayTypeRef.get(dayTypeId).dates()::addAll);
+          .ifPresent(activeDatesForDayTypeRef.get(dayTypeId).dates()::addAll);
       }
     }
   }
@@ -208,7 +208,7 @@ public class ActiveDatesBuilder {
       if (activeDatesForDayTypeRef.containsKey(dayTypeId)) {
         Optional
           .ofNullable(includedAndExcludedDates.get(Boolean.TRUE))
-          .map(activeDatesForDayTypeRef.get(dayTypeId).dates()::addAll);
+          .ifPresent(activeDatesForDayTypeRef.get(dayTypeId).dates()::addAll);
       }
     }
   }
