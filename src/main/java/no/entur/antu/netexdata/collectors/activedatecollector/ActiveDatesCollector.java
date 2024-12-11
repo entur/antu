@@ -4,7 +4,6 @@ import static no.entur.antu.config.cache.CacheConfig.ACTIVE_DATES_CACHE;
 import static no.entur.antu.netexdata.collectors.activedatecollector.calender.CalendarUtilities.getValidityForFrameOrDefault;
 
 import jakarta.xml.bind.JAXBElement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,30 +47,94 @@ public class ActiveDatesCollector extends NetexDataCollector {
   }
 
   private void collectData(JAXBValidationContext validationContext) {
+    List<ServiceCalendarFrameObject> serviceCalendarFrameObjects =
+      parseServiceCalendarFrame(validationContext);
+
+    Map<String, String> activeDates = getActiveDatesPerIdAsMapOfStrings(
+      serviceCalendarFrameObjects
+    );
+
+    if (!activeDates.isEmpty()) {
+      storeActiveDates(
+        validationContext.getValidationReportId(),
+        validationContext.getFileName(),
+        activeDates
+      );
+    }
+  }
+
+  static List<ServiceCalendarFrameObject> parseServiceCalendarFrame(
+    JAXBValidationContext validationContext
+  ) {
+    // TODO: Is it possible that the file has ServiceCalendarFrames has ServiceCalendarFrames outside the compositeFrame,
+    //  while compositeFrame also exists? if yes, parse both and combine the result.
+    if (validationContext.hasCompositeFrames()) {
+      return validationContext
+        .compositeFrames()
+        .stream()
+        .map(ActiveDatesCollector::getServiceCalendarFrameObjects)
+        .flatMap(List::stream)
+        .toList();
+    } else if (validationContext.hasServiceCalendarFrames()) {
+      return validationContext
+        .serviceCalendarFrames()
+        .stream()
+        .map(ActiveDatesCollector::getServiceCalendarFrameObjects)
+        .toList();
+    }
+    return List.of();
+  }
+
+  static Map<String, String> getActiveDatesPerIdAsMapOfStrings(
+    List<ServiceCalendarFrameObject> serviceCalendarFrameObjects
+  ) {
     ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
 
-    // TODO: Is it possible that the file has ServiceCalendarFrames has ServiceCalendarFrames outside the compositeFrame,
-    //  while compositeFrame also exists?
-    List<ServiceCalendarFrameObject> serviceCalendarFrameObjects =
-      new ArrayList<>();
-    if (validationContext.hasCompositeFrames()) {
-      serviceCalendarFrameObjects =
-        validationContext
-          .compositeFrames()
-          .stream()
-          .map(ActiveDatesCollector::getServiceCalendarFrameObjects)
-          .flatMap(List::stream)
-          .toList();
-    } else if (validationContext.hasServiceCalendarFrames()) {
-      serviceCalendarFrameObjects =
-        validationContext
-          .serviceCalendarFrames()
-          .stream()
-          .map(ActiveDatesCollector::getServiceCalendarFrameObjects)
-          .toList();
-    }
+    Map<String, String> activeDatesPerDayTypes = getActiveDatesPerDayTypeId(
+      serviceCalendarFrameObjects,
+      activeDatesBuilder
+    );
 
-    Map<String, String> activeDatesPerDayTypes = serviceCalendarFrameObjects
+    // This is needed for DatedServiceJourneys
+    Map<String, String> activeDatesPerOperationDays =
+      getActiveDatesPerOperatingDayId(
+        serviceCalendarFrameObjects,
+        activeDatesBuilder
+      );
+
+    return Stream
+      .concat(
+        activeDatesPerDayTypes.entrySet().stream(),
+        activeDatesPerOperationDays.entrySet().stream()
+      )
+      .collect(
+        Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1)
+      );
+  }
+
+  private static Map<String, String> getActiveDatesPerOperatingDayId(
+    List<ServiceCalendarFrameObject> serviceCalendarFrameObjects,
+    ActiveDatesBuilder activeDatesBuilder
+  ) {
+    return serviceCalendarFrameObjects
+      .stream()
+      .map(activeDatesBuilder::buildPerOperatingDay)
+      .flatMap(map -> map.entrySet().stream())
+      .filter(entry -> entry.getValue().isValid())
+      .collect(
+        Collectors.toMap(
+          entry -> entry.getKey().toString(),
+          entry -> entry.getValue().toString(),
+          (v1, v2) -> v1
+        )
+      );
+  }
+
+  private static Map<String, String> getActiveDatesPerDayTypeId(
+    List<ServiceCalendarFrameObject> serviceCalendarFrameObjects,
+    ActiveDatesBuilder activeDatesBuilder
+  ) {
+    return serviceCalendarFrameObjects
       .stream()
       .map(activeDatesBuilder::buildPerDayType)
       .flatMap(map -> map.entrySet().stream())
@@ -83,40 +146,9 @@ public class ActiveDatesCollector extends NetexDataCollector {
           (v1, v2) -> v1
         )
       );
-
-    Map<String, String> activeDatesPerOperationDays =
-      serviceCalendarFrameObjects
-        .stream()
-        .map(activeDatesBuilder::buildPerOperatingDay)
-        .flatMap(map -> map.entrySet().stream())
-        .filter(entry -> entry.getValue().isValid())
-        .collect(
-          Collectors.toMap(
-            entry -> entry.getKey().toString(),
-            entry -> entry.getValue().toString(),
-            (v1, v2) -> v1
-          )
-        );
-
-    Map<String, String> activeDates = Stream
-      .concat(
-        activeDatesPerDayTypes.entrySet().stream(),
-        activeDatesPerOperationDays.entrySet().stream()
-      )
-      .collect(
-        Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1)
-      );
-
-    if (!activeDates.isEmpty()) {
-      addActiveDates(
-        validationContext.getValidationReportId(),
-        validationContext.getFileName(),
-        activeDates
-      );
-    }
   }
 
-  private void addActiveDates(
+  private void storeActiveDates(
     String validationReportId,
     String filename,
     Map<String, String> activeDates

@@ -53,6 +53,10 @@ record ValidOperatingPeriod(LocalDate startDate, LocalDate endDate) {
     LocalDate endDate,
     ValidBetween validBetween
   ) {
+    if (validBetween == null) {
+      return new ValidOperatingPeriod(startDate, endDate);
+    }
+
     LocalDate validFrom = validBetween.getFromDate() != null
       ? validBetween.getFromDate().toLocalDate()
       : null;
@@ -65,7 +69,7 @@ record ValidOperatingPeriod(LocalDate startDate, LocalDate endDate) {
       (validFrom != null && endDate.isBefore(validFrom)) ||
       (validTo != null && startDate.isAfter(validTo))
     ) {
-      return new ValidOperatingPeriod(startDate, endDate);
+      return new ValidOperatingPeriod(null, null);
     }
 
     // Adjust the start and end dates to be within the valid range
@@ -82,6 +86,10 @@ record ValidOperatingPeriod(LocalDate startDate, LocalDate endDate) {
   }
 
   List<LocalDate> toDates(List<LocalDate> excludedDates, int intDayTypes) {
+    if (!isValid()) {
+      return List.of();
+    }
+
     List<LocalDate> dates = new ArrayList<>();
 
     if (intDayTypes != 0) {
@@ -91,11 +99,17 @@ record ValidOperatingPeriod(LocalDate startDate, LocalDate endDate) {
         int aDayOfWeek = date.getDayOfWeek().getValue() - 1;
         int aDayOfWeekFlag = 1 << aDayOfWeek;
         if ((intDayTypes & aDayOfWeekFlag) == aDayOfWeekFlag) {
-          if (!excludedDates.contains(date)) dates.add(date);
+          if (excludedDates == null || !excludedDates.contains(date)) {
+            dates.add(date);
+          }
         }
         date = date.plusDays(1);
       }
     }
     return dates;
+  }
+
+  public boolean isValid() {
+    return startDate != null && endDate != null;
   }
 }

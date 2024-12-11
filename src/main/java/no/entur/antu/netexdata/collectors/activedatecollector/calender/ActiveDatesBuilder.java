@@ -221,24 +221,27 @@ public class ActiveDatesBuilder {
       Collection<DayTypeAssignment> dayTypeAssignments = calendarData
         .dayTypeAssignments()
         .get(dayTypeId);
-      dayTypeAssignments.forEach(dayTypeAssignment -> {
+      dayTypeAssignments.forEach(dayTypeAssignment ->
         Optional
           .ofNullable(dayTypeAssignment.getOperatingPeriodRef())
           .map(JAXBElement::getValue)
           .map(VersionOfObjectRefStructure::getRef)
           .map(calendarData.operatingPeriods()::get)
-          .ifPresent(operatingPeriod -> {
-            ValidOperatingPeriod validOperatingPeriod = ValidOperatingPeriod.of(
+          .map(operatingPeriod ->
+            ValidOperatingPeriod.of(
               operatingPeriod,
               validBetween,
               calendarData.operatingDays()
-            );
+            )
+          )
+          .filter(ValidOperatingPeriod::isValid)
+          .ifPresent(validOperatingPeriod ->
             activeDatesForDayTypeRef
               .get(dayTypeId)
               .dates()
-              .addAll(validOperatingPeriod.toDates(excludedDates, intDayTypes));
-          });
-      });
+              .addAll(validOperatingPeriod.toDates(excludedDates, intDayTypes))
+          )
+      );
     }
   }
 

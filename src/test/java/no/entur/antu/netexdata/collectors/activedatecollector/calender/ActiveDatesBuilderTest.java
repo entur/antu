@@ -746,4 +746,617 @@ class ActiveDatesBuilderTest {
       )
     );
   }
+
+  /**
+   * When no validity is set, all the dates should be valid.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithDatesWithNoValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3);
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithDates(
+      dayTypes,
+      LocalDate.of(2024, 11, 21)
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    assertEquals(
+      3,
+      dayTypeIdActiveDatesMap
+        .values()
+        .stream()
+        .filter(ActiveDates::isValid)
+        .count()
+    );
+  }
+
+  /**
+   * Validity is set with no from and to dates, all the dates should be valid.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithDatesWithEmptyValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3);
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithDates(
+      dayTypes,
+      LocalDate.of(2024, 11, 21)
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    assertEquals(
+      3,
+      dayTypeIdActiveDatesMap
+        .values()
+        .stream()
+        .filter(ActiveDates::isValid)
+        .count()
+    );
+  }
+
+  /**
+   * When no validity is set, all the operating days should be valid.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithOperatingDaysWithNoValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3);
+
+    List<NetexEntitiesTestFactory.CreateOperatingDay> operatingDays =
+      serviceCalendarFrame.createOperatingDays(3, LocalDate.of(2024, 11, 21));
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithOperatingDays(
+      dayTypes,
+      operatingDays
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    // Dates outside the validity of the service calendar frame is not included in the active dates
+    assertEquals(
+      3,
+      dayTypeIdActiveDatesMap
+        .values()
+        .stream()
+        .filter(ActiveDates::isValid)
+        .count()
+    );
+  }
+
+  /**
+   * Validity is set with no from and to dates, all the operating days should be valid.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithOperatingDaysWithEmptyValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3);
+
+    List<NetexEntitiesTestFactory.CreateOperatingDay> operatingDays =
+      serviceCalendarFrame.createOperatingDays(3, LocalDate.of(2024, 11, 21));
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithOperatingDays(
+      dayTypes,
+      operatingDays
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    // Dates outside the validity of the service calendar frame is not included in the active dates
+    assertEquals(
+      3,
+      dayTypeIdActiveDatesMap
+        .values()
+        .stream()
+        .filter(ActiveDates::isValid)
+        .count()
+    );
+  }
+
+  /**
+   * When no validity is set, all the dates in operating period should be valid.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithOperatingPeriodsWithNoValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3, DayOfWeekEnumeration.EVERYDAY);
+
+    /*
+      TST:DayType:1 = 2024-11-20,2024-11-21,2024-11-22,2024-11-23,2024-11-24,2024-11-25
+      TST:DayType:2 = 2024-11-25,2024-11-26,2024-11-27,2024-11-28,2024-11-29,2024-11-30
+      TST:DayType:3 = 2024-11-30,2024-12-01,2024-12-02,2024-12-03,2024-12-04,2024-12-05
+     */
+    List<NetexEntitiesTestFactory.CreateOperatingPeriod> operatingPeriods =
+      serviceCalendarFrame.createOperatingPeriods(
+        3,
+        LocalDate.of(2024, 11, 20),
+        LocalDate.of(2024, 11, 25),
+        5
+      );
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithOperatingPeriods(
+      dayTypes,
+      operatingPeriods
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    // Date outside the validity of the service calendar frame is not included in the active dates
+    assertEquals(
+      "2024-11-20,2024-11-21,2024-11-22,2024-11-23,2024-11-24,2024-11-25",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(0).ref()))
+        .toString()
+    );
+    assertEquals(
+      "2024-11-25,2024-11-26,2024-11-27,2024-11-28,2024-11-29,2024-11-30",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(1).ref()))
+        .toString()
+    );
+    assertEquals(
+      "2024-11-30,2024-12-01,2024-12-02,2024-12-03,2024-12-04,2024-12-05",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(2).ref()))
+        .toString()
+    );
+  }
+
+  /**
+   * Validity is set with no from and to dates, all the dates in operating period should be valid.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithOperatingPeriodsWithEmptyValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3, DayOfWeekEnumeration.EVERYDAY);
+
+    /*
+      TST:DayType:1 = 2024-11-20,2024-11-21,2024-11-22,2024-11-23,2024-11-24,2024-11-25
+      TST:DayType:2 = 2024-11-25,2024-11-26,2024-11-27,2024-11-28,2024-11-29,2024-11-30
+      TST:DayType:3 = 2024-11-30,2024-12-01,2024-12-02,2024-12-03,2024-12-04,2024-12-05
+     */
+    List<NetexEntitiesTestFactory.CreateOperatingPeriod> operatingPeriods =
+      serviceCalendarFrame.createOperatingPeriods(
+        3,
+        LocalDate.of(2024, 11, 20),
+        LocalDate.of(2024, 11, 25),
+        5
+      );
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithOperatingPeriods(
+      dayTypes,
+      operatingPeriods
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    // Date outside the validity of the service calendar frame is not included in the active dates
+    assertEquals(
+      "2024-11-20,2024-11-21,2024-11-22,2024-11-23,2024-11-24,2024-11-25",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(0).ref()))
+        .toString()
+    );
+    assertEquals(
+      "2024-11-25,2024-11-26,2024-11-27,2024-11-28,2024-11-29,2024-11-30",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(1).ref()))
+        .toString()
+    );
+    assertEquals(
+      "2024-11-30,2024-12-01,2024-12-02,2024-12-03,2024-12-04,2024-12-05",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(2).ref()))
+        .toString()
+    );
+  }
+
+  /**
+   * When the validity is set only with from date,
+   * all the dates from the from date should be valid.
+   * From date is inclusive.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithDatesWithOnlyFromDateValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+        .withFromDate(LocalDateTime.of(2024, 11, 22, 0, 0))
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3);
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithDates(
+      dayTypes,
+      LocalDate.of(2024, 11, 21)
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    assertEquals(
+      2,
+      dayTypeIdActiveDatesMap
+        .values()
+        .stream()
+        .filter(ActiveDates::isValid)
+        .count()
+    );
+  }
+
+  /**
+   * When the validity is set only with to date,
+   * all the dates till the to date should be valid.
+   * To date is exclusive.
+   * TODO: Should it be inclusive or exclusive? In Chouette it is exclusive.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithDatesWithOnlyToDateValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+        .withToDate(LocalDateTime.of(2024, 11, 22, 0, 0))
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3);
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithDates(
+      dayTypes,
+      LocalDate.of(2024, 11, 21)
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    assertEquals(
+      1,
+      dayTypeIdActiveDatesMap
+        .values()
+        .stream()
+        .filter(ActiveDates::isValid)
+        .count()
+    );
+  }
+
+  /**
+   * When the validity is set only with from date,
+   * all the operating days from the from date should be valid.
+   * From date is inclusive.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithOperatingDaysWithFromDateValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+        .withFromDate(LocalDateTime.of(2024, 11, 22, 0, 0))
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3);
+
+    List<NetexEntitiesTestFactory.CreateOperatingDay> operatingDays =
+      serviceCalendarFrame.createOperatingDays(3, LocalDate.of(2024, 11, 21));
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithOperatingDays(
+      dayTypes,
+      operatingDays
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    // Dates outside the validity of the service calendar frame is not included in the active dates
+    assertEquals(
+      2,
+      dayTypeIdActiveDatesMap
+        .values()
+        .stream()
+        .filter(ActiveDates::isValid)
+        .count()
+    );
+  }
+
+  /**
+   * When the validity is set only with to date,
+   * all the operating days till the to date should be valid.
+   * To date is exclusive.
+   * TODO: Should it be inclusive or exclusive? In Chouette it is exclusive.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithOperatingDaysWithToDateValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+        .withToDate(LocalDateTime.of(2024, 11, 22, 0, 0))
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3);
+
+    List<NetexEntitiesTestFactory.CreateOperatingDay> operatingDays =
+      serviceCalendarFrame.createOperatingDays(3, LocalDate.of(2024, 11, 21));
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithOperatingDays(
+      dayTypes,
+      operatingDays
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    // Dates outside the validity of the service calendar frame is not included in the active dates
+    assertEquals(
+      1,
+      dayTypeIdActiveDatesMap
+        .values()
+        .stream()
+        .filter(ActiveDates::isValid)
+        .count()
+    );
+  }
+
+  /**
+   * When the validity is set only with from date,
+   * all the dates in operating period from the from date should be valid.
+   * From date is inclusive.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithOperatingPeriodsWithFromDateValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+        .withFromDate(LocalDateTime.of(2024, 11, 22, 0, 0))
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3, DayOfWeekEnumeration.EVERYDAY);
+
+    /*
+      TST:DayType:1 = 2024-11-20,2024-11-21,2024-11-22,2024-11-23,2024-11-24,2024-11-25
+      TST:DayType:2 = 2024-11-25,2024-11-26,2024-11-27,2024-11-28,2024-11-29,2024-11-30
+      TST:DayType:3 = 2024-11-30,2024-12-01,2024-12-02,2024-12-03,2024-12-04,2024-12-05
+     */
+    List<NetexEntitiesTestFactory.CreateOperatingPeriod> operatingPeriods =
+      serviceCalendarFrame.createOperatingPeriods(
+        3,
+        LocalDate.of(2024, 11, 20),
+        LocalDate.of(2024, 11, 25),
+        5
+      );
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithOperatingPeriods(
+      dayTypes,
+      operatingPeriods
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    // Date outside the validity of the service calendar frame is not included in the active dates
+    assertEquals(
+      "2024-11-22,2024-11-23,2024-11-24,2024-11-25",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(0).ref()))
+        .toString()
+    );
+    assertEquals(
+      "2024-11-25,2024-11-26,2024-11-27,2024-11-28,2024-11-29,2024-11-30",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(1).ref()))
+        .toString()
+    );
+    assertEquals(
+      "2024-11-30,2024-12-01,2024-12-02,2024-12-03,2024-12-04,2024-12-05",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(2).ref()))
+        .toString()
+    );
+  }
+
+  /**
+   * When the validity is set only with to date,
+   * all the dates in operating period till the to date should be valid.
+   * To date is inclusive.
+   * TODO: Should it be inclusive or exclusive? In Chouette it is inclusive.
+   */
+  @Test
+  void testActiveDatesForDayTypeAssignmentsWithOperatingPeriodsWithToDateValidity() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    serviceCalendarFrame.withValidBetween(
+      new NetexEntitiesTestFactory.CreateValidBetween(1)
+        .withToDate(LocalDateTime.of(2024, 11, 27, 0, 0))
+    );
+
+    List<NetexEntitiesTestFactory.CreateDayType> dayTypes =
+      serviceCalendarFrame.createDayTypes(3, DayOfWeekEnumeration.EVERYDAY);
+
+    /*
+      TST:DayType:1 = 2024-11-20,2024-11-21,2024-11-22,2024-11-23,2024-11-24,2024-11-25
+      TST:DayType:2 = 2024-11-25,2024-11-26,2024-11-27,2024-11-28,2024-11-29,2024-11-30
+      TST:DayType:3 = 2024-11-30,2024-12-01,2024-12-02,2024-12-03,2024-12-04,2024-12-05
+     */
+    List<NetexEntitiesTestFactory.CreateOperatingPeriod> operatingPeriods =
+      serviceCalendarFrame.createOperatingPeriods(
+        3,
+        LocalDate.of(2024, 11, 20),
+        LocalDate.of(2024, 11, 25),
+        5
+      );
+
+    serviceCalendarFrame.createDayTypeAssignmentsWithOperatingPeriods(
+      dayTypes,
+      operatingPeriods
+    );
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    Map<DayTypeId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerDayType(serviceCalendarFrameObject);
+
+    // Date outside the validity of the service calendar frame is not included in the active dates
+    assertEquals(
+      "2024-11-20,2024-11-21,2024-11-22,2024-11-23,2024-11-24,2024-11-25",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(0).ref()))
+        .toString()
+    );
+    assertEquals(
+      "2024-11-25,2024-11-26,2024-11-27",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(1).ref()))
+        .toString()
+    );
+    assertEquals(
+      "",
+      dayTypeIdActiveDatesMap
+        .get(new DayTypeId(dayTypes.get(2).ref()))
+        .toString()
+    );
+  }
 }

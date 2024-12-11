@@ -78,11 +78,11 @@ public class NetexEntitiesTestFactory {
     }
 
     if (serviceCalendarFrames != null) {
-      serviceCalendarFrames.forEach(serviceCalendarFrame -> {
+      serviceCalendarFrames.forEach(serviceCalendarFrame ->
         netexEntitiesIndex
           .getServiceCalendarFrames()
-          .add(serviceCalendarFrame.create());
-      });
+          .add(serviceCalendarFrame.create())
+      );
     }
 
     fillIndexes(netexEntitiesIndex);
@@ -727,7 +727,9 @@ public class NetexEntitiesTestFactory {
     }
   }
 
-  public abstract static class CreateGenericCalender<T extends EntityStructure>
+  protected abstract static class CreateGenericCalender<
+    T extends EntityStructure
+  >
     extends CreateEntity<T> {
 
     protected CreateValidBetween validBetween;
@@ -738,6 +740,10 @@ public class NetexEntitiesTestFactory {
 
     public CreateGenericCalender(int id) {
       super(id);
+    }
+
+    public void withValidBetween(CreateValidBetween validBetween) {
+      this.validBetween = validBetween;
     }
 
     public CreateValidBetween createValidBetween(

@@ -610,4 +610,18 @@ class ServiceCalendarFrameObjectTest {
         .size()
     );
   }
+
+  @Test
+  void testNoValidityPresent() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    assertNotNull(serviceCalendarFrameObject);
+  }
 }
