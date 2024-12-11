@@ -30,10 +30,6 @@ import org.rutebanken.netex.model.*;
 
 public class NetexEntitiesTestFactory {
 
-  private static final DayType EVERYDAY = new DayType()
-    .withId("EVERYDAY")
-    .withName(new MultilingualString().withValue("everyday"));
-
   private CreateGenericLine<? extends Line_VersionStructure> line;
 
   private CreateRoute route;
