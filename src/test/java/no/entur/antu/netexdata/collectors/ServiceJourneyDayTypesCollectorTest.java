@@ -44,12 +44,12 @@ class ServiceJourneyDayTypesCollectorTest {
       );
 
     assertEquals(4, dayTypesPerServiceJourneyId.size());
-    dayTypesPerServiceJourneyId.forEach((serviceJourneyId, dayTypes) -> {
-      assertEquals(4, dayTypes.split(",").length);
-    });
+    dayTypesPerServiceJourneyId.forEach((serviceJourneyId, dayTypes) ->
+      assertEquals(4, dayTypes.split(",").length)
+    );
   }
 
-  // @Test TODO: Need to merge https://github.com/entur/netex-validator-java/pull/266 first.
+  @Test
   void testInValidServiceJourneysFilteredOut() {
     NetexEntitiesTestFactory netexEntitiesTestFactory =
       new NetexEntitiesTestFactory();
