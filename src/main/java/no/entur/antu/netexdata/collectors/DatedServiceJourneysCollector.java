@@ -35,6 +35,21 @@ public class DatedServiceJourneysCollector extends NetexDataCollector {
   protected void collectDataFromLineFile(
     JAXBValidationContext validationContext
   ) {
+    Map<String, String> operatingDaysPerServiceJourney =
+      getOperatingDaysPerServiceJourneyIsAsStrings(validationContext);
+
+    if (!operatingDaysPerServiceJourney.isEmpty()) {
+      addServiceJourneyOperatingDays(
+        validationContext.getValidationReportId(),
+        validationContext.getFileName(),
+        operatingDaysPerServiceJourney
+      );
+    }
+  }
+
+  static Map<String, String> getOperatingDaysPerServiceJourneyIsAsStrings(
+    JAXBValidationContext validationContext
+  ) {
     Multimap<String, String> serviceJourneyOperatingDays = validationContext
       .datedServiceJourneys()
       .stream()
@@ -43,20 +58,16 @@ public class DatedServiceJourneysCollector extends NetexDataCollector {
       .map(Optional::get)
       .collect(toMultimap(Map.Entry::getKey, Map.Entry::getValue));
 
-    addServiceJourneyOperatingDays(
-      validationContext.getValidationReportId(),
-      validationContext.getFileName(),
-      serviceJourneyOperatingDays
-        .asMap()
-        .entrySet()
-        .stream()
-        .collect(
-          Collectors.toMap(
-            Map.Entry::getKey,
-            entry -> String.join(",", entry.getValue())
-          )
+    return serviceJourneyOperatingDays
+      .asMap()
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          Map.Entry::getKey,
+          entry -> String.join(",", entry.getValue())
         )
-    );
+      );
   }
 
   @Override

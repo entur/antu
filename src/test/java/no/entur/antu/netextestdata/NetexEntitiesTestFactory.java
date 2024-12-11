@@ -13,7 +13,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -900,6 +899,15 @@ public class NetexEntitiesTestFactory {
       return createDayType(1);
     }
 
+    /**
+     * Adds numberOfDayTypes new day types with the given ids
+     * The day types will be created with the given dayOfWeeks in circular fashion.
+     * If no dayOfWeeks are provided, the day types will be created without daysOfWeek.
+     *
+     * @param numberOfDayTypes the number of day types to create
+     * @param dayOfWeeks the day of weeks to assign to the day types
+     * @return List of CreateDayType
+     */
     public List<CreateDayType> createDayTypes(
       int numberOfDayTypes,
       DayOfWeekEnumeration... dayOfWeeks
@@ -1860,79 +1868,17 @@ public class NetexEntitiesTestFactory {
     }
   }
 
-  public static class CreateDeadRun extends CreateEntity<DeadRun> {
+  public abstract static class CreateJourney<T extends Journey_VersionStructure>
+    extends CreateEntity<T> {
 
-    private final CreateGenericLine<? extends Line_VersionStructure> lineRef;
-    private final CreateJourneyPattern journeyPattern;
-    private final List<CreateTimetabledPassingTime> timetabledPassingTimes =
-      new ArrayList<>();
+    protected final CreateGenericLine<? extends Line_VersionStructure> line;
+    protected final CreateJourneyPattern journeyPattern;
+    protected List<CreateTimetabledPassingTime> timetabledPassingTimes;
+    protected List<DayTypeRefStructure> dayTypes;
+    protected AllVehicleModesOfTransportEnumeration transportMode;
+    protected TransportSubmodeStructure transportSubmode;
 
-    public CreateDeadRun(
-      int id,
-      CreateGenericLine<? extends Line_VersionStructure> lineRef,
-      CreateJourneyPattern journeyPattern
-    ) {
-      super(id);
-      this.lineRef = lineRef;
-      this.journeyPattern = journeyPattern;
-    }
-
-    /**
-     * Adds a new timetabled passing time with the given id
-     *
-     * @param id the id of the timetabled passing time
-     * @param createStopPointInJourneyPattern the stop point in the journey pattern ref for the timetabled passing time
-     * @return CreateTimetabledPassingTime
-     */
-    public CreateTimetabledPassingTime createTimetabledPassingTime(
-      int id,
-      CreateStopPointInJourneyPattern createStopPointInJourneyPattern
-    ) {
-      CreateTimetabledPassingTime createTimetabledPassingTime =
-        new CreateTimetabledPassingTime(id, createStopPointInJourneyPattern);
-      timetabledPassingTimes.add(createTimetabledPassingTime);
-      return createTimetabledPassingTime;
-    }
-
-    public DeadRun create() {
-      DeadRun deadRun = new DeadRun()
-        .withId(ref())
-        .withLineRef(
-          createJaxbElement(new LineRefStructure().withRef(lineRef.ref()))
-        )
-        .withDayTypes(createEveryDayRefs())
-        .withJourneyPatternRef(
-          createJaxbElement(
-            new JourneyPatternRefStructure().withRef(journeyPattern.ref())
-          )
-        );
-
-      deadRun.withPassingTimes(
-        new TimetabledPassingTimes_RelStructure()
-          .withTimetabledPassingTime(
-            timetabledPassingTimes
-              .stream()
-              .map(CreateTimetabledPassingTime::create)
-              .toList()
-          )
-      );
-
-      return deadRun;
-    }
-  }
-
-  public static class CreateServiceJourney
-    extends CreateEntity<ServiceJourney>
-    implements CreateRef<VersionOfObjectRefStructure> {
-
-    private final CreateGenericLine<? extends Line_VersionStructure> line;
-    private final CreateJourneyPattern journeyPattern;
-    private final List<CreateTimetabledPassingTime> timetabledPassingTimes =
-      new ArrayList<>();
-    private AllVehicleModesOfTransportEnumeration transportMode;
-    private TransportSubmodeStructure transportSubmode;
-
-    public CreateServiceJourney(
+    public CreateJourney(
       int id,
       CreateGenericLine<? extends Line_VersionStructure> line,
       CreateJourneyPattern journeyPattern
@@ -1942,10 +1888,6 @@ public class NetexEntitiesTestFactory {
       this.journeyPattern = journeyPattern;
     }
 
-    public VehicleJourneyRefStructure refObject() {
-      return NetexEntitiesTestFactory.createServiceJourneyRef(id);
-    }
-
     /**
      * Adds a new timetabled passing time with the given id
      *
@@ -1957,24 +1899,136 @@ public class NetexEntitiesTestFactory {
       int id,
       CreateStopPointInJourneyPattern createStopPointInJourneyPattern
     ) {
+      if (timetabledPassingTimes == null) {
+        timetabledPassingTimes = new ArrayList<>();
+      }
       CreateTimetabledPassingTime createTimetabledPassingTime =
         new CreateTimetabledPassingTime(id, createStopPointInJourneyPattern);
       timetabledPassingTimes.add(createTimetabledPassingTime);
       return createTimetabledPassingTime;
     }
 
-    public CreateServiceJourney withTransportMode(
+    /**
+     * Creates timetabled passing times for the given stop points in the journey pattern
+     *
+     * @param stopPointsInJourneyPattern the stop points in the journey pattern
+     * @return List of CreateTimetabledPassingTime
+     */
+    public List<CreateTimetabledPassingTime> createTimetabledPassingTimes(
+      List<CreateStopPointInJourneyPattern> stopPointsInJourneyPattern
+    ) {
+      return IntStream
+        .range(0, stopPointsInJourneyPattern.size())
+        .mapToObj(i ->
+          createTimetabledPassingTime(i + 1, stopPointsInJourneyPattern.get(i))
+        )
+        .toList();
+    }
+
+    public CreateJourney<T> addDayTypeRef(DayTypeRefStructure dayTypeRef) {
+      if (dayTypes == null) {
+        dayTypes = new ArrayList<>();
+      }
+      dayTypes.add(dayTypeRef);
+      return this;
+    }
+
+    public CreateJourney<T> addDayTypeRef(CreateDayType dayType) {
+      return addDayTypeRef(new DayTypeRefStructure().withRef(dayType.ref()));
+    }
+
+    public CreateJourney<T> addDayTypeRefs(List<CreateDayType> dayTypes) {
+      dayTypes.forEach(this::addDayTypeRef);
+      return this;
+    }
+
+    public CreateJourney<T> withTransportMode(
       AllVehicleModesOfTransportEnumeration transportMode
     ) {
       this.transportMode = transportMode;
       return this;
     }
 
-    public CreateServiceJourney withTransportSubmode(
+    public CreateJourney<T> withTransportSubmode(
       TransportSubmodeStructure transportSubmode
     ) {
       this.transportSubmode = transportSubmode;
       return this;
+    }
+  }
+
+  public static class CreateDeadRun extends CreateJourney<DeadRun> {
+
+    public CreateDeadRun(
+      int id,
+      CreateGenericLine<? extends Line_VersionStructure> lineRef,
+      CreateJourneyPattern journeyPattern
+    ) {
+      super(id, lineRef, journeyPattern);
+    }
+
+    public DeadRun create() {
+      DeadRun deadRun = new DeadRun()
+        .withId(ref())
+        .withLineRef(
+          createJaxbElement(new LineRefStructure().withRef(line.ref()))
+        )
+        .withJourneyPatternRef(
+          createJaxbElement(
+            new JourneyPatternRefStructure().withRef(journeyPattern.ref())
+          )
+        );
+
+      if (dayTypes != null) {
+        deadRun.withDayTypes(
+          new DayTypeRefs_RelStructure()
+            .withDayTypeRef(
+              dayTypes
+                .stream()
+                .map(MappingSupport::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            )
+        );
+      }
+
+      if (timetabledPassingTimes != null) {
+        deadRun.withPassingTimes(
+          new TimetabledPassingTimes_RelStructure()
+            .withTimetabledPassingTime(
+              timetabledPassingTimes
+                .stream()
+                .map(CreateTimetabledPassingTime::create)
+                .toList()
+            )
+        );
+      }
+
+      if (transportMode != null) {
+        deadRun.withTransportMode(transportMode);
+      }
+
+      if (transportSubmode != null) {
+        deadRun.withTransportSubmode(transportSubmode);
+      }
+
+      return deadRun;
+    }
+  }
+
+  public static class CreateServiceJourney
+    extends CreateJourney<ServiceJourney>
+    implements CreateRef<VersionOfObjectRefStructure> {
+
+    public CreateServiceJourney(
+      int id,
+      CreateGenericLine<? extends Line_VersionStructure> lineRef,
+      CreateJourneyPattern journeyPattern
+    ) {
+      super(id, lineRef, journeyPattern);
+    }
+
+    public VehicleJourneyRefStructure refObject() {
+      return NetexEntitiesTestFactory.createServiceJourneyRef(id);
     }
 
     public ServiceJourney create() {
@@ -1983,22 +2037,35 @@ public class NetexEntitiesTestFactory {
         .withLineRef(
           createJaxbElement(new LineRefStructure().withRef(line.ref()))
         )
-        .withDayTypes(createEveryDayRefs())
         .withJourneyPatternRef(
           createJaxbElement(
             new JourneyPatternRefStructure().withRef(journeyPattern.ref())
           )
         );
 
-      serviceJourney.withPassingTimes(
-        new TimetabledPassingTimes_RelStructure()
-          .withTimetabledPassingTime(
-            timetabledPassingTimes
-              .stream()
-              .map(CreateTimetabledPassingTime::create)
-              .toList()
-          )
-      );
+      if (dayTypes != null) {
+        serviceJourney.withDayTypes(
+          new DayTypeRefs_RelStructure()
+            .withDayTypeRef(
+              dayTypes
+                .stream()
+                .map(MappingSupport::createJaxbElement)
+                .collect(Collectors.toCollection(ArrayList::new))
+            )
+        );
+      }
+
+      if (timetabledPassingTimes != null) {
+        serviceJourney.withPassingTimes(
+          new TimetabledPassingTimes_RelStructure()
+            .withTimetabledPassingTime(
+              timetabledPassingTimes
+                .stream()
+                .map(CreateTimetabledPassingTime::create)
+                .toList()
+            )
+        );
+      }
 
       if (transportMode != null) {
         serviceJourney.withTransportMode(transportMode);
@@ -2218,16 +2285,5 @@ public class NetexEntitiesTestFactory {
             )
         );
     }
-  }
-
-  private static DayTypeRefs_RelStructure createEveryDayRefs() {
-    return new DayTypeRefs_RelStructure()
-      .withDayTypeRef(Collections.singleton(createEveryDayRef()));
-  }
-
-  private static JAXBElement<DayTypeRefStructure> createEveryDayRef() {
-    return createJaxbElement(
-      new DayTypeRefStructure().withRef(EVERYDAY.getId())
-    );
   }
 }

@@ -30,7 +30,22 @@ public class ServiceJourneyDayTypesCollector extends NetexDataCollector {
   protected void collectDataFromLineFile(
     JAXBValidationContext validationContext
   ) {
-    Map<String, String> serviceJourneyDayTypes = NetexUtils
+    Map<String, String> serviceJourneyDayTypes =
+      getDayTypesPerServiceJourneyIdAsStrings(validationContext);
+
+    if (!serviceJourneyDayTypes.isEmpty()) {
+      addServiceJourneyDayTypes(
+        validationContext.getValidationReportId(),
+        validationContext.getFileName(),
+        serviceJourneyDayTypes
+      );
+    }
+  }
+
+  static Map<String, String> getDayTypesPerServiceJourneyIdAsStrings(
+    JAXBValidationContext validationContext
+  ) {
+    return NetexUtils
       .validServiceJourneys(validationContext)
       .stream()
       .map(serviceJourney ->
@@ -50,14 +65,6 @@ public class ServiceJourneyDayTypesCollector extends NetexDataCollector {
           entry -> String.join(",", entry.getValue())
         )
       );
-
-    if (!serviceJourneyDayTypes.isEmpty()) {
-      addServiceJourneyDayTypes(
-        validationContext.getValidationReportId(),
-        validationContext.getFileName(),
-        serviceJourneyDayTypes
-      );
-    }
   }
 
   @Override
