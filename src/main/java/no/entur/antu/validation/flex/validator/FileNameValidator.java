@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
-import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationRule;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 
-public class FileNameValidator extends AbstractXPathValidator {
+public class FileNameValidator implements XPathValidator {
 
   static final ValidationRule RULE = new ValidationRule(
     "NETEX_FILE_NAME_1",

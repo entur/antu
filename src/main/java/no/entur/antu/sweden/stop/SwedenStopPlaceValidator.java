@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationRule;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Verify that Stop place and Quays referenced in the dataset are defined in a SiteFrame inside the dataset.
  */
-public class SwedenStopPlaceValidator extends AbstractXPathValidator {
+public class SwedenStopPlaceValidator implements XPathValidator {
 
   static final ValidationRule RULE = new ValidationRule(
     "STOP_PLACE_REF_SE_1",
@@ -106,9 +106,7 @@ public class SwedenStopPlaceValidator extends AbstractXPathValidator {
             id,
             fileName
           );
-          validationIssues.add(
-            new ValidationIssue(RULE, getIdVersionLocation(id))
-          );
+          validationIssues.add(new ValidationIssue(RULE, id.dataLocation()));
         }
       }
     }
