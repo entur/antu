@@ -1,6 +1,5 @@
 package no.entur.antu.validation.validator.xpath;
 
-import java.util.List;
 import java.util.Objects;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoAlightingAtFirstStopPoint;
@@ -8,15 +7,15 @@ import no.entur.antu.validation.validator.journeypattern.stoppoint.NoBoardingAtL
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
-import org.entur.netex.validation.validator.xpath.DefaultValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.ValidationTree;
-import org.entur.netex.validation.validator.xpath.XPathValidationRule;
+import org.entur.netex.validation.validator.xpath.tree.DefaultTimetableFrameValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.PublicationDeliveryValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.ValidationTreeBuilder;
 
 /**
  * Build the tree of XPath validation rules with Entur-specific rules.
  */
 public class EnturTimetableDataValidationTreeFactory
-  extends DefaultValidationTreeFactory {
+  extends PublicationDeliveryValidationTreeFactory {
 
   private final OrganisationRepository organisationRepository;
 
@@ -28,66 +27,24 @@ public class EnturTimetableDataValidationTreeFactory
   }
 
   @Override
-  protected ValidationTree getResourceFrameValidationTree(String path) {
-    ValidationTree resourceFrameValidationTree =
-      super.getResourceFrameValidationTree(path);
-    resourceFrameValidationTree.addValidationRule(
-      new ValidateAuthorityId(organisationRepository)
-    );
-    return resourceFrameValidationTree;
-  }
-
-  @Override
-  protected List<XPathValidationRule> getCompositeFrameBaseValidationRules() {
-    List<XPathValidationRule> validationRules =
-      super.getCompositeFrameBaseValidationRules();
-    validationRules.add(new ValidateNSRCodespace());
-    return validationRules;
-  }
-
-  @Override
-  protected ValidationTree getCommonFileValidationTree() {
-    ValidationTree commonFileValidationTree =
-      super.getCommonFileValidationTree();
-    commonFileValidationTree.addValidationRule(new ValidateAllowedCodespaces());
-    return commonFileValidationTree;
-  }
-
-  @Override
-  protected ValidationTree getLineFileValidationTree() {
-    ValidationTree lineFileValidationTree = super.getLineFileValidationTree();
-    lineFileValidationTree.addValidationRule(new ValidateAllowedCodespaces());
-    return lineFileValidationTree;
-  }
-
-  @Override
-  protected ValidationTree getTimetableFrameValidationTree(String path) {
-    ValidationTree timetableFrameValidationTree =
-      super.getTimetableFrameValidationTree(path);
+  public ValidationTreeBuilder builder() {
+    // Validation against the Norwegian organisation register
+    resourceFrameValidationTreeBuilder()
+      .withRule(new ValidateAuthorityId(organisationRepository));
+    // Validation against Norwegian codespaces
+    compositeFrameValidationTreeBuilder().withRule(new ValidateNSRCodespace());
+    rootValidationTreeBuilder().withRule(new ValidateAllowedCodespaces());
     // Disabling check of duplicate DatedServiceJourney with different versions (slow test)
-    timetableFrameValidationTree.removeValidationRule(
-      "DATED_SERVICE_JOURNEY_4"
-    );
-    return timetableFrameValidationTree;
-  }
-
-  @Override
-  protected ValidationTree getServiceFrameValidationTreeForLineFile(
-    String path
-  ) {
-    ValidationTree serviceFrameValidationTreeForLineFile =
-      super.getServiceFrameValidationTreeForLineFile(path);
-
+    timetableFrameValidationTreeBuilder()
+      .removeRule(
+        DefaultTimetableFrameValidationTreeFactory.CODE_DATED_SERVICE_JOURNEY_4
+      );
     // No boarding at last stop point in journey pattern
-    serviceFrameValidationTreeForLineFile.addValidationRule(
-      new NoBoardingAtLastStopPoint(path)
-    );
-
+    serviceFrameValidationTreeBuilder()
+      .withRuleForLineFile(new NoBoardingAtLastStopPoint("."));
     // No alighting at first stop point in journey pattern
-    serviceFrameValidationTreeForLineFile.addValidationRule(
-      new NoAlightingAtFirstStopPoint(path)
-    );
-
-    return serviceFrameValidationTreeForLineFile;
+    serviceFrameValidationTreeBuilder()
+      .withRuleForLineFile(new NoAlightingAtFirstStopPoint("."));
+    return super.builder();
   }
 }

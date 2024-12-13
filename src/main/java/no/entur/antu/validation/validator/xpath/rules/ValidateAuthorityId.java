@@ -24,8 +24,9 @@ import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
  */
 public class ValidateAuthorityId extends AbstractXPathValidationRule {
 
+  public static final String CODE_AUTHORITY_ID = "AUTHORITY_ID";
   static final ValidationRule RULE = new ValidationRule(
-    "AUTHORITY_ID",
+    CODE_AUTHORITY_ID,
     "Authority invalid Id",
     "Invalid Authority Id",
     Severity.ERROR

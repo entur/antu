@@ -1,5 +1,7 @@
 package no.entur.antu.validation.validator.xpath.rules;
 
+import static org.entur.netex.validation.xml.NetexXMLParser.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +13,6 @@ import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.validation.NetexCodespace;
-import org.entur.netex.validation.Constants;
 import org.entur.netex.validation.exception.NetexValidationException;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
@@ -57,14 +58,14 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
         String xmlnsUrl = null;
         XdmNode codespaceNamespaceNode = getChild(
           codespaceNode,
-          new QName("n", Constants.NETEX_NAMESPACE, "Xmlns")
+          new QName("n", NETEX_NAMESPACE, "Xmlns")
         );
         if (codespaceNamespaceNode != null) {
           xmlns = codespaceNamespaceNode.getStringValue();
         }
         XdmNode codespaceNamespaceUrlNode = getChild(
           codespaceNode,
-          new QName("n", Constants.NETEX_NAMESPACE, "XmlnsUrl")
+          new QName("n", NETEX_NAMESPACE, "XmlnsUrl")
         );
         if (codespaceNamespaceUrlNode != null) {
           xmlnsUrl = codespaceNamespaceUrlNode.getStringValue();
