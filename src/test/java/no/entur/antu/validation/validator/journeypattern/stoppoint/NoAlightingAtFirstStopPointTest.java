@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.netextestdata.NetexXmlTestFragment;
+import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
@@ -11,8 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class NoAlightingAtFirstStopPointTest {
-
-  private static final NetexXMLParser NETEX_XML_PARSER = new NetexXMLParser();
 
   @Test
   void testForAlightingFalseAtFirstStopShouldBeOk() {
@@ -177,17 +176,12 @@ class NoAlightingAtFirstStopPointTest {
   }
 
   private List<ValidationIssue> runTestWith(String journeyPatterns) {
-    XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(journeyPatterns);
-
     XPathRuleValidationContext xpathValidationContext =
-      new XPathRuleValidationContext(
-        document,
-        NETEX_XML_PARSER,
-        NetexXmlTestFragment.TEST_CODESPACE,
-        null
-      );
+      TestValidationContextBuilder
+        .ofNetexFragment(journeyPatterns)
+        .withCodespace(NetexXmlTestFragment.TEST_CODESPACE)
+        .build();
 
-    return new NoAlightingAtFirstStopPoint("ServiceFrame")
-      .validate(xpathValidationContext);
+    return new NoAlightingAtFirstStopPoint().validate(xpathValidationContext);
   }
 }

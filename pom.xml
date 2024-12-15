@@ -239,6 +239,13 @@
 
         <!-- testing -->
         <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-validator-java</artifactId>
+            <classifier>tests</classifier>
+            <version>${netex-validator-java.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>

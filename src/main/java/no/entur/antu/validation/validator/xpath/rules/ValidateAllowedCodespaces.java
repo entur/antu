@@ -48,7 +48,7 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
         .getNetexXMLParser()
         .getXPathCompiler()
         .compile(
-          "PublicationDelivery/dataObjects/*/codespaces/Codespace | PublicationDelivery/dataObjects/CompositeFrame/frames/*/codespaces/Codespace"
+          "dataObjects/*/codespaces/Codespace | dataObjects/CompositeFrame/frames/*/codespaces/Codespace"
         )
         .load();
       selector.setContextItem(validationContext.getXmlNode());

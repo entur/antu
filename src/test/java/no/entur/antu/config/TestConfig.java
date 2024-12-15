@@ -1,11 +1,11 @@
 package no.entur.antu.config;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.organisation.SimpleOrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.*;
@@ -32,26 +32,14 @@ public class TestConfig {
   @Bean
   @Primary
   public OrganisationRepository organisationRepository() {
-    return new OrganisationRepository() {
-      @Override
-      public void refreshCache() {}
-
-      @Override
-      public boolean isEmpty() {
-        return false;
-      }
-
-      @Override
-      public Set<String> getWhitelistedAuthorityIds(String codespace) {
-        if ("avi".equals(codespace)) {
-          return Set.of("AVI:Authority:Avinor");
-        }
-        if ("flb".equals(codespace)) {
-          return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
-        }
-        return Collections.emptySet();
-      }
-    };
+    return new SimpleOrganisationRepository(
+      Map.of(
+        "avi",
+        Set.of("AVI:Authority:Avinor"),
+        "flb",
+        Set.of("FLB:Authority:XXX", "FLB:Authority:YYY")
+      )
+    );
   }
 
   @Bean(name = "stopPlaceRepository")

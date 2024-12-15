@@ -2,8 +2,8 @@ package no.entur.antu.sweden.validator;
 
 import static org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFrameTreeFactory.CODE_COMPOSITE_FRAME_1;
 
-import java.util.Set;
-import no.entur.antu.organisation.OrganisationRepository;
+import java.util.Map;
+import no.entur.antu.organisation.SimpleOrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
@@ -28,22 +28,7 @@ public class EnturTimetableDataSwedenValidationTreeFactory
   public static final String CODE_COMPOSITE_FRAME_SE_1 = "COMPOSITE_FRAME_SE_1";
 
   public EnturTimetableDataSwedenValidationTreeFactory() {
-    super(
-      new OrganisationRepository() {
-        @Override
-        public void refreshCache() {}
-
-        @Override
-        public boolean isEmpty() {
-          return false;
-        }
-
-        @Override
-        public Set<String> getWhitelistedAuthorityIds(String codespace) {
-          return Set.of();
-        }
-      }
-    );
+    super(new SimpleOrganisationRepository(Map.of()));
   }
 
   @Override

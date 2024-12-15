@@ -41,10 +41,10 @@ public class EnturTimetableDataValidationTreeFactory
       );
     // No boarding at last stop point in journey pattern
     serviceFrameValidationTreeBuilder()
-      .withRuleForLineFile(new NoBoardingAtLastStopPoint("."));
+      .withRuleForLineFile(new NoBoardingAtLastStopPoint());
     // No alighting at first stop point in journey pattern
     serviceFrameValidationTreeBuilder()
-      .withRuleForLineFile(new NoAlightingAtFirstStopPoint("."));
+      .withRuleForLineFile(new NoAlightingAtFirstStopPoint());
     return super.builder();
   }
 }

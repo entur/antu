@@ -1,12 +1,13 @@
 package no.entur.antu.validation.validator.xpath.rules;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.organisation.SimpleOrganisationRepository;
+import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,9 +17,6 @@ class ValidateAuthorityIdTest {
   public static final String TEST_CODESPACE = "AVI";
   public static final String TEST_VALID_AUTHORITY_ID = "AVI:Authority:Avinor";
   public static final String TEST_INVALID_AUTHORITY_ID = "XXX:Authority:1";
-  private static final NetexXMLParser NETEX_XML_PARSER = new NetexXMLParser(
-    Set.of("SiteFrame")
-  );
 
   private static final String NETEX_FRAGMENT =
     """
@@ -42,65 +40,42 @@ class ValidateAuthorityIdTest {
   @BeforeEach
   void setUpTest() {
     OrganisationRepository organisationRepository =
-      new OrganisationRepository() {
-        @Override
-        public void refreshCache() {}
-
-        @Override
-        public boolean isEmpty() {
-          return false;
-        }
-
-        @Override
-        public Set<String> getWhitelistedAuthorityIds(String codespace) {
-          return Set.of(TEST_VALID_AUTHORITY_ID);
-        }
-      };
+      new SimpleOrganisationRepository(
+        Map.of(TEST_CODESPACE, Set.of(TEST_VALID_AUTHORITY_ID))
+      );
 
     validateAuthorityId = new ValidateAuthorityId(organisationRepository);
   }
 
   @Test
   void testInvalidAuthority() {
-    String fragmentWithInvalidCodespace = NETEX_FRAGMENT.replace(
+    String netexFragment = NETEX_FRAGMENT.replace(
       "${AUTHORITY_ID}",
       TEST_INVALID_AUTHORITY_ID
     );
-    XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
-      fragmentWithInvalidCodespace
-    );
     XPathRuleValidationContext xpathValidationContext =
-      new XPathRuleValidationContext(
-        document,
-        NETEX_XML_PARSER,
-        TEST_CODESPACE,
-        null
-      );
+      TestValidationContextBuilder
+        .ofNetexFragment(netexFragment)
+        .withCodespace(TEST_CODESPACE)
+        .build();
     List<ValidationIssue> xPathValidationReportEntries =
       validateAuthorityId.validate(xpathValidationContext);
-    Assertions.assertNotNull(xPathValidationReportEntries);
     Assertions.assertFalse(xPathValidationReportEntries.isEmpty());
   }
 
   @Test
   void testValidAuthority() {
-    String fragmentWithInvalidCodespace = NETEX_FRAGMENT.replace(
+    String netexFragment = NETEX_FRAGMENT.replace(
       "${AUTHORITY_ID}",
       TEST_VALID_AUTHORITY_ID
     );
-    XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
-      fragmentWithInvalidCodespace
-    );
     XPathRuleValidationContext xpathValidationContext =
-      new XPathRuleValidationContext(
-        document,
-        NETEX_XML_PARSER,
-        TEST_CODESPACE,
-        null
-      );
+      TestValidationContextBuilder
+        .ofNetexFragment(netexFragment)
+        .withCodespace(TEST_CODESPACE)
+        .build();
     List<ValidationIssue> xPathValidationReportEntries =
       validateAuthorityId.validate(xpathValidationContext);
-    Assertions.assertNotNull(xPathValidationReportEntries);
     Assertions.assertTrue(xPathValidationReportEntries.isEmpty());
   }
 }
