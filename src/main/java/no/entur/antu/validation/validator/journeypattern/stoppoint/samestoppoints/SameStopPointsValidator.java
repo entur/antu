@@ -24,7 +24,7 @@ public class SameStopPointsValidator implements JAXBValidator {
   static final ValidationRule RULE = new ValidationRule(
     "SAME_STOP_POINT_IN_JOURNEY_PATTERNS",
     "JourneyPatterns have same StopPoints",
-    "JourneyPatterns have same StopPoints:  [%s]",
+    "JourneyPatterns have same StopPoints: [%s]",
     Severity.WARNING
   );
 

@@ -38,6 +38,7 @@ import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasi
 import no.entur.antu.validation.validator.servicejourney.servicealteration.InvalidServiceAlterationValidator;
 import no.entur.antu.validation.validator.servicejourney.servicealteration.MissingReplacementValidator;
 import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeedValidator;
+import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportModeSubModeValidator;
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
@@ -77,81 +78,6 @@ public class TimetableDataValidatorConfig {
     ) ValidationTreeFactory validationTreeFactory
   ) {
     return new XPathRuleValidator(validationTreeFactory);
-  }
-
-  @Bean
-  public UnexpectedDistanceBetweenStopPointsValidator unexpectedDistanceBetweenStopPointsValidator() {
-    return new UnexpectedDistanceBetweenStopPointsValidator();
-  }
-
-  @Bean
-  public IdenticalStopPointsValidator identicalStopPointsValidator() {
-    return new IdenticalStopPointsValidator();
-  }
-
-  @Bean
-  public SameQuayRefValidator sameQuayRefValidator() {
-    return new SameQuayRefValidator();
-  }
-
-  @Bean
-  public SameStopPointsValidator sameStopPointsValidator() {
-    return new SameStopPointsValidator();
-  }
-
-  @Bean
-  public StopPointsCountValidator stopPointsCountValidator() {
-    return new StopPointsCountValidator();
-  }
-
-  @Bean
-  public MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator() {
-    return new MissingPassengerStopAssignmentValidator();
-  }
-
-  @Bean
-  public NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator() {
-    return new NonIncreasingPassingTimeValidator();
-  }
-
-  @Bean
-  public UnexpectedSpeedValidator unexpectedSpeedValidator() {
-    return new UnexpectedSpeedValidator();
-  }
-
-  @Bean
-  public UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator() {
-    return new UnexpectedDistanceInServiceLinkValidator();
-  }
-
-  @Bean
-  public MismatchedStopPointsValidator mismatchedStopPointsValidator() {
-    return new MismatchedStopPointsValidator();
-  }
-
-  @Bean
-  public MandatoryFieldsValidator mandatoryFieldsValidator() {
-    return new MandatoryFieldsValidator();
-  }
-
-  @Bean
-  public DuplicateInterchangesValidator duplicateInterchangesValidator() {
-    return new DuplicateInterchangesValidator();
-  }
-
-  @Bean
-  public InvalidServiceAlterationValidator missingServiceAlterationValidator() {
-    return new InvalidServiceAlterationValidator();
-  }
-
-  @Bean
-  public MissingReplacementValidator missingReplacementValidator() {
-    return new MissingReplacementValidator();
-  }
-
-  @Bean
-  public UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator() {
-    return new UnexpectedInterchangeDistanceValidator();
   }
 
   @Bean
@@ -197,23 +123,8 @@ public class TimetableDataValidatorConfig {
     @Qualifier(
       "netexIdUniquenessValidator"
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
-    UnexpectedDistanceBetweenStopPointsValidator unexpectedDistanceBetweenStopPointsValidator,
-    IdenticalStopPointsValidator identicalStopPointsValidator,
-    SameQuayRefValidator sameQuayRefValidator,
-    SameStopPointsValidator sameStopPointsValidator,
-    StopPointsCountValidator stopPointsCountValidator,
-    MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator,
-    NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator,
-    UnexpectedSpeedValidator unexpectedSpeedValidator,
-    UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator,
-    MismatchedStopPointsValidator mismatchedStopPointsValidator,
-    MandatoryFieldsValidator mandatoryFieldsValidator,
-    DuplicateInterchangesValidator duplicateInterchangesValidator,
-    InvalidServiceAlterationValidator invalidServiceAlterationValidator,
-    UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator,
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
-    MissingReplacementValidator missingReplacementValidator,
     LineInfoCollector lineInfoCollector,
     ServiceJourneyStopsCollector serviceJourneyStopsCollector,
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
@@ -234,22 +145,22 @@ public class TimetableDataValidatorConfig {
     );
 
     List<JAXBValidator> jaxbValidators = List.of(
-      unexpectedDistanceBetweenStopPointsValidator,
-      identicalStopPointsValidator,
-      sameQuayRefValidator,
-      sameStopPointsValidator,
-      stopPointsCountValidator,
-      missingPassengerStopAssignmentValidator,
-      nonIncreasingPassingTimeValidator,
-      unexpectedSpeedValidator,
-      unexpectedDistanceInServiceLinkValidator,
-      mismatchedStopPointsValidator,
-      mandatoryFieldsValidator,
-      duplicateInterchangesValidator,
-      invalidServiceAlterationValidator,
-      missingReplacementValidator,
-      duplicateInterchangesValidator,
-      unexpectedInterchangeDistanceValidator
+      new MismatchedTransportModeSubModeValidator(),
+      new UnexpectedDistanceBetweenStopPointsValidator(),
+      new IdenticalStopPointsValidator(),
+      new SameQuayRefValidator(),
+      new SameStopPointsValidator(),
+      new StopPointsCountValidator(),
+      new MissingPassengerStopAssignmentValidator(),
+      new NonIncreasingPassingTimeValidator(),
+      new UnexpectedSpeedValidator(),
+      new UnexpectedDistanceInServiceLinkValidator(),
+      new MismatchedStopPointsValidator(),
+      new MandatoryFieldsValidator(),
+      new DuplicateInterchangesValidator(),
+      new InvalidServiceAlterationValidator(),
+      new MissingReplacementValidator(),
+      new UnexpectedInterchangeDistanceValidator()
     );
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
