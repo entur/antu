@@ -1,30 +1,27 @@
 package no.entur.antu.validation.validator.xpath.rules;
 
 import java.util.List;
-import java.util.Set;
-import net.sf.saxon.s9api.XdmNode;
+import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class ValidateNSRCodespaceTest {
 
   public static final String TEST_CODESPACE = "FLB";
-  private static final NetexXMLParser NETEX_XML_PARSER = new NetexXMLParser(
-    Set.of("SiteFrame")
-  );
 
   private static final String NETEX_FRAGMENT =
     """
-                                    <codespaces xmlns="http://www.netex.org.uk/netex">
-                                      <Codespace id="nsr">
-                                        <Xmlns>NSR</Xmlns>
-                                        <XmlnsUrl>${XML_NAMESPACE_URL}</XmlnsUrl>
-                                      </Codespace>
-                                    </codespaces>
-            """;
+  <CompositeFrame  xmlns="http://www.netex.org.uk/netex">
+    <codespaces>
+      <Codespace id="nsr">
+        <Xmlns>NSR</Xmlns>
+        <XmlnsUrl>${XML_NAMESPACE_URL}</XmlnsUrl>
+      </Codespace>
+    </codespaces>
+  </CompositeFrame>
+  """;
 
   @Test
   void testMissingNSRCodeSpace() {
@@ -33,19 +30,15 @@ class ValidateNSRCodespaceTest {
       "${XML_NAMESPACE_URL}",
       "http://www.rutebanken.org/ns/nsr-invalid"
     );
-    XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
-      fragmentWithInvalidCodespace
-    );
+
     XPathRuleValidationContext xpathValidationContext =
-      new XPathRuleValidationContext(
-        document,
-        NETEX_XML_PARSER,
-        TEST_CODESPACE,
-        null
-      );
+      TestValidationContextBuilder
+        .ofNetexFragment(fragmentWithInvalidCodespace)
+        .withCodespace(TEST_CODESPACE)
+        .build();
+
     List<ValidationIssue> xPathValidationReportEntries =
       validateNSRCodespace.validate(xpathValidationContext);
-    Assertions.assertNotNull(xPathValidationReportEntries);
     Assertions.assertFalse(xPathValidationReportEntries.isEmpty());
   }
 
@@ -56,19 +49,13 @@ class ValidateNSRCodespaceTest {
       "${XML_NAMESPACE_URL}",
       "http://www.rutebanken.org/ns/nsr"
     );
-    XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
-      fragmentWithValidCodespace
-    );
     XPathRuleValidationContext xpathValidationContext =
-      new XPathRuleValidationContext(
-        document,
-        NETEX_XML_PARSER,
-        TEST_CODESPACE,
-        null
-      );
+      TestValidationContextBuilder
+        .ofNetexFragment(fragmentWithValidCodespace)
+        .withCodespace(TEST_CODESPACE)
+        .build();
     List<ValidationIssue> xPathValidationReportEntries =
       validateNSRCodespace.validate(xpathValidationContext);
-    Assertions.assertNotNull(xPathValidationReportEntries);
     Assertions.assertTrue(xPathValidationReportEntries.isEmpty());
   }
 }

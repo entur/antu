@@ -1,11 +1,14 @@
 package no.entur.antu.finland.validator;
 
-import java.util.List;
-import java.util.Set;
-import no.entur.antu.organisation.OrganisationRepository;
+import java.util.Map;
+import no.entur.antu.organisation.SimpleOrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.ValidationTree;
-import org.entur.netex.validation.validator.xpath.XPathValidationRule;
+import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
+import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
+import org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFrameTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.DefaultServiceFrameValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.DefaultSiteFrameValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.ValidationTreeBuilder;
 
 /**
  * XPath validation tree for timetable data from Finland.
@@ -15,65 +18,32 @@ public class EnturTimetableDataFinlandValidationTreeFactory
   extends EnturTimetableDataValidationTreeFactory {
 
   public EnturTimetableDataFinlandValidationTreeFactory() {
-    super(
-      new OrganisationRepository() {
-        @Override
-        public void refreshCache() {}
-
-        @Override
-        public boolean isEmpty() {
-          return false;
-        }
-
-        @Override
-        public Set<String> getWhitelistedAuthorityIds(String codespace) {
-          return Set.of();
-        }
-      }
-    );
+    super(new SimpleOrganisationRepository(Map.of()));
   }
 
   @Override
-  protected ValidationTree getSingleFramesValidationTreeForCommonFile() {
-    ValidationTree validationTree =
-      super.getSingleFramesValidationTreeForCommonFile();
-    // remove check on SiteFrame, they are part of Swedish datasets
-    validationTree.removeValidationRule("SITE_FRAME_IN_COMMON_FILE");
-    return validationTree;
-  }
-
-  @Override
-  protected List<XPathValidationRule> getCompositeFrameBaseValidationRules() {
-    List<XPathValidationRule> compositeFrameBaseValidationRules =
-      super.getCompositeFrameBaseValidationRules();
-    // remove check on NSR codespace
-    compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.rule().code().equals("NSR_CODESPACE")
-    );
-    // allow SiteFrame
-    compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.rule().code().equals("COMPOSITE_SITE_FRAME_IN_COMMON_FILE")
-    );
-    return compositeFrameBaseValidationRules;
-  }
-
-  @Override
-  protected ValidationTree getResourceFrameValidationTree(String path) {
-    ValidationTree resourceFrameValidationTree =
-      super.getResourceFrameValidationTree(path);
+  public ValidationTreeBuilder builder() {
+    // accept SiteFrame, they are part of Finnish datasets
+    siteFrameValidationTreeBuilder()
+      .removeRuleForCommonFile(
+        DefaultSiteFrameValidationTreeFactory.CODE_SITE_FRAME_IN_COMMON_FILE
+      )
+      .removeRuleForLineFile(
+        DefaultSiteFrameValidationTreeFactory.CODE_SITE_FRAME_IN_LINE_FILE
+      );
+    // remove validation on NSR codespace
+    compositeFrameValidationTreeBuilder()
+      .removeRule(ValidateNSRCodespace.CODE_NSR_CODESPACE)
+      .removeRule(
+        DefaultCompositeFrameTreeFactory.CODE_COMPOSITE_FRAME_SITE_FRAME
+      );
     // remove validation against the Norwegian organisation registry
-    resourceFrameValidationTree.removeValidationRule("AUTHORITY_ID");
-    return resourceFrameValidationTree;
-  }
-
-  @Override
-  protected List<XPathValidationRule> getServiceFrameBaseValidationRules() {
-    List<XPathValidationRule> serviceFrameBaseValidationRules =
-      super.getServiceFrameBaseValidationRules();
-    // remove time-consuming rule
-    serviceFrameBaseValidationRules.removeIf(validationRule ->
-      "PASSENGER_STOP_ASSIGNMENT_3".equals(validationRule.rule().code())
-    );
-    return serviceFrameBaseValidationRules;
+    resourceFrameValidationTreeBuilder()
+      .removeRule(ValidateAuthorityId.CODE_AUTHORITY_ID);
+    serviceFrameValidationTreeBuilder()
+      .removeRule(
+        DefaultServiceFrameValidationTreeFactory.CODE_PASSENGER_STOP_ASSIGNMENT_3
+      );
+    return super.builder();
   }
 }

@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.organisation.SimpleOrganisationRepository;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
@@ -21,24 +23,14 @@ class XpathValidatorIntegrationTest {
 
   private static final String TEST_DATASET_AUTHORITY_VALIDATION_FILE_NAME =
     "rb_flb-aggregated-netex.zip";
+  private static final String TEST_CODESPACE = "FLB";
 
   @Test
   void testValidator() throws IOException {
     OrganisationRepository stubOrganisationRepository =
-      new OrganisationRepository() {
-        @Override
-        public void refreshCache() {}
-
-        @Override
-        public boolean isEmpty() {
-          return false;
-        }
-
-        @Override
-        public Set<String> getWhitelistedAuthorityIds(String codespace) {
-          return Set.of("FLB:Authority:XXX", "FLB:Authority:YYY");
-        }
-      };
+      new SimpleOrganisationRepository(
+        Map.of(TEST_CODESPACE, Set.of("FLB:Authority:XXX", "FLB:Authority:YYY"))
+      );
     ValidationTreeFactory validationTreeFactory =
       new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository);
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));

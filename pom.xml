@@ -27,7 +27,7 @@
         <entur.google.pubsub.emulator.download.skip>false</entur.google.pubsub.emulator.download.skip>
         <camel.version>4.4.4</camel.version>
         <entur.helpers.version>4.4</entur.helpers.version>
-        <netex-validator-java.version>8.0.3</netex-validator-java.version>
+        <netex-validator-java.version>9.0.0</netex-validator-java.version>
         <netex-parser-java.version>3.1.29</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
         <commons-io.version>2.11.0</commons-io.version>
@@ -238,6 +238,13 @@
         </dependency>
 
         <!-- testing -->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>netex-validator-java</artifactId>
+            <classifier>tests</classifier>
+            <version>${netex-validator-java.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

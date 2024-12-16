@@ -3,21 +3,16 @@ package no.entur.antu.validation.validator.xpath;
 import static no.entur.antu.validation.NetexCodespace.NSR_NETEX_CODESPACE;
 
 import java.util.List;
-import java.util.Set;
-import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
+import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 class ValidateAllowedCodespacesTest {
 
   public static final String TEST_CODESPACE = "FLB";
-  private static final NetexXMLParser NETEX_XML_PARSER = new NetexXMLParser(
-    Set.of("SiteFrame")
-  );
 
   private static final String NETEX_FRAGMENT =
     """
@@ -43,19 +38,15 @@ class ValidateAllowedCodespacesTest {
     );
     ValidateAllowedCodespaces validateAllowedCodespaces =
       new ValidateAllowedCodespaces();
-    XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
-      publicationDeliveryWithInvalidCodespace
-    );
+
     XPathRuleValidationContext xpathValidationContext =
-      new XPathRuleValidationContext(
-        document,
-        NETEX_XML_PARSER,
-        TEST_CODESPACE,
-        null
-      );
+      TestValidationContextBuilder
+        .ofNetexFragment(publicationDeliveryWithInvalidCodespace)
+        .withCodespace(TEST_CODESPACE)
+        .build();
+
     List<ValidationIssue> xPathValidationReportEntries =
       validateAllowedCodespaces.validate(xpathValidationContext);
-    Assertions.assertNotNull(xPathValidationReportEntries);
     Assertions.assertFalse(xPathValidationReportEntries.isEmpty());
   }
 
@@ -67,19 +58,14 @@ class ValidateAllowedCodespacesTest {
     );
     ValidateAllowedCodespaces validateAllowedCodespaces =
       new ValidateAllowedCodespaces();
-    XdmNode document = NETEX_XML_PARSER.parseStringToXdmNode(
-      publicationDeliveryWithValidCodespace
-    );
     XPathRuleValidationContext xpathValidationContext =
-      new XPathRuleValidationContext(
-        document,
-        NETEX_XML_PARSER,
-        TEST_CODESPACE,
-        null
-      );
+      TestValidationContextBuilder
+        .ofNetexFragment(publicationDeliveryWithValidCodespace)
+        .withCodespace(TEST_CODESPACE)
+        .build();
+
     List<ValidationIssue> xPathValidationReportEntries =
       validateAllowedCodespaces.validate(xpathValidationContext);
-    Assertions.assertNotNull(xPathValidationReportEntries);
     Assertions.assertTrue(xPathValidationReportEntries.isEmpty());
   }
 }

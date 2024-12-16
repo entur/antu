@@ -8,11 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import no.entur.antu.validation.NetexCodespace;
-import org.entur.netex.validation.validator.AbstractXPathValidator;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationRule;
+import org.entur.netex.validation.validator.XPathValidator;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.slf4j.Logger;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Validate that NeTEX IDs have a valid structure.
  */
-public class NetexIdValidator extends AbstractXPathValidator {
+public class NetexIdValidator implements XPathValidator {
 
   static final ValidationRule RULE_INVALID_ID_STRUCTURE = new ValidationRule(
     "NETEX_ID_2",
@@ -92,7 +92,7 @@ public class NetexIdValidator extends AbstractXPathValidator {
 
     for (IdVersion id : validationContext.getLocalIds()) {
       Matcher m = PATTERN_VALID_ID.matcher(id.getId());
-      DataLocation dataLocation = getIdVersionLocation(id);
+      DataLocation dataLocation = id.dataLocation();
       if (!m.matches()) {
         validationIssues.add(
           new ValidationIssue(RULE_INVALID_ID_STRUCTURE, dataLocation)

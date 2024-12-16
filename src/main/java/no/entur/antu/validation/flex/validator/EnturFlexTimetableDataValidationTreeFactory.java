@@ -1,17 +1,20 @@
 package no.entur.antu.validation.flex.validator;
 
-import java.util.List;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.ValidationTree;
-import org.entur.netex.validation.validator.xpath.XPathValidationRule;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
+import org.entur.netex.validation.validator.xpath.tree.DefaultSiteFrameValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.ValidationTreeBuilder;
 
 /**
  * XPath validation tree for flexible transport timetable data.
  */
 public class EnturFlexTimetableDataValidationTreeFactory
   extends EnturTimetableDataValidationTreeFactory {
+
+  public static final String CODE_STOP_PLACE_IN_FLEX_COMMON_FILE =
+    "STOP_PLACE_IN_FLEX_COMMON_FILE";
 
   public EnturFlexTimetableDataValidationTreeFactory(
     OrganisationRepository organisationRepository
@@ -20,55 +23,22 @@ public class EnturFlexTimetableDataValidationTreeFactory
   }
 
   @Override
-  protected ValidationTree getSingleFramesValidationTreeForCommonFile() {
-    ValidationTree validationTree =
-      super.getSingleFramesValidationTreeForCommonFile();
-    // remove check on SiteFrame, this is a valid part of flexible datasets
-    validationTree.removeValidationRule("SITE_FRAME_IN_COMMON_FILE");
-    return validationTree;
-  }
-
-  @Override
-  protected List<XPathValidationRule> getCompositeFrameBaseValidationRules() {
-    List<XPathValidationRule> compositeFrameBaseValidationRules =
-      super.getCompositeFrameBaseValidationRules();
-    // allow common files that contain a SiteFrame
-    compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.rule().code().equals("COMPOSITE_SITE_FRAME_IN_COMMON_FILE")
-    );
-
-    return compositeFrameBaseValidationRules;
-  }
-
-  @Override
-  protected ValidationTree getCompositeFrameValidationTreeForCommonFile() {
-    ValidationTree validationTree =
-      super.getCompositeFrameValidationTreeForCommonFile();
-
-    validationTree.addSubTree(
-      getSiteFrameValidationTreeForCommonFile("frames/SiteFrame")
-    );
-
-    return validationTree;
-  }
-
-  @Override
-  protected ValidationTree getSiteFrameValidationTreeForCommonFile(
-    String path
-  ) {
-    ValidationTree siteFrameValidationTree = new ValidationTree(
-      "Site frame in common file",
-      path
-    );
-
-    siteFrameValidationTree.addValidationRule(
-      new ValidateNotExist(
-        "stopPlaces",
-        "stopPlaces not allowed in flexible shared files",
-        "SITE_FRAME_IN_COMMON_FILE_1"
+  public ValidationTreeBuilder builder() {
+    // accept SiteFrame in common file, they are part of flex datasets
+    siteFrameValidationTreeBuilder()
+      .removeRuleForCommonFile(
+        DefaultSiteFrameValidationTreeFactory.CODE_SITE_FRAME_IN_COMMON_FILE
       )
-    );
-
-    return siteFrameValidationTree;
+      // reject non-flex stop place definitions in SiteFrame
+      .withRuleForCommonFile(
+        new ValidateNotExist(
+          "stopPlaces",
+          CODE_STOP_PLACE_IN_FLEX_COMMON_FILE,
+          "Flexible Line stopPlaces not allowed",
+          "StopPlaces not allowed in flexible shared files",
+          Severity.ERROR
+        )
+      );
+    return super.builder();
   }
 }

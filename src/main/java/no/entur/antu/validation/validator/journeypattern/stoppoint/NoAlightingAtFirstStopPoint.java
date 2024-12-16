@@ -1,5 +1,6 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint;
 
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 /**
@@ -8,11 +9,11 @@ import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
  */
 public class NoAlightingAtFirstStopPoint extends ValidateNotExist {
 
-  public NoAlightingAtFirstStopPoint(String path) {
+  public NoAlightingAtFirstStopPoint() {
     super(
       """
       for-each(
-        %s/journeyPatterns/JourneyPattern,
+        journeyPatterns/JourneyPattern,
         function($jp) {
           sort(
             $jp/pointsInSequence/StopPointInJourneyPattern,
@@ -23,11 +24,11 @@ public class NoAlightingAtFirstStopPoint extends ValidateNotExist {
           )[1][count(ForAlighting) = 0 or ForAlighting != 'false']
         }
       )
-      """.formatted(
-          path
-        ),
+      """,
+      "JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP",
+      "Journey Pattern - No alighting on first stop",
       "First StopPointInJourneyPattern must not allow alighting",
-      "JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP"
+      Severity.ERROR
     );
   }
 }

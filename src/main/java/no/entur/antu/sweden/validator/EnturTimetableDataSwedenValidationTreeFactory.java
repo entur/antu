@@ -1,13 +1,20 @@
 package no.entur.antu.sweden.validator;
 
-import java.util.List;
-import java.util.Set;
-import no.entur.antu.organisation.OrganisationRepository;
+import static org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFrameTreeFactory.CODE_COMPOSITE_FRAME_1;
+
+import java.util.Map;
+import no.entur.antu.organisation.SimpleOrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import org.entur.netex.validation.validator.xpath.ValidationTree;
-import org.entur.netex.validation.validator.xpath.XPathValidationRule;
+import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
+import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
+import org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFrameTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.DefaultServiceFrameValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.DefaultSingleFramesValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.DefaultSiteFrameValidationTreeFactory;
+import org.entur.netex.validation.validator.xpath.tree.ValidationTreeBuilder;
 
 /**
  * XPath validation tree for timetable data from Sweden.
@@ -16,88 +23,63 @@ import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 public class EnturTimetableDataSwedenValidationTreeFactory
   extends EnturTimetableDataValidationTreeFactory {
 
+  public static final String CODE_VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1 =
+    "VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1";
+  public static final String CODE_COMPOSITE_FRAME_SE_1 = "COMPOSITE_FRAME_SE_1";
+
   public EnturTimetableDataSwedenValidationTreeFactory() {
-    super(
-      new OrganisationRepository() {
-        @Override
-        public void refreshCache() {}
-
-        @Override
-        public boolean isEmpty() {
-          return false;
-        }
-
-        @Override
-        public Set<String> getWhitelistedAuthorityIds(String codespace) {
-          return Set.of();
-        }
-      }
-    );
+    super(new SimpleOrganisationRepository(Map.of()));
   }
 
   @Override
-  protected ValidationTree getSingleFramesValidationTreeForCommonFile() {
-    ValidationTree validationTree =
-      super.getSingleFramesValidationTreeForCommonFile();
-    // remove check on SiteFrame, they are part of Swedish datasets
-    validationTree.removeValidationRule("SITE_FRAME_IN_COMMON_FILE");
-    // allow common files that contain only a SiteFrame and accept ValidBetween syntax in addition to validityConditions syntax
-    validationTree.removeValidationRule("VALIDITY_CONDITIONS_IN_COMMON_FILE_1");
-    validationTree.addValidationRule(
-      new ValidateAtLeastOne(
-        "ServiceFrame[validityConditions or ValidBetween] | ServiceCalendarFrame[validityConditions or ValidBetween] | SiteFrame[validityConditions or ValidBetween]",
-        "Neither ServiceFrame nor ServiceCalendarFrame nor SiteFrame defines ValidityConditions",
-        "VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1"
+  public ValidationTreeBuilder builder() {
+    // accept SiteFrame, they are part of Finnish datasets
+    siteFrameValidationTreeBuilder()
+      .removeRuleForCommonFile(
+        DefaultSiteFrameValidationTreeFactory.CODE_SITE_FRAME_IN_COMMON_FILE
       )
-    );
-    return validationTree;
-  }
-
-  @Override
-  protected List<XPathValidationRule> getCompositeFrameBaseValidationRules() {
-    List<XPathValidationRule> compositeFrameBaseValidationRules =
-      super.getCompositeFrameBaseValidationRules();
-    // remove check on NSR codespace
-    compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.rule().code().equals("NSR_CODESPACE")
-    );
-    // allow common files that contain only a SiteFrame
-    compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.rule().code().equals("SITE_FRAME_IN_COMMON_FILE")
-    );
-
-    // accept ValidBetween syntax in addition to validityConditions syntax
-    compositeFrameBaseValidationRules.removeIf(validationRule ->
-      validationRule.rule().code().equals("COMPOSITE_FRAME_1")
-    );
-    compositeFrameBaseValidationRules.add(
-      new ValidateNotExist(
-        ".[not(validityConditions or ValidBetween)]",
-        "A CompositeFrame must define a ValidityCondition valid for all data within the CompositeFrame",
-        "COMPOSITE_FRAME_SE_1"
+      .removeRuleForLineFile(
+        DefaultSiteFrameValidationTreeFactory.CODE_SITE_FRAME_IN_LINE_FILE
+      );
+    // Accept ValidBetween syntax in addition to validityConditions syntax
+    singleFramesValidationTreeBuilder()
+      .removeRuleForCommonFile(
+        DefaultSingleFramesValidationTreeFactory.CODE_VALIDITY_CONDITIONS_IN_COMMON_FILE_1
       )
-    );
-
-    return compositeFrameBaseValidationRules;
-  }
-
-  @Override
-  protected ValidationTree getResourceFrameValidationTree(String path) {
-    ValidationTree resourceFrameValidationTree =
-      super.getResourceFrameValidationTree(path);
+      .withRuleForCommonFile(
+        new ValidateAtLeastOne(
+          "ServiceFrame[validityConditions or ValidBetween] | ServiceCalendarFrame[validityConditions or ValidBetween] | SiteFrame[validityConditions or ValidBetween]",
+          CODE_VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1,
+          "SE/Validity condition on common frames",
+          "Neither ServiceFrame nor ServiceCalendarFrame nor SiteFrame defines ValidityConditions",
+          Severity.ERROR
+        )
+      );
+    // remove validation on NSR codespace
+    compositeFrameValidationTreeBuilder()
+      .removeRule(ValidateNSRCodespace.CODE_NSR_CODESPACE)
+      // accept ValidBetween syntax in addition to validityConditions syntax
+      .removeRule(
+        DefaultCompositeFrameTreeFactory.CODE_COMPOSITE_FRAME_SITE_FRAME
+      )
+      .removeRuleForCommonFile(CODE_COMPOSITE_FRAME_1)
+      .withRule(
+        new ValidateNotExist(
+          ".[not(validityConditions or ValidBetween)]",
+          CODE_COMPOSITE_FRAME_SE_1,
+          "SE/CompositeFrame missing ValidityCondition/ValidBetween",
+          "A CompositeFrame must define a ValidityCondition valid for all data within the CompositeFrame",
+          Severity.ERROR
+        )
+      );
     // remove validation against the Norwegian organisation registry
-    resourceFrameValidationTree.removeValidationRule("AUTHORITY_ID");
-    return resourceFrameValidationTree;
-  }
-
-  @Override
-  protected List<XPathValidationRule> getServiceFrameBaseValidationRules() {
-    List<XPathValidationRule> serviceFrameBaseValidationRules =
-      super.getServiceFrameBaseValidationRules();
+    resourceFrameValidationTreeBuilder()
+      .removeRule(ValidateAuthorityId.CODE_AUTHORITY_ID);
     // remove time-consuming rule
-    serviceFrameBaseValidationRules.removeIf(validationRule ->
-      "PASSENGER_STOP_ASSIGNMENT_3".equals(validationRule.rule().code())
-    );
-    return serviceFrameBaseValidationRules;
+    serviceFrameValidationTreeBuilder()
+      .removeRule(
+        DefaultServiceFrameValidationTreeFactory.CODE_PASSENGER_STOP_ASSIGNMENT_3
+      );
+    return super.builder();
   }
 }

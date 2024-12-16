@@ -1,6 +1,6 @@
 package no.entur.antu.netextestdata;
 
-import static no.entur.antu.netextestdata.MappingSupport.createJaxbElement;
+import static org.entur.netex.validation.test.jaxb.support.JAXBUtils.createJaxbElement;
 
 import jakarta.xml.bind.JAXBElement;
 import java.lang.reflect.ParameterizedType;

@@ -1,5 +1,6 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint;
 
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 
 /**
@@ -8,11 +9,11 @@ import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
  */
 public class NoBoardingAtLastStopPoint extends ValidateNotExist {
 
-  public NoBoardingAtLastStopPoint(String path) {
+  public NoBoardingAtLastStopPoint() {
     super(
       """
       for-each(
-        %s/journeyPatterns/JourneyPattern,
+        journeyPatterns/JourneyPattern,
         function($jp) {
           sort(
             $jp/pointsInSequence/StopPointInJourneyPattern,
@@ -23,11 +24,11 @@ public class NoBoardingAtLastStopPoint extends ValidateNotExist {
           )[last()][count(ForBoarding) = 0 or ForBoarding != 'false']
         }
       )
-      """.formatted(
-          path
-        ),
+      """,
+      "JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP",
+      "Journey Pattern - No boarding on last stop",
       "Last StopPointInJourneyPattern must not allow boarding",
-      "JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP"
+      Severity.ERROR
     );
   }
 }
