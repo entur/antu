@@ -32,8 +32,6 @@ public class CamelConfig {
 
   /**
    * Register Java Time Module for JSON serialization/deserialization of Java Time objects.
-   *
-   * @return
    */
   @Bean("jacksonJavaTimeModule")
   JavaTimeModule jacksonJavaTimeModule() {

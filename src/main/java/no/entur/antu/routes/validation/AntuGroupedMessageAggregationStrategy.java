@@ -21,9 +21,6 @@ public abstract class AntuGroupedMessageAggregationStrategy
 
   /**
    * Copy the validation headers that should be propagated into the aggregated message.
-   *
-   * @param newExchange
-   * @param aggregatedExchange
    */
   protected static void copyValidationHeaders(
     Exchange newExchange,

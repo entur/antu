@@ -2,12 +2,10 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint;
 
 import java.util.Collections;
 import java.util.List;
-import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.netextestdata.NetexXmlTestFragment;
 import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
