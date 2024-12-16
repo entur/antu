@@ -37,6 +37,7 @@ import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasi
 import no.entur.antu.validation.validator.servicejourney.servicealteration.InvalidServiceAlterationValidator;
 import no.entur.antu.validation.validator.servicejourney.servicealteration.MissingReplacementValidator;
 import no.entur.antu.validation.validator.servicejourney.speed.UnexpectedSpeedValidator;
+import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportModeSubModeValidator;
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
 import org.entur.netex.validation.validator.DatasetValidator;
@@ -100,23 +101,8 @@ public class TimetableDataFinlandValidatorConfig {
     @Qualifier(
       "netexIdUniquenessValidator"
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
-    UnexpectedDistanceBetweenStopPointsValidator unexpectedDistanceBetweenStopPointsValidator,
-    IdenticalStopPointsValidator identicalStopPointsValidator,
-    SameQuayRefValidator sameQuayRefValidator,
-    SameStopPointsValidator sameStopPointsValidator,
-    StopPointsCountValidator stopPointsCountValidator,
-    MissingPassengerStopAssignmentValidator missingPassengerStopAssignmentValidator,
-    NonIncreasingPassingTimeValidator nonIncreasingPassingTimeValidator,
-    UnexpectedSpeedValidator unexpectedSpeedValidator,
-    UnexpectedDistanceInServiceLinkValidator unexpectedDistanceInServiceLinkValidator,
-    MismatchedStopPointsValidator mismatchedStopPointsValidator,
-    MandatoryFieldsValidator mandatoryFieldsValidator,
-    DuplicateInterchangesValidator duplicateInterchangesValidator,
-    InvalidServiceAlterationValidator invalidServiceAlterationValidator,
-    UnexpectedInterchangeDistanceValidator unexpectedInterchangeDistanceValidator,
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
-    MissingReplacementValidator missingReplacementValidator,
     LineInfoCollector lineInfoCollector,
     ServiceJourneyStopsCollector serviceJourneyStopsCollector,
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
@@ -137,22 +123,22 @@ public class TimetableDataFinlandValidatorConfig {
     );
 
     List<JAXBValidator> jaxbValidators = List.of(
-      unexpectedDistanceBetweenStopPointsValidator,
-      identicalStopPointsValidator,
-      sameQuayRefValidator,
-      sameStopPointsValidator,
-      stopPointsCountValidator,
-      missingPassengerStopAssignmentValidator,
-      nonIncreasingPassingTimeValidator,
-      unexpectedSpeedValidator,
-      unexpectedDistanceInServiceLinkValidator,
-      mismatchedStopPointsValidator,
-      mandatoryFieldsValidator,
-      duplicateInterchangesValidator,
-      invalidServiceAlterationValidator,
-      missingReplacementValidator,
-      duplicateInterchangesValidator,
-      unexpectedInterchangeDistanceValidator
+      new MismatchedTransportModeSubModeValidator(),
+      new UnexpectedDistanceBetweenStopPointsValidator(),
+      new IdenticalStopPointsValidator(),
+      new SameQuayRefValidator(),
+      new SameStopPointsValidator(),
+      new StopPointsCountValidator(),
+      new MissingPassengerStopAssignmentValidator(),
+      new NonIncreasingPassingTimeValidator(),
+      new UnexpectedSpeedValidator(),
+      new UnexpectedDistanceInServiceLinkValidator(),
+      new MismatchedStopPointsValidator(),
+      new MandatoryFieldsValidator(),
+      new DuplicateInterchangesValidator(),
+      new InvalidServiceAlterationValidator(),
+      new MissingReplacementValidator(),
+      new UnexpectedInterchangeDistanceValidator()
     );
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
