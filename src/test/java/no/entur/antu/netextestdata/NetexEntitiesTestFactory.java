@@ -26,6 +26,7 @@ import net.opengis.gml._3.ObjectFactory;
 import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
+import org.entur.netex.validation.test.jaxb.support.JAXBUtils;
 import org.rutebanken.netex.model.*;
 
 public class NetexEntitiesTestFactory {
@@ -686,7 +687,7 @@ public class NetexEntitiesTestFactory {
               serviceCalendarFrames
                 .stream()
                 .map(CreateServiceCalendarFrame::create)
-                .map(MappingSupport::createJaxbElement)
+                .map(JAXBUtils::createJaxbElement)
                 .collect(Collectors.toCollection(ArrayList::new))
             )
         );
@@ -1094,7 +1095,7 @@ public class NetexEntitiesTestFactory {
               dayTypes
                 .stream()
                 .map(CreateDayType::create)
-                .map(MappingSupport::createJaxbElement)
+                .map(JAXBUtils::createJaxbElement)
                 .collect(Collectors.toCollection(ArrayList::new))
             );
         serviceCalendarFrame.setDayTypes(dayTypesInFrameRelStructure);
@@ -1162,7 +1163,7 @@ public class NetexEntitiesTestFactory {
             dayTypes
               .stream()
               .map(CreateDayType::create)
-              .map(MappingSupport::createJaxbElement)
+              .map(JAXBUtils::createJaxbElement)
               .collect(Collectors.toCollection(ArrayList::new))
           );
         serviceCalendar.setDayTypes(dayTypesRelStructure);
@@ -1187,7 +1188,7 @@ public class NetexEntitiesTestFactory {
               operatingPeriods
                 .stream()
                 .map(CreateOperatingPeriod::create)
-                .map(MappingSupport::createJaxbElement)
+                .map(JAXBUtils::createJaxbElement)
                 .collect(Collectors.toCollection(ArrayList::new))
             );
         serviceCalendar.setOperatingPeriods(operatingPeriodsRelStructure);
@@ -1981,7 +1982,7 @@ public class NetexEntitiesTestFactory {
             .withDayTypeRef(
               dayTypes
                 .stream()
-                .map(MappingSupport::createJaxbElement)
+                .map(JAXBUtils::createJaxbElement)
                 .collect(Collectors.toCollection(ArrayList::new))
             )
         );
@@ -2045,7 +2046,7 @@ public class NetexEntitiesTestFactory {
             .withDayTypeRef(
               dayTypes
                 .stream()
-                .map(MappingSupport::createJaxbElement)
+                .map(JAXBUtils::createJaxbElement)
                 .collect(Collectors.toCollection(ArrayList::new))
             )
         );
