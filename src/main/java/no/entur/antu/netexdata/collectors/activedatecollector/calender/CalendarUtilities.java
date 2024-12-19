@@ -2,20 +2,13 @@ package no.entur.antu.netexdata.collectors.activedatecollector.calender;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import jakarta.xml.bind.JAXBElement;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import org.rutebanken.netex.model.AvailabilityCondition;
 import org.rutebanken.netex.model.Common_VersionFrameStructure;
-import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
-import org.rutebanken.netex.model.DayTypesInFrame_RelStructure;
-import org.rutebanken.netex.model.DayTypes_RelStructure;
-import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
-import org.rutebanken.netex.model.OperatingPeriods_RelStructure;
 import org.rutebanken.netex.model.ValidBetween;
 import org.rutebanken.netex.model.ValidityConditions_RelStructure;
 

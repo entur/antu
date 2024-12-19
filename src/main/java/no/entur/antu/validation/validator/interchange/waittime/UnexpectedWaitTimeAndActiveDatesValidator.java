@@ -118,7 +118,7 @@ public class UnexpectedWaitTimeAndActiveDatesValidator
   private ValidationReportEntry validateWaitTime(
     UnexpectedWaitTimeAndActiveDatesContext context
   ) {
-    long MILLIS_PER_DAY = 86400000L;
+    long millisPerDay = 86400000L;
 
     int dayOffsetDiff =
       context.toServiceJourneyStop().departureDayOffset() -
@@ -138,7 +138,7 @@ public class UnexpectedWaitTimeAndActiveDatesValidator
       1000L;
 
     if (msWait < 0) {
-      msWait = MILLIS_PER_DAY + msWait;
+      msWait = millisPerDay + msWait;
       dayOffsetDiff--;
     }
 

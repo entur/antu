@@ -680,6 +680,11 @@ public class NetexEntitiesTestFactory {
 
     public CompositeFrame create() {
       CompositeFrame compositeFrame = new CompositeFrame().withId(ref());
+
+      if (validBetween != null) {
+        compositeFrame.withValidBetween(validBetween.create());
+      }
+
       if (serviceCalendarFrames != null) {
         compositeFrame.setFrames(
           new Frames_RelStructure()
@@ -991,23 +996,23 @@ public class NetexEntitiesTestFactory {
       List<CreateDayType> dayTypes,
       List<CreateOperatingDay> operatingDays
     ) {
-      List<CreateDayTypeAssignment> dayTypeAssignments = IntStream
+      List<CreateDayTypeAssignment> createDayTypeAssignments = IntStream
         .range(0, dayTypes.size())
         .mapToObj(i -> createDayTypeAssignment(i + 1, dayTypes.get(i)))
         .toList();
 
       if (operatingDays != null && !operatingDays.isEmpty()) {
         return IntStream
-          .range(0, dayTypeAssignments.size())
+          .range(0, createDayTypeAssignments.size())
           .mapToObj(i ->
-            dayTypeAssignments
+            createDayTypeAssignments
               .get(i)
               .withOperatingDayRef(operatingDays.get(i % operatingDays.size()))
           )
           .toList();
       }
 
-      return dayTypeAssignments;
+      return createDayTypeAssignments;
     }
 
     /**
@@ -1451,13 +1456,13 @@ public class NetexEntitiesTestFactory {
     extends CreateEntity<DayTypeAssignment> {
 
     private LocalDate date;
-    private final CreateDayType DayTypeRef;
+    private final CreateDayType dayTypeRef;
     private CreateOperatingDay operatingDayRef;
     private CreateOperatingPeriod operatingPeriodRef;
 
     public CreateDayTypeAssignment(int id, CreateDayType DayTypeRef) {
       super(id);
-      this.DayTypeRef = DayTypeRef;
+      this.dayTypeRef = DayTypeRef;
     }
 
     public CreateDayTypeAssignment withDate(LocalDate date) {
@@ -1489,7 +1494,7 @@ public class NetexEntitiesTestFactory {
       DayTypeAssignment dayTypeAssignment = new DayTypeAssignment()
         .withId(ref())
         .withDayTypeRef(
-          createJaxbElement(new DayTypeRefStructure().withRef(DayTypeRef.ref()))
+          createJaxbElement(new DayTypeRefStructure().withRef(dayTypeRef.ref()))
         );
 
       Optional

@@ -2,7 +2,6 @@ package no.entur.antu.netexdata.collectors;
 
 import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_DAY_TYPES_CACHE;
 
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.entur.antu.validation.validator.support.NetexUtils;

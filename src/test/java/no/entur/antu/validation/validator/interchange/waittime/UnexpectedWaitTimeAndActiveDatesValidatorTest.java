@@ -125,10 +125,10 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         int dayTypeId,
         LocalDate... activeDates
       ) {
-        TestActiveDates dayTypes = new TestActiveDates()
+        TestActiveDates testDayTypes = new TestActiveDates()
           .withActiveDatesRef("TST:DayType:" + dayTypeId);
-        Stream.of(activeDates).forEach(dayTypes::addActiveDate);
-        this.dayTypes.add(dayTypes);
+        Stream.of(activeDates).forEach(testDayTypes::addActiveDate);
+        this.dayTypes.add(testDayTypes);
         return this;
       }
 
@@ -136,10 +136,10 @@ class UnexpectedWaitTimeAndActiveDatesValidatorTest extends ValidationTest {
         int operatingDayId,
         LocalDate... activeDates
       ) {
-        TestActiveDates operatingDays = new TestActiveDates()
+        TestActiveDates testOperatingDays = new TestActiveDates()
           .withActiveDatesRef("TST:OperatingDay:" + operatingDayId);
-        Stream.of(activeDates).forEach(operatingDays::addActiveDate);
-        this.operatingDays.add(operatingDays);
+        Stream.of(activeDates).forEach(testOperatingDays::addActiveDate);
+        this.operatingDays.add(testOperatingDays);
         return this;
       }
 
