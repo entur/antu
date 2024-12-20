@@ -129,3 +129,12 @@ validationRuleConfigs:
   - code: TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF
     name: ToPointRef in interchange is not a part of ToJourneyRef
     severity: WARNING
+  - code: NO_SHARED_ACTIVE_DATE_FOUND_IN_INTERCHANGE
+    name: No shared active date found in interchange
+    severity: WARNING
+  - code: WAIT_TIME_IN_INTERCHANGE_EXCEEDS_WARNING_LIMIT
+    name: Wait time in interchange exceeds warning limit
+    severity: WARNING
+  - code: WAIT_TIME_IN_INTERCHANGE_EXCEEDS_MAX_LIMIT
+    name: Wait time in interchange exceeds maximum limit
+    severity: WARNING
