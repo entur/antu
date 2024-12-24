@@ -119,6 +119,30 @@ public class ValidationTest {
       .thenReturn(serviceJourneyStops);
   }
 
+  protected void mockGetServiceJourneyDayTypes(
+    Map<ServiceJourneyId, List<DayTypeId>> serviceJourneyDayTypes
+  ) {
+    Mockito
+      .when(netexDataRepositoryMock.serviceJourneyDayTypes(anyString()))
+      .thenReturn(serviceJourneyDayTypes);
+  }
+
+  protected void mockGetServiceJourneyOperatingDays(
+    Map<ServiceJourneyId, List<OperatingDayId>> serviceJourneyOperatingDays
+  ) {
+    Mockito
+      .when(netexDataRepositoryMock.serviceJourneyOperatingDays(anyString()))
+      .thenReturn(serviceJourneyOperatingDays);
+  }
+
+  protected void mockGetActiveDays(
+    Map<ActiveDatesId, ActiveDates> activeDates
+  ) {
+    Mockito
+      .when(netexDataRepositoryMock.activeDates(anyString()))
+      .thenReturn(activeDates);
+  }
+
   protected void mockGetServiceJourneyInterchangeInfo(
     List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos
   ) {

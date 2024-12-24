@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
 import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
+import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
@@ -87,5 +89,31 @@ public class NetexUtils {
       )
       .findFirst()
       .orElse(null);
+  }
+
+  /**
+   * Returns the Stream of all the valid ServiceJourneys in all the TimeTableFrames.
+   * The valid serviceJourneys are those that have number of timetabledPassingTime equals to number of StopPointsInJourneyPattern.
+   * This is validated with SERVICE_JOURNEY_10.
+   */
+  public static List<ServiceJourney> validServiceJourneys(
+    JAXBValidationContext validationContext
+  ) {
+    return validationContext
+      .serviceJourneys()
+      .stream()
+      .filter(serviceJourney -> {
+        JourneyPattern journeyPattern = validationContext.journeyPattern(
+          serviceJourney
+        );
+        if (journeyPattern == null) {
+          return false;
+        }
+        return (
+          stopPointsInJourneyPattern(journeyPattern).size() ==
+          validationContext.timetabledPassingTimes(serviceJourney).size()
+        );
+      })
+      .toList();
   }
 }
