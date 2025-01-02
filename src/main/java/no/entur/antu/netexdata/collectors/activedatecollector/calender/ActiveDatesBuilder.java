@@ -114,16 +114,33 @@ public class ActiveDatesBuilder {
   public Map<OperatingDayId, ActiveDates> buildPerOperatingDay(
     ServiceCalendarFrameObject serviceCalendarFrameObject
   ) {
-    return serviceCalendarFrameObject
-      .calendarData()
+    Map<OperatingDayId, ActiveDates> activeDaysPerOperatingDayId =
+      activeDaysPerOperatingDayId(
+        serviceCalendarFrameObject.calendarData(),
+        serviceCalendarFrameObject.validBetween()
+      );
+
+    if (serviceCalendarFrameObject.serviceCalendar() != null) {
+      activeDaysPerOperatingDayId(
+        serviceCalendarFrameObject.serviceCalendar().calendarData(),
+        serviceCalendarFrameObject.serviceCalendar().validBetween()
+      )
+        .forEach(activeDaysPerOperatingDayId::putIfAbsent);
+    }
+
+    return activeDaysPerOperatingDayId;
+  }
+
+  private Map<OperatingDayId, ActiveDates> activeDaysPerOperatingDayId(
+    CalendarData calendarData,
+    ValidBetween validBetween
+  ) {
+    return calendarData
       .operatingDays()
       .entrySet()
       .stream()
       .filter(entry ->
-        isWithinValidRange(
-          entry.getValue().getCalendarDate(),
-          serviceCalendarFrameObject.validBetween()
-        )
+        isWithinValidRange(entry.getValue().getCalendarDate(), validBetween)
       )
       .collect(
         toMap(

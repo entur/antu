@@ -701,7 +701,7 @@ class ActiveDatesBuilderTest {
   }
 
   @Test
-  void testActiveDatesWithBuildPerOperationDays() {
+  void testActiveDatesWithBuildPerOperationDaysInServiceCalendarFrame() {
     NetexEntitiesTestFactory netexEntitiesTestFactory =
       new NetexEntitiesTestFactory();
 
@@ -717,6 +717,56 @@ class ActiveDatesBuilderTest {
     // Creating 3 Operating days: 2024-11-21, 2024-11-22, 2024-11-23
     List<NetexEntitiesTestFactory.CreateOperatingDay> operatingDays =
       serviceCalendarFrame.createOperatingDays(3, LocalDate.of(2024, 11, 21));
+
+    ServiceCalendarFrameObject serviceCalendarFrameObject =
+      ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
+
+    ActiveDatesBuilder activeDatesBuilder = new ActiveDatesBuilder();
+
+    // Build per operating days
+    Map<OperatingDayId, ActiveDates> dayTypeIdActiveDatesMap =
+      activeDatesBuilder.buildPerOperatingDay(serviceCalendarFrameObject);
+
+    assertEquals(
+      "2024-11-21",
+      dayTypeIdActiveDatesMap
+        .get(new OperatingDayId(operatingDays.get(0).ref()))
+        .toString()
+    );
+    assertEquals(
+      "2024-11-22",
+      dayTypeIdActiveDatesMap
+        .get(new OperatingDayId(operatingDays.get(1).ref()))
+        .toString()
+    );
+    // the third operating day is outside the validity of the service calendar frame
+    assertNull(
+      dayTypeIdActiveDatesMap.get(
+        new OperatingDayId(operatingDays.get(2).ref())
+      )
+    );
+  }
+
+  @Test
+  void testActiveDatesWithBuildPerOperationDaysInServiceCalendar() {
+    NetexEntitiesTestFactory netexEntitiesTestFactory =
+      new NetexEntitiesTestFactory();
+
+    NetexEntitiesTestFactory.CreateServiceCalendarFrame serviceCalendarFrame =
+      netexEntitiesTestFactory.createServiceCalendarFrame();
+
+    NetexEntitiesTestFactory.CreateServiceCalendar serviceCalendar =
+      serviceCalendarFrame.createServiceCalendar();
+
+    // Validity on service calendar frame
+    serviceCalendar.createValidBetween(
+      LocalDateTime.of(2024, 11, 20, 0, 0),
+      LocalDateTime.of(2024, 11, 22, 0, 0)
+    );
+
+    // Creating 3 Operating days: 2024-11-21, 2024-11-22, 2024-11-23
+    List<NetexEntitiesTestFactory.CreateOperatingDay> operatingDays =
+      serviceCalendar.createOperatingDays(3, LocalDate.of(2024, 11, 21));
 
     ServiceCalendarFrameObject serviceCalendarFrameObject =
       ServiceCalendarFrameObject.ofNullable(serviceCalendarFrame.create());
