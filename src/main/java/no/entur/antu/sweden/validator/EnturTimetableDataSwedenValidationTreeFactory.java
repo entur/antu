@@ -64,7 +64,7 @@ public class EnturTimetableDataSwedenValidationTreeFactory
       .removeRule(
         DefaultCompositeFrameTreeFactory.CODE_COMPOSITE_FRAME_SITE_FRAME
       )
-      .removeRuleForCommonFile(CODE_COMPOSITE_FRAME_1)
+      .removeRule(CODE_COMPOSITE_FRAME_1)
       .withRule(
         new ValidateNotExist(
           ".[not(validityConditions or ValidBetween)]",
