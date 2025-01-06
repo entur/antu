@@ -23,6 +23,8 @@ public class EnturTimetableDataFinlandValidationTreeFactory
 
   @Override
   public ValidationTreeBuilder builder() {
+    ValidationTreeBuilder builder = super.builder();
+
     // accept SiteFrame, they are part of Finnish datasets
     siteFrameValidationTreeBuilder()
       .removeRuleForCommonFile(
@@ -44,6 +46,6 @@ public class EnturTimetableDataFinlandValidationTreeFactory
       .removeRule(
         DefaultServiceFrameValidationTreeFactory.CODE_PASSENGER_STOP_ASSIGNMENT_3
       );
-    return super.builder();
+    return builder;
   }
 }
