@@ -54,7 +54,7 @@ public record UnexpectedDistanceInServiceLinkContext(
       Optional<LineString> lineString = mapServiceLinkToLineString(serviceLink);
 
       if (lineString.isEmpty()) {
-        LOGGER.warn(
+        LOGGER.info(
           "Could not map serviceLink {} to a LineString",
           serviceLink.getId()
         );
@@ -121,7 +121,7 @@ public record UnexpectedDistanceInServiceLinkContext(
     private List<Double> getCoordinates(LineStringType lineString) {
       List<Double> coordinates = GeometryUtilities.getCoordinates(lineString);
       if (coordinates.isEmpty()) {
-        LOGGER.warn("LineString with no coordinates: {}", lineString.getId());
+        LOGGER.info("LineString with no coordinates: {}", lineString.getId());
       }
       return coordinates;
     }
