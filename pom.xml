@@ -32,7 +32,7 @@
         <jts-core.version>1.20.0</jts-core.version>
         <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.17</zt-zip.version>
-        <redisson.version>3.42.0</redisson.version>
+        <redisson.version>3.43.0</redisson.version>
         <kryo.version>5.6.2</kryo.version>
         <embedded-redis.version>0.9.1</embedded-redis.version>
         <prettier-java.version>2.1.0</prettier-java.version>
