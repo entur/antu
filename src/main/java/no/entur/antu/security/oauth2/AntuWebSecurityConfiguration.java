@@ -39,7 +39,10 @@ public class AntuWebSecurityConfiguration {
         "Access-Control-Request-Method",
         "Access-Control-Request-Headers",
         "Authorization",
-        "x-correlation-id"
+        "x-correlation-id",
+        "baggage",
+        "sentry-trace",
+        "et-client-name"
       )
     );
     configuration.addAllowedOrigin("*");
