@@ -35,7 +35,7 @@ jobs:
             ${{ runner.os }}-maven-
             ${{ runner.os }}-
       - name: Run maven build
-        run: mvn verify -s .github/workflows/settings.xml
+        run: mvn verify -s .github/workflows/settings.xml  -PprettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
       - uses: actions/upload-artifact@v4.6.0
         with:
           path: target/*-SNAPSHOT.jar
@@ -48,6 +48,7 @@ jobs:
           mvn -s .github/workflows/settings.xml \
                   org.jacoco:jacoco-maven-plugin:prepare-agent verify \
                   org.jacoco:jacoco-maven-plugin:report sonar:sonar \
+                  -P prettierSkip \
                   -Dmaven.main.skip \
                   -DskipTests \
                   -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
