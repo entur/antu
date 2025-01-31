@@ -4,9 +4,11 @@ import static org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFr
 
 import java.util.Map;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
+import no.entur.antu.organisation.SimpleOrganisationV3Repository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
+import no.entur.antu.validation.validator.xpath.rules.ValidateReferenceToOrgV3;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
@@ -28,7 +30,10 @@ public class EnturTimetableDataSwedenValidationTreeFactory
   public static final String CODE_COMPOSITE_FRAME_SE_1 = "COMPOSITE_FRAME_SE_1";
 
   public EnturTimetableDataSwedenValidationTreeFactory() {
-    super(new SimpleOrganisationRepository(Map.of()));
+    super(
+      new SimpleOrganisationRepository(Map.of()),
+      new SimpleOrganisationV3Repository()
+    );
   }
 
   @Override
@@ -77,6 +82,8 @@ public class EnturTimetableDataSwedenValidationTreeFactory
     // remove validation against the Norwegian organisation registry
     resourceFrameValidationTreeBuilder()
       .removeRule(ValidateAuthorityId.CODE_AUTHORITY_ID);
+    resourceFrameValidationTreeBuilder()
+      .removeRule(ValidateReferenceToOrgV3.CODE_AUTHORITY_ID);
     // remove time-consuming rule
     serviceFrameValidationTreeBuilder()
       .removeRule(

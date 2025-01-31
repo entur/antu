@@ -2,6 +2,7 @@ package no.entur.antu.finland.validator;
 
 import java.util.Map;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
+import no.entur.antu.organisation.SimpleOrganisationV3Repository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
@@ -18,7 +19,10 @@ public class EnturTimetableDataFinlandValidationTreeFactory
   extends EnturTimetableDataValidationTreeFactory {
 
   public EnturTimetableDataFinlandValidationTreeFactory() {
-    super(new SimpleOrganisationRepository(Map.of()));
+    super(
+      new SimpleOrganisationRepository(Map.of()),
+      new SimpleOrganisationV3Repository()
+    );
   }
 
   @Override

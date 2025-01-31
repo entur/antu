@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 public class CacheConfig {
 
   public static final String ORGANISATION_CACHE = "organisationCache";
+  public static final String ORGANISATION_ID_CACHE = "organisationIdCache";
   public static final String COMMON_IDS_CACHE = "commonIdsCache";
   public static final String SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE =
     "scheduledStopPointAndQuayIdCache";
@@ -87,6 +88,14 @@ public class CacheConfig {
       ORGANISATION_CACHE,
       DEFAULT_CODEC
     );
+  }
+
+  /**
+   * Keeps track of existing Organisation master id's in Organisation registry V3
+   */
+  @Bean
+  public Set<String> organisationIdCache(RedissonClient redissonClient) {
+    return redissonClient.getSet(ORGANISATION_ID_CACHE);
   }
 
   /**

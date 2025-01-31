@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.organisation.OrganisationV3Repository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
+import no.entur.antu.organisation.SimpleOrganisationV3Repository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.*;
@@ -40,6 +42,12 @@ public class TestConfig {
         Set.of("FLB:Authority:XXX", "FLB:Authority:YYY")
       )
     );
+  }
+
+  @Bean
+  @Primary
+  public OrganisationV3Repository organisationV3Repository() {
+    return new SimpleOrganisationV3Repository();
   }
 
   @Bean(name = "stopPlaceRepository")
