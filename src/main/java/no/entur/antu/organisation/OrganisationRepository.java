@@ -15,8 +15,6 @@
 
 package no.entur.antu.organisation;
 
-import java.util.Set;
-
 /**
  * Repository that stores organisation data retrieved from the Organisation Register.
  */
@@ -32,9 +30,7 @@ public interface OrganisationRepository {
   boolean isEmpty();
 
   /**
-   * Return the set of whitelisted authorities for a given codespace.
-   * @param codespace the dataset codespace
-   * @return the set of whitelisted authorities for the codespace.
+   * Return true if the organisation exists in the registry.
    */
-  Set<String> getWhitelistedAuthorityIds(String codespace);
+  Boolean organisationExists(String masterIdOrAlias);
 }

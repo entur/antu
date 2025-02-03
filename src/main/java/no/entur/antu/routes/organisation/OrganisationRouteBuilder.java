@@ -59,33 +59,19 @@ public class OrganisationRouteBuilder extends BaseRouteBuilder {
     from(
       "master:lockOnAntuRefreshOrganisationCache:timer://antu/refreshOrganisationCacheAtStartup?repeatCount=1&delay=5000"
     )
+      .routeId("prime-organisation-cache")
       .choice()
       .when(method("organisationRepository", "isEmpty"))
       .log(
         LoggingLevel.INFO,
-        correlation() + "Organisation cache is empty, priming cache"
-      )
-      .bean("organisationRepository", "refreshCache")
-      .otherwise()
-      .log(
-        LoggingLevel.INFO,
-        correlation() + "Existing organisation cache found"
-      )
-      .routeId("prime-organisation-cache")
-      .choice()
-      .when(method("organisationV3Repository", "isEmpty"))
-      .log(
-        LoggingLevel.INFO,
         correlation() + "Organisation cache v3 is empty, priming cache"
       )
-      .bean("organisationV3Repository", "refreshCache");
+      .bean("organisationRepository", "refreshCache");
 
     from("direct:refreshOrganisationCache")
       .log(LoggingLevel.INFO, correlation() + "Refreshing organisation cache")
       .process(this::extendAckDeadline)
       .bean("organisationRepository", "refreshCache")
-      .process(this::extendAckDeadline)
-      .bean("organisationV3Repository", "refreshCache")
       .process(this::extendAckDeadline)
       .log(LoggingLevel.INFO, correlation() + "Refreshed organisation cache")
       .routeId("refresh-organisation-cache");

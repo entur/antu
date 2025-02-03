@@ -1,8 +1,8 @@
 package no.entur.antu.validation.validator.xpath.rules;
 
-import no.entur.antu.organisation.DefaultOrganisationV3Repository;
-import no.entur.antu.organisation.OrganisationV3Repository;
-import no.entur.antu.organisation.OrganisationV3Resource;
+import no.entur.antu.organisation.DefaultOrganisationRepository;
+import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.organisation.OrganisationResource;
 import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationRule;
@@ -15,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.HashSet;
 import java.util.List;
 
-import static no.entur.antu.validation.validator.xpath.rules.ValidateReferenceToOrgV3.CODE_AUTHORITY_ID;
+import static no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef.CODE_AUTHORITY_REF;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +33,7 @@ public class ValidateReferenceToOrgV3Test {
     public static final String TEST_VALID_AUTHORITY_ID = "AVI:Authority:Avinor";
     public static final String TEST_INVALID_AUTHORITY_ID = "INVALID:Authority:1";
 
-    private ValidateReferenceToOrgV3 validator;
+    private ValidateAuthorityRef validator;
     private final HashSet<String> mockedOrganisationIdsCache = new HashSet<>();
 
     @BeforeEach
@@ -44,10 +44,10 @@ public class ValidateReferenceToOrgV3Test {
         when(webClient.mutate()).thenReturn(webClientBuilder);
         when(webClientBuilder.build()).thenReturn(webClient);
 
-        OrganisationV3Resource organisationV3Resource = new OrganisationV3Resource(webClient);
-        OrganisationV3Repository organisationV3Repository = new DefaultOrganisationV3Repository(organisationV3Resource, mockedOrganisationIdsCache);
+        OrganisationResource organisationResource = new OrganisationResource(webClient);
+        OrganisationRepository organisationV3Repository = new DefaultOrganisationRepository(organisationResource, mockedOrganisationIdsCache);
 
-        validator = new ValidateReferenceToOrgV3(organisationV3Repository);
+        validator = new ValidateAuthorityRef(organisationV3Repository);
         mockedOrganisationIdsCache.clear();
     }
 
@@ -70,6 +70,6 @@ public class ValidateReferenceToOrgV3Test {
         List<ValidationIssue> validationIssues = validator.validate(validationContext);
         Assertions.assertEquals(1, validationIssues.size());
         ValidationRule brokeRule = validationIssues.get(0).rule();
-        Assertions.assertEquals(CODE_AUTHORITY_ID, brokeRule.code());
+        Assertions.assertEquals(CODE_AUTHORITY_REF, brokeRule.code());
     }
 }

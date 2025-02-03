@@ -1,10 +1,8 @@
 package no.entur.antu.finland.validator;
 
-import java.util.Map;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
-import no.entur.antu.organisation.SimpleOrganisationV3Repository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
+import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFrameTreeFactory;
 import org.entur.netex.validation.validator.xpath.tree.DefaultServiceFrameValidationTreeFactory;
@@ -20,8 +18,7 @@ public class EnturTimetableDataFinlandValidationTreeFactory
 
   public EnturTimetableDataFinlandValidationTreeFactory() {
     super(
-      new SimpleOrganisationRepository(Map.of()),
-      new SimpleOrganisationV3Repository()
+      new SimpleOrganisationRepository()
     );
   }
 
@@ -45,7 +42,7 @@ public class EnturTimetableDataFinlandValidationTreeFactory
       );
     // remove validation against the Norwegian organisation registry
     resourceFrameValidationTreeBuilder()
-      .removeRule(ValidateAuthorityId.CODE_AUTHORITY_ID);
+      .removeRule(ValidateAuthorityRef.CODE_AUTHORITY_REF);
     serviceFrameValidationTreeBuilder()
       .removeRule(
         DefaultServiceFrameValidationTreeFactory.CODE_PASSENGER_STOP_ASSIGNMENT_3

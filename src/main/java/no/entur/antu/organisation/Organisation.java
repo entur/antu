@@ -1,77 +1,17 @@
-/*
- * Licensed under the EUPL, Version 1.2 or – as soon they will be approved by
- * the European Commission - subsequent versions of the EUPL (the "Licence");
- * You may not use this work except in compliance with the Licence.
- * You may obtain a copy of the Licence at:
- *
- *   https://joinup.ec.europa.eu/software/page/eupl
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the Licence is distributed on an "AS IS" basis,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the Licence for the specific language governing permissions and
- * limitations under the Licence.
- */
-
 package no.entur.antu.organisation;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
-/**
- * An organisation defined in the Organisation Register.
- */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Organisation {
+    public String masterId;
+    public Integer internalId;
+    public Integer organisationId;
+    public List<String> aliases;
 
-  public static final String NETEX_AUTHORITY_ID_REFERENCE_KEY =
-    "netexAuthorityId";
-  public static final String NETEX_OPERATOR_ID_REFERENCE_KEY =
-    "netexOperatorId";
-  public static final String AUTHORITY_TYPE = "authority";
-  public static final String OPERATOR_TYPE = "operator";
-
-  public static final String COMPANY_NUMBER_REFERENCE_KEY = "companyNumber";
-  public String id;
-  public String name;
-  public String version;
-
-  public String legalName;
-  public Map<String, String> references;
-  public Set<String> types;
-
-  public OrganisationContact contact;
-  public OrganisationContact customerContact;
-
-  public String getAuthorityNetexId() {
-    if (!isAuthority() || references == null) {
-      return null;
+    public Organisation(String masterId, Integer internalId, Integer organisationId, List<String> aliases) {
+        this.masterId = masterId;
+        this.internalId = internalId;
+        this.organisationId = organisationId;
+        this.aliases = aliases;
     }
-
-    return references.get(NETEX_AUTHORITY_ID_REFERENCE_KEY);
-  }
-
-  public String getOperatorNetexId() {
-    if (!isOperator() || references == null) {
-      return null;
-    }
-
-    return references.get(NETEX_OPERATOR_ID_REFERENCE_KEY);
-  }
-
-  public String getCompanyNumber() {
-    if (references == null) {
-      return null;
-    }
-    return references.get(COMPANY_NUMBER_REFERENCE_KEY);
-  }
-
-  public boolean isOperator() {
-    return types != null && types.contains(OPERATOR_TYPE);
-  }
-
-  public boolean isAuthority() {
-    return types != null && types.contains(AUTHORITY_TYPE);
-  }
 }

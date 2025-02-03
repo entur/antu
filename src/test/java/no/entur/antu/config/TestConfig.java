@@ -2,12 +2,9 @@ package no.entur.antu.config;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import no.entur.antu.organisation.OrganisationRepository;
-import no.entur.antu.organisation.OrganisationV3Repository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
-import no.entur.antu.organisation.SimpleOrganisationV3Repository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.*;
@@ -34,20 +31,7 @@ public class TestConfig {
   @Bean
   @Primary
   public OrganisationRepository organisationRepository() {
-    return new SimpleOrganisationRepository(
-      Map.of(
-        "avi",
-        Set.of("AVI:Authority:Avinor"),
-        "flb",
-        Set.of("FLB:Authority:XXX", "FLB:Authority:YYY")
-      )
-    );
-  }
-
-  @Bean
-  @Primary
-  public OrganisationV3Repository organisationV3Repository() {
-    return new SimpleOrganisationV3Repository();
+    return new SimpleOrganisationRepository();
   }
 
   @Bean(name = "stopPlaceRepository")

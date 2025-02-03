@@ -7,7 +7,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
-import no.entur.antu.organisation.OrganisationV3Repository;
+import no.entur.antu.organisation.OrganisationRepository;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
@@ -15,19 +15,19 @@ import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 
-public class ValidateReferenceToOrgV3 extends AbstractXPathValidationRule {
+public class ValidateAuthorityRef extends AbstractXPathValidationRule {
 
-  public static final String CODE_AUTHORITY_ID = "AUTHORITY_ID_2";
+  public static final String CODE_AUTHORITY_REF = "AUTHORITY_REF";
   static final ValidationRule RULE = new ValidationRule(
-    CODE_AUTHORITY_ID,
-    "Authority invalid Id (Missing in orgreg)",
-    "Invalid Authority Id (Missing in orgreg)",
+          CODE_AUTHORITY_REF,
+    "Invalid Authority Ref",
+    "Invalid Authority Ref",
     Severity.ERROR
   );
 
-  private final OrganisationV3Repository organisationV3Repository;
+  private final OrganisationRepository organisationV3Repository;
 
-  public ValidateReferenceToOrgV3(OrganisationV3Repository organisationV3Repository) {
+  public ValidateAuthorityRef(OrganisationRepository organisationV3Repository) {
     this.organisationV3Repository = Objects.requireNonNull(organisationV3Repository);
   }
 

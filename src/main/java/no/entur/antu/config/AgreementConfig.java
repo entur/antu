@@ -11,19 +11,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Licence for the specific language governing permissions and
  * limitations under the Licence.
+ *
  */
 
-package no.entur.antu.organisation;
+package no.entur.antu.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import no.entur.antu.agreement.AgreementResource;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.reactive.function.client.WebClient;
 
-/**
- * Contact details for an {@link Organisation}
- */
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrganisationContact {
+@Configuration
+public class AgreementConfig {
 
-  public String url;
-  public String email;
-  public String phone;
+    @Bean
+    @Profile("!test")
+    AgreementResource agreementResource(@Qualifier("agreementRegisterClient") WebClient agreementRegisterClient) {
+        return new AgreementResource(agreementRegisterClient);
+    }
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -26,16 +25,11 @@ class XpathValidatorIntegrationTest {
 
   @Test
   void testValidator() throws IOException {
-    OrganisationRepository stubOrganisationRepository =
-      new SimpleOrganisationRepository(
-        Map.of(TEST_CODESPACE, Set.of("FLB:Authority:XXX", "FLB:Authority:YYY"))
-      );
-    OrganisationV3Repository stubDefaultOrganisationV3Repository =
-      new SimpleOrganisationV3Repository();
+    OrganisationRepository stubDefaultOrganisationRepository =
+      new SimpleOrganisationRepository();
     ValidationTreeFactory validationTreeFactory =
       new EnturTimetableDataValidationTreeFactory(
-        stubOrganisationRepository,
-        stubDefaultOrganisationV3Repository
+        stubDefaultOrganisationRepository
       );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     XPathRuleValidator xPathValidator = new XPathRuleValidator(
