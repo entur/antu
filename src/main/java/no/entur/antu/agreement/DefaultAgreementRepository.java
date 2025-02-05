@@ -20,10 +20,17 @@ public class DefaultAgreementRepository implements AgreementRepository {
 
     @Override
     public void refreshCache() {
-        ArrayList<String> authorityIds = new ArrayList<>(agreementResource.getAuthorityIds());
-        ArrayList<String> operatorIds = new ArrayList<>(agreementResource.getOperatorIds());
-        organisationIdCache.addAll(authorityIds);
-        organisationIdCache.addAll(operatorIds);
+        ArrayList<Agreement> authorities = new ArrayList<>(agreementResource.getAuthorityIds());
+        ArrayList<Agreement> operators = new ArrayList<>(agreementResource.getOperatorIds());
+
+        ArrayList<String> ids = new ArrayList<>();
+        for (Agreement agreement : authorities) {
+            ids.add(agreement.roleId);
+        }
+        for (Agreement operator : operators) {
+            ids.add(operator.roleId);
+        }
+        organisationIdCache.addAll(ids);
     }
 
     @Override

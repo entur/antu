@@ -114,7 +114,7 @@ public class OAuth2Config {
     return new AuthorizedWebClientBuilder(webClientBuilder)
       .withOAuth2ClientProperties(properties)
       .withAudience(audience)
-      .withClientRegistrationId("antu")
+      .withClientRegistrationId("orgregister")
       .build()
       .mutate()
       .clientConnector(clientHttpConnector)

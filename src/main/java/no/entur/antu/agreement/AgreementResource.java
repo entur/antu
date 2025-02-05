@@ -21,12 +21,12 @@ public class AgreementResource {
         this.webClient = agreementRegisterWebClient.mutate().build();
     }
 
-    public Collection<String> getAuthorityIds() {
-        List<String> authorities = webClient
+    public Collection<Agreement> getAuthorityIds() {
+        List<Agreement> authorities = webClient
             .get()
             .uri("/AUTHORITY")
             .retrieve()
-            .bodyToFlux(String.class)
+            .bodyToFlux(Agreement.class)
             .retryWhen(Retry.backoff(MAX_RETRY_ATTEMPTS, Duration.ofSeconds(1)).filter(is5xx))
             .collectList()
             .block();
@@ -37,12 +37,12 @@ public class AgreementResource {
         return new ArrayList<>(authorities);
     }
 
-    public Collection<String> getOperatorIds() {
-        List<String> operators = webClient
+    public Collection<Agreement> getOperatorIds() {
+        List<Agreement> operators = webClient
             .get()
             .uri("/OPERATOR")
             .retrieve()
-            .bodyToFlux(String.class)
+            .bodyToFlux(Agreement.class)
             .retryWhen(Retry.backoff(MAX_RETRY_ATTEMPTS, Duration.ofSeconds(1)).filter(is5xx))
             .collectList()
             .block();
