@@ -2,6 +2,7 @@ package no.entur.antu.validation.validator.xpath;
 
 import java.util.Objects;
 
+import no.entur.antu.agreement.AgreementRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoAlightingAtFirstStopPoint;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoBoardingAtLastStopPoint;
@@ -18,13 +19,17 @@ import org.entur.netex.validation.validator.xpath.tree.ValidationTreeBuilder;
 public class EnturTimetableDataValidationTreeFactory
   extends PublicationDeliveryValidationTreeFactory {
 
-  private final OrganisationRepository defaultOrganisationV3Repository;
+  private final OrganisationRepository defaultOrganisationRepository;
+  private final AgreementRepository defaultAgreementRepository;
 
   public EnturTimetableDataValidationTreeFactory(
-    OrganisationRepository defaultOrganisationRepository
+    OrganisationRepository defaultOrganisationRepository,
+    AgreementRepository defaultAgreementRepository
   ) {
-    this.defaultOrganisationV3Repository =
+    this.defaultOrganisationRepository =
       Objects.requireNonNull(defaultOrganisationRepository);
+    this.defaultAgreementRepository =
+      Objects.requireNonNull(defaultAgreementRepository);
   }
 
   @Override
@@ -34,7 +39,12 @@ public class EnturTimetableDataValidationTreeFactory
     rootValidationTreeBuilder().withRule(new ValidateAllowedCodespaces());
     // Validation against the Norwegian organisation register
     rootValidationTreeBuilder()
-      .withRule(new ValidateAuthorityRef(defaultOrganisationV3Repository));
+      .withRule(
+        new ValidateAuthorityRef(
+          defaultOrganisationRepository,
+          defaultAgreementRepository
+        )
+      );
     // Disabling check of duplicate DatedServiceJourney with different versions (slow test)
     timetableFrameValidationTreeBuilder()
       .removeRule(

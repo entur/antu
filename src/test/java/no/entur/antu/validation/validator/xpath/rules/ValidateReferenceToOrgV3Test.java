@@ -1,5 +1,8 @@
 package no.entur.antu.validation.validator.xpath.rules;
 
+import no.entur.antu.agreement.AgreementRepository;
+import no.entur.antu.agreement.AgreementResource;
+import no.entur.antu.agreement.DefaultAgreementRepository;
 import no.entur.antu.organisation.DefaultOrganisationRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.organisation.OrganisationResource;
@@ -34,7 +37,8 @@ public class ValidateReferenceToOrgV3Test {
     public static final String TEST_INVALID_AUTHORITY_ID = "INVALID:Authority:1";
 
     private ValidateAuthorityRef validator;
-    private final HashSet<String> mockedOrganisationIdsCache = new HashSet<>();
+    private final HashSet<String> mockedOrganisationsFromOrgregCache = new HashSet<>();
+    private final HashSet<String> mockedOrganisationsFromAgreementRegCache = new HashSet<>();
 
     @BeforeEach
     void setUp() {
@@ -45,10 +49,14 @@ public class ValidateReferenceToOrgV3Test {
         when(webClientBuilder.build()).thenReturn(webClient);
 
         OrganisationResource organisationResource = new OrganisationResource(webClient);
-        OrganisationRepository organisationV3Repository = new DefaultOrganisationRepository(organisationResource, mockedOrganisationIdsCache);
+        OrganisationRepository organisationRepository = new DefaultOrganisationRepository(organisationResource, mockedOrganisationsFromOrgregCache);
 
-        validator = new ValidateAuthorityRef(organisationV3Repository);
-        mockedOrganisationIdsCache.clear();
+        AgreementResource agreementResource = new AgreementResource(webClient);
+        AgreementRepository agreementRepository = new DefaultAgreementRepository(agreementResource, mockedOrganisationsFromAgreementRegCache);
+
+        validator = new ValidateAuthorityRef(organisationRepository, agreementRepository);
+        mockedOrganisationsFromOrgregCache.clear();
+        mockedOrganisationsFromAgreementRegCache.clear();
     }
 
     private XPathRuleValidationContext createXPathRuleValidationContext(String testAuthorityId) {
@@ -58,7 +66,7 @@ public class ValidateReferenceToOrgV3Test {
 
     @Test
     public void validatorShouldReturnNoValidationErrorsIfOrganisationExists() {
-        mockedOrganisationIdsCache.add(TEST_VALID_AUTHORITY_ID);
+        mockedOrganisationsFromOrgregCache.add(TEST_VALID_AUTHORITY_ID);
         XPathRuleValidationContext validationContext = createXPathRuleValidationContext(TEST_VALID_AUTHORITY_ID);
         List<ValidationIssue> validationIssues = validator.validate(validationContext);
         Assertions.assertEquals(0, validationIssues.size());

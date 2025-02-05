@@ -18,6 +18,8 @@ package no.entur.antu.config;
 
 import java.util.List;
 import java.util.Set;
+
+import no.entur.antu.agreement.AgreementRepository;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
@@ -66,9 +68,10 @@ public class TimetableDataValidatorConfig {
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(
-    @Qualifier("organisationRepository") OrganisationRepository defaultOrganisationRepository
+    @Qualifier("organisationRepository") OrganisationRepository defaultOrganisationRepository,
+    @Qualifier("agreementRepository") AgreementRepository defaultAgreementRepository
   ) {
-    return new EnturTimetableDataValidationTreeFactory(defaultOrganisationRepository);
+    return new EnturTimetableDataValidationTreeFactory(defaultOrganisationRepository, defaultAgreementRepository);
   }
 
   @Bean

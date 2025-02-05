@@ -1,5 +1,6 @@
 package no.entur.antu.finland.validator;
 
+import no.entur.antu.agreement.SimpleAgreementRepository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
@@ -18,7 +19,8 @@ public class EnturTimetableDataFinlandValidationTreeFactory
 
   public EnturTimetableDataFinlandValidationTreeFactory() {
     super(
-      new SimpleOrganisationRepository()
+      new SimpleOrganisationRepository(),
+      new SimpleAgreementRepository()
     );
   }
 

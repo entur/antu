@@ -7,6 +7,7 @@ import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
+import no.entur.antu.agreement.AgreementRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
@@ -25,10 +26,18 @@ public class ValidateAuthorityRef extends AbstractXPathValidationRule {
     Severity.ERROR
   );
 
-  private final OrganisationRepository organisationV3Repository;
+  private final OrganisationRepository organisationRepository;
+  private final AgreementRepository agreementRepository;
 
-  public ValidateAuthorityRef(OrganisationRepository organisationV3Repository) {
-    this.organisationV3Repository = Objects.requireNonNull(organisationV3Repository);
+  public ValidateAuthorityRef(OrganisationRepository organisationRepository, AgreementRepository agreementRepository) {
+    this.organisationRepository = Objects.requireNonNull(organisationRepository);
+    this.agreementRepository = Objects.requireNonNull(agreementRepository);
+  }
+
+  private Boolean organisationExists(String authorityRef) {
+    Boolean organisationExistsInOrgreg = organisationRepository.organisationExists(authorityRef);
+    Boolean organisationExistsInAgreementRegistry = agreementRepository.organisationExists(authorityRef);
+    return organisationExistsInOrgreg || organisationExistsInAgreementRegistry;
   }
 
   @Override
@@ -50,7 +59,7 @@ public class ValidateAuthorityRef extends AbstractXPathValidationRule {
       for (XdmValue node : nodes) {
         XdmNode xdmNode = (XdmNode) node;
         String authorityRef = ((XdmNode) node).attribute("ref");
-        Boolean organisationExists = organisationV3Repository.organisationExists(authorityRef);
+        Boolean organisationExists = this.organisationExists(authorityRef);
         DataLocation dataLocation = getXdmNodeLocation(
           validationContext.getFileName(),
           xdmNode

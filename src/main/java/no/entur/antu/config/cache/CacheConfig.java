@@ -75,7 +75,7 @@ public class CacheConfig {
   }
 
   /**
-   * Keeps track of existing Organisation master id's in Organisation registry V3
+   * Keeps track of existing Organisation master id's
    */
   @Bean
   public Set<String> organisationIdCache(RedissonClient redissonClient) {

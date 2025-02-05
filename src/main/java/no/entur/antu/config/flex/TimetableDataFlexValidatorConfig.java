@@ -19,6 +19,7 @@ package no.entur.antu.config.flex;
 import java.util.List;
 import java.util.Set;
 
+import no.entur.antu.agreement.AgreementRepository;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.flex.validator.EnturFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValidationTreeFactory;
@@ -53,19 +54,23 @@ public class TimetableDataFlexValidatorConfig {
 
   @Bean
   public ValidationTreeFactory flexTimetableDataValidationTreeFactory(
-    OrganisationRepository organisationRepository
+    OrganisationRepository organisationRepository,
+    AgreementRepository agreementRepository
   ) {
     return new EnturFlexTimetableDataValidationTreeFactory(
-      organisationRepository
+      organisationRepository,
+      agreementRepository
     );
   }
 
   @Bean
   public ValidationTreeFactory importFlexTimetableDataValidationTreeFactory(
-    OrganisationRepository organisationRepository
+    OrganisationRepository organisationRepository,
+    AgreementRepository agreementRepository
   ) {
     return new EnturImportFlexTimetableDataValidationTreeFactory(
-      organisationRepository
+      organisationRepository,
+      agreementRepository
     );
   }
 

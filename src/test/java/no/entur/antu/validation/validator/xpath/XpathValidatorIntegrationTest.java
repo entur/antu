@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import net.sf.saxon.s9api.XdmNode;
+import no.entur.antu.agreement.AgreementRepository;
+import no.entur.antu.agreement.SimpleAgreementRepository;
 import no.entur.antu.organisation.*;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
@@ -27,9 +29,12 @@ class XpathValidatorIntegrationTest {
   void testValidator() throws IOException {
     OrganisationRepository stubDefaultOrganisationRepository =
       new SimpleOrganisationRepository();
+    AgreementRepository stubDefaultAgreementRepository =
+      new SimpleAgreementRepository();
     ValidationTreeFactory validationTreeFactory =
       new EnturTimetableDataValidationTreeFactory(
-        stubDefaultOrganisationRepository
+        stubDefaultOrganisationRepository,
+        stubDefaultAgreementRepository
       );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     XPathRuleValidator xPathValidator = new XPathRuleValidator(

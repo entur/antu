@@ -17,11 +17,14 @@
 package no.entur.antu.config;
 
 import no.entur.antu.agreement.AgreementResource;
+import no.entur.antu.agreement.DefaultAgreementRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.Set;
 
 @Configuration
 public class AgreementConfig {
@@ -30,5 +33,14 @@ public class AgreementConfig {
     @Profile("!test")
     AgreementResource agreementResource(@Qualifier("agreementRegisterClient") WebClient agreementRegisterClient) {
         return new AgreementResource(agreementRegisterClient);
+    }
+
+    @Bean
+    @Profile("!test")
+    DefaultAgreementRepository agreementRepository(
+        AgreementResource agreementResource,
+        @Qualifier("organisationIdCache") Set<String> organisationIdCache
+    ) {
+        return new DefaultAgreementRepository(agreementResource, organisationIdCache);
     }
 }

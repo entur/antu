@@ -2,6 +2,9 @@ package no.entur.antu.config;
 
 import java.util.List;
 import java.util.Map;
+
+import no.entur.antu.agreement.AgreementRepository;
+import no.entur.antu.agreement.SimpleAgreementRepository;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
@@ -32,6 +35,12 @@ public class TestConfig {
   @Primary
   public OrganisationRepository organisationRepository() {
     return new SimpleOrganisationRepository();
+  }
+
+  @Bean
+  @Primary
+  public AgreementRepository agreementRepository() {
+    return new SimpleAgreementRepository();
   }
 
   @Bean(name = "stopPlaceRepository")

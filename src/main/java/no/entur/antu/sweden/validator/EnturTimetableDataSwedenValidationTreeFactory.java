@@ -2,6 +2,7 @@ package no.entur.antu.sweden.validator;
 
 import static org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFrameTreeFactory.CODE_COMPOSITE_FRAME_1;
 
+import no.entur.antu.agreement.SimpleAgreementRepository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
@@ -28,7 +29,8 @@ public class EnturTimetableDataSwedenValidationTreeFactory
 
   public EnturTimetableDataSwedenValidationTreeFactory() {
     super(
-      new SimpleOrganisationRepository()
+      new SimpleOrganisationRepository(),
+      new SimpleAgreementRepository()
     );
   }
 
