@@ -79,7 +79,7 @@ data:
     antu.redis.server.trust.store.file=/deployments/truststore/redis-server-ca.jks
 
     # Actuator
-    management.endpoints.enabled-by-default=false
+    management.endpoints.access.default=none
     management.endpoint.health.enabled=true
     management.health.defaults.enabled=false
     management.endpoint.health.probes.enabled=true
