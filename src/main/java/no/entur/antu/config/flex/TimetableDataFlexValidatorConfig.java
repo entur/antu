@@ -24,6 +24,7 @@ import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValid
 import no.entur.antu.validation.flex.validator.FileNameValidator;
 import no.entur.antu.validation.flex.validator.flexiblearea.InvalidFlexibleAreaValidator;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportModeSubModeValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.XPathValidator;
@@ -138,7 +139,10 @@ public class TimetableDataFlexValidatorConfig {
       netexReferenceValidator,
       netexIdUniquenessValidator
     );
-    List<JAXBValidator> jaxbValidators = List.of(invalidFlexibleAreaValidator);
+    List<JAXBValidator> jaxbValidators = List.of(
+      invalidFlexibleAreaValidator,
+      new MismatchedTransportModeSubModeValidator()
+    );
     // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
     return NetexValidatorsRunner
