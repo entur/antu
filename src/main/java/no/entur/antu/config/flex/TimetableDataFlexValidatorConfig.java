@@ -103,6 +103,50 @@ public class TimetableDataFlexValidatorConfig {
     return new InvalidFlexibleAreaValidator();
   }
 
+  private NetexValidatorsRunner buildValidatorRunner(
+    ValidationReportEntryFactory validationReportEntryFactory,
+    XPathRuleValidator flexXPathValidator,
+    NetexIdValidator netexIdValidator,
+    NetexIdUniquenessValidator netexIdUniquenessValidator,
+    NetexSchemaValidator netexSchemaValidator,
+    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
+    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
+    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
+    NetexReferenceValidator netexReferenceValidator,
+    FileNameValidator fileNameValidator,
+    InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
+    CommonDataRepositoryLoader commonDataRepository,
+    NetexDataRepository netexDataRepository,
+    StopPlaceRepository stopPlaceRepository
+  ) {
+    List<XPathValidator> xpathValidators = List.of(
+      fileNameValidator,
+      flexXPathValidator,
+      netexIdValidator,
+      versionOnLocalNetexIdValidator,
+      versionOnRefToLocalNetexIdValidator,
+      referenceToValidEntityTypeValidator,
+      netexReferenceValidator,
+      netexIdUniquenessValidator
+    );
+    List<JAXBValidator> jaxbValidators = List.of(
+      invalidFlexibleAreaValidator,
+      new MismatchedTransportModeSubModeValidator()
+    );
+    NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
+    return NetexValidatorsRunner
+      .of()
+      .withNetexXMLParser(netexXMLParser)
+      .withNetexSchemaValidator(netexSchemaValidator)
+      .withXPathValidators(xpathValidators)
+      .withJaxbValidators(jaxbValidators)
+      .withCommonDataRepository(commonDataRepository)
+      .withNetexDataRepository(netexDataRepository)
+      .withStopPlaceRepository(stopPlaceRepository)
+      .withValidationReportEntryFactory(validationReportEntryFactory)
+      .build();
+  }
+
   /**
    * This validation runner is used for the flexible line data exported from Nplan.
    */
@@ -129,33 +173,22 @@ public class TimetableDataFlexValidatorConfig {
     NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    List<XPathValidator> xpathValidators = List.of(
-      fileNameValidator,
+    return buildValidatorRunner(
+      validationReportEntryFactory,
       flexXPathValidator,
       netexIdValidator,
+      netexIdUniquenessValidator,
+      netexSchemaValidator,
       versionOnLocalNetexIdValidator,
       versionOnRefToLocalNetexIdValidator,
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
-      netexIdUniquenessValidator
-    );
-    List<JAXBValidator> jaxbValidators = List.of(
+      fileNameValidator,
       invalidFlexibleAreaValidator,
-      new MismatchedTransportModeSubModeValidator()
+      commonDataRepository,
+      netexDataRepository,
+      stopPlaceRepository
     );
-    // do not ignore SiteFrame
-    NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return NetexValidatorsRunner
-      .of()
-      .withNetexXMLParser(netexXMLParser)
-      .withNetexSchemaValidator(netexSchemaValidator)
-      .withXPathValidators(xpathValidators)
-      .withJaxbValidators(jaxbValidators)
-      .withCommonDataRepository(commonDataRepository)
-      .withNetexDataRepository(netexDataRepository)
-      .withStopPlaceRepository(stopPlaceRepository)
-      .withValidationReportEntryFactory(validationReportEntryFactory)
-      .build();
   }
 
   /**
@@ -184,31 +217,21 @@ public class TimetableDataFlexValidatorConfig {
     NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    List<XPathValidator> xpathValidators = List.of(
-      fileNameValidator,
+    return buildValidatorRunner(
+      validationReportEntryFactory,
       flexXPathValidator,
       netexIdValidator,
+      netexIdUniquenessValidator,
+      netexSchemaValidator,
       versionOnLocalNetexIdValidator,
       versionOnRefToLocalNetexIdValidator,
       referenceToValidEntityTypeValidator,
       netexReferenceValidator,
-      netexIdUniquenessValidator
+      fileNameValidator,
+      invalidFlexibleAreaValidator,
+      commonDataRepository,
+      netexDataRepository,
+      stopPlaceRepository
     );
-
-    List<JAXBValidator> jaxbValidators = List.of(invalidFlexibleAreaValidator);
-
-    // do not ignore SiteFrame
-    NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return NetexValidatorsRunner
-      .of()
-      .withNetexXMLParser(netexXMLParser)
-      .withNetexSchemaValidator(netexSchemaValidator)
-      .withXPathValidators(xpathValidators)
-      .withJaxbValidators(jaxbValidators)
-      .withCommonDataRepository(commonDataRepository)
-      .withNetexDataRepository(netexDataRepository)
-      .withStopPlaceRepository(stopPlaceRepository)
-      .withValidationReportEntryFactory(validationReportEntryFactory)
-      .build();
   }
 }
