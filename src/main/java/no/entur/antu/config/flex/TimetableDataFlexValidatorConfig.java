@@ -178,7 +178,6 @@ public class TimetableDataFlexValidatorConfig {
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
     return NetexValidatorsRunner
       .of()
-      .toBuilder()
       .withNetexXMLParser(netexXMLParser)
       .withNetexSchemaValidator(netexSchemaValidator)
       .withXPathValidators(flexTimetableDataXPathValidators)
