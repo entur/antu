@@ -85,6 +85,20 @@ spring.cloud.gcp.pubsub.emulatorHost=localhost:8085
 camel.component.google-pubsub.endpoint=localhost:8085
 ```
 
+### Additional instructions for Mac OS when validating large datasets
+
+When validating large datasets, Google PubSub emulator may start to fail processing messages due to Mac OS limitations
+on the number of ephemeral ports available for outgoing connections.
+
+This limit can be configured by setting the following values in `/etc/sysctl.conf` (if file does not exist, create it):
+
+```
+net.inet.ip.portrange.first=32768
+net.inet.ip.portrange.last=65535
+```
+
+Mac will need to be restarted for changes to take effect.
+
 ## Access to the stop place registry
 
 Access to the stop place registry is configured in the Spring Boot application.properties file:
