@@ -16,6 +16,7 @@
 
 package no.entur.antu.config.flex;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import no.entur.antu.organisation.OrganisationRepository;
@@ -24,6 +25,7 @@ import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValid
 import no.entur.antu.validation.flex.validator.FileNameValidator;
 import no.entur.antu.validation.flex.validator.flexiblearea.InvalidFlexibleAreaValidator;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportModeSubModeValidator;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.XPathValidator;
@@ -102,6 +104,58 @@ public class TimetableDataFlexValidatorConfig {
     return new InvalidFlexibleAreaValidator();
   }
 
+  @Bean
+  public List<XPathValidator> commonXPathValidators(
+    FileNameValidator fileNameValidator,
+    @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
+    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
+    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
+    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
+    NetexReferenceValidator netexReferenceValidator,
+    @Qualifier(
+      "netexIdUniquenessValidator"
+    ) NetexIdUniquenessValidator netexIdUniquenessValidator
+  ) {
+    return List.of(
+      fileNameValidator,
+      netexIdValidator,
+      versionOnLocalNetexIdValidator,
+      versionOnRefToLocalNetexIdValidator,
+      referenceToValidEntityTypeValidator,
+      netexReferenceValidator,
+      netexIdUniquenessValidator
+    );
+  }
+
+  private List<XPathValidator> mergeXPathValidators(
+    XPathValidator validator,
+    List<XPathValidator> validators
+  ) {
+    ArrayList<XPathValidator> listOfValidators = new ArrayList<>(validators);
+    listOfValidators.add(validator);
+    return listOfValidators;
+  }
+
+  @Bean
+  public List<XPathValidator> importFlexTimetableDataXPathValidators(
+    List<XPathValidator> commonXPathValidators,
+    @Qualifier(
+      "importFlexTimetableDataXPathValidator"
+    ) XPathRuleValidator flexXPathValidator
+  ) {
+    return mergeXPathValidators(flexXPathValidator, commonXPathValidators);
+  }
+
+  @Bean
+  public List<XPathValidator> flexTimetableDataXPathValidators(
+    List<XPathValidator> commonXPathValidators,
+    @Qualifier(
+      "flexTimetableDataXPathValidator"
+    ) XPathRuleValidator flexXPathValidator
+  ) {
+    return mergeXPathValidators(flexXPathValidator, commonXPathValidators);
+  }
+
   /**
    * This validation runner is used for the flexible line data exported from Nplan.
    */
@@ -110,42 +164,23 @@ public class TimetableDataFlexValidatorConfig {
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
-    @Qualifier(
-      "flexTimetableDataXPathValidator"
-    ) XPathRuleValidator flexXPathValidator,
-    @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
-    @Qualifier(
-      "netexIdUniquenessValidator"
-    ) NetexIdUniquenessValidator netexIdUniquenessValidator,
     NetexSchemaValidator netexSchemaValidator,
-    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
-    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
-    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
-    NetexReferenceValidator netexReferenceValidator,
-    FileNameValidator fileNameValidator,
+    List<XPathValidator> flexTimetableDataXPathValidators,
     InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
     CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository
   ) {
-    List<XPathValidator> xpathValidators = List.of(
-      fileNameValidator,
-      flexXPathValidator,
-      netexIdValidator,
-      versionOnLocalNetexIdValidator,
-      versionOnRefToLocalNetexIdValidator,
-      referenceToValidEntityTypeValidator,
-      netexReferenceValidator,
-      netexIdUniquenessValidator
+    List<JAXBValidator> jaxbValidators = List.of(
+      invalidFlexibleAreaValidator,
+      new MismatchedTransportModeSubModeValidator()
     );
-    List<JAXBValidator> jaxbValidators = List.of(invalidFlexibleAreaValidator);
-    // do not ignore SiteFrame
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
     return NetexValidatorsRunner
       .of()
       .withNetexXMLParser(netexXMLParser)
       .withNetexSchemaValidator(netexSchemaValidator)
-      .withXPathValidators(xpathValidators)
+      .withXPathValidators(flexTimetableDataXPathValidators)
       .withJaxbValidators(jaxbValidators)
       .withCommonDataRepository(commonDataRepository)
       .withNetexDataRepository(netexDataRepository)
@@ -160,51 +195,13 @@ public class TimetableDataFlexValidatorConfig {
   @Bean
   public NetexValidatorsRunner importFlexTimetableDataValidatorsRunner(
     @Qualifier(
-      "validationReportEntryFactory"
-    ) ValidationReportEntryFactory validationReportEntryFactory,
-    @Qualifier(
-      "importFlexTimetableDataXPathValidator"
-    ) XPathRuleValidator flexXPathValidator,
-    @Qualifier("flexNetexIdValidator") NetexIdValidator netexIdValidator,
-    @Qualifier(
-      "netexIdUniquenessValidator"
-    ) NetexIdUniquenessValidator netexIdUniquenessValidator,
-    NetexSchemaValidator netexSchemaValidator,
-    VersionOnLocalNetexIdValidator versionOnLocalNetexIdValidator,
-    VersionOnRefToLocalNetexIdValidator versionOnRefToLocalNetexIdValidator,
-    ReferenceToValidEntityTypeValidator referenceToValidEntityTypeValidator,
-    NetexReferenceValidator netexReferenceValidator,
-    FileNameValidator fileNameValidator,
-    InvalidFlexibleAreaValidator invalidFlexibleAreaValidator,
-    CommonDataRepositoryLoader commonDataRepository,
-    NetexDataRepository netexDataRepository,
-    StopPlaceRepository stopPlaceRepository
+      "flexTimetableDataValidatorsRunner"
+    ) NetexValidatorsRunner baseRunner,
+    List<XPathValidator> importFlexTimetableDataXPathValidators
   ) {
-    List<XPathValidator> xpathValidators = List.of(
-      fileNameValidator,
-      flexXPathValidator,
-      netexIdValidator,
-      versionOnLocalNetexIdValidator,
-      versionOnRefToLocalNetexIdValidator,
-      referenceToValidEntityTypeValidator,
-      netexReferenceValidator,
-      netexIdUniquenessValidator
-    );
-
-    List<JAXBValidator> jaxbValidators = List.of(invalidFlexibleAreaValidator);
-
-    // do not ignore SiteFrame
-    NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
-    return NetexValidatorsRunner
-      .of()
-      .withNetexXMLParser(netexXMLParser)
-      .withNetexSchemaValidator(netexSchemaValidator)
-      .withXPathValidators(xpathValidators)
-      .withJaxbValidators(jaxbValidators)
-      .withCommonDataRepository(commonDataRepository)
-      .withNetexDataRepository(netexDataRepository)
-      .withStopPlaceRepository(stopPlaceRepository)
-      .withValidationReportEntryFactory(validationReportEntryFactory)
+    return baseRunner
+      .toBuilder()
+      .withXPathValidators(importFlexTimetableDataXPathValidators)
       .build();
   }
 }
