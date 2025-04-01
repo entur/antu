@@ -23,12 +23,16 @@ public class CommonDataConfig {
     ) Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     @Qualifier(
       SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE
-    ) Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache
+    ) Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
+    @Qualifier(
+      SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE
+    ) Map<String, Map<String, String>> scheduledStopPointRefToFlexibleStopPointRefCache
   ) {
     return new RedisCommonDataRepository(
       redissonClient,
       scheduledStopPointAndQuayIdCache,
-      serviceLinksAndFromToScheduledStopPointIdCache
+      serviceLinksAndFromToScheduledStopPointIdCache,
+      scheduledStopPointRefToFlexibleStopPointRefCache
     );
   }
 }
