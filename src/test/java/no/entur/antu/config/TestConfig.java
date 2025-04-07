@@ -73,7 +73,10 @@ public class TestConfig {
     }
 
     @Override
-    public String getFlexibleStopPlaceRefByStopPointRef(String validationReportId, String stopPointRef) {
+    public String getFlexibleStopPlaceRefByStopPointRef(
+      String validationReportId,
+      String stopPointRef
+    ) {
       return "";
     }
 

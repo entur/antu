@@ -75,9 +75,12 @@ public final class SortStopTimesUtil {
             NetexUtils.stopPointRef(timetabledPassingTime)
           ),
           timetabledPassingTime,
-          hasFlexibleStopPoint(scheduledStopPointIdByStopPointId.get(
-                  NetexUtils.stopPointRef(timetabledPassingTime)
-          ).id(), validationContext)
+          hasFlexibleStopPoint(
+            scheduledStopPointIdByStopPointId
+              .get(NetexUtils.stopPointRef(timetabledPassingTime))
+              .id(),
+            validationContext
+          )
         )
       )
       .toList();
@@ -111,6 +114,11 @@ public final class SortStopTimesUtil {
     String scheduledStopPointId,
     JAXBValidationContext validationContext
   ) {
-    return validationContext.flexibleStopPlaceRefFromScheduledStopPointRef(scheduledStopPointId) != null;
+    return (
+      validationContext.flexibleStopPlaceRefFromScheduledStopPointRef(
+        scheduledStopPointId
+      ) !=
+      null
+    );
   }
 }

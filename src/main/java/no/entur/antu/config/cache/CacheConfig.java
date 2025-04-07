@@ -38,7 +38,7 @@ public class CacheConfig {
   public static final String SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE =
     "serviceLinksAndFromToScheduledStopPointIdCache";
   public static final String SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE =
-          "scheduledStopPointRefToFlexibleStopPointRefCache";
+    "scheduledStopPointRefToFlexibleStopPointRefCache";
   public static final String LINE_INFO_CACHE = "linesInfoCache";
   public static final String SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE =
     "serviceJourneyInterchangeInfoCache";
@@ -154,12 +154,12 @@ public class CacheConfig {
    */
   @Bean(name = SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE)
   public Map<String, Map<String, String>> scheduledStopPointRefToFlexibleStopPointRefCache(
-          RedissonClient redissonClient
+    RedissonClient redissonClient
   ) {
     return getOrCreateReportScopedCache(
-            redissonClient,
-            SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE,
-            new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+      redissonClient,
+      SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
     );
   }
 
