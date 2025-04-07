@@ -1,14 +1,15 @@
-FROM bellsoft/liberica-openjdk-alpine:17.0.13-12 AS builder
+FROM bellsoft/liberica-openjre-alpine:17.0.14-10 AS builder
+WORKDIR /builder
 COPY target/antu-*-SNAPSHOT.jar application.jar
-RUN java -Djarmode=layertools -jar application.jar extract
+RUN java -Djarmode=tools  -jar application.jar extract --layers --destination extracted
 
-FROM bellsoft/liberica-openjdk-alpine:17.0.13-12
+FROM bellsoft/liberica-openjre-alpine:17.0.14-10
 RUN apk update && apk upgrade && apk add --no-cache tini
 WORKDIR /deployments
 RUN addgroup appuser && adduser --disabled-password appuser --ingroup appuser
 USER appuser
-COPY --from=builder dependencies/ ./
-COPY --from=builder snapshot-dependencies/ ./
-COPY --from=builder spring-boot-loader/ ./
-COPY --from=builder application/ ./
-ENTRYPOINT [ "/sbin/tini", "--", "java", "org.springframework.boot.loader.launch.JarLauncher" ]
+COPY --from=builder /builder/extracted/dependencies/ ./
+COPY --from=builder /builder/extracted/spring-boot-loader/ ./
+COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
+COPY --from=builder /builder/extracted/application/ ./
+ENTRYPOINT [ "/sbin/tini", "--", "java", "-jar", "application.jar" ]
