@@ -73,6 +73,11 @@ public class TestConfig {
     }
 
     @Override
+    public String getFlexibleStopPlaceRefByStopPointRef(String validationReportId, String stopPointRef) {
+      return "";
+    }
+
+    @Override
     public void collect(
       String validationReportId,
       NetexEntitiesIndex netexEntitiesIndex

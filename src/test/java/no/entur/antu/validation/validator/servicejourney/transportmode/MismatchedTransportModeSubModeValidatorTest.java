@@ -3,6 +3,8 @@ package no.entur.antu.validation.validator.servicejourney.transportmode;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import no.entur.antu.common.repository.TestCommonDataRepository;
+import no.entur.antu.common.repository.TestStopPlaceRepository;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationIssue;

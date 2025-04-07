@@ -1,4 +1,4 @@
-package no.entur.antu.validation.validator.servicejourney.transportmode;
+package no.entur.antu.common.repository;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -9,20 +9,26 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceLinkId;
 
-class TestCommonDataRepository implements CommonDataRepository {
+public class TestCommonDataRepository implements CommonDataRepository {
+
+  private final String VALIDATION_REPORT_KEY = "VALIDATION_REPORT_KEY";
 
   private final Map<ScheduledStopPointId, QuayId> quayForScheduledStopPoint;
+  private final Map<String, Map<String, String>> flexibleStopPlaceRefByStopPointRef;
 
-  TestCommonDataRepository(
-    Map<ScheduledStopPointId, QuayId> quayForScheduledStopPoint
+  public TestCommonDataRepository(
+    Map<ScheduledStopPointId, QuayId> quayForScheduledStopPoint,
+    Map<String, String> stopPointRefToFlexibleStopPlaceRefMap
   ) {
     this.quayForScheduledStopPoint = quayForScheduledStopPoint;
+    this.flexibleStopPlaceRefByStopPointRef =
+      Map.of(VALIDATION_REPORT_KEY, stopPointRefToFlexibleStopPlaceRefMap);
   }
 
   /**
    * Return a common data repository that maps ScheduledStopPoint #i to Quay #i
    */
-  static CommonDataRepository of(int numScheduledStopPoints) {
+  public static CommonDataRepository of(int numScheduledStopPoints) {
     Map<ScheduledStopPointId, QuayId> stopPointIdQuayIdMap = IntStream
       .rangeClosed(1, numScheduledStopPoints)
       .boxed()
@@ -33,7 +39,7 @@ class TestCommonDataRepository implements CommonDataRepository {
         )
       );
 
-    return new TestCommonDataRepository(stopPointIdQuayIdMap);
+    return new TestCommonDataRepository(stopPointIdQuayIdMap, Map.of());
   }
 
   @Override
@@ -58,5 +64,14 @@ class TestCommonDataRepository implements CommonDataRepository {
     String validationReportId
   ) {
     return null;
+  }
+
+  @Override
+  public String getFlexibleStopPlaceRefByStopPointRef(
+    String validationReportId,
+    String stopPointRef
+  ) {
+    return this.flexibleStopPlaceRefByStopPointRef.get(VALIDATION_REPORT_KEY)
+      .get(stopPointRef);
   }
 }
