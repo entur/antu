@@ -38,7 +38,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertFalse(
       containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
@@ -59,7 +59,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertTrue(
       containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
@@ -80,7 +80,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertTrue(
       containsValidationIssuesForRule(issues, RULE_INCONSISTENT_TIME)
@@ -98,13 +98,16 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .toBuilder()
       .addServiceJourney(serviceJourney)
       .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlace("RUT:ScheduledStopPoint:1", flexibleStopPlace)
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
       .build();
 
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertFalse(
       containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
@@ -122,13 +125,16 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .toBuilder()
       .addServiceJourney(serviceJourney)
       .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlace("RUT:ScheduledStopPoint:1", flexibleStopPlace)
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
       .build();
 
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertTrue(
       containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
@@ -146,13 +152,16 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .toBuilder()
       .addServiceJourney(serviceJourney)
       .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlace("RUT:ScheduledStopPoint:1", flexibleStopPlace)
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
       .build();
 
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertTrue(
       containsValidationIssuesForRule(issues, RULE_INCONSISTENT_TIME)
@@ -181,7 +190,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertTrue(
       containsValidationIssuesForRule(issues, RULE_NON_INCREASING_TIME)
@@ -199,7 +208,10 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .toBuilder()
       .addServiceJourney(serviceJourney)
       .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlace("RUT:ScheduledStopPoint:1", flexibleStopPlace)
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
       .build();
 
     TimetabledPassingTime firstPassingTime =
@@ -213,7 +225,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertFalse(
       containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
@@ -234,7 +246,10 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .toBuilder()
       .addServiceJourney(serviceJourney)
       .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlace("RUT:ScheduledStopPoint:2", flexibleStopPlace)
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:2",
+        flexibleStopPlace
+      )
       .build();
 
     TimetabledPassingTime secondPassingTime =
@@ -248,7 +263,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertFalse(
       containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
@@ -269,8 +284,14 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .toBuilder()
       .addServiceJourney(serviceJourney)
       .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlace("RUT:ScheduledStopPoint:1", flexibleStopPlace)
-      .addFlexibleStopPlace("RUT:ScheduledStopPoint:2", flexibleStopPlace)
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:2",
+        flexibleStopPlace
+      )
       .build();
 
     TimetabledPassingTime firstPassingTime =
@@ -295,7 +316,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertTrue(
       containsValidationIssuesForRule(issues, RULE_NON_INCREASING_TIME)
@@ -313,7 +334,10 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .toBuilder()
       .addServiceJourney(serviceJourney)
       .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlace("RUT:ScheduledStopPoint:1", flexibleStopPlace)
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
       .build();
 
     TimetabledPassingTime firstPassingTime =
@@ -332,7 +356,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
     List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.jaxbValidationContext
+      netexTestEnvironment.getJaxbValidationContext()
     );
     Assertions.assertTrue(
       containsValidationIssuesForRule(issues, RULE_NON_INCREASING_TIME)

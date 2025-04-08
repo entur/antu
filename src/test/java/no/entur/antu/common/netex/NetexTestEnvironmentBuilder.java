@@ -28,11 +28,22 @@ public class NetexTestEnvironmentBuilder {
     return this;
   }
 
-  public NetexTestEnvironmentBuilder addFlexibleStopPlace(
+  public NetexTestEnvironmentBuilder addFlexibleStopPlaceToNetexEntitiesIndex(
     String scheduledStopPointId,
     FlexibleStopPlace flexibleStopPlace
   ) {
-    this.netexTestEnvironment.addFlexibleStopPlace(
+    this.netexTestEnvironment.addFlexibleStopPlaceToNetexEntitiesIndex(
+        scheduledStopPointId,
+        flexibleStopPlace
+      );
+    return this;
+  }
+
+  public NetexTestEnvironmentBuilder addFlexibleStopPlaceToCommonDataRepository(
+    String scheduledStopPointId,
+    FlexibleStopPlace flexibleStopPlace
+  ) {
+    this.netexTestEnvironment.addFlexibleStopPlaceToCommonDataRepository(
         scheduledStopPointId,
         flexibleStopPlace
       );

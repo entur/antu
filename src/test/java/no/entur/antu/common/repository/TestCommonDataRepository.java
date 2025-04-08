@@ -1,5 +1,6 @@
 package no.entur.antu.common.repository;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -14,15 +15,18 @@ public class TestCommonDataRepository implements CommonDataRepository {
   private final String VALIDATION_REPORT_KEY = "VALIDATION_REPORT_KEY";
 
   private final Map<ScheduledStopPointId, QuayId> quayForScheduledStopPoint;
-  private final Map<String, Map<String, String>> flexibleStopPlaceRefByStopPointRef;
+  private final HashMap<String, HashMap<String, String>> flexibleStopPlaceRefByStopPointRef;
 
   public TestCommonDataRepository(
     Map<ScheduledStopPointId, QuayId> quayForScheduledStopPoint,
-    Map<String, String> stopPointRefToFlexibleStopPlaceRefMap
+    HashMap<String, String> stopPointRefToFlexibleStopPlaceRefMap
   ) {
     this.quayForScheduledStopPoint = quayForScheduledStopPoint;
-    this.flexibleStopPlaceRefByStopPointRef =
-      Map.of(VALIDATION_REPORT_KEY, stopPointRefToFlexibleStopPlaceRefMap);
+    this.flexibleStopPlaceRefByStopPointRef = new HashMap<>();
+    flexibleStopPlaceRefByStopPointRef.put(
+      VALIDATION_REPORT_KEY,
+      stopPointRefToFlexibleStopPlaceRefMap
+    );
   }
 
   /**
@@ -39,7 +43,7 @@ public class TestCommonDataRepository implements CommonDataRepository {
         )
       );
 
-    return new TestCommonDataRepository(stopPointIdQuayIdMap, Map.of());
+    return new TestCommonDataRepository(stopPointIdQuayIdMap, new HashMap<>());
   }
 
   @Override
@@ -73,5 +77,9 @@ public class TestCommonDataRepository implements CommonDataRepository {
   ) {
     return this.flexibleStopPlaceRefByStopPointRef.get(VALIDATION_REPORT_KEY)
       .get(stopPointRef);
+  }
+
+  public HashMap<String, String> getFlexibleStopPlaceRefByStopPointRef() {
+    return this.flexibleStopPlaceRefByStopPointRef.get(VALIDATION_REPORT_KEY);
   }
 }
