@@ -37,6 +37,32 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .build();
   }
 
+  private NetexTestEnvironment addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+    NetexTestEnvironment netexTestEnvironment,
+    FlexibleStopPlace flexibleStopPlace
+  ) {
+    return netexTestEnvironment
+      .toBuilder()
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .build();
+  }
+
+  private NetexTestEnvironment addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+    NetexTestEnvironment netexTestEnvironment,
+    FlexibleStopPlace flexibleStopPlace
+  ) {
+    return netexTestEnvironment
+      .toBuilder()
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .build();
+  }
+
   @Test
   void testValidateServiceJourneyWithCompleteStopTimes() {
     ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
@@ -112,13 +138,11 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
 
-    NetexTestEnvironment envWithFlexibleStopFromSharedFile = baseTestEnvironment
-      .toBuilder()
-      .addFlexibleStopPlaceToCommonDataRepository(
-        "RUT:ScheduledStopPoint:1",
+    NetexTestEnvironment envWithFlexibleStopFromSharedFile =
+      addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+        baseTestEnvironment,
         flexibleStopPlace
-      )
-      .build();
+      );
     List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
       envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
     );
@@ -129,13 +153,11 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       )
     );
 
-    NetexTestEnvironment envWithFlexibleStopFromLineFile = baseTestEnvironment
-      .toBuilder()
-      .addFlexibleStopPlaceToNetexEntitiesIndex(
-        "RUT:ScheduledStopPoint:1",
+    NetexTestEnvironment envWithFlexibleStopFromLineFile =
+      addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+        baseTestEnvironment,
         flexibleStopPlace
-      )
-      .build();
+      );
     List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
       envWithFlexibleStopFromLineFile.getJaxbValidationContext()
     );
@@ -154,23 +176,43 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
     FlexibleStopPlace flexibleStopPlace =
       NetexTestDataSample.defaultFlexibleStopPlace();
-    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment()
-      .toBuilder()
-      .addServiceJourney(serviceJourney)
-      .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlaceToCommonDataRepository(
-        "RUT:ScheduledStopPoint:1",
+
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopFromSharedFile =
+      addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+        baseTestEnvironment,
         flexibleStopPlace
-      )
-      .build();
+      );
+    NetexTestEnvironment envWithFlexibleStopFromLineFile =
+      addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
 
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
-    List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.getJaxbValidationContext()
+
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
     );
     Assertions.assertTrue(
-      containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
+      containsValidationIssuesForRule(
+        issuesWhenUsingSharedFile,
+        RULE_INCOMPLETE_TIME
+      )
+    );
+
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopFromLineFile.getJaxbValidationContext()
+    );
+    Assertions.assertTrue(
+      containsValidationIssuesForRule(
+        issuesWhenUsingLineFile,
+        RULE_INCOMPLETE_TIME
+      )
     );
   }
 
@@ -181,23 +223,42 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
     FlexibleStopPlace flexibleStopPlace =
       NetexTestDataSample.defaultFlexibleStopPlace();
-    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment()
-      .toBuilder()
-      .addServiceJourney(serviceJourney)
-      .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlaceToCommonDataRepository(
-        "RUT:ScheduledStopPoint:1",
+
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopFromSharedFile =
+      addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+        baseTestEnvironment,
         flexibleStopPlace
-      )
-      .build();
+      );
+    NetexTestEnvironment envWithFlexibleStopFromLineFile =
+      addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
 
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
-    List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.getJaxbValidationContext()
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
     );
     Assertions.assertTrue(
-      containsValidationIssuesForRule(issues, RULE_INCONSISTENT_TIME)
+      containsValidationIssuesForRule(
+        issuesWhenUsingSharedFile,
+        RULE_INCONSISTENT_TIME
+      )
+    );
+
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopFromLineFile.getJaxbValidationContext()
+    );
+    Assertions.assertTrue(
+      containsValidationIssuesForRule(
+        issuesWhenUsingLineFile,
+        RULE_INCONSISTENT_TIME
+      )
     );
   }
 
@@ -237,12 +298,95 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     FlexibleStopPlace flexibleStopPlace =
       NetexTestDataSample.defaultFlexibleStopPlace();
 
-    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment()
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopFromSharedFile =
+      addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
+    NetexTestEnvironment envWithFlexibleStopFromLineFile =
+      addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
+
+    TimetabledPassingTime firstPassingTime =
+      NetexTestDataSample.getFirstPassingTime(serviceJourney);
+    firstPassingTime
+      .withLatestArrivalTime(firstPassingTime.getDepartureTime())
+      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
+      .withArrivalTime(null)
+      .withDepartureTime(null);
+
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
+    );
+    Assertions.assertFalse(
+      containsValidationIssuesForRule(
+        issuesWhenUsingSharedFile,
+        RULE_INCOMPLETE_TIME
+      )
+    );
+    Assertions.assertFalse(
+      containsValidationIssuesForRule(
+        issuesWhenUsingSharedFile,
+        RULE_NON_INCREASING_TIME
+      )
+    );
+
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopFromLineFile.getJaxbValidationContext()
+    );
+    Assertions.assertFalse(
+      containsValidationIssuesForRule(
+        issuesWhenUsingLineFile,
+        RULE_INCOMPLETE_TIME
+      )
+    );
+    Assertions.assertFalse(
+      containsValidationIssuesForRule(
+        issuesWhenUsingLineFile,
+        RULE_NON_INCREASING_TIME
+      )
+    );
+  }
+
+  @Test
+  void testValidateServiceJourneyWithStopAreaFollowedByStopArea() {
+    ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    FlexibleStopPlace flexibleStopPlace =
+      NetexTestDataSample.defaultFlexibleStopPlace();
+
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopsFromSharedFile =
+      baseTestEnvironment
+        .toBuilder()
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:1",
+          flexibleStopPlace
+        )
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:2",
+          flexibleStopPlace
+        )
+        .build();
+    NetexTestEnvironment envWithFlexibleStopsFromLineFile = baseTestEnvironment
       .toBuilder()
-      .addServiceJourney(serviceJourney)
-      .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlaceToCommonDataRepository(
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
         "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
+        "RUT:ScheduledStopPoint:2",
         flexibleStopPlace
       )
       .build();
@@ -255,54 +399,49 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
       .withArrivalTime(null)
       .withDepartureTime(null);
 
-    NonIncreasingPassingTimeValidator validator =
-      new NonIncreasingPassingTimeValidator();
-    List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.getJaxbValidationContext()
-    );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
-    );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(issues, RULE_NON_INCREASING_TIME)
-    );
-  }
-
-  @Test
-  void testValidateServiceJourneyWithStopAreaFollowedByStopArea() {
-    ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
-    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
-    FlexibleStopPlace flexibleStopPlace =
-      NetexTestDataSample.defaultFlexibleStopPlace();
-
-    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment()
-      .toBuilder()
-      .addServiceJourney(serviceJourney)
-      .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlaceToCommonDataRepository(
-        "RUT:ScheduledStopPoint:2",
-        flexibleStopPlace
-      )
-      .build();
-
     TimetabledPassingTime secondPassingTime =
       NetexTestDataSample.getSecondPassingTime(serviceJourney);
     secondPassingTime
       .withLatestArrivalTime(secondPassingTime.getDepartureTime())
-      .withEarliestDepartureTime(secondPassingTime.getDepartureTime())
+      .withEarliestDepartureTime(
+        secondPassingTime.getDepartureTime().plusMinutes(1)
+      )
       .withArrivalTime(null)
       .withDepartureTime(null);
 
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
-    List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.getJaxbValidationContext()
+
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
     );
     Assertions.assertFalse(
-      containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
+      containsValidationIssuesForRule(
+        issuesWhenUsingSharedFile,
+        RULE_INCOMPLETE_TIME
+      )
     );
     Assertions.assertFalse(
-      containsValidationIssuesForRule(issues, RULE_NON_INCREASING_TIME)
+      containsValidationIssuesForRule(
+        issuesWhenUsingSharedFile,
+        RULE_NON_INCREASING_TIME
+      )
+    );
+
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
+    );
+    Assertions.assertFalse(
+      containsValidationIssuesForRule(
+        issuesWhenUsingLineFile,
+        RULE_INCOMPLETE_TIME
+      )
+    );
+    Assertions.assertFalse(
+      containsValidationIssuesForRule(
+        issuesWhenUsingLineFile,
+        RULE_NON_INCREASING_TIME
+      )
     );
   }
 
@@ -313,15 +452,29 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     FlexibleStopPlace flexibleStopPlace =
       NetexTestDataSample.defaultFlexibleStopPlace();
 
-    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment()
+    NetexTestEnvironment netexTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopsFromSharedFile =
+      netexTestEnvironment
+        .toBuilder()
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:1",
+          flexibleStopPlace
+        )
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:2",
+          flexibleStopPlace
+        )
+        .build();
+    NetexTestEnvironment envWithFlexibleStopsFromLineFile = netexTestEnvironment
       .toBuilder()
-      .addServiceJourney(serviceJourney)
-      .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlaceToCommonDataRepository(
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
         "RUT:ScheduledStopPoint:1",
         flexibleStopPlace
       )
-      .addFlexibleStopPlaceToCommonDataRepository(
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
         "RUT:ScheduledStopPoint:2",
         flexibleStopPlace
       )
@@ -348,11 +501,25 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
-    List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.getJaxbValidationContext()
+
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
     );
     Assertions.assertTrue(
-      containsValidationIssuesForRule(issues, RULE_NON_INCREASING_TIME)
+      containsValidationIssuesForRule(
+        issuesWhenUsingSharedFile,
+        RULE_NON_INCREASING_TIME
+      )
+    );
+
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
+    );
+    Assertions.assertTrue(
+      containsValidationIssuesForRule(
+        issuesWhenUsingLineFile,
+        RULE_NON_INCREASING_TIME
+      )
     );
   }
 
@@ -363,11 +530,21 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     FlexibleStopPlace flexibleStopPlace =
       NetexTestDataSample.defaultFlexibleStopPlace();
 
-    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment()
+    NetexTestEnvironment netexTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopsFromSharedFile =
+      netexTestEnvironment
+        .toBuilder()
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:1",
+          flexibleStopPlace
+        )
+        .build();
+    NetexTestEnvironment envWithFlexibleStopsFromLineFile = netexTestEnvironment
       .toBuilder()
-      .addServiceJourney(serviceJourney)
-      .addJourneyPattern(journeyPattern)
-      .addFlexibleStopPlaceToCommonDataRepository(
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
         "RUT:ScheduledStopPoint:1",
         flexibleStopPlace
       )
@@ -388,11 +565,25 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
     NonIncreasingPassingTimeValidator validator =
       new NonIncreasingPassingTimeValidator();
-    List<ValidationIssue> issues = validator.validate(
-      netexTestEnvironment.getJaxbValidationContext()
+
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
     );
     Assertions.assertTrue(
-      containsValidationIssuesForRule(issues, RULE_NON_INCREASING_TIME)
+      containsValidationIssuesForRule(
+        issuesWhenUsingSharedFile,
+        RULE_NON_INCREASING_TIME
+      )
+    );
+
+    List<ValidationIssue> issuesWhenUsingLinefile = validator.validate(
+      envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
+    );
+    Assertions.assertTrue(
+      containsValidationIssuesForRule(
+        issuesWhenUsingLinefile,
+        RULE_NON_INCREASING_TIME
+      )
     );
   }
 }
