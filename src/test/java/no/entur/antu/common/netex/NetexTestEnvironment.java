@@ -1,11 +1,9 @@
 package no.entur.antu.common.netex;
 
-import static org.mockito.Mockito.mock;
-
 import java.util.HashMap;
 import java.util.Map;
 import no.entur.antu.common.repository.TestCommonDataRepository;
-import org.entur.netex.index.api.NetexEntitiesIndex;
+import no.entur.antu.common.repository.TestStopPlaceRepository;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
@@ -16,34 +14,19 @@ import org.rutebanken.netex.model.ServiceJourney;
 public class NetexTestEnvironment {
 
   private JAXBValidationContext jaxbValidationContext;
-  private StopPlaceRepository stopPlaceRepositoryMock;
-  private TestCommonDataRepository commonDataRepositoryMock;
+  private StopPlaceRepository testStopPlaceRepository;
+  private TestCommonDataRepository testCommonDataRepository;
 
   public NetexTestEnvironment() {
-    this.commonDataRepositoryMock =
+    this.testCommonDataRepository =
       new TestCommonDataRepository(Map.of(), new HashMap<>());
-    this.stopPlaceRepositoryMock = mock(StopPlaceRepository.class);
+    this.testStopPlaceRepository = TestStopPlaceRepository.ofLocalBusStops(1);
     this.jaxbValidationContext =
       new JAXBValidationContext(
         "VALIDATION_REPORT_KEY",
         new NetexEntitiesIndexImpl(),
-        commonDataRepositoryMock,
-        v -> stopPlaceRepositoryMock,
-        "ENT",
-        "_common.xml",
-        Map.of()
-      );
-  }
-
-  public void updateTestCommonDataRepository() {
-    NetexEntitiesIndex netexEntitiesIndex =
-      this.jaxbValidationContext.getNetexEntitiesIndex();
-    this.jaxbValidationContext =
-      new JAXBValidationContext(
-        this.jaxbValidationContext.getValidationReportId(),
-        netexEntitiesIndex,
-        new TestCommonDataRepository(Map.of(), new HashMap<>()),
-        v -> stopPlaceRepositoryMock,
+        testCommonDataRepository,
+        v -> testStopPlaceRepository,
         "ENT",
         "_common.xml",
         Map.of()
@@ -54,14 +37,12 @@ public class NetexTestEnvironment {
     this.jaxbValidationContext.getNetexEntitiesIndex()
       .getServiceJourneyIndex()
       .put(serviceJourney.getId(), serviceJourney);
-    this.updateTestCommonDataRepository();
   }
 
   public void addJourneyPattern(JourneyPattern journeyPattern) {
     this.jaxbValidationContext.getNetexEntitiesIndex()
       .getJourneyPatternIndex()
       .put(journeyPattern.getId(), journeyPattern);
-    this.updateTestCommonDataRepository();
   }
 
   public void addFlexibleStopPlaceToNetexEntitiesIndex(
@@ -76,33 +57,55 @@ public class NetexTestEnvironment {
       .put(scheduledStopPointId, flexibleStopPlace.getId());
   }
 
+  private JAXBValidationContext recreateJaxbValidationContext(
+    HashMap<String, String> flexibleStopPlaceRefByStopPointRef
+  ) {
+    return new JAXBValidationContext(
+      this.jaxbValidationContext.getValidationReportId(),
+      this.jaxbValidationContext.getNetexEntitiesIndex(),
+      new TestCommonDataRepository(
+        Map.ofEntries(),
+        flexibleStopPlaceRefByStopPointRef
+      ),
+      v -> testStopPlaceRepository,
+      "ENT",
+      "_common.xml",
+      Map.of()
+    );
+  }
+
   public void addFlexibleStopPlaceToCommonDataRepository(
     String scheduledStopPointId,
     FlexibleStopPlace flexibleStopPlace
   ) {
     HashMap<String, String> currentFlexibleStopPlaceRefByStopPointRef =
-      this.commonDataRepositoryMock.getFlexibleStopPlaceRefByStopPointRef();
+      this.testCommonDataRepository.getFlexibleStopPlaceRefByStopPointRef();
     currentFlexibleStopPlaceRefByStopPointRef.put(
       scheduledStopPointId,
       flexibleStopPlace.getId()
     );
     this.jaxbValidationContext =
-      new JAXBValidationContext(
-        this.jaxbValidationContext.getValidationReportId(),
-        this.jaxbValidationContext.getNetexEntitiesIndex(),
-        new TestCommonDataRepository(
-          Map.ofEntries(),
-          currentFlexibleStopPlaceRefByStopPointRef
-        ),
-        v -> stopPlaceRepositoryMock,
-        "ENT",
-        "_common.xml",
-        Map.of()
+      recreateJaxbValidationContext(currentFlexibleStopPlaceRefByStopPointRef);
+  }
+
+  private NetexTestEnvironment recreateNetexTestEnvironment() {
+    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment();
+    netexTestEnvironment.testCommonDataRepository
+      .getFlexibleStopPlaceRefByStopPointRef()
+      .putAll(
+        this.testCommonDataRepository.getFlexibleStopPlaceRefByStopPointRef()
       );
+    netexTestEnvironment.jaxbValidationContext =
+      recreateJaxbValidationContext(
+        this.testCommonDataRepository.getFlexibleStopPlaceRefByStopPointRef()
+      );
+    netexTestEnvironment.testStopPlaceRepository = this.testStopPlaceRepository;
+    return netexTestEnvironment;
   }
 
   public NetexTestEnvironmentBuilder toBuilder() {
-    return new NetexTestEnvironmentBuilder(this);
+    NetexTestEnvironment netexTestEnvironment = recreateNetexTestEnvironment();
+    return new NetexTestEnvironmentBuilder(netexTestEnvironment);
   }
 
   public JAXBValidationContext getJaxbValidationContext() {
