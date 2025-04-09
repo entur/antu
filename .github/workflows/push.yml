@@ -37,6 +37,7 @@ jobs:
         with:
           path: target/*-SNAPSHOT.jar
       - name: Sonar Scan
+        if: github.repository_owner == 'entur' && github.ref == 'refs/heads/main'
         env:
           SONAR_TOKEN: ${{ secrets.ENTUR_SONAR_PASSWORD }}
           SONAR_PROJECT_NAME: ${{ github.event.repository.name }}
