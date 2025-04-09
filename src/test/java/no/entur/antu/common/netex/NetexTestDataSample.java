@@ -11,6 +11,10 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import org.rutebanken.netex.model.*;
 
+/**
+ * This class is mostly a copy of this class in OpenTripPlanner:
+ * https://github.com/opentripplanner/OpenTripPlanner/blob/master/application/src/test/java/org/opentripplanner/netex/mapping/NetexTestDataSample.java
+ * */
 public class NetexTestDataSample {
 
   private static final DayType EVERYDAY = new DayType();
