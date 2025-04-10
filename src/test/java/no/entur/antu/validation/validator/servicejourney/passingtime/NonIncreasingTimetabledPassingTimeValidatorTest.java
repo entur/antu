@@ -5,25 +5,13 @@ import static no.entur.antu.validation.validator.servicejourney.passingtime.NonI
 import java.util.List;
 import no.entur.antu.common.netex.NetexTestDataSample;
 import no.entur.antu.common.netex.NetexTestEnvironment;
+import no.entur.antu.common.util.TestUtils;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.validation.validator.ValidationIssue;
-import org.entur.netex.validation.validator.ValidationRule;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.*;
 
 class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
-
-  private boolean containsValidationIssuesForRule(
-    List<ValidationIssue> validationIssues,
-    ValidationRule rule
-  ) {
-    List<ValidationIssue> validationIssuesForRule = validationIssues
-      .stream()
-      .filter(issue -> issue.rule() == rule)
-      .toList();
-    return validationIssuesForRule.size() > 0;
-  }
 
   private NetexTestEnvironment buildNetexTestEnvironment(
     ServiceJourney serviceJourney,
@@ -77,9 +65,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issues = validator.validate(
       netexTestEnvironment.getJaxbValidationContext()
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
-    );
+    TestUtils.assertNoIssuesForRule(issues, RULE_INCOMPLETE_TIME);
   }
 
   @Test
@@ -97,9 +83,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issues = validator.validate(
       netexTestEnvironment.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(issues, RULE_INCOMPLETE_TIME)
-    );
+    TestUtils.assertHasIssuesForRule(issues, RULE_INCOMPLETE_TIME);
   }
 
   @Test
@@ -117,9 +101,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issues = validator.validate(
       netexTestEnvironment.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(issues, RULE_INCONSISTENT_TIME)
-    );
+    TestUtils.assertHasIssuesForRule(issues, RULE_INCONSISTENT_TIME);
   }
 
   @Test
@@ -146,11 +128,9 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
       envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_INCOMPLETE_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCOMPLETE_TIME
     );
 
     NetexTestEnvironment envWithFlexibleStopFromLineFile =
@@ -161,11 +141,9 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
       envWithFlexibleStopFromLineFile.getJaxbValidationContext()
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLineFile,
-        RULE_INCOMPLETE_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCOMPLETE_TIME
     );
   }
 
@@ -198,21 +176,17 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
       envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_INCOMPLETE_TIME
-      )
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCOMPLETE_TIME
     );
 
     List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
       envWithFlexibleStopFromLineFile.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLineFile,
-        RULE_INCOMPLETE_TIME
-      )
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCOMPLETE_TIME
     );
   }
 
@@ -244,21 +218,17 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
       envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_INCONSISTENT_TIME
-      )
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCONSISTENT_TIME
     );
 
     List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
       envWithFlexibleStopFromLineFile.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLineFile,
-        RULE_INCONSISTENT_TIME
-      )
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCONSISTENT_TIME
     );
   }
 
@@ -286,9 +256,7 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issues = validator.validate(
       netexTestEnvironment.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(issues, RULE_NON_INCREASING_TIME)
-    );
+    TestUtils.assertHasIssuesForRule(issues, RULE_NON_INCREASING_TIME);
   }
 
   @Test
@@ -326,33 +294,25 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
       envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_INCOMPLETE_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCOMPLETE_TIME
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_NON_INCREASING_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_NON_INCREASING_TIME
     );
 
     List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
       envWithFlexibleStopFromLineFile.getJaxbValidationContext()
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLineFile,
-        RULE_INCOMPLETE_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCOMPLETE_TIME
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLineFile,
-        RULE_NON_INCREASING_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_NON_INCREASING_TIME
     );
   }
 
@@ -415,33 +375,25 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
       envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_INCOMPLETE_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCOMPLETE_TIME
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_NON_INCREASING_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_NON_INCREASING_TIME
     );
 
     List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
       envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLineFile,
-        RULE_INCOMPLETE_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCOMPLETE_TIME
     );
-    Assertions.assertFalse(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLineFile,
-        RULE_NON_INCREASING_TIME
-      )
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_NON_INCREASING_TIME
     );
   }
 
@@ -505,21 +457,17 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
       envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_NON_INCREASING_TIME
-      )
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_NON_INCREASING_TIME
     );
 
     List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
       envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLineFile,
-        RULE_NON_INCREASING_TIME
-      )
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_NON_INCREASING_TIME
     );
   }
 
@@ -569,21 +517,17 @@ class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
     List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
       envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(
-        issuesWhenUsingSharedFile,
-        RULE_NON_INCREASING_TIME
-      )
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_NON_INCREASING_TIME
     );
 
     List<ValidationIssue> issuesWhenUsingLinefile = validator.validate(
       envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
     );
-    Assertions.assertTrue(
-      containsValidationIssuesForRule(
-        issuesWhenUsingLinefile,
-        RULE_NON_INCREASING_TIME
-      )
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingLinefile,
+      RULE_NON_INCREASING_TIME
     );
   }
 }
