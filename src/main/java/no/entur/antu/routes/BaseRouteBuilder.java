@@ -236,7 +236,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
         .getSubscriberStub(fromEndpoint)
     ) {
       subscriberStub.modifyAckDeadlineCallable().call(modifyAckDeadlineRequest);
-    } catch (IOException e) {
+    } catch (Exception e) {
       String correlation = simple(correlation(), String.class)
         .evaluate(exchange, String.class);
       log.warn("{} Ack deadline extension failed", correlation, e);
