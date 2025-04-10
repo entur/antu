@@ -11,11 +11,13 @@ public class RedisCommonDataRepository extends DefaultCommonDataRepository {
   public RedisCommonDataRepository(
     RedissonClient redissonClient,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
-    Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache
+    Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
+    Map<String, Map<String, String>> scheduledStopPointRefToFlexibleStopPointRefCache
   ) {
     super(
       scheduledStopPointAndQuayIdCache,
-      serviceLinksAndFromToScheduledStopPointIdCache
+      serviceLinksAndFromToScheduledStopPointIdCache,
+      scheduledStopPointRefToFlexibleStopPointRefCache
     );
     this.redissonClient = redissonClient;
   }

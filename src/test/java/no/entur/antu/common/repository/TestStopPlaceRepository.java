@@ -1,4 +1,4 @@
-package no.entur.antu.validation.validator.servicejourney.transportmode;
+package no.entur.antu.common.repository;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -17,7 +17,7 @@ import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.StopPlace;
 
-class TestStopPlaceRepository implements StopPlaceRepository {
+public class TestStopPlaceRepository implements StopPlaceRepository {
 
   private final Map<StopPlaceId, StopPlace> stopPlaces;
   private final Map<QuayId, Quay> quays;
@@ -57,7 +57,7 @@ class TestStopPlaceRepository implements StopPlaceRepository {
    * Return a stop place repository containing numStops stop places and numStops quays with transport mode/submode
    * bus/local bus
    */
-  static StopPlaceRepository ofLocalBusStops(int numStops) {
+  public static StopPlaceRepository ofLocalBusStops(int numStops) {
     return ofTransportMode(
       numStops,
       stopPlace ->
@@ -71,7 +71,7 @@ class TestStopPlaceRepository implements StopPlaceRepository {
    * Return a stop place repository containing numStops stop places and numStops quays with transport mode/submode
    * bus/rail replacement bus
    */
-  static StopPlaceRepository ofRailReplacementBusStops(int numStops) {
+  public static StopPlaceRepository ofRailReplacementBusStops(int numStops) {
     return ofTransportMode(
       numStops,
       stopPlace ->
@@ -86,7 +86,7 @@ class TestStopPlaceRepository implements StopPlaceRepository {
    * coach/national coach
    */
 
-  static StopPlaceRepository ofNationalCoachStops(int numStops) {
+  public static StopPlaceRepository ofNationalCoachStops(int numStops) {
     return ofTransportMode(
       numStops,
       stopPlace ->
@@ -100,7 +100,7 @@ class TestStopPlaceRepository implements StopPlaceRepository {
    * Return a stop place repository containing numStops stop places and numStops quays with transport mode/submode
    * rail/local
    */
-  static StopPlaceRepository ofLocalTrainStops(int numStops) {
+  public static StopPlaceRepository ofLocalTrainStops(int numStops) {
     return ofTransportMode(
       numStops,
       stopPlace ->
@@ -114,7 +114,9 @@ class TestStopPlaceRepository implements StopPlaceRepository {
    * Return a stop place repository containing numStops stop places and numStops quays where the transport modes and
    * submodes are missing
    */
-  static StopPlaceRepository ofMissingTransportModeAndSubMode(int numStops) {
+  public static StopPlaceRepository ofMissingTransportModeAndSubMode(
+    int numStops
+  ) {
     return ofTransportMode(numStops, Function.identity());
   }
 

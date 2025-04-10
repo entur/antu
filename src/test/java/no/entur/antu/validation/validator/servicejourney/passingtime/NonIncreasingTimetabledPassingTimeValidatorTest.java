@@ -1,502 +1,533 @@
 package no.entur.antu.validation.validator.servicejourney.passingtime;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeValidator.*;
 
-import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
+import no.entur.antu.common.netex.NetexTestDataSample;
+import no.entur.antu.common.netex.NetexTestEnvironment;
+import no.entur.antu.common.util.TestUtils;
 import no.entur.antu.validation.ValidationTest;
-import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.entur.netex.validation.validator.ValidationReport;
-import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex.validation.validator.ValidationIssue;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
+import org.rutebanken.netex.model.*;
 
 class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 
-  private ValidationReport runValidation(
-    NetexEntitiesIndex netexEntitiesIndex
+  private NetexTestEnvironment buildNetexTestEnvironment(
+    ServiceJourney serviceJourney,
+    JourneyPattern journeyPattern
   ) {
-    return runValidationOnLineFile(
-      netexEntitiesIndex,
-      NonIncreasingPassingTimeValidator.class
-    );
+    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment();
+    return netexTestEnvironment
+      .toBuilder()
+      .addServiceJourney(serviceJourney)
+      .addJourneyPattern(journeyPattern)
+      .build();
   }
 
-  private record Context(
-    NetexEntitiesTestFactory netexEntitiesTestFactory,
-    List<ScheduledStopPointRefStructure> scheduledStopPointRefs,
-    List<NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> stopPointInJourneyPatterns,
-    List<NetexEntitiesTestFactory.CreateTimetabledPassingTime> timetabledPassingTimes,
-    List<LocalTime> departureTimes
+  private NetexTestEnvironment addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+    NetexTestEnvironment netexTestEnvironment,
+    FlexibleStopPlace flexibleStopPlace
   ) {
-    private static final int numberOfStopPointsInJourneyPattern = 4;
+    return netexTestEnvironment
+      .toBuilder()
+      .addFlexibleStopPlaceToCommonDataRepository(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .build();
+  }
 
-    public static Context create() {
-      NetexEntitiesTestFactory netexEntitiesTestFactory =
-        new NetexEntitiesTestFactory();
+  private NetexTestEnvironment addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+    NetexTestEnvironment netexTestEnvironment,
+    FlexibleStopPlace flexibleStopPlace
+  ) {
+    return netexTestEnvironment
+      .toBuilder()
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .build();
+  }
 
-      NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-        netexEntitiesTestFactory.createJourneyPattern();
+  @Test
+  void testValidateServiceJourneyWithCompleteStopTimes() {
+    ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    NetexTestEnvironment netexTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
 
-      NetexEntitiesTestFactory.CreateServiceJourney createServiceJourney =
-        netexEntitiesTestFactory.createServiceJourney(createJourneyPattern);
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+    List<ValidationIssue> issues = validator.validate(
+      netexTestEnvironment.getJaxbValidationContext()
+    );
+    TestUtils.assertNoIssuesForRule(issues, RULE_INCOMPLETE_TIME);
+  }
 
-      List<ScheduledStopPointRefStructure> scheduledStopPointRefs = IntStream
-        .rangeClosed(1, numberOfStopPointsInJourneyPattern)
-        .mapToObj(NetexEntitiesTestFactory::createScheduledStopPointRef)
-        .toList();
+  @Test
+  void testValidateServiceJourneyWithIncompleteStopTimesForRegularStop() {
+    ServiceJourney serviceJourney =
+      NetexTestDataSample.serviceJourneyWithIncompletePassingTimesForRegularStop();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    NetexTestEnvironment netexTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
 
-      List<NetexEntitiesTestFactory.CreateStopPointInJourneyPattern> stopPointInJourneyPatterns =
-        IntStream
-          .rangeClosed(1, numberOfStopPointsInJourneyPattern)
-          .mapToObj(index ->
-            createJourneyPattern
-              .createStopPointInJourneyPattern(index)
-              .withScheduledStopPointRef(scheduledStopPointRefs.get(index - 1))
-          )
-          .toList();
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+    List<ValidationIssue> issues = validator.validate(
+      netexTestEnvironment.getJaxbValidationContext()
+    );
+    TestUtils.assertHasIssuesForRule(issues, RULE_INCOMPLETE_TIME);
+  }
 
-      List<LocalTime> departureTimes = IntStream
-        .rangeClosed(1, numberOfStopPointsInJourneyPattern)
-        .mapToObj(index -> LocalTime.of(5, index * 5))
-        .toList();
+  @Test
+  void testValidateServiceJourneyWithInconsistentStopTimesForRegularStop() {
+    ServiceJourney serviceJourney =
+      NetexTestDataSample.serviceJourneyWithInconsistentPassingTimesForRegularStop();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    NetexTestEnvironment netexTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
 
-      List<NetexEntitiesTestFactory.CreateTimetabledPassingTime> timetabledPassingTimes =
-        IntStream
-          .rangeClosed(1, numberOfStopPointsInJourneyPattern)
-          .mapToObj(index ->
-            createServiceJourney
-              .createTimetabledPassingTime(
-                index,
-                stopPointInJourneyPatterns.get(index - 1)
-              )
-              .withDepartureTime(departureTimes.get(index - 1))
-          )
-          .toList();
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+    List<ValidationIssue> issues = validator.validate(
+      netexTestEnvironment.getJaxbValidationContext()
+    );
+    TestUtils.assertHasIssuesForRule(issues, RULE_INCONSISTENT_TIME);
+  }
 
-      return new Context(
-        netexEntitiesTestFactory,
-        scheduledStopPointRefs,
-        stopPointInJourneyPatterns,
-        timetabledPassingTimes,
-        departureTimes
+  @Test
+  void testValidateServiceJourneyWithFlexibleStop() {
+    ServiceJourney serviceJourney =
+      NetexTestDataSample.serviceJourneyWithFlexibleTimetabledPassingTime();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    FlexibleStopPlace flexibleStopPlace =
+      NetexTestDataSample.defaultFlexibleStopPlace();
+
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+
+    NetexTestEnvironment envWithFlexibleStopFromSharedFile =
+      addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
       );
-    }
-  }
-
-  @Test
-  void testValidateServiceJourneyWithRegularStop() {
-    Context context = Context.create();
-
-    ValidationReport validationReport = runValidation(
-      context.netexEntitiesTestFactory.create()
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCOMPLETE_TIME
     );
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
-  }
-
-  @Test
-  void testValidateServiceJourneyWithRegularStopMissingTime() {
-    Context context = Context.create();
-
-    // remove arrival time and departure time for the first passing time
-    context.timetabledPassingTimes
-      .get(0)
-      .withDepartureTime(null)
-      .withArrivalTime(null);
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(0))
+    NetexTestEnvironment envWithFlexibleStopFromLineFile =
+      addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopFromLineFile.getJaxbValidationContext()
     );
-
-    ValidationReport validationReport = runValidation(
-      context.netexEntitiesTestFactory.create()
-    );
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
-        ),
-      is(true)
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCOMPLETE_TIME
     );
   }
 
   @Test
-  void testValidateServiceJourneyWithRegularStopInconsistentTime() {
-    Context context = Context.create();
+  void testValidateServiceJourneyWithIncompletePassingTimeForFlexibleStop() {
+    ServiceJourney serviceJourney =
+      NetexTestDataSample.serviceJourneyWithIncompletePassingTimeForFlexibleStop();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    FlexibleStopPlace flexibleStopPlace =
+      NetexTestDataSample.defaultFlexibleStopPlace();
 
-    NetexEntitiesTestFactory.CreateTimetabledPassingTime firstTimetabledPassingTime =
-      context.timetabledPassingTimes.get(0);
-    // set arrival time after departure time for the first passing time
-    firstTimetabledPassingTime.withArrivalTime(
-      context.departureTimes.get(0).plusMinutes(1)
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopFromSharedFile =
+      addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
+    NetexTestEnvironment envWithFlexibleStopFromLineFile =
+      addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
+
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
+    );
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCOMPLETE_TIME
     );
 
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(0))
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopFromLineFile.getJaxbValidationContext()
     );
-
-    ValidationReport validationReport = runValidation(
-      context.netexEntitiesTestFactory.create()
-    );
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_INCONSISTENT_TIME.name()
-        ),
-      is(true)
-    );
-  }
-
-  @Test
-  void testValidateServiceJourneyWithAreaStop() {
-    Context context = Context.create();
-    // remove arrival time and departure time and add flex window
-    context.timetabledPassingTimes
-      .get(0)
-      .withDepartureTime(null)
-      .withArrivalTime(null)
-      .withEarliestDepartureTime(LocalTime.MIDNIGHT)
-      .withLatestArrivalTime(LocalTime.MIDNIGHT.plusMinutes(1));
-
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
-
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(0).getRef(), "");
-
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
-  }
-
-  @Test
-  void testValidateServiceJourneyWithAreaStopMissingTimeWindow() {
-    Context context = Context.create();
-    // remove arrival time and departure time and add flex window
-    context.timetabledPassingTimes
-      .get(0)
-      .withDepartureTime(null)
-      .withArrivalTime(null);
-
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
-
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(0).getRef(), "");
-
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(0))
-    );
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
-        ),
-      is(true)
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCOMPLETE_TIME
     );
   }
 
   @Test
-  void testValidateServiceJourneyWithAreaStopInconsistentTimeWindow() {
-    Context context = Context.create();
-    // remove arrival time and departure time and add flex window
-    context.timetabledPassingTimes
-      .get(0)
-      .withDepartureTime(null)
-      .withArrivalTime(null)
-      .withEarliestDepartureTime(LocalTime.MIDNIGHT.plusMinutes(1))
-      .withLatestArrivalTime(LocalTime.MIDNIGHT);
+  void testValidateServiceJourneyWithInconsistentPassingTimeForFlexibleStop() {
+    ServiceJourney serviceJourney =
+      NetexTestDataSample.serviceJourneyWithInconsistentPassingTimeForFlexibleStop();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    FlexibleStopPlace flexibleStopPlace =
+      NetexTestDataSample.defaultFlexibleStopPlace();
 
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
-
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(0).getRef(), "");
-
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(0))
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
     );
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
+    NetexTestEnvironment envWithFlexibleStopFromSharedFile =
+      addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
+    NetexTestEnvironment envWithFlexibleStopFromLineFile =
+      addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_INCONSISTENT_TIME.name()
-        ),
-      is(true)
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
+    );
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCONSISTENT_TIME
+    );
+
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopFromLineFile.getJaxbValidationContext()
+    );
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCONSISTENT_TIME
     );
   }
 
   @Test
   void testValidateServiceJourneyWithRegularStopFollowedByRegularStopNonIncreasingTime() {
-    Context context = Context.create();
-    // remove arrival time and departure time and add flex window on second stop
-    context.timetabledPassingTimes
-      .get(1)
-      .withArrivalTime(context.departureTimes.get(0).minusMinutes(1));
+    ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
 
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(0))
-    );
-    ValidationReport validationReport = runValidation(
-      context.netexEntitiesTestFactory.create()
+    TimetabledPassingTime firstPassingTime =
+      NetexTestDataSample.getFirstPassingTime(serviceJourney);
+    TimetabledPassingTime secondPassingTime =
+      NetexTestDataSample.getSecondPassingTime(serviceJourney);
+    secondPassingTime.withArrivalTime(
+      firstPassingTime.getDepartureTime().minusMinutes(1)
     );
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_NON_INCREASING_TIME.name()
-        ),
-      is(true)
+    NetexTestEnvironment netexTestEnvironment = new NetexTestEnvironment()
+      .toBuilder()
+      .addServiceJourney(serviceJourney)
+      .addJourneyPattern(journeyPattern)
+      .build();
+
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+    List<ValidationIssue> issues = validator.validate(
+      netexTestEnvironment.getJaxbValidationContext()
     );
-  }
-
-  /**
-   * This test makes sure all passing times are complete and consistent, before it checks for
-   * increasing times.
-   */
-  @Test
-  void testValidateWithRegularStopFollowedByRegularStopWithMissingTime() {
-    Context context = Context.create();
-    // Set arrivalTime AFTER departure time (not valid)
-    context.timetabledPassingTimes
-      .get(1)
-      .withArrivalTime(null)
-      .withDepartureTime(null);
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(1))
-    );
-
-    ValidationReport validationReport = runValidation(
-      context.netexEntitiesTestFactory.create()
-    );
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
-        ),
-      is(true)
-    );
-  }
-
-  @Test
-  void testValidateServiceJourneyWithRegularStopFollowedByStopArea() {
-    Context context = Context.create();
-
-    // remove arrival time and departure time and add flex window on second stop
-    context.timetabledPassingTimes
-      .get(1)
-      .withDepartureTime(null)
-      .withArrivalTime(null)
-      .withEarliestDepartureTime(context.departureTimes().get(1))
-      .withLatestArrivalTime(context.departureTimes().get(1).plusMinutes(1));
-
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
-
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(1).getRef(), "");
-
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
-  }
-
-  @Test
-  void testValidateServiceJourneyWithRegularStopFollowedByStopAreaNonIncreasingTime() {
-    Context context = Context.create();
-    // remove arrival time and departure time and add flex window with decreasing time on second stop
-    context.timetabledPassingTimes
-      .get(1)
-      .withEarliestDepartureTime(context.departureTimes.get(0).minusMinutes(1))
-      .withArrivalTime(null)
-      .withDepartureTime(null);
-
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
-
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(0).getRef(), "");
-
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(0))
-    );
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
-        ),
-      is(true)
-    );
+    TestUtils.assertHasIssuesForRule(issues, RULE_NON_INCREASING_TIME);
   }
 
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByRegularStop() {
-    Context context = Context.create();
+    ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    FlexibleStopPlace flexibleStopPlace =
+      NetexTestDataSample.defaultFlexibleStopPlace();
 
-    // remove arrival time and departure time and add flex window on first stop
-    context.timetabledPassingTimes
-      .get(0)
-      .withEarliestDepartureTime(context.departureTimes.get(0))
-      .withLatestArrivalTime(context.departureTimes.get(0))
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopFromSharedFile =
+      addFlexStopPlaceFromSharedFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
+    NetexTestEnvironment envWithFlexibleStopFromLineFile =
+      addFlexStopPlaceFromLineFileToNetexTestEnvironment(
+        baseTestEnvironment,
+        flexibleStopPlace
+      );
+
+    TimetabledPassingTime firstPassingTime =
+      NetexTestDataSample.getFirstPassingTime(serviceJourney);
+    firstPassingTime
+      .withLatestArrivalTime(firstPassingTime.getDepartureTime())
+      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
       .withArrivalTime(null)
       .withDepartureTime(null);
 
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopFromSharedFile.getJaxbValidationContext()
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCOMPLETE_TIME
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_NON_INCREASING_TIME
+    );
 
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(0).getRef(), "");
-
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopFromLineFile.getJaxbValidationContext()
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCOMPLETE_TIME
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_NON_INCREASING_TIME
+    );
   }
 
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByStopArea() {
-    Context context = Context.create();
-    context.timetabledPassingTimes
-      .get(0)
-      .withEarliestDepartureTime(context.departureTimes.get(0))
-      .withLatestArrivalTime(context.departureTimes.get(0))
+    ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    FlexibleStopPlace flexibleStopPlace =
+      NetexTestDataSample.defaultFlexibleStopPlace();
+
+    NetexTestEnvironment baseTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopsFromSharedFile =
+      baseTestEnvironment
+        .toBuilder()
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:1",
+          flexibleStopPlace
+        )
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:2",
+          flexibleStopPlace
+        )
+        .build();
+    NetexTestEnvironment envWithFlexibleStopsFromLineFile = baseTestEnvironment
+      .toBuilder()
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
+        "RUT:ScheduledStopPoint:2",
+        flexibleStopPlace
+      )
+      .build();
+
+    TimetabledPassingTime firstPassingTime =
+      NetexTestDataSample.getFirstPassingTime(serviceJourney);
+    firstPassingTime
+      .withLatestArrivalTime(firstPassingTime.getDepartureTime())
+      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
       .withArrivalTime(null)
       .withDepartureTime(null);
 
-    context.timetabledPassingTimes
-      .get(1)
-      .withEarliestDepartureTime(context.departureTimes.get(1))
-      .withLatestArrivalTime(context.departureTimes.get(1).plusMinutes(1))
+    TimetabledPassingTime secondPassingTime =
+      NetexTestDataSample.getSecondPassingTime(serviceJourney);
+    secondPassingTime
+      .withLatestArrivalTime(secondPassingTime.getDepartureTime())
+      .withEarliestDepartureTime(
+        secondPassingTime.getDepartureTime().plusMinutes(1)
+      )
       .withArrivalTime(null)
       .withDepartureTime(null);
 
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
 
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(0).getRef(), "");
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_INCOMPLETE_TIME
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_NON_INCREASING_TIME
+    );
 
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(1).getRef(), "");
-
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
-
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_INCOMPLETE_TIME
+    );
+    TestUtils.assertNoIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_NON_INCREASING_TIME
+    );
   }
 
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByStopAreaNonIncreasingTime() {
-    Context context = Context.create();
-    // remove arrival time and departure time and add flex window on first stop and second stop
-    // and add decreasing time on second stop
-    context.timetabledPassingTimes
-      .get(0)
-      .withEarliestDepartureTime(context.departureTimes.get(0))
-      .withLatestArrivalTime(context.departureTimes.get(0))
-      .withArrivalTime(null)
-      .withDepartureTime(null);
+    ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    FlexibleStopPlace flexibleStopPlace =
+      NetexTestDataSample.defaultFlexibleStopPlace();
 
-    context.timetabledPassingTimes
-      .get(1)
-      .withEarliestDepartureTime(context.departureTimes.get(1).minusMinutes(1))
-      .withLatestArrivalTime(context.departureTimes.get(1).plusMinutes(1))
-      .withArrivalTime(null)
-      .withDepartureTime(null);
-
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
-
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(0).getRef(), "");
-
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(0))
+    NetexTestEnvironment netexTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
     );
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
+    NetexTestEnvironment envWithFlexibleStopsFromSharedFile =
+      netexTestEnvironment
+        .toBuilder()
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:1",
+          flexibleStopPlace
+        )
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:2",
+          flexibleStopPlace
+        )
+        .build();
+    NetexTestEnvironment envWithFlexibleStopsFromLineFile = netexTestEnvironment
+      .toBuilder()
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
+        "RUT:ScheduledStopPoint:2",
+        flexibleStopPlace
+      )
+      .build();
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_INCOMPLETE_TIME.name()
-        ),
-      is(true)
+    TimetabledPassingTime firstPassingTime =
+      NetexTestDataSample.getFirstPassingTime(serviceJourney);
+    firstPassingTime
+      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
+      .withLatestArrivalTime(firstPassingTime.getDepartureTime())
+      .withArrivalTime(null)
+      .withDepartureTime(null);
+    TimetabledPassingTime secondPassingTime =
+      NetexTestDataSample.getSecondPassingTime(serviceJourney);
+    secondPassingTime
+      .withEarliestDepartureTime(
+        firstPassingTime.getEarliestDepartureTime().minusMinutes(1)
+      )
+      .withLatestArrivalTime(
+        secondPassingTime.getEarliestDepartureTime().plusMinutes(1)
+      )
+      .withArrivalTime(null)
+      .withDepartureTime(null);
+
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
+
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
+    );
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_NON_INCREASING_TIME
+    );
+
+    List<ValidationIssue> issuesWhenUsingLineFile = validator.validate(
+      envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
+    );
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingLineFile,
+      RULE_NON_INCREASING_TIME
     );
   }
 
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByRegularStopNonIncreasingTime() {
-    Context context = Context.create();
+    ServiceJourney serviceJourney = NetexTestDataSample.defaultServiceJourney();
+    JourneyPattern journeyPattern = NetexTestDataSample.defaultJourneyPattern();
+    FlexibleStopPlace flexibleStopPlace =
+      NetexTestDataSample.defaultFlexibleStopPlace();
 
-    // remove arrival time and departure time and add flex window on first stop
-    // and add decreasing time on second stop
+    NetexTestEnvironment netexTestEnvironment = buildNetexTestEnvironment(
+      serviceJourney,
+      journeyPattern
+    );
+    NetexTestEnvironment envWithFlexibleStopsFromSharedFile =
+      netexTestEnvironment
+        .toBuilder()
+        .addFlexibleStopPlaceToCommonDataRepository(
+          "RUT:ScheduledStopPoint:1",
+          flexibleStopPlace
+        )
+        .build();
+    NetexTestEnvironment envWithFlexibleStopsFromLineFile = netexTestEnvironment
+      .toBuilder()
+      .addFlexibleStopPlaceToNetexEntitiesIndex(
+        "RUT:ScheduledStopPoint:1",
+        flexibleStopPlace
+      )
+      .build();
 
-    context.timetabledPassingTimes
-      .get(0)
-      .withEarliestDepartureTime(context.departureTimes.get(0))
-      .withLatestArrivalTime(context.departureTimes.get(0))
+    TimetabledPassingTime firstPassingTime =
+      NetexTestDataSample.getFirstPassingTime(serviceJourney);
+    firstPassingTime
+      .withEarliestDepartureTime(firstPassingTime.getDepartureTime())
+      .withLatestArrivalTime(firstPassingTime.getDepartureTime())
       .withArrivalTime(null)
       .withDepartureTime(null);
-
-    context.timetabledPassingTimes
-      .get(1)
-      .withArrivalTime(context.departureTimes.get(0).minusMinutes(1))
+    TimetabledPassingTime secondPassingTime =
+      NetexTestDataSample.getSecondPassingTime(serviceJourney);
+    secondPassingTime
+      .withArrivalTime(firstPassingTime.getLatestArrivalTime().minusMinutes(1))
       .withDepartureTime(null);
 
-    NetexEntitiesIndex netexEntitiesIndex =
-      context.netexEntitiesTestFactory.create();
+    NonIncreasingPassingTimeValidator validator =
+      new NonIncreasingPassingTimeValidator();
 
-    netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .put(context.scheduledStopPointRefs.get(0).getRef(), "");
-
-    mockGetStopName(
-      ScheduledStopPointId.of(context.scheduledStopPointRefs.get(0))
+    List<ValidationIssue> issuesWhenUsingSharedFile = validator.validate(
+      envWithFlexibleStopsFromSharedFile.getJaxbValidationContext()
     );
-    ValidationReport validationReport = runValidation(netexEntitiesIndex);
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingSharedFile,
+      RULE_NON_INCREASING_TIME
+    );
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(1));
-    assertThat(
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .containsKey(
-          NonIncreasingPassingTimeValidator.RULE_NON_INCREASING_TIME.name()
-        ),
-      is(true)
+    List<ValidationIssue> issuesWhenUsingLinefile = validator.validate(
+      envWithFlexibleStopsFromLineFile.getJaxbValidationContext()
+    );
+    TestUtils.assertHasIssuesForRule(
+      issuesWhenUsingLinefile,
+      RULE_NON_INCREASING_TIME
     );
   }
 }

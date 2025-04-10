@@ -76,10 +76,10 @@ public final class SortStopTimesUtil {
           ),
           timetabledPassingTime,
           hasFlexibleStopPoint(
-            validationContext.getNetexEntitiesIndex(),
-            scheduledStopPointIdByStopPointId.get(
-              NetexUtils.stopPointRef(timetabledPassingTime)
-            )
+            scheduledStopPointIdByStopPointId
+              .get(NetexUtils.stopPointRef(timetabledPassingTime))
+              .id(),
+            validationContext
           )
         )
       )
@@ -111,11 +111,14 @@ public final class SortStopTimesUtil {
   }
 
   private static boolean hasFlexibleStopPoint(
-    NetexEntitiesIndex netexEntitiesIndex,
-    ScheduledStopPointId scheduledStopPointId
+    String scheduledStopPointId,
+    JAXBValidationContext validationContext
   ) {
-    return netexEntitiesIndex
-      .getFlexibleStopPlaceIdByStopPointRefIndex()
-      .containsKey(scheduledStopPointId.id());
+    return (
+      validationContext.flexibleStopPlaceRefFromScheduledStopPointRef(
+        scheduledStopPointId
+      ) !=
+      null
+    );
   }
 }

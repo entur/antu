@@ -37,6 +37,8 @@ public class CacheConfig {
     "scheduledStopPointAndQuayIdCache";
   public static final String SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE =
     "serviceLinksAndFromToScheduledStopPointIdCache";
+  public static final String SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE =
+    "scheduledStopPointRefToFlexibleStopPointRefCache";
   public static final String LINE_INFO_CACHE = "linesInfoCache";
   public static final String SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE =
     "serviceJourneyInterchangeInfoCache";
@@ -141,6 +143,22 @@ public class CacheConfig {
     return getOrCreateReportScopedCache(
       redissonClient,
       SERVICE_LINKS_AND_SCHEDULED_STOP_POINT_IDS_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+    );
+  }
+
+  /**
+   * Holds mapping from scheduled stop place refs to flexible stop place refs.
+   * The cache is report-scoped.
+   * The cache key is the current validation report.
+   */
+  @Bean(name = SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE)
+  public Map<String, Map<String, String>> scheduledStopPointRefToFlexibleStopPointRefCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE,
       new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
     );
   }
