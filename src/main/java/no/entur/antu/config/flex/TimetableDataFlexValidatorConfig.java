@@ -27,6 +27,9 @@ import no.entur.antu.validation.flex.validator.flexiblearea.InvalidFlexibleAreaV
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeValidator;
 import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportModeSubModeValidator;
+import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
+import org.entur.netex.validation.configuration.ValidationConfigLoader;
+import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReportEntryFactory;
 import org.entur.netex.validation.validator.XPathValidator;
@@ -44,6 +47,7 @@ import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -60,6 +64,29 @@ public class TimetableDataFlexValidatorConfig {
     return new EnturFlexTimetableDataValidationTreeFactory(
       organisationRepository
     );
+  }
+
+  @Bean
+  public ValidationConfigLoader flexValidationConfigLoader(
+    @Value(
+      "${antu.netex.validation.configuration.file:configuration.antu.yaml}"
+    ) String antuConfigurationFile,
+    @Value(
+      "${antu.netex.validation.configuration.file.flex:configuration.antu.flex.yaml}"
+    ) String flexConfigurationFile
+  ) {
+    return new DefaultValidationConfigLoader(
+      List.of(antuConfigurationFile, flexConfigurationFile)
+    );
+  }
+
+  @Bean
+  public ValidationReportEntryFactory flexValidationReportEntryFactory(
+    @Qualifier(
+      "flexValidationConfigLoader"
+    ) ValidationConfigLoader validationConfigLoader
+  ) {
+    return new DefaultValidationEntryFactory(validationConfigLoader);
   }
 
   @Bean
@@ -163,7 +190,7 @@ public class TimetableDataFlexValidatorConfig {
   @Bean
   public NetexValidatorsRunner flexTimetableDataValidatorsRunner(
     @Qualifier(
-      "validationReportEntryFactory"
+      "flexValidationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     NetexSchemaValidator netexSchemaValidator,
     List<XPathValidator> flexTimetableDataXPathValidators,
