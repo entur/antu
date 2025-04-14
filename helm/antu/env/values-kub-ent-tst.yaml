@@ -40,9 +40,3 @@ horizontalPodAutoscaler:
   project: ent-antu-tst
 
 stopplaceRegistryUrl: https://api.staging.entur.io/stop-places/v1/read
-
-resources:
-  memLimit: 6000Mi
-  cpuRequest: "2"
-  memRequest: 5000Mi
-  xmx: 5000m
