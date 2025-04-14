@@ -42,7 +42,6 @@ horizontalPodAutoscaler:
 stopplaceRegistryUrl: https://api.staging.entur.io/stop-places/v1/read
 
 resources:
-  cpuLimit: "3"
   memLimit: 6000Mi
   cpuRequest: "2"
   memRequest: 5000Mi
