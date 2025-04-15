@@ -120,7 +120,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .routeId("validate-netex");
 
     from("direct:runNetexValidators")
-      .streamCaching()
+      .streamCache("true")
       .log(
         LoggingLevel.DEBUG,
         correlation() +
