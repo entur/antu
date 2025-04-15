@@ -36,7 +36,7 @@ public class EnturTimetableDataValidationTreeFactory
     rootValidationTreeBuilder().withRule(new ValidateAllowedCodespaces());
     // Disabling check of duplicate DatedServiceJourney with different versions (slow test)
     timetableFrameValidationTreeBuilder()
-      .removeRule(
+      .removeRuleForLineFile(
         DefaultTimetableFrameValidationTreeFactory.CODE_DATED_SERVICE_JOURNEY_4
       );
     // No boarding at last stop point in journey pattern
