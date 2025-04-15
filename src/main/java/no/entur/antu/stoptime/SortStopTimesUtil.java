@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.entur.antu.validation.validator.support.NetexUtils;
-import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.EntityStructure;
