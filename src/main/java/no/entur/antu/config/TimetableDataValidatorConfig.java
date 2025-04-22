@@ -33,6 +33,7 @@ import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.S
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoints.SameStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount.StopPointsCountValidator;
 import no.entur.antu.validation.validator.line.DuplicateLineNameValidator;
+import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import no.entur.antu.validation.validator.passengerstopassignment.MissingPassengerStopAssignmentValidator;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeValidator;
 import no.entur.antu.validation.validator.servicejourney.servicealteration.InvalidServiceAlterationValidator;
@@ -42,6 +43,7 @@ import no.entur.antu.validation.validator.servicejourney.transportmode.Mismatche
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
+import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.NetexReferenceValidator;
@@ -66,9 +68,10 @@ public class TimetableDataValidatorConfig {
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(
-    OrganisationRepository organisationRepository
+    OrganisationRepository organisationRepository,
+    OrganisationAliasRepository organisationAliasRepository
   ) {
-    return new EnturTimetableDataValidationTreeFactory(organisationRepository);
+    return new EnturTimetableDataValidationTreeFactory(organisationRepository, organisationAliasRepository);
   }
 
   @Bean
@@ -130,8 +133,7 @@ public class TimetableDataValidatorConfig {
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
     CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
-    StopPlaceRepository stopPlaceRepository
-  ) {
+    StopPlaceRepository stopPlaceRepository) {
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
 
     List<XPathValidator> xPathValidators = List.of(

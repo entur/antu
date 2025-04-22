@@ -78,4 +78,25 @@ public class OAuth2Config {
       .baseUrl(organisationRegistryUrl)
       .build();
   }
+
+  @Bean("agreementRegistryWebClient")
+  @Profile("!test")
+  WebClient agreementRegistryWebClient(
+          WebClient.Builder webClientBuilder,
+          OAuth2ClientProperties properties,
+          @Value("${orgregister.oauth2.client.audience}") String audience,
+          ClientHttpConnector clientHttpConnector,
+          @Value("${antu.agreement.registry.url}") String organisationRegistryUrl
+  ) {
+    return new AuthorizedWebClientBuilder(webClientBuilder)
+            .withOAuth2ClientProperties(properties)
+            .withAudience(audience)
+            .withClientRegistrationId("orgregister")
+            .build()
+            .mutate()
+            .clientConnector(clientHttpConnector)
+            .defaultHeader("Et-Client-Name", "entur-antu")
+            .baseUrl(organisationRegistryUrl)
+            .build();
+  }
 }

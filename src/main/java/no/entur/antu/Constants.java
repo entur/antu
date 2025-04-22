@@ -54,6 +54,8 @@ public final class Constants {
     "REFRESH_STOP_PLACE_CACHE";
   public static final String JOB_TYPE_REFRESH_ORGANISATION_CACHE =
     "REFRESH_ORGANISATION_CACHE";
+  public static final String JOB_TYPE_REFRESH_ORGANISATION_ALIAS_CACHE =
+          "REFRESH_ORGANISATION_ALIAS_CACHE";
 
   public static final String STATUS_VALIDATION_STARTED = "started";
   public static final String STATUS_VALIDATION_OK = "ok";

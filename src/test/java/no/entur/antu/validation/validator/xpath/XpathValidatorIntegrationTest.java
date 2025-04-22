@@ -10,7 +10,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.organisation.OrganisationRepository;
+import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
+import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
@@ -31,8 +33,10 @@ class XpathValidatorIntegrationTest {
       new SimpleOrganisationRepository(
         Map.of(TEST_CODESPACE, Set.of("FLB:Authority:XXX", "FLB:Authority:YYY"))
       );
+    OrganisationAliasRepository stubOrganisationAliasRepository =
+            new SimpleOrganisationAliasRepository();
     ValidationTreeFactory validationTreeFactory =
-      new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository);
+      new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository, stubOrganisationAliasRepository);
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     XPathRuleValidator xPathValidator = new XPathRuleValidator(
       validationTreeFactory

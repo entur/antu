@@ -2,6 +2,7 @@ package no.entur.antu.common.repository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
@@ -77,6 +78,11 @@ public class TestCommonDataRepository implements CommonDataRepository {
   ) {
     return this.flexibleStopPlaceRefByStopPointRef.get(VALIDATION_REPORT_KEY)
       .get(stopPointRef);
+  }
+
+  @Override
+  public Set<String> authorityRefs(String validationReportId) {
+    return Set.of();
   }
 
   public HashMap<String, String> getFlexibleStopPlaceRefByStopPointRef() {

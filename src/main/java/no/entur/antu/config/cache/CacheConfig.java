@@ -45,6 +45,7 @@ public class CacheConfig {
   public static final String SERVICE_JOURNEY_STOPS_CACHE =
     "serviceJourneyStopsCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
+  public static final String AUTHORITY_REF_CACHE = "authorityRefCache";
 
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
@@ -161,6 +162,12 @@ public class CacheConfig {
       SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE,
       new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
     );
+  }
+
+  @Bean(name = AUTHORITY_REF_CACHE)
+  public Set<String> authorityRefCache(RedissonClient redissonClient) {
+//    getOrCreateApplicationScopedCache(redissonClient, AUTHORITY_REF_CACHE, DEFAULT_CODEC);
+    return redissonClient.getSet(AUTHORITY_REF_CACHE);
   }
 
   /**

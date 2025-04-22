@@ -1,6 +1,8 @@
 package no.entur.antu.netexdata;
 
 import java.util.Map;
+import java.util.Set;
+
 import org.entur.netex.validation.validator.jaxb.DefaultCommonDataRepository;
 import org.redisson.api.RedissonClient;
 
@@ -12,12 +14,14 @@ public class RedisCommonDataRepository extends DefaultCommonDataRepository {
     RedissonClient redissonClient,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
-    Map<String, Map<String, String>> scheduledStopPointRefToFlexibleStopPointRefCache
+    Map<String, Map<String, String>> scheduledStopPointRefToFlexibleStopPointRefCache,
+    Map<String, Set<String>> authorityRefsCache
   ) {
     super(
       scheduledStopPointAndQuayIdCache,
       serviceLinksAndFromToScheduledStopPointIdCache,
-      scheduledStopPointRefToFlexibleStopPointRefCache
+      scheduledStopPointRefToFlexibleStopPointRefCache,
+      authorityRefsCache
     );
     this.redissonClient = redissonClient;
   }

@@ -4,8 +4,10 @@ import java.util.Objects;
 import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoAlightingAtFirstStopPoint;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoBoardingAtLastStopPoint;
+import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
+import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.xpath.tree.DefaultTimetableFrameValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.tree.PublicationDeliveryValidationTreeFactory;
@@ -18,12 +20,15 @@ public class EnturTimetableDataValidationTreeFactory
   extends PublicationDeliveryValidationTreeFactory {
 
   private final OrganisationRepository organisationRepository;
+  private final OrganisationAliasRepository organisationAliasRepository;
 
   public EnturTimetableDataValidationTreeFactory(
-    OrganisationRepository organisationRepository
+    OrganisationRepository organisationRepository,
+    OrganisationAliasRepository organisationAliasRepository
   ) {
     this.organisationRepository =
       Objects.requireNonNull(organisationRepository);
+    this.organisationAliasRepository = organisationAliasRepository;
   }
 
   @Override
@@ -31,6 +36,8 @@ public class EnturTimetableDataValidationTreeFactory
     // Validation against the Norwegian organisation register
     resourceFrameValidationTreeBuilder()
       .withRule(new ValidateAuthorityId(organisationRepository));
+    serviceFrameValidationTreeBuilder()
+      .withRule(new ValidateAuthorityRef(organisationAliasRepository));
     // Validation against Norwegian codespaces
     compositeFrameValidationTreeBuilder().withRule(new ValidateNSRCodespace());
     rootValidationTreeBuilder().withRule(new ValidateAllowedCodespaces());
