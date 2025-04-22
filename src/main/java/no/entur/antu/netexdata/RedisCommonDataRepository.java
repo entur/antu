@@ -14,14 +14,12 @@ public class RedisCommonDataRepository extends DefaultCommonDataRepository {
     RedissonClient redissonClient,
     Map<String, Map<String, String>> scheduledStopPointAndQuayIdCache,
     Map<String, Map<String, String>> serviceLinksAndFromToScheduledStopPointIdCache,
-    Map<String, Map<String, String>> scheduledStopPointRefToFlexibleStopPointRefCache,
-    Map<String, Set<String>> authorityRefsCache
+    Map<String, Map<String, String>> scheduledStopPointRefToFlexibleStopPointRefCache
   ) {
     super(
       scheduledStopPointAndQuayIdCache,
       serviceLinksAndFromToScheduledStopPointIdCache,
-      scheduledStopPointRefToFlexibleStopPointRefCache,
-      authorityRefsCache
+      scheduledStopPointRefToFlexibleStopPointRefCache
     );
     this.redissonClient = redissonClient;
   }

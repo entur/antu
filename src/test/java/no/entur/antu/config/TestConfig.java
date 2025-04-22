@@ -81,11 +81,6 @@ public class TestConfig {
     }
 
     @Override
-    public Set<String> authorityRefs(String validationReportId) {
-      return Set.of();
-    }
-
-    @Override
     public void collect(
       String validationReportId,
       NetexEntitiesIndex netexEntitiesIndex

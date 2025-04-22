@@ -80,11 +80,6 @@ public class TestCommonDataRepository implements CommonDataRepository {
       .get(stopPointRef);
   }
 
-  @Override
-  public Set<String> authorityRefs(String validationReportId) {
-    return Set.of();
-  }
-
   public HashMap<String, String> getFlexibleStopPlaceRefByStopPointRef() {
     return this.flexibleStopPlaceRefByStopPointRef.get(VALIDATION_REPORT_KEY);
   }
