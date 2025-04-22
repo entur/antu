@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 
 class AgreementResourceTest {
 
@@ -39,7 +40,7 @@ class AgreementResourceTest {
             String mockedResponseBody = mockResponseBody();
             WebClient webClient = mockWebClient(HttpStatus.OK, mockedResponseBody);
             AgreementResource agreementResource = new AgreementResource(webClient);
-            List<String> organisationAliases = agreementResource.getOrganisationAliases();
+            Set<String> organisationAliases = agreementResource.getOrganisationAliases();
             Assertions.assertTrue(
                     organisationAliases.containsAll(
                             List.of(

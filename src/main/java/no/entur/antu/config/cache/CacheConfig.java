@@ -164,9 +164,12 @@ public class CacheConfig {
     );
   }
 
+  /**
+   * Distributed cache of organisation IDs as provided by agreement registry.
+   * The cache is refreshed periodically.
+   */
   @Bean(name = AUTHORITY_REF_CACHE)
   public Set<String> authorityRefCache(RedissonClient redissonClient) {
-//    getOrCreateApplicationScopedCache(redissonClient, AUTHORITY_REF_CACHE, DEFAULT_CODEC);
     return redissonClient.getSet(AUTHORITY_REF_CACHE);
   }
 

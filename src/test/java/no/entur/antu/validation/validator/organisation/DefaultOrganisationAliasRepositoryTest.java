@@ -45,7 +45,7 @@ class DefaultOrganisationAliasRepositoryTest {
         HashSet<String> refreshedOrganisationIds = new HashSet<>();
         refreshedOrganisationIds.add("TestOrg2");
         refreshedOrganisationIds.add("TestOrg3");
-        Mockito.when(agreementResource.getOrganisationAliases()).thenReturn(refreshedOrganisationIds.stream().toList());
+        Mockito.when(agreementResource.getOrganisationAliases()).thenReturn(refreshedOrganisationIds);
 
         repository.refreshCache();
         Assertions.assertFalse(repository.hasOrganisationWithAlias("TestOrg1"));

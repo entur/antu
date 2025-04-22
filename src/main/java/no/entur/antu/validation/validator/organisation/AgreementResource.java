@@ -10,7 +10,9 @@ import reactor.util.retry.Retry;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class AgreementResource {
     private static final long MAX_RETRY_ATTEMPTS = 3;
@@ -23,7 +25,7 @@ public class AgreementResource {
         this.webClient = agreementRegistryWebClient.mutate().build();
     }
 
-    public List<String> getOrganisationAliases() {
+    public Set<String> getOrganisationAliases() {
         return webClient
                 .get()
                 .uri("/adapter/transmodel/ids")
@@ -39,8 +41,7 @@ public class AgreementResource {
                     aliases.addAll(agreement.getRoleIds());
                     return aliases;
                 })
-                .collectList()
-                .block();
+                .collect(Collectors.toSet()).block();
     }
 
     protected static final Predicate<Throwable> is5xx = throwable ->
