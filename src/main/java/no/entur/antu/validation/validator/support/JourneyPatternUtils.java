@@ -6,8 +6,12 @@ import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JourneyPatternUtils {
+
+  static Logger log = LoggerFactory.getLogger(JourneyPatternUtils.class);
 
   private JourneyPatternUtils() {}
 
@@ -21,6 +25,10 @@ public class JourneyPatternUtils {
       .getRef();
 
     if (scheduledStopPointRef == null) {
+      log.warn(
+        "Scheduled stop point ref is null for stop point {}",
+        stopPointInJourneyPattern.getId()
+      );
       return null;
     }
 
@@ -33,13 +41,21 @@ public class JourneyPatternUtils {
     );
 
     if (quayId == null) {
+      log.warn(
+        "Quay ID not found for scheduled stop point id {}",
+        scheduledStopPointId
+      );
       return null;
     }
 
     QuayCoordinates coordinatesForQuayId =
       validationContext.coordinatesForQuayId(quayId);
-    return coordinatesForQuayId == null
-      ? null
-      : Map.entry(scheduledStopPointId, coordinatesForQuayId);
+
+    if (coordinatesForQuayId == null) {
+      log.warn("Quay coordinates not found for quay id {}", quayId);
+      return null;
+    }
+
+    return Map.entry(scheduledStopPointId, coordinatesForQuayId);
   }
 }
