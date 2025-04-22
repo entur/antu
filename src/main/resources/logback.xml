@@ -16,11 +16,6 @@
   -->
 
 <configuration>
-    <if condition='property("env").contains("dev")'>
-    <then>
-        <include resource="org/springframework/boot/logging/logback/base.xml" />
-    </then>
-    <else>
         <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
                 <providers>
@@ -54,6 +49,4 @@
         <root level="INFO">
             <appender-ref ref="console"/>
         </root>
-    </else>
-    </if>
 </configuration>

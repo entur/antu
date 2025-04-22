@@ -116,7 +116,7 @@ public class MemoryStoreRoute extends BaseRouteBuilder {
       .routeId("memory-store-upload");
 
     from("direct:downloadSingleNetexFileFromMemoryStore")
-      .streamCaching()
+      .streamCache("true")
       .log(
         LoggingLevel.DEBUG,
         correlation() +

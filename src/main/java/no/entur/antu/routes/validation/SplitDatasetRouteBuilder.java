@@ -57,7 +57,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
     super.configure();
 
     from("direct:splitDataset")
-      .streamCaching()
+      .streamCache("true")
       .setProperty(PROP_STOP_WATCH, StopWatch::new)
       .setHeader(FILE_HANDLE, header(VALIDATION_DATASET_FILE_HANDLE_HEADER))
       .to("direct:downloadNetexDataset")

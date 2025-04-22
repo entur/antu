@@ -33,8 +33,8 @@ spec:
           image: {{ .Values.image.identifier }}
           env:
             - name: JDK_JAVA_OPTIONS
-              value: -server -Xmx{{ .Values.resources.xmx }} -Xss512k -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
-                -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:ActiveProcessorCount={{ .Values.resources.cpuRequest }}
+              value: -server -Xmx{{ .Values.resources.xmx }} -Xms128m -Xss512k -XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
+                -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:ActiveProcessorCount=2
                 --add-opens=java.base/java.nio=ALL-UNNAMED
                 --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
                 -Dspring.config.location=/etc/application-config/application.properties
@@ -83,7 +83,6 @@ spec:
             timeoutSeconds: 10
           resources:
             limits:
-              cpu: {{ .Values.resources.cpuLimit }}
               memory: {{ .Values.resources.memLimit }}
             requests:
               cpu: {{ .Values.resources.cpuRequest }}
