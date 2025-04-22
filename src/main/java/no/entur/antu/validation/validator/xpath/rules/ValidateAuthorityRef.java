@@ -18,7 +18,7 @@ import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 public class ValidateAuthorityRef extends AbstractXPathValidationRule {
 
     public static final String CODE_AUTHORITY_REF = "AUTHORITY_REF";
-    static final ValidationRule RULE = new ValidationRule(
+    static final ValidationRule INVALID_AUTHORITY_REF_RULE = new ValidationRule(
             CODE_AUTHORITY_REF,
             "Invalid Authority Ref",
             "Authority Ref does not exist in agreement registry",
@@ -60,7 +60,7 @@ public class ValidateAuthorityRef extends AbstractXPathValidationRule {
                         xdmNode
                 );
                 if (!organisationExists) {
-                    validationIssues.add(new ValidationIssue(RULE, dataLocation));
+                    validationIssues.add(new ValidationIssue(INVALID_AUTHORITY_REF_RULE, dataLocation));
                 }
             }
             return validationIssues;
@@ -71,6 +71,6 @@ public class ValidateAuthorityRef extends AbstractXPathValidationRule {
 
     @Override
     public ValidationRule rule() {
-        return RULE;
+        return INVALID_AUTHORITY_REF_RULE;
     }
 }
