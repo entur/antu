@@ -16,6 +16,8 @@
 
 package no.entur.antu.config;
 
+import static no.entur.antu.Constants.ORGANISATION_ET_CLIENT_NAME;
+
 import org.entur.oauth2.AuthorizedWebClientBuilder;
 import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolver;
 import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolverBuilder;
@@ -74,7 +76,7 @@ public class OAuth2Config {
       .build()
       .mutate()
       .clientConnector(clientHttpConnector)
-      .defaultHeader("Et-Client-Name", "entur-antu")
+      .defaultHeader("Et-Client-Name", ORGANISATION_ET_CLIENT_NAME)
       .baseUrl(organisationRegistryUrl)
       .build();
   }

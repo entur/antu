@@ -110,5 +110,10 @@ public final class Constants {
   public static final String PEN_XMLNS = "PEN";
   public static final String PEN_XMLNSURL = "http://www.rutebanken.org/ns/pen";
 
+  /**
+   * Constants used towards APIs
+   */
+  public static final String ORGANISATION_ET_CLIENT_NAME = "entur-antu";
+
   private Constants() {}
 }
