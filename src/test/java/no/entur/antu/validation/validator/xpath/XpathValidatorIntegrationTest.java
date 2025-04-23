@@ -34,9 +34,12 @@ class XpathValidatorIntegrationTest {
         Map.of(TEST_CODESPACE, Set.of("FLB:Authority:XXX", "FLB:Authority:YYY"))
       );
     OrganisationAliasRepository stubOrganisationAliasRepository =
-            new SimpleOrganisationAliasRepository();
+      new SimpleOrganisationAliasRepository();
     ValidationTreeFactory validationTreeFactory =
-      new EnturTimetableDataValidationTreeFactory(stubOrganisationRepository, stubOrganisationAliasRepository);
+      new EnturTimetableDataValidationTreeFactory(
+        stubOrganisationRepository,
+        stubOrganisationAliasRepository
+      );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     XPathRuleValidator xPathValidator = new XPathRuleValidator(
       validationTreeFactory

@@ -17,60 +17,65 @@ import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 
 public class ValidateAuthorityRef extends AbstractXPathValidationRule {
 
-    public static final String CODE_AUTHORITY_REF = "AUTHORITY_REF";
-    static final ValidationRule INVALID_AUTHORITY_REF_RULE = new ValidationRule(
-            CODE_AUTHORITY_REF,
-            "Invalid Authority Ref",
-            "Authority Ref does not exist in agreement registry",
-            Severity.WARNING
-    );
+  public static final String CODE_AUTHORITY_REF = "AUTHORITY_REF";
+  static final ValidationRule INVALID_AUTHORITY_REF_RULE = new ValidationRule(
+    CODE_AUTHORITY_REF,
+    "Invalid Authority Ref",
+    "Authority Ref does not exist in agreement registry",
+    Severity.WARNING
+  );
 
-    private final OrganisationAliasRepository organisationAliasRepository;
+  private final OrganisationAliasRepository organisationAliasRepository;
 
-    public ValidateAuthorityRef(OrganisationAliasRepository organisationAliasRepository) {
-        this.organisationAliasRepository = Objects.requireNonNull(organisationAliasRepository);
-    }
+  public ValidateAuthorityRef(
+    OrganisationAliasRepository organisationAliasRepository
+  ) {
+    this.organisationAliasRepository =
+      Objects.requireNonNull(organisationAliasRepository);
+  }
 
-    private Boolean organisationExists(String authorityRef) {
-        return organisationAliasRepository.hasOrganisationWithAlias(authorityRef);
-    }
+  private Boolean organisationExists(String authorityRef) {
+    return organisationAliasRepository.hasOrganisationWithAlias(authorityRef);
+  }
 
-    @Override
-    public List<ValidationIssue> validate(
-            XPathRuleValidationContext validationContext
-    ) {
-        String xpath = "//ServiceFrame/Network/AuthorityRef";
-        XPathSelector selector = null;
-        List<ValidationIssue> validationIssues = new ArrayList<>();
-        try {
-            selector =
-                    validationContext
-                            .getNetexXMLParser()
-                            .getXPathCompiler()
-                            .compile(xpath)
-                            .load();
-            selector.setContextItem(validationContext.getXmlNode());
-            XdmValue nodes = selector.evaluate();
-            for (XdmValue node : nodes) {
-                XdmNode xdmNode = (XdmNode) node;
-                String authorityRef = ((XdmNode) node).attribute("ref");
-                Boolean organisationExists = this.organisationExists(authorityRef);
-                DataLocation dataLocation = getXdmNodeLocation(
-                        validationContext.getFileName(),
-                        xdmNode
-                );
-                if (!organisationExists) {
-                    validationIssues.add(new ValidationIssue(INVALID_AUTHORITY_REF_RULE, dataLocation));
-                }
-            }
-            return validationIssues;
-        } catch (SaxonApiException e) {
-            throw new RuntimeException(e);
+  @Override
+  public List<ValidationIssue> validate(
+    XPathRuleValidationContext validationContext
+  ) {
+    String xpath = "//ServiceFrame/Network/AuthorityRef";
+    XPathSelector selector = null;
+    List<ValidationIssue> validationIssues = new ArrayList<>();
+    try {
+      selector =
+        validationContext
+          .getNetexXMLParser()
+          .getXPathCompiler()
+          .compile(xpath)
+          .load();
+      selector.setContextItem(validationContext.getXmlNode());
+      XdmValue nodes = selector.evaluate();
+      for (XdmValue node : nodes) {
+        XdmNode xdmNode = (XdmNode) node;
+        String authorityRef = ((XdmNode) node).attribute("ref");
+        Boolean organisationExists = this.organisationExists(authorityRef);
+        DataLocation dataLocation = getXdmNodeLocation(
+          validationContext.getFileName(),
+          xdmNode
+        );
+        if (!organisationExists) {
+          validationIssues.add(
+            new ValidationIssue(INVALID_AUTHORITY_REF_RULE, dataLocation)
+          );
         }
+      }
+      return validationIssues;
+    } catch (SaxonApiException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public ValidationRule rule() {
-        return INVALID_AUTHORITY_REF_RULE;
-    }
+  @Override
+  public ValidationRule rule() {
+    return INVALID_AUTHORITY_REF_RULE;
+  }
 }

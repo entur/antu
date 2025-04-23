@@ -16,12 +16,12 @@
 
 package no.entur.antu.routes.organisation;
 
+import static no.entur.antu.Constants.*;
+
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import static no.entur.antu.Constants.*;
 
 /**
  * Refresh the organisation alias cache.
@@ -73,11 +73,17 @@ public class OrganisationAliasRouteBuilder extends BaseRouteBuilder {
       .routeId("prime-organisation-alias-cache");
 
     from("direct:refreshOrganisationAliasCache")
-      .log(LoggingLevel.INFO, correlation() + "Refreshing organisation alias cache")
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Refreshing organisation alias cache"
+      )
       .process(this::extendAckDeadline)
       .bean("organisationAliasRepository", "refreshCache")
       .process(this::extendAckDeadline)
-      .log(LoggingLevel.INFO, correlation() + "Refreshed organisation alias cache")
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Refreshed organisation alias cache"
+      )
       .routeId("refresh-organisation-alias-cache");
   }
 }

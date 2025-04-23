@@ -45,7 +45,8 @@ public class CacheConfig {
   public static final String SERVICE_JOURNEY_STOPS_CACHE =
     "serviceJourneyStopsCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
-  public static final String ORGANISATION_ALIAS_CACHE = "organisationAliasCache";
+  public static final String ORGANISATION_ALIAS_CACHE =
+    "organisationAliasCache";
 
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 

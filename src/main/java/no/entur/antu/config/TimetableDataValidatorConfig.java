@@ -71,7 +71,10 @@ public class TimetableDataValidatorConfig {
     OrganisationRepository organisationRepository,
     OrganisationAliasRepository organisationAliasRepository
   ) {
-    return new EnturTimetableDataValidationTreeFactory(organisationRepository, organisationAliasRepository);
+    return new EnturTimetableDataValidationTreeFactory(
+      organisationRepository,
+      organisationAliasRepository
+    );
   }
 
   @Bean
@@ -133,7 +136,8 @@ public class TimetableDataValidatorConfig {
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
     CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
-    StopPlaceRepository stopPlaceRepository) {
+    StopPlaceRepository stopPlaceRepository
+  ) {
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
 
     List<XPathValidator> xPathValidators = List.of(

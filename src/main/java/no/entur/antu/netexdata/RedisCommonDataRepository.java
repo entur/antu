@@ -1,7 +1,6 @@
 package no.entur.antu.netexdata;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.entur.netex.validation.validator.jaxb.DefaultCommonDataRepository;
 import org.redisson.api.RedissonClient;

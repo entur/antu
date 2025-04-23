@@ -1,5 +1,6 @@
 package no.entur.antu.config;
 
+import java.util.Set;
 import no.entur.antu.validation.validator.organisation.AgreementResource;
 import no.entur.antu.validation.validator.organisation.DefaultOrganisationAliasRepository;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
@@ -9,15 +10,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Set;
-
 @Configuration
 public class AgreementConfig {
 
   @Bean
   @Profile("!test")
   AgreementResource agreementResource(
-    @Qualifier("agreementRegistryWebClient") WebClient agreementRegistryWebClient
+    @Qualifier(
+      "agreementRegistryWebClient"
+    ) WebClient agreementRegistryWebClient
   ) {
     return new AgreementResource(agreementRegistryWebClient);
   }

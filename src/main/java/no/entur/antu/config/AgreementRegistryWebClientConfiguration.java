@@ -9,10 +9,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class AgreementRegistryWebClientConfiguration {
 
-    @Bean("agreementRegistryWebClient")
-    @Profile("!test")
-    WebClient agreementRegistryWebClient(@Value("${antu.agreement.registry.url}") String agreementRegistryUrl) {
-        return WebClient.builder().defaultHeader("Et-Client-Name", "entur-antu").baseUrl(agreementRegistryUrl).build();
-    }
-
+  @Bean("agreementRegistryWebClient")
+  @Profile("!test")
+  WebClient agreementRegistryWebClient(
+    @Value("${antu.agreement.registry.url}") String agreementRegistryUrl
+  ) {
+    return WebClient
+      .builder()
+      .defaultHeader("Et-Client-Name", "entur-antu")
+      .baseUrl(agreementRegistryUrl)
+      .build();
+  }
 }
