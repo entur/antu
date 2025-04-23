@@ -23,7 +23,6 @@ import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import com.google.cloud.pubsub.v1.stub.SubscriberStub;
 import com.google.pubsub.v1.ModifyAckDeadlineRequest;
 import com.google.pubsub.v1.ProjectSubscriptionName;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
