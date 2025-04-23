@@ -3,10 +3,10 @@ package no.entur.antu.validation.validator.xpath.rules;
 import static no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef.INVALID_AUTHORITY_REF_RULE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
+import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
@@ -17,26 +17,16 @@ import org.junit.jupiter.api.Test;
 class ValidateAuthorityRefTest {
 
   private ValidateAuthorityRef validator;
-  private OrganisationAliasRepository organisationAliasRepository;
 
   private final String EXISTING_ORGANISATION_ALIAS = "OrganisationAlias:1";
   private final String NON_EXISTENT_ORGANISATION_ALIAS = "OrganisationAlias:2";
 
   @BeforeEach
   public void setUp() {
-    this.organisationAliasRepository = mock(OrganisationAliasRepository.class);
-    when(
-      this.organisationAliasRepository.hasOrganisationWithAlias(
-          EXISTING_ORGANISATION_ALIAS
-        )
-    )
-      .thenReturn(true);
-    when(
-      this.organisationAliasRepository.hasOrganisationWithAlias(
-          NON_EXISTENT_ORGANISATION_ALIAS
-        )
-    )
-      .thenReturn(false);
+    OrganisationAliasRepository organisationAliasRepository =
+      new SimpleOrganisationAliasRepository(
+        Set.of(EXISTING_ORGANISATION_ALIAS)
+      );
     this.validator = new ValidateAuthorityRef(organisationAliasRepository);
   }
 
