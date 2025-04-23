@@ -11,7 +11,7 @@ resources:
   memLimit: 3000Mi
   cpuRequest: 1500m
   memRequest: 3000Mi
-  xmx: 2000m
+  xmx: 2500m
 
 horizontalPodAutoscaler:
   maxReplicas: 10
