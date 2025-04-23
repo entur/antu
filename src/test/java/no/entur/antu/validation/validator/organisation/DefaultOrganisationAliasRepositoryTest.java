@@ -1,9 +1,10 @@
 package no.entur.antu.validation.validator.organisation;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashSet;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,7 +26,7 @@ class DefaultOrganisationAliasRepositoryTest {
         this.agreementResource,
         organisationIds
       );
-    Assertions.assertTrue(repository.isEmpty());
+    assertTrue(repository.isEmpty());
   }
 
   @Test
@@ -36,9 +37,9 @@ class DefaultOrganisationAliasRepositoryTest {
         this.agreementResource,
         organisationIds
       );
-    Assertions.assertFalse(repository.hasOrganisationWithAlias("TestOrg"));
+    assertFalse(repository.hasOrganisationWithAlias("TestOrg"));
     organisationIds.add("TestOrg");
-    Assertions.assertTrue(repository.hasOrganisationWithAlias("TestOrg"));
+    assertTrue(repository.hasOrganisationWithAlias("TestOrg"));
   }
 
   @Test
@@ -60,8 +61,8 @@ class DefaultOrganisationAliasRepositoryTest {
       .thenReturn(refreshedOrganisationIds);
 
     repository.refreshCache();
-    Assertions.assertFalse(repository.hasOrganisationWithAlias("TestOrg1"));
-    Assertions.assertTrue(repository.hasOrganisationWithAlias("TestOrg2"));
-    Assertions.assertTrue(repository.hasOrganisationWithAlias("TestOrg3"));
+    assertFalse(repository.hasOrganisationWithAlias("TestOrg1"));
+    assertTrue(repository.hasOrganisationWithAlias("TestOrg2"));
+    assertTrue(repository.hasOrganisationWithAlias("TestOrg3"));
   }
 }

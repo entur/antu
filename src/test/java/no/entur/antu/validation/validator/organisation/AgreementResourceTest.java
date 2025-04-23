@@ -1,8 +1,10 @@
 package no.entur.antu.validation.validator.organisation;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -39,7 +41,7 @@ class AgreementResourceTest {
     AgreementResource agreementResource = new AgreementResource(webClient);
     Set<String> organisationAliases =
       agreementResource.getOrganisationAliases();
-    Assertions.assertTrue(
+    assertTrue(
       organisationAliases.containsAll(
         List.of(
           "KOL:Operator:301",
@@ -63,7 +65,7 @@ class AgreementResourceTest {
       mockedResponseBody
     );
     AgreementResource agreementResource = new AgreementResource(webClient);
-    Assertions.assertThrows(
+    assertThrows(
       WebClientResponseException.class,
       () -> agreementResource.getOrganisationAliases()
     );

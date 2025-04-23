@@ -1,6 +1,8 @@
 package no.entur.antu.validation.validator.xpath.rules;
 
 import static no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef.INVALID_AUTHORITY_REF_RULE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -9,7 +11,6 @@ import no.entur.antu.validation.validator.organisation.OrganisationAliasReposito
 import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,7 @@ class ValidateAuthorityRefTest {
     List<ValidationIssue> validationIssues = validator.validate(
       validationContext
     );
-    Assertions.assertTrue(validationIssues.isEmpty());
+    assertTrue(validationIssues.isEmpty());
   }
 
   @Test
@@ -56,11 +57,8 @@ class ValidateAuthorityRefTest {
     List<ValidationIssue> validationIssues = validator.validate(
       validationContext
     );
-    Assertions.assertEquals(1, validationIssues.size());
-    Assertions.assertEquals(
-      INVALID_AUTHORITY_REF_RULE,
-      validationIssues.get(0).rule()
-    );
+    assertEquals(1, validationIssues.size());
+    assertEquals(INVALID_AUTHORITY_REF_RULE, validationIssues.get(0).rule());
   }
 
   private static final String NETEX_FRAGMENT =
