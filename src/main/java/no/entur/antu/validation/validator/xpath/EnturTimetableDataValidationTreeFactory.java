@@ -34,11 +34,19 @@ public class EnturTimetableDataValidationTreeFactory
     // Validation against Norwegian codespaces
     compositeFrameValidationTreeBuilder().withRule(new ValidateNSRCodespace());
     rootValidationTreeBuilder().withRule(new ValidateAllowedCodespaces());
+
+    // Disabling check of duplicate ServiceJourney with different versions (slow test)
+    timetableFrameValidationTreeBuilder()
+      .removeRuleForLineFile(
+        DefaultTimetableFrameValidationTreeFactory.CODE_SERVICE_JOURNEY_16
+      );
+
     // Disabling check of duplicate DatedServiceJourney with different versions (slow test)
     timetableFrameValidationTreeBuilder()
       .removeRuleForLineFile(
         DefaultTimetableFrameValidationTreeFactory.CODE_DATED_SERVICE_JOURNEY_4
       );
+
     // No boarding at last stop point in journey pattern
     serviceFrameValidationTreeBuilder()
       .withRuleForLineFile(new NoBoardingAtLastStopPoint());
