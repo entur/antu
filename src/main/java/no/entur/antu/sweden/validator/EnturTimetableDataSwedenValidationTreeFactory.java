@@ -7,6 +7,7 @@ import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityId;
+import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateAtLeastOne;
@@ -81,6 +82,9 @@ public class EnturTimetableDataSwedenValidationTreeFactory
     // remove validation against the Norwegian organisation registry
     resourceFrameValidationTreeBuilder()
       .removeRule(ValidateAuthorityId.CODE_AUTHORITY_ID);
+    // remove validation against the Norwegian agreement registry
+    serviceFrameValidationTreeBuilder()
+      .removeRule(ValidateAuthorityRef.CODE_AUTHORITY_REF);
     // remove time-consuming rule
     serviceFrameValidationTreeBuilder()
       .removeRule(

@@ -3,7 +3,6 @@ package no.entur.antu.config;
 import static no.entur.antu.config.cache.CacheConfig.*;
 
 import java.util.Map;
-
 import no.entur.antu.netexdata.RedisCommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.CommonDataRepositoryLoader;
 import org.redisson.api.RedissonClient;
