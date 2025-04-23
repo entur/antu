@@ -135,7 +135,7 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-      terminationGracePeriodSeconds: 80
+      terminationGracePeriodSeconds: 180
       volumes:
         - name: application-config
           configMap:

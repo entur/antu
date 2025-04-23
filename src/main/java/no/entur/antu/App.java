@@ -50,6 +50,9 @@ public class App extends RouteBuilder {
   @Override
   public void configure() {
     getContext().getShutdownStrategy().setTimeout(shutdownTimeout);
+    getContext()
+      .getExecutorServiceManager()
+      .setShutdownAwaitTermination(shutdownTimeout * 1000);
     getContext().setUseMDCLogging(true);
     getContext().setUseBreadcrumb(true);
     getContext().setMessageHistory(true);

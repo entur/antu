@@ -20,7 +20,7 @@ data:
     camel.main.stream-caching-enabled=false
     camel.main.stream-caching-spool-enabled=true
     # the Camel shutdown timeout must be shorter than the Kubernetes terminationGracePeriod
-    antu.shutdown.timeout=75
+    antu.shutdown.timeout=175
     antu.camel.redelivery.max=0
 
     # Organisation register
