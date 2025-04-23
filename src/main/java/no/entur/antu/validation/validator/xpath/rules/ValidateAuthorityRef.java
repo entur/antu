@@ -15,6 +15,10 @@ import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 
+/**
+ * Validates that the value of AuthorityRef.ref in the NeTEx file being validated
+ * exists in the repository of organisation aliases.
+ * */
 public class ValidateAuthorityRef extends AbstractXPathValidationRule {
 
   public static final String CODE_AUTHORITY_REF = "AUTHORITY_REF";
