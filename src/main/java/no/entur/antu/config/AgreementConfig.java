@@ -26,11 +26,11 @@ public class AgreementConfig {
   @Profile("!test")
   OrganisationAliasRepository organisationAliasRepository(
     AgreementResource agreementResource,
-    @Qualifier("authorityRefCache") Set<String> authorityRefCache
+    @Qualifier("organisationAliasCache") Set<String> organisationAliasCache
   ) {
     return new DefaultOrganisationAliasRepository(
       agreementResource,
-      authorityRefCache
+      organisationAliasCache
     );
   }
 }

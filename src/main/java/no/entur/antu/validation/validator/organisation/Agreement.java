@@ -15,15 +15,7 @@ public class Agreement {
         return roleIds;
     }
 
-    public void setRoleIds(List<String> roleIds) {
-        this.roleIds = roleIds;
-    }
-
     public List<String> getAliases() {
         return aliases;
-    }
-
-    public void setAliases(List<String> aliases) {
-        this.aliases = aliases;
     }
 }

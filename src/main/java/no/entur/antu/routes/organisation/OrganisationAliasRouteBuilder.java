@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import static no.entur.antu.Constants.*;
 
 /**
- * Refresh the organisation register cache.
+ * Refresh the organisation alias cache.
  */
 @Component
 public class OrganisationAliasRouteBuilder extends BaseRouteBuilder {
@@ -44,7 +44,7 @@ public class OrganisationAliasRouteBuilder extends BaseRouteBuilder {
   public void configure() throws Exception {
     super.configure();
     from(
-      "master:lockOnAntuRefreshOrganisationAliasCache:quartz://antu/refreshOrganisationAliasCache?" +
+      "master:lockOnAntuRefreshOrganisationAliasCachePeriodically:quartz://antu/refreshOrganisationAliasCache?" +
       quartzTrigger
     )
       .setHeader(JOB_TYPE, simple(JOB_TYPE_REFRESH_ORGANISATION_ALIAS_CACHE))
@@ -56,7 +56,7 @@ public class OrganisationAliasRouteBuilder extends BaseRouteBuilder {
       .routeId("refresh-organisation-alias-cache-quartz");
 
     from(
-      "master:lockOnAntuRefreshOrganisationAliasCache:timer://antu/refreshOrganisationAliasCacheAtStartup?repeatCount=1&delay=5000"
+      "master:lockOnAntuRefreshOrganisationAliasCachePeriodically:timer://antu/refreshOrganisationAliasCacheAtStartup?repeatCount=1&delay=5000"
     )
       .choice()
       .when(method("organisationAliasRepository", "isEmpty"))

@@ -45,7 +45,7 @@ public class CacheConfig {
   public static final String SERVICE_JOURNEY_STOPS_CACHE =
     "serviceJourneyStopsCache";
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
-  public static final String AUTHORITY_REF_CACHE = "authorityRefCache";
+  public static final String ORGANISATION_ALIAS_CACHE = "organisationAliasCache";
 
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
@@ -165,12 +165,12 @@ public class CacheConfig {
   }
 
   /**
-   * Distributed cache of organisation IDs as provided by agreement registry.
+   * Distributed cache of organisation aliases as provided by agreement registry.
    * The cache is refreshed periodically.
    */
-  @Bean(name = AUTHORITY_REF_CACHE)
-  public Set<String> authorityRefCache(RedissonClient redissonClient) {
-    return redissonClient.getSet(AUTHORITY_REF_CACHE);
+  @Bean(name = ORGANISATION_ALIAS_CACHE)
+  public Set<String> organisationAliasCache(RedissonClient redissonClient) {
+    return redissonClient.getSet(ORGANISATION_ALIAS_CACHE);
   }
 
   /**
