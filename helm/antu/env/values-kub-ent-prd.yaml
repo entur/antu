@@ -15,6 +15,7 @@ gcp:
 tiamatUrl: http://tiamat.prd.entur.internal
 
 organisationRegistryUrl: https://api.entur.io/organisations/v1/register/organisations
+agreementRegistryUrl: https://api.entur.io/agreements/v1
 
 auth0:
   ror:

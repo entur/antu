@@ -54,6 +54,8 @@ public final class Constants {
     "REFRESH_STOP_PLACE_CACHE";
   public static final String JOB_TYPE_REFRESH_ORGANISATION_CACHE =
     "REFRESH_ORGANISATION_CACHE";
+  public static final String JOB_TYPE_REFRESH_ORGANISATION_ALIAS_CACHE =
+    "REFRESH_ORGANISATION_ALIAS_CACHE";
 
   public static final String STATUS_VALIDATION_STARTED = "started";
   public static final String STATUS_VALIDATION_OK = "ok";
@@ -107,6 +109,14 @@ public final class Constants {
 
   public static final String PEN_XMLNS = "PEN";
   public static final String PEN_XMLNSURL = "http://www.rutebanken.org/ns/pen";
+
+  /**
+   * Constants used towards APIs
+   */
+  public static final String ORGANISATION_ET_CLIENT_NAME_HEADER =
+    "Et-Client-Name";
+  public static final String ORGANISATION_ET_CLIENT_NAME_HEADER_VALUE =
+    "entur-antu";
 
   private Constants() {}
 }

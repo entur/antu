@@ -25,6 +25,7 @@ import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValid
 import no.entur.antu.validation.flex.validator.FileNameValidator;
 import no.entur.antu.validation.flex.validator.flexiblearea.InvalidFlexibleAreaValidator;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import no.entur.antu.validation.validator.servicejourney.passingtime.NonIncreasingPassingTimeValidator;
 import no.entur.antu.validation.validator.servicejourney.transportmode.MismatchedTransportModeSubModeValidator;
 import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
@@ -59,10 +60,12 @@ public class TimetableDataFlexValidatorConfig {
 
   @Bean
   public ValidationTreeFactory flexTimetableDataValidationTreeFactory(
-    OrganisationRepository organisationRepository
+    OrganisationRepository organisationRepository,
+    OrganisationAliasRepository organisationAliasRepository
   ) {
     return new EnturFlexTimetableDataValidationTreeFactory(
-      organisationRepository
+      organisationRepository,
+      organisationAliasRepository
     );
   }
 
@@ -91,10 +94,12 @@ public class TimetableDataFlexValidatorConfig {
 
   @Bean
   public ValidationTreeFactory importFlexTimetableDataValidationTreeFactory(
-    OrganisationRepository organisationRepository
+    OrganisationRepository organisationRepository,
+    OrganisationAliasRepository organisationAliasRepository
   ) {
     return new EnturImportFlexTimetableDataValidationTreeFactory(
-      organisationRepository
+      organisationRepository,
+      organisationAliasRepository
     );
   }
 
