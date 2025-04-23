@@ -27,6 +27,9 @@ data:
     antu.organisation.registry.url={{ .Values.organisationRegistryUrl }}
     antu.organisation.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
 
+    # Agreement registry
+    antu.agreement.registry.url={{ .Values.agreementRegistryUrl }}
+
     # Stop place register
     antu.stop.registry.id.url={{ .Values.tiamatUrl }}/services/stop_places
     # Refresh stop place cache at 01:00 and 14:00 every day
