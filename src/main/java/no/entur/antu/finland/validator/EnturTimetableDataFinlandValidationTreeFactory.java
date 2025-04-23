@@ -1,5 +1,6 @@
 package no.entur.antu.finland.validator;
 
+import java.util.HashSet;
 import java.util.Map;
 import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
@@ -22,7 +23,7 @@ public class EnturTimetableDataFinlandValidationTreeFactory
   public EnturTimetableDataFinlandValidationTreeFactory() {
     super(
       new SimpleOrganisationRepository(Map.of()),
-      new SimpleOrganisationAliasRepository()
+      new SimpleOrganisationAliasRepository(new HashSet<>())
     );
   }
 

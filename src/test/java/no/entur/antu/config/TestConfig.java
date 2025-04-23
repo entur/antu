@@ -1,5 +1,6 @@
 package no.entur.antu.config;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class TestConfig {
   @Bean
   @Primary
   public OrganisationAliasRepository organisationAliasRepository() {
-    return new SimpleOrganisationAliasRepository();
+    return new SimpleOrganisationAliasRepository(new HashSet<>());
   }
 
   @Bean(name = "stopPlaceRepository")

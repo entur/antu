@@ -2,6 +2,7 @@ package no.entur.antu.sweden.validator;
 
 import static org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFrameTreeFactory.CODE_COMPOSITE_FRAME_1;
 
+import java.util.HashSet;
 import java.util.Map;
 import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.organisation.SimpleOrganisationRepository;
@@ -32,7 +33,7 @@ public class EnturTimetableDataSwedenValidationTreeFactory
   public EnturTimetableDataSwedenValidationTreeFactory() {
     super(
       new SimpleOrganisationRepository(Map.of()),
-      new SimpleOrganisationAliasRepository()
+      new SimpleOrganisationAliasRepository(new HashSet<>())
     );
   }
 

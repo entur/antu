@@ -2,10 +2,7 @@ package no.entur.antu.validation.validator.xpath;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import net.sf.saxon.s9api.XdmNode;
@@ -34,7 +31,7 @@ class XpathValidatorIntegrationTest {
         Map.of(TEST_CODESPACE, Set.of("FLB:Authority:XXX", "FLB:Authority:YYY"))
       );
     OrganisationAliasRepository stubOrganisationAliasRepository =
-      new SimpleOrganisationAliasRepository();
+      new SimpleOrganisationAliasRepository(new HashSet<>());
     ValidationTreeFactory validationTreeFactory =
       new EnturTimetableDataValidationTreeFactory(
         stubOrganisationRepository,
