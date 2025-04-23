@@ -42,4 +42,4 @@ spec:
         - type: Pods
           value: 10
           periodSeconds: 15
-      stabilizationWindowSeconds : 300
+      stabilizationWindowSeconds : 60
