@@ -92,6 +92,10 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .to("direct:refreshStopCache")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_REFRESH_ORGANISATION_CACHE))
       .to("direct:refreshOrganisationCache")
+      .when(
+        header(JOB_TYPE).isEqualTo(JOB_TYPE_REFRESH_ORGANISATION_ALIAS_CACHE)
+      )
+      .to("direct:refreshOrganisationAliasCache")
       .otherwise()
       .log(
         LoggingLevel.ERROR,
