@@ -16,7 +16,7 @@ resources:
 horizontalPodAutoscaler:
   maxReplicas: 10
   minReplicas: 2
-  targetCPUUtilizationPercentage: 50
+  targetCPUUtilizationPercentage: 10
 
 kubernetes:
   namespace: antu
