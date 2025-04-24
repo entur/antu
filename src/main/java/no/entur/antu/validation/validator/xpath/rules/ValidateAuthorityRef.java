@@ -25,8 +25,8 @@ public class ValidateAuthorityRef extends AbstractXPathValidationRule {
   static final ValidationRule INVALID_AUTHORITY_REF_RULE = new ValidationRule(
     CODE_AUTHORITY_REF,
     "Invalid Authority Ref",
-    "Authority Ref %s does not exist in agreement registry",
-    Severity.WARNING
+    "Authority Ref %s does not exist in the organisation registry",
+    Severity.ERROR
   );
 
   private final OrganisationAliasRepository organisationAliasRepository;
