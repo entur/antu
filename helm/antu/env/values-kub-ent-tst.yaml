@@ -17,6 +17,9 @@ tiamatUrl: http://tiamat.tst.entur.internal
 organisationRegistryUrl: https://api.staging.entur.io/organisations/v1/register/organisations
 agreementRegistryUrl: https://api.entur.io/agreements/v1
 
+baba:
+  service: http://baba.tst.entur.internal
+
 auth0:
   ror:
     url: https://ror-entur-staging.eu.auth0.com/
@@ -30,6 +33,12 @@ auth0:
     clientId: N2f2Hinou2m6JiCRw4mYWUd89eBm0Jbp
     orgregister:
       audience: https://api.staging.entur.io
+
+  internal:
+    clientId: LVDqz3RiLvDFNcGnq1hjdi2fg54b4TTu
+    tokenUri: https://internal.staging.entur.org/oauth/token
+
+roleAssignmentExtractor: jwt
 
 monitoringEnabled: true
 

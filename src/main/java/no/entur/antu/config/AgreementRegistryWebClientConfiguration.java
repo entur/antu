@@ -1,7 +1,7 @@
 package no.entur.antu.config;
 
-import static no.entur.antu.Constants.ORGANISATION_ET_CLIENT_NAME_HEADER;
-import static no.entur.antu.Constants.ORGANISATION_ET_CLIENT_NAME_HEADER_VALUE;
+import static no.entur.antu.Constants.ET_CLIENT_NAME_HEADER;
+import static no.entur.antu.Constants.ET_CLIENT_NAME_HEADER_VALUE;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,10 +19,7 @@ public class AgreementRegistryWebClientConfiguration {
   ) {
     return WebClient
       .builder()
-      .defaultHeader(
-        ORGANISATION_ET_CLIENT_NAME_HEADER,
-        ORGANISATION_ET_CLIENT_NAME_HEADER_VALUE
-      )
+      .defaultHeader(ET_CLIENT_NAME_HEADER, ET_CLIENT_NAME_HEADER_VALUE)
       .baseUrl(agreementRegistryUrl)
       .build();
   }
