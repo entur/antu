@@ -53,6 +53,7 @@ public class NetexValidationProfile {
     NetexValidatorsRunner netexValidatorsRunner = getNetexValidatorsRunner(
       validationProfile
     );
+
     return netexValidatorsRunner.validate(
       codespace,
       validationReportId,

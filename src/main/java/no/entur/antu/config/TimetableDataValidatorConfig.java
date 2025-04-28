@@ -21,7 +21,6 @@ import java.util.Set;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
-import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterchangeDistanceValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
@@ -68,11 +67,9 @@ public class TimetableDataValidatorConfig {
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(
-    OrganisationRepository organisationRepository,
     OrganisationAliasRepository organisationAliasRepository
   ) {
     return new EnturTimetableDataValidationTreeFactory(
-      organisationRepository,
       organisationAliasRepository
     );
   }
