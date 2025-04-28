@@ -57,6 +57,8 @@ spec:
                 name: antu-redis-configmap
             - secretRef:
                 name: antu-auth-secret
+            - secretRef:
+                name: auth0
           ports:
             - containerPort: {{ .Values.service.http.internalPort }}
               name: http

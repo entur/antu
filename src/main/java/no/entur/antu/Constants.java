@@ -113,10 +113,8 @@ public final class Constants {
   /**
    * Constants used towards APIs
    */
-  public static final String ORGANISATION_ET_CLIENT_NAME_HEADER =
-    "Et-Client-Name";
-  public static final String ORGANISATION_ET_CLIENT_NAME_HEADER_VALUE =
-    "entur-antu";
+  public static final String ET_CLIENT_NAME_HEADER = "Et-Client-Name";
+  public static final String ET_CLIENT_NAME_HEADER_VALUE = "entur-antu";
 
   private Constants() {}
 }

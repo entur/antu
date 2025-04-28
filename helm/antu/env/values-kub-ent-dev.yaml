@@ -17,6 +17,9 @@ tiamatUrl: http://tiamat.dev.entur.internal
 organisationRegistryUrl: https://api.dev.entur.io/organisations/v1/register/organisations
 agreementRegistryUrl: https://api.entur.io/agreements/v1
 
+baba:
+  service: http://baba.dev.entur.internal
+
 auth0:
   ror:
     url: https://ror-entur-dev.eu.auth0.com/
@@ -30,6 +33,12 @@ auth0:
     clientId: 373j34zZk6PHDf1Ap2LPbOBiL1f5LGte
     orgregister:
       audience: https://api.dev.entur.io
+
+  internal:
+    clientId: qfkUHWPLnW5tcCdcqYAQSS8wwVkic9lH
+    tokenUri: https://internal.dev.entur.org/oauth/token
+
+roleAssignmentExtractor: baba
 
 monitoringEnabled: true
 

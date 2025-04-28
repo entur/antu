@@ -16,6 +16,7 @@
 
 package no.entur.antu.config;
 
+import static no.entur.antu.Constants.ET_CLIENT_NAME_HEADER;
 import static no.entur.antu.config.cache.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.QUAY_CACHE;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_CACHE;
@@ -47,7 +48,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class StopPlaceConfig {
 
   private static final String ET_CLIENT_ID_HEADER = "ET-Client-ID";
-  private static final String ET_CLIENT_NAME_HEADER = "ET-Client-Name";
 
   @Bean
   @Profile("!test")
