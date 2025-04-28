@@ -70,7 +70,7 @@ data:
     # OAuth2 Entur Internal Client
     spring.security.oauth2.client.registration.internal.authorization-grant-type=client_credentials
     spring.security.oauth2.client.registration.internal.client-id={{ .Values.auth0.internal.clientId }}
-    spring.security.oauth2.client.provider.internal.token-uri={{ .Values.oauth2.internal.tokenUri }}
+    spring.security.oauth2.client.provider.internal.token-uri={{ .Values.auth0.internal.tokenUri }}
     ror.oauth2.client.audience={{ .Values.auth0.ror.audience }}
 
 
