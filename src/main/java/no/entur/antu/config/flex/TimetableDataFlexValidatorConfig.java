@@ -206,8 +206,7 @@ public class TimetableDataFlexValidatorConfig {
   ) {
     List<JAXBValidator> jaxbValidators = List.of(
       invalidFlexibleAreaValidator,
-      new MismatchedTransportModeSubModeValidator(),
-      new NonIncreasingPassingTimeValidator()
+      new MismatchedTransportModeSubModeValidator()
     );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of());
     return NetexValidatorsRunner
