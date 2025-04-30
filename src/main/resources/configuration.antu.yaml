@@ -19,7 +19,7 @@ validationRuleConfigs:
     name: NeTEx ID with unapproved codespace
     severity: ERROR
   - code: NETEX_ID_4W
-    name: NeTEx ID with unapproved codespace
+    name: NeTEx ID with unapproved codespace on operator
     severity: WARNING
   - code: NETEX_FILE_NAME_1
     name: Invalid file name
