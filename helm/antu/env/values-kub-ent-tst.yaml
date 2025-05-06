@@ -50,3 +50,5 @@ horizontalPodAutoscaler:
   project: ent-antu-tst
 
 stopplaceRegistryUrl: https://api.staging.entur.io/stop-places/v1/read
+
+stopPlaceCacheRefreshCron: ?cron=0+0+03,14+?+*+*
