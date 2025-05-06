@@ -33,7 +33,7 @@ data:
     # Stop place register
     antu.stop.registry.id.url={{ .Values.tiamatUrl }}/services/stop_places
     # Refresh stop place cache at 01:00 and 14:00 every day
-    antu.stop.refresh.interval=?cron=0+0+01,14+?+*+*
+    antu.stop.refresh.interval={{ .Values.stopPlaceCacheRefreshCron }}
     stopplace.registry.url={{ .Values.stopplaceRegistryUrl }}
 
 
