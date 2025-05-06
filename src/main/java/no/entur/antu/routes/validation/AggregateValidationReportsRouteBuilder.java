@@ -115,14 +115,14 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         PROP_STOP_WATCH +
         ".taken()} ms"
       )
-      .choice()
-      .when(simple("${body.hasError()}"))
+//      .choice()
+//      .when(simple("${body.hasError()}"))
       .log(
         LoggingLevel.INFO,
         correlation() + "Validation errors found, skipping dataset validation"
       )
       .to("direct:completeValidation")
-      .otherwise()
+//      .otherwise()
       .marshal()
       .json(JsonLibrary.Jackson)
       .to("direct:uploadValidationReport")
@@ -137,24 +137,27 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
             .setHeader(FILE_HANDLE, header(VALIDATION_DATASET_FILE_HANDLE_HEADER))
             .to("direct:downloadNetexDataset")
             .log(LoggingLevel.INFO, correlation() + "Unpacking NeTEx Zip")
-            .process(exchange -> {
-              InputStream originalInputStream = exchange
-                      .getIn()
-                      .getBody(InputStream.class);
+//            .process(exchange -> {
+//              InputStream originalInputStream = exchange
+//                      .getIn()
+//                      .getBody(InputStream.class);
+//
+//              try {
+//                Stream<InputStream> extractedStreams =
+//                        ZipStreamUtil.createInputStreamFromZip(originalInputStream);
+//                log.info(
+//                        "{}Successfully prepared ZIP stream for XML processing",
+//                        correlation()
+//                );
+//                exchange.setProperty("StreamOfZippedFileInputStream", extractedStreams);
+//              } catch (Exception e) {
+//                log.error("{}Exception during file extraction", correlation(), e);
+//                throw e;
+//              }});
+    ;
 
-              try {
-                Stream<InputStream> extractedStreams =
-                        ZipStreamUtil.createInputStreamFromZip(originalInputStream);
-                log.info(
-                        "{}Successfully prepared ZIP stream for XML processing",
-                        correlation()
-                );
-                exchange.setProperty("StreamOfZippedFileInputStream", extractedStreams);
-              } catch (Exception e) {
-                log.error("{}Exception during file extraction", correlation(), e);
-                throw e;
-              }
-            });
+    from("google-pubsub:{{antu.pubsub.project.id}}:ManualValidateDataset")
+            .to("direct:validateDataset");
 
     from("direct:validateDataset")
       .log(
@@ -164,22 +167,22 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       )
       .convertBodyTo(String.class)
       .to("direct:makeStreamOfZippedFiles")
-      .to("direct:downloadValidationReport")
-      .unmarshal()
-      .json(JsonLibrary.Jackson, ValidationReport.class)
-      .process(exchange ->
-              exchange.setProperty(
-                      PROP_NETEX_VALIDATION_CALLBACK,
-                      new AntuNetexValidationProgressCallback(this, exchange)
-              )
-      )
+//      .to("direct:downloadValidationReport")
+//      .unmarshal()
+//      .json(JsonLibrary.Jackson, ValidationReport.class)
+//      .process(exchange ->
+//              exchange.setProperty(
+//                      PROP_NETEX_VALIDATION_CALLBACK,
+//                      new AntuNetexValidationProgressCallback(this, exchange)
+//              )
+//      )
       .bean(
         "netexValidationProfile",
         "crossValidateNetexDataset(" +
-        "${exchangeProperty.StreamOfZippedFileInputStream}," +
+        "${body}," +
         "${header." +
         VALIDATION_PROFILE_HEADER +
-        "}, ${body})"
+        "})"
       )
       .log(
         LoggingLevel.INFO,

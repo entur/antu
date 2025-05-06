@@ -81,9 +81,6 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE))
       .to("direct:validateNetex")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_VALIDATE_DATASET))
-            .process(exchange -> {
-              System.out.println(exchange.getIn().getBody(String.class));
-            })
       .to("direct:validateDataset")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_COMPLETE_VALIDATION))
       .to("direct:completeValidation")

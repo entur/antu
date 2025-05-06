@@ -1,16 +1,26 @@
 package no.entur.antu.validation;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
 
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.utils.zip.ZipStreamUtil;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.index.api.NetexEntityIndex;
 import org.entur.netex.validation.validator.NetexValidationProgressCallBack;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.ServiceJourneyInterchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,32 +83,70 @@ public class NetexValidationProfile {
     );
   }
 
+  private Stream<InputStream> zipFileToStreamOfInputStreams(InputStream zipFileAsInputStream) {
+    try {
+      Stream<InputStream> extractedStreams =
+              ZipStreamUtil.createInputStreamFromZip(zipFileAsInputStream);
+      log.info(
+              "Successfully prepared ZIP stream for XML processing"
+      );
+      return extractedStreams;
+    } catch (Exception e) {
+      log.error("Exception during file extraction" + e);
+      throw e;
+    }
+  }
+
   /**
    * Validate a NeTEx file according to a validation profile
    *
    * @return a ValidationReport listing the findings for this NeTEx file.
    */
-  public ValidationReport crossValidateNetexDataset(Stream<InputStream> zipFilesInputStream, String validationProfile, ValidationReport report) {
+  public ValidationReport crossValidateNetexDataset(InputStream zipFileInputStream, String validationProfile) throws IOException {
     if (validationProfile == null) {
       throw new AntuException("Missing validation profile");
     }
+
 
     log.info("Validating netex dataset...");
 
     NetexParser netexParser = new NetexParser();
     NetexValidatorsRunner netexValidatorsRunner = getNetexValidatorsRunner(validationProfile);
 
-    zipFilesInputStream.forEach(zipFileInputStream -> {
+    byte[] zipAsByteArray = zipFileInputStream.readAllBytes();
 
-      // cache?
-      NetexEntitiesIndex index = netexParser.parse(zipFileInputStream);
-      index.getServiceJourneyInterchangeIndex();
-      log.info("Caching data from netex file");
-    });
+    AtomicReference<NetexEntityIndex<ServiceJourneyInterchange>> serviceJourneyInterchangeNetexEntityIndex = new AtomicReference<>();
 
-    // then validate?
+    var iterator = zipFileToStreamOfInputStreams(new ByteArrayInputStream(zipAsByteArray)).iterator();
+    while (iterator.hasNext()) {
+      InputStream fileAsInputStream = iterator.next();
+      NetexEntitiesIndex index = netexParser.parse(fileAsInputStream);
+      if (serviceJourneyInterchangeNetexEntityIndex.get() == null) {
+        serviceJourneyInterchangeNetexEntityIndex.set(index.getServiceJourneyInterchangeIndex());
+      } else {
+        serviceJourneyInterchangeNetexEntityIndex.get().putAll(index.getServiceJourneyInterchangeIndex().getAll());
+      }
+    }
 
-    return report;
+    Set<String> serviceJourneyIds = new HashSet<>();
+    for (ServiceJourneyInterchange interchange : serviceJourneyInterchangeNetexEntityIndex.get().getAll()) {
+      serviceJourneyIds.add(interchange.getFromJourneyRef().getRef());
+      serviceJourneyIds.add(interchange.getToJourneyRef().getRef());
+    }
+
+    Map<String, ServiceJourney> mapOfServiceJourneys = new HashMap<>();
+    iterator = zipFileToStreamOfInputStreams(new ByteArrayInputStream(zipAsByteArray)).iterator();
+    while (iterator.hasNext()) {
+      InputStream fileInputStream = iterator.next();
+      NetexEntitiesIndex index = netexParser.parse(fileInputStream);
+      for (ServiceJourney serviceJourney : index.getServiceJourneyIndex().getAll()) {
+        if (serviceJourneyIds.contains(serviceJourney.getId())) {
+          mapOfServiceJourneys.put(serviceJourney.getId(), serviceJourney);
+          serviceJourneyIds.remove(serviceJourney.getId());
+        }
+      }
+    }
+    return new ValidationReport();
   }
 
 
