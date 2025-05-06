@@ -1,10 +1,18 @@
 package no.entur.antu.validation;
 
+import java.io.InputStream;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.zip.ZipFile;
+
 import no.entur.antu.exception.AntuException;
+import org.entur.netex.NetexParser;
+import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.NetexValidationProgressCallBack;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validate a NeTEx dataset according to a given validation profile.
@@ -12,6 +20,7 @@ import org.entur.netex.validation.validator.ValidationReport;
  */
 public class NetexValidationProfile {
 
+  private static final Logger log = LoggerFactory.getLogger(NetexValidationProfile.class);
   private final Map<ValidationProfile, NetexValidatorsRunner> netexValidatorsRunners;
   private final boolean skipSchemaValidation;
   private final boolean skipNetexValidators;
@@ -69,10 +78,40 @@ public class NetexValidationProfile {
    *
    * @return a ValidationReport listing the findings for this NeTEx file.
    */
+  public ValidationReport crossValidateNetexDataset(Stream<InputStream> zipFilesInputStream, String validationProfile, ValidationReport report) {
+    if (validationProfile == null) {
+      throw new AntuException("Missing validation profile");
+    }
+
+    log.info("Validating netex dataset...");
+
+    NetexParser netexParser = new NetexParser();
+    NetexValidatorsRunner netexValidatorsRunner = getNetexValidatorsRunner(validationProfile);
+
+    zipFilesInputStream.forEach(zipFileInputStream -> {
+
+      // cache?
+      NetexEntitiesIndex index = netexParser.parse(zipFileInputStream);
+      index.getServiceJourneyInterchangeIndex();
+      log.info("Caching data from netex file");
+    });
+
+    // then validate?
+
+    return report;
+  }
+
+
+  /**
+   * Validate a NeTEx file according to a validation profile
+   *
+   * @return a ValidationReport listing the findings for this NeTEx file.
+   */
   public ValidationReport validateDataset(
     ValidationReport validationReport,
     String validationProfile,
-    NetexValidationProgressCallBack netexValidationProgressCallBack
+    NetexValidationProgressCallBack netexValidationProgressCallBack,
+    ZipFile zipFile
   ) {
     if (validationReport == null) {
       throw new AntuException("Missing validation report");
@@ -84,9 +123,10 @@ public class NetexValidationProfile {
       validationProfile
     );
 
-    return netexValidatorsRunner.runNetexDatasetValidators(
+    return netexValidatorsRunner.runNetexDatasetValidatorsNext(
       validationReport,
-      netexValidationProgressCallBack
+      netexValidationProgressCallBack,
+      zipFile
     );
   }
 

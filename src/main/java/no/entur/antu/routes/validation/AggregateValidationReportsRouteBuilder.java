@@ -18,25 +18,7 @@
 
 package no.entur.antu.routes.validation;
 
-import static no.entur.antu.Constants.DATASET_CODESPACE;
-import static no.entur.antu.Constants.DATASET_NB_NETEX_FILES;
-import static no.entur.antu.Constants.DATASET_REFERENTIAL;
-import static no.entur.antu.Constants.DATASET_STATUS;
-import static no.entur.antu.Constants.FILENAME_DELIMITER;
-import static no.entur.antu.Constants.FILE_HANDLE;
-import static no.entur.antu.Constants.JOB_TYPE_AGGREGATE_REPORTS;
-import static no.entur.antu.Constants.JOB_TYPE_VALIDATE_DATASET;
-import static no.entur.antu.Constants.NETEX_FILE_NAME;
-import static no.entur.antu.Constants.REPORT_CREATION_DATE;
-import static no.entur.antu.Constants.STATUS_VALIDATION_FAILED;
-import static no.entur.antu.Constants.STATUS_VALIDATION_OK;
-import static no.entur.antu.Constants.TEMPORARY_FILE_NAME;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
-import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
-import static no.entur.antu.Constants.VALIDATION_REPORT_STATUS_SUFFIX;
-import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
-
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,6 +31,7 @@ import no.entur.antu.Constants;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.metrics.AntuPrometheusMetricsService;
 import no.entur.antu.routes.BaseRouteBuilder;
+import no.entur.antu.utils.zip.ZipStreamUtil;
 import no.entur.antu.validation.AntuNetexValidationProgressCallback;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePropertyKey;
@@ -62,6 +45,8 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import static no.entur.antu.Constants.*;
 
 /**
  * Aggregate validation reports.
@@ -148,6 +133,29 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .end()
       .routeId("aggregate-reports");
 
+    from("direct:makeStreamOfZippedFiles")
+            .setHeader(FILE_HANDLE, header(VALIDATION_DATASET_FILE_HANDLE_HEADER))
+            .to("direct:downloadNetexDataset")
+            .log(LoggingLevel.INFO, correlation() + "Unpacking NeTEx Zip")
+            .process(exchange -> {
+              InputStream originalInputStream = exchange
+                      .getIn()
+                      .getBody(InputStream.class);
+
+              try {
+                Stream<InputStream> extractedStreams =
+                        ZipStreamUtil.createInputStreamFromZip(originalInputStream);
+                log.info(
+                        "{}Successfully prepared ZIP stream for XML processing",
+                        correlation()
+                );
+                exchange.setProperty("StreamOfZippedFileInputStream", extractedStreams);
+              } catch (Exception e) {
+                log.error("{}Exception during file extraction", correlation(), e);
+                throw e;
+              }
+            });
+
     from("direct:validateDataset")
       .log(
         LoggingLevel.INFO,
@@ -155,25 +163,23 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         "Downloading the aggregated validation report for dataset validation"
       )
       .convertBodyTo(String.class)
-      .setHeader(NETEX_FILE_NAME, body())
+      .to("direct:makeStreamOfZippedFiles")
       .to("direct:downloadValidationReport")
       .unmarshal()
       .json(JsonLibrary.Jackson, ValidationReport.class)
       .process(exchange ->
-        exchange.setProperty(
-          PROP_NETEX_VALIDATION_CALLBACK,
-          new AntuNetexValidationProgressCallback(this, exchange)
-        )
+              exchange.setProperty(
+                      PROP_NETEX_VALIDATION_CALLBACK,
+                      new AntuNetexValidationProgressCallback(this, exchange)
+              )
       )
       .bean(
         "netexValidationProfile",
-        "validateDataset(" +
-        "${body}, " +
+        "crossValidateNetexDataset(" +
+        "${exchangeProperty.StreamOfZippedFileInputStream}," +
         "${header." +
         VALIDATION_PROFILE_HEADER +
-        "},${exchangeProperty." +
-        PROP_NETEX_VALIDATION_CALLBACK +
-        "})"
+        "}, ${body})"
       )
       .log(
         LoggingLevel.INFO,

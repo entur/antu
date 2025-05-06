@@ -9,11 +9,11 @@ Content-Type: application/json
       "attributes": {
         "EnturValidationClient": "Marduk",
         "EnturValidationCorrelationId": "14f2ba67-ce75-4be2-8052-6a0938069bc1",
-        "EnturValidationDatasetFileHandle": "inbound/received/sjv/outbound_netex_rb_sjv-aggregated-netex.zip",
+        "EnturValidationDatasetFileHandle": "inbound/received/hur/outbound_netex_rb_hur-aggregated-netex.zip",
         "EnturValidationImportType": "ImportType_netex_flex",
-        "EnturValidationProfile": "TimetableFlexibleTransport",
+        "EnturValidationProfile": "Timetable",
         "EnturValidationStage": "EnturValidationStageFlexPostValidation",
-        "EnturDatasetReferential": "sjv"
+        "EnturDatasetReferential": "hur"
       },
       "data": ""
     }
