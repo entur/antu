@@ -24,3 +24,6 @@ kubernetes:
 secrets:
   antu-auth-secret:
     - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ORGREGISTER_CLIENT_SECRET
+
+
+stopPlaceCacheRefreshCron: ?cron=0+0+01,14+?+*+*

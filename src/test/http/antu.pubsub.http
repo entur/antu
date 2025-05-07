@@ -41,3 +41,26 @@ Content-Type: application/json
     }
   ]
 }
+
+###
+
+POST http://localhost:8085/v1/projects/test/topics/AntuNetexValidationQueue:publish
+Content-Type: application/json
+
+{
+  "messages": [
+    {
+      "attributes": {
+        "EnturValidationClient": "Marduk",
+        "EnturValidationCorrelationId": "14f2ba67-ce75-4be2-8052-6a0938069bc1",
+        "EnturValidationDatasetFileHandle": "inbound/received/flt/20250422-145337_flytoget.zip",
+        "EnturValidationImportType": "ImportType_netex_flex",
+        "EnturValidationProfile": "Timetable",
+        "EnturValidationStage": "EnturValidationStagePrevalidation",
+        "EnturDatasetReferential": "flt"
+      },
+      "data": ""
+    }
+  ]
+}
+

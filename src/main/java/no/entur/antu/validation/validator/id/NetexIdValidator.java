@@ -47,7 +47,7 @@ public class NetexIdValidator implements XPathValidator {
   static final ValidationRule RULE_UNAPPROVED_CODESPACE_WARNING =
     new ValidationRule(
       "NETEX_ID_4W",
-      "NeTEx ID with unapproved codespace",
+      "NeTEx ID with unapproved codespace on operator",
       "Use of unapproved codespace. Approved codespaces are %s",
       Severity.WARNING
     );

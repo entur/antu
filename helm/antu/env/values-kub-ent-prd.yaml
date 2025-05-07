@@ -16,6 +16,9 @@ tiamatUrl: http://tiamat.prd.entur.internal
 
 agreementRegistryUrl: https://api.entur.io/agreements/v1
 
+baba:
+  service: http://baba.prd.entur.internal
+
 auth0:
   ror:
     url: https://auth2.entur.org/
@@ -29,6 +32,12 @@ auth0:
     clientId: ms08sY6rN2fjlNst881de632KNGyvgcY
     orgregister:
       audience: https://api.entur.io
+
+  internal:
+    clientId: yBQ4Gct1iVdU6zqtF5gwuEoy2cRtBcN0
+    tokenUri: https://internal.entur.org/oauth/token
+
+roleAssignmentExtractor: jwt
 
 
 monitoringEnabled: false
