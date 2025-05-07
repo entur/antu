@@ -37,7 +37,7 @@ auth0:
     clientId: LVDqz3RiLvDFNcGnq1hjdi2fg54b4TTu
     tokenUri: https://internal.staging.entur.org/oauth/token
 
-roleAssignmentExtractor: jwt
+roleAssignmentExtractor: baba
 
 monitoringEnabled: true
 
