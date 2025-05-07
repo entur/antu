@@ -39,6 +39,7 @@ import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.redisson.client.RedisException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -84,7 +85,9 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .doCatch(
         InterruptedException.class,
         RetryableNetexValidationException.class,
-        RetryableAntuException.class
+        RetryableAntuException.class,
+        // TODO: Temporary fix to ensure intermittent failures towards Redis are retried.
+        RedisException.class
       )
       .log(
         LoggingLevel.INFO,
