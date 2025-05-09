@@ -16,19 +16,12 @@
 
 package no.entur.antu.config;
 
-import static no.entur.antu.Constants.ET_CLIENT_NAME_HEADER;
-import static no.entur.antu.Constants.ET_CLIENT_NAME_HEADER_VALUE;
-
-import org.entur.oauth2.AuthorizedWebClientBuilder;
 import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolver;
 import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolverBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.client.reactive.ClientHttpConnector;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class OAuth2Config {
@@ -58,27 +51,6 @@ public class OAuth2Config {
       .withRorAuth0Issuer(rorAuth0Issuer)
       .withRorAuth0Audience(rorAuth0Audience)
       .withRorAuth0ClaimNamespace(rorAuth0ClaimNamespace)
-      .build();
-  }
-
-  @Bean("orgRegisterWebClient")
-  @Profile("!test")
-  WebClient orgRegisterWebClient(
-    WebClient.Builder webClientBuilder,
-    OAuth2ClientProperties properties,
-    @Value("${orgregister.oauth2.client.audience}") String audience,
-    ClientHttpConnector clientHttpConnector,
-    @Value("${antu.organisation.registry.url}") String organisationRegistryUrl
-  ) {
-    return new AuthorizedWebClientBuilder(webClientBuilder)
-      .withOAuth2ClientProperties(properties)
-      .withAudience(audience)
-      .withClientRegistrationId("orgregister")
-      .build()
-      .mutate()
-      .clientConnector(clientHttpConnector)
-      .defaultHeader(ET_CLIENT_NAME_HEADER, ET_CLIENT_NAME_HEADER_VALUE)
-      .baseUrl(organisationRegistryUrl)
       .build();
   }
 }

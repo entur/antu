@@ -14,7 +14,6 @@ gcp:
 
 tiamatUrl: http://tiamat.tst.entur.internal
 
-organisationRegistryUrl: https://api.staging.entur.io/organisations/v1/register/organisations
 agreementRegistryUrl: https://api.entur.io/agreements/v1
 
 baba:

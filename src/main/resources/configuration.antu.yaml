@@ -129,6 +129,3 @@ validationRuleConfigs:
   - code: TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF
     name: ToPointRef in interchange is not a part of ToJourneyRef
     severity: WARNING
-  - code: AUTHORITY_REF
-    name: Invalid Authority Ref
-    severity: INFO

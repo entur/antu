@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CacheConfig {
 
-  public static final String ORGANISATION_CACHE = "organisationCache";
   public static final String COMMON_IDS_CACHE = "commonIdsCache";
   public static final String SCHEDULED_STOP_POINT_AND_QUAY_ID_CACHE =
     "scheduledStopPointAndQuayIdCache";
@@ -75,21 +74,6 @@ public class CacheConfig {
       redissonClient,
       QUAY_CACHE,
       new CompositeCodec(new QuayIdCodec(), DEFAULT_CODEC)
-    );
-  }
-
-  /**
-   * Maps an organisation codespace to the list of Authorities it can refer to in a NeTEx dataset.
-   * The cache is refreshed  periodically by querying the organisation register.
-   */
-  @Bean
-  public Map<String, Set<String>> organisationCache(
-    RedissonClient redissonClient
-  ) {
-    return getOrCreateApplicationScopedCache(
-      redissonClient,
-      ORGANISATION_CACHE,
-      DEFAULT_CODEC
     );
   }
 

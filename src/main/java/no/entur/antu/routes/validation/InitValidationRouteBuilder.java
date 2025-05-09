@@ -90,8 +90,6 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .to("direct:aggregateReports")
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_REFRESH_STOP_CACHE))
       .to("direct:refreshStopCache")
-      .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_REFRESH_ORGANISATION_CACHE))
-      .to("direct:refreshOrganisationCache")
       .when(
         header(JOB_TYPE).isEqualTo(JOB_TYPE_REFRESH_ORGANISATION_ALIAS_CACHE)
       )
