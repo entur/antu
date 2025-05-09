@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-parser-java</artifactId>
-            <version>${netex-parser-java.version}</version>
+            <version>3.1.48</version>
         </dependency>
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
