@@ -131,4 +131,4 @@ validationRuleConfigs:
     severity: WARNING
   - code: AUTHORITY_REF
     name: Invalid Authority Ref
-    severity: INFO
+    severity: ERROR
