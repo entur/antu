@@ -3,10 +3,7 @@ package no.entur.antu.validation;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.zip.ZipFile;
@@ -19,8 +16,7 @@ import org.entur.netex.index.api.NetexEntityIndex;
 import org.entur.netex.validation.validator.NetexValidationProgressCallBack;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReport;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
+import org.rutebanken.netex.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,38 +107,99 @@ public class NetexValidationProfile {
     log.info("Validating netex dataset...");
 
     NetexParser netexParser = new NetexParser();
-    NetexValidatorsRunner netexValidatorsRunner = getNetexValidatorsRunner(validationProfile);
-
     byte[] zipAsByteArray = zipFileInputStream.readAllBytes();
+    Set<ServiceJourneyInterChangeValidationContext> validationContexts = new HashSet<>();
 
-    AtomicReference<NetexEntityIndex<ServiceJourneyInterchange>> serviceJourneyInterchangeNetexEntityIndex = new AtomicReference<>();
+    Map<String, ServiceJourneyInterChangeValidationContext> toServiceJourneyIdsToContext = new HashMap<>();
+    Map<String, ServiceJourneyInterChangeValidationContext> fromServiceJourneyIdsToContext = new HashMap<>();
+    Map<String, ServiceJourneyInterChangeValidationContext> scheduledStopPointIdsToContext = new HashMap<>();
 
     var iterator = zipFileToStreamOfInputStreams(new ByteArrayInputStream(zipAsByteArray)).iterator();
     while (iterator.hasNext()) {
       InputStream fileAsInputStream = iterator.next();
       NetexEntitiesIndex index = netexParser.parse(fileAsInputStream);
-      if (serviceJourneyInterchangeNetexEntityIndex.get() == null) {
-        serviceJourneyInterchangeNetexEntityIndex.set(index.getServiceJourneyInterchangeIndex());
-      } else {
-        serviceJourneyInterchangeNetexEntityIndex.get().putAll(index.getServiceJourneyInterchangeIndex().getAll());
+      for (ServiceJourneyInterchange interchange : index.getServiceJourneyInterchangeIndex().getAll()) {
+        var validationContext = new ServiceJourneyInterChangeValidationContext(
+            interchange.getId(),
+            interchange.getFromJourneyRef().getRef(),
+            interchange.getToJourneyRef().getRef(),
+            interchange.getFromPointRef().getRef(),
+            interchange.getToPointRef().getRef(),
+            interchange.getMaximumWaitTime()
+        );
+        fromServiceJourneyIdsToContext.put(interchange.getFromJourneyRef().getRef(), validationContext);
+        toServiceJourneyIdsToContext.put(interchange.getToJourneyRef().getRef(), validationContext);
+        scheduledStopPointIdsToContext.put(interchange.getFromPointRef().getRef(), validationContext);
+        scheduledStopPointIdsToContext.put(interchange.getToPointRef().getRef(), validationContext);
+        validationContexts.add(validationContext);
       }
-    }
-
-    Set<String> serviceJourneyIds = new HashSet<>();
-    for (ServiceJourneyInterchange interchange : serviceJourneyInterchangeNetexEntityIndex.get().getAll()) {
-      serviceJourneyIds.add(interchange.getFromJourneyRef().getRef());
-      serviceJourneyIds.add(interchange.getToJourneyRef().getRef());
     }
 
     Map<String, ServiceJourney> mapOfServiceJourneys = new HashMap<>();
     iterator = zipFileToStreamOfInputStreams(new ByteArrayInputStream(zipAsByteArray)).iterator();
+    /*
+     *
+     * Fra ServiceJourneyInterchange trenger vi:
+     * 1. ServiceJourneyRefene til de to servicejourneyene
+     * 2. ScheduledStopPointRefene til de to ScheduledStopPointene
+     * 3. MaximumWaitTime
+     *
+     * Fra journeypattern trenger vi:
+     * 1. StopPointInJourneyPattern IDer som har ScheduledStopPointRefene fra ServiceJourneyInterchange
+     *
+     * Fra servicejourney trenger vi:
+     * 1. ID
+     * 2. DepartureTime og ArrivalTime, DepartureDayOffset og ArrivalDayOffset fra de TimetabledPassingTime entitetene som har StopPointInJourneyPatternRefene fra journeypattern
+     * 3. DayTypeRef
+     *
+     *
+     * ScheduledStopPoint ID er referert til i ServiceJourneyInterchange,
+     * JourneyPattern har ScheduledStopPointRef i en StopPointInJourneyPattern entitet
+     * StopPointInJourneyPattern har en ID (eg. SKY:StopPointInJourneyPattern:311-468-1)
+     * StopPointInJourneyPattern IDen er referert til i StopPointInJourneyPatternRef inne i en TimetabledPassingTime
+     * TimetabledPassingTime er inne i en ServiceJourney
+     * TimetabledPassingTime har også en departure time som vi må bruke
+     *
+     *
+     * SKY:ScheduledStopPoint:default-58351
+     */
+    Set<String> stopPointInJourneyPatternIds = new HashSet<>();
     while (iterator.hasNext()) {
       InputStream fileInputStream = iterator.next();
       NetexEntitiesIndex index = netexParser.parse(fileInputStream);
+
+      for (JourneyPattern journeyPattern : index.getJourneyPatternIndex().getAll()) {
+        List<StopPointInJourneyPattern> stopPointInJourneyPatterns = journeyPattern.getPointsInSequence().getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern().stream()
+            .filter(pointInJourneyPattern -> pointInJourneyPattern instanceof StopPointInJourneyPattern)
+            .map(point -> (StopPointInJourneyPattern) point)
+            .toList();
+
+        for (StopPointInJourneyPattern stopPointInJourneyPattern : stopPointInJourneyPatterns) {
+          if (stopPointInJourneyPattern.getScheduledStopPointRef() != null && scheduledStopPointIdsToContext.containsKey(stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef())) {
+            var validationContext = scheduledStopPointIdsToContext.get(stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef());
+            validationContext.addStopPointInJourneyPatternRef(stopPointInJourneyPattern.getId());
+            stopPointInJourneyPatternIds.add(stopPointInJourneyPattern.getId());
+          }
+        }
+      }
+    }
+
+    iterator = zipFileToStreamOfInputStreams(new ByteArrayInputStream(zipAsByteArray)).iterator();
+    Set<TimetabledPassingTime> timetabledPassingTimes = new HashSet<>();
+    while (iterator.hasNext()) {
+      InputStream fileInputStream = iterator.next();
+      NetexEntitiesIndex index = netexParser.parse(fileInputStream);
+
       for (ServiceJourney serviceJourney : index.getServiceJourneyIndex().getAll()) {
         if (serviceJourneyIds.contains(serviceJourney.getId())) {
           mapOfServiceJourneys.put(serviceJourney.getId(), serviceJourney);
           serviceJourneyIds.remove(serviceJourney.getId());
+        }
+
+        for (TimetabledPassingTime timetabledPassingTime : serviceJourney.getPassingTimes().getTimetabledPassingTime()) {
+          if (stopPointInJourneyPatternIds.contains(timetabledPassingTime.getPointInJourneyPatternRef().getValue().getRef())) {
+            timetabledPassingTimes.add(timetabledPassingTime);
+          }
         }
       }
     }
@@ -171,11 +228,7 @@ public class NetexValidationProfile {
       validationProfile
     );
 
-    return netexValidatorsRunner.runNetexDatasetValidatorsNext(
-      validationReport,
-      netexValidationProgressCallBack,
-      zipFile
-    );
+    return null;
   }
 
   private NetexValidatorsRunner getNetexValidatorsRunner(
