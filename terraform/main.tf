@@ -91,7 +91,7 @@ resource "google_pubsub_subscription" "AntuJobQueue" {
   topic = google_pubsub_topic.AntuJobQueue.name
   project = var.gcp_resources_project
   labels = var.labels
-  ack_deadline_seconds = 60
+  ack_deadline_seconds = 200
   message_retention_duration = "3600s"
   retry_policy {
     minimum_backoff = "10s"
