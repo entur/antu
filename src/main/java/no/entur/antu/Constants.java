@@ -52,8 +52,6 @@ public final class Constants {
     "AGGREGATE_COMMON_FILES";
   public static final String JOB_TYPE_REFRESH_STOP_CACHE =
     "REFRESH_STOP_PLACE_CACHE";
-  public static final String JOB_TYPE_REFRESH_ORGANISATION_CACHE =
-    "REFRESH_ORGANISATION_CACHE";
   public static final String JOB_TYPE_REFRESH_ORGANISATION_ALIAS_CACHE =
     "REFRESH_ORGANISATION_ALIAS_CACHE";
 

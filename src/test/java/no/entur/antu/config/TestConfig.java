@@ -3,11 +3,8 @@ package no.entur.antu.config;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
-import no.entur.antu.organisation.OrganisationRepository;
 import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
-import no.entur.antu.organisation.SimpleOrganisationRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -30,19 +27,6 @@ public class TestConfig {
   @Primary
   public NetexDataRepository netexDataRepository() {
     return new TestNetexDataRepository();
-  }
-
-  @Bean
-  @Primary
-  public OrganisationRepository organisationRepository() {
-    return new SimpleOrganisationRepository(
-      Map.of(
-        "avi",
-        Set.of("AVI:Authority:Avinor"),
-        "flb",
-        Set.of("FLB:Authority:XXX", "FLB:Authority:YYY")
-      )
-    );
   }
 
   @Bean
