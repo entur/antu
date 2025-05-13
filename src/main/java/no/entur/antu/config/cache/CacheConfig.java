@@ -3,6 +3,7 @@ package no.entur.antu.config.cache;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.*;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,8 @@ public class CacheConfig {
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
   public static final String ORGANISATION_ALIAS_CACHE =
     "organisationAliasCache";
+  public static final String ACTIVE_DATES_BY_DAY_TYPE_REF = "activeDatesByDayTypeRefCache";
+  public static final String ACTIVE_DATES_BY_SERVICE_JOURNEY_REF = "activeDatesByServiceJourneyRefCache";
 
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
@@ -193,6 +196,24 @@ public class CacheConfig {
       redissonClient,
       SERVICE_JOURNEY_STOPS_CACHE,
       new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+    );
+  }
+
+  @Bean(name = ACTIVE_DATES_BY_DAY_TYPE_REF)
+  public Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache(RedissonClient redissonClient) {
+    return getOrCreateReportScopedCache(
+            redissonClient,
+            ACTIVE_DATES_BY_DAY_TYPE_REF,
+            new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+    );
+  }
+
+  @Bean(name = ACTIVE_DATES_BY_SERVICE_JOURNEY_REF)
+  public Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache(RedissonClient redissonClient) {
+    return getOrCreateReportScopedCache(
+            redissonClient,
+            ACTIVE_DATES_BY_SERVICE_JOURNEY_REF,
+            new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
     );
   }
 

@@ -1,18 +1,19 @@
 package no.entur.antu.config.cache;
 
-import static no.entur.antu.config.cache.CacheConfig.LINE_INFO_CACHE;
-import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE;
-import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_STOPS_CACHE;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
+import no.entur.antu.netexdata.collectors.ServiceJourneyActiveDatesCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import static no.entur.antu.config.cache.CacheConfig.*;
 
 @Configuration
 public class NetexDataCollectorConfig {
@@ -48,6 +49,23 @@ public class NetexDataCollectorConfig {
     return new ServiceJourneyStopsCollector(
       redissonClient,
       serviceJourneyStopsCache
+    );
+  }
+
+  @Bean
+  public ServiceJourneyActiveDatesCollector serviceJourneyActiveDatesCollector(
+          RedissonClient redissonClient,
+          @Qualifier(
+                  ACTIVE_DATES_BY_DAY_TYPE_REF
+          ) Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
+          @Qualifier(
+                  ACTIVE_DATES_BY_SERVICE_JOURNEY_REF
+          ) Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache
+  ) {
+    return new ServiceJourneyActiveDatesCollector(
+            redissonClient,
+            dayTypeActiveDatesCache,
+            serviceJourneyActiveDatesCache
     );
   }
 }
