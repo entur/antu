@@ -204,7 +204,7 @@ public class CacheConfig {
     return getOrCreateReportScopedCache(
             redissonClient,
             ACTIVE_DATES_BY_DAY_TYPE_REF,
-            new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+            new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
     );
   }
 
@@ -213,7 +213,7 @@ public class CacheConfig {
     return getOrCreateReportScopedCache(
             redissonClient,
             ACTIVE_DATES_BY_SERVICE_JOURNEY_REF,
-            new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+            new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
     );
   }
 

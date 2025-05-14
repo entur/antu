@@ -19,6 +19,7 @@ package no.entur.antu.config;
 import java.util.List;
 import java.util.Set;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
+import no.entur.antu.netexdata.collectors.ServiceJourneyActiveDatesCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
@@ -133,7 +134,8 @@ public class TimetableDataValidatorConfig {
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
     CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    StopPlaceRepository stopPlaceRepository,
+    ServiceJourneyActiveDatesCollector serviceJourneyActiveDatesCollector
   ) {
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
 
@@ -174,7 +176,8 @@ public class TimetableDataValidatorConfig {
     List<NetexDataCollector> commonDataCollectors = List.of(
       lineInfoCollector,
       serviceJourneyInterchangeInfoCollector,
-      serviceJourneyStopsCollector
+      serviceJourneyStopsCollector,
+      serviceJourneyActiveDatesCollector
     );
 
     return NetexValidatorsRunner

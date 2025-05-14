@@ -30,7 +30,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
 
     @Override
     protected void collectDataFromLineFile(JAXBValidationContext jaxbValidationContext) {
-        var commonDayTypeActiveDates = this.dayTypeActiveDates.get(jaxbValidationContext.getValidationReportId());
+        var commonDayTypeActiveDates = this.dayTypeActiveDates.getOrDefault(jaxbValidationContext.getValidationReportId(), new HashMap<>());
         var lineDayTypesToActiveDates = getDayTypesToActiveDates(jaxbValidationContext);
 
         // Så kan vi samle opp daytypes fra servicejourneys + operatingdays fra datedservicejourneys
@@ -42,8 +42,12 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
             List<LocalDateTime> serviceJourneyDates = new ArrayList<>();
             dayTypeRefs.forEach(dt -> {
                 var dtId = dt.getValue().getRef();
-                serviceJourneyDates.addAll(commonDayTypeActiveDates.get(dtId));
-                serviceJourneyDates.addAll(lineDayTypesToActiveDates.get(dtId));
+                if (commonDayTypeActiveDates.containsKey(dtId)) {
+                    serviceJourneyDates.addAll(commonDayTypeActiveDates.get(dtId));
+                }
+                if (lineDayTypesToActiveDates.containsKey(dtId)) {
+                    serviceJourneyDates.addAll(lineDayTypesToActiveDates.get(dtId));
+                }
             });
             return Map.entry(
                     serviceJourney.getId(),
@@ -100,7 +104,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
         RLock lock = redissonClient.getLock(validationReportId);
         try {
             lock.lock();
-            var reportServiceJourneyActiveDates = this.serviceJourneyActiveDates.get(validationReportId);
+            var reportServiceJourneyActiveDates = this.serviceJourneyActiveDates.getOrDefault(validationReportId, new HashMap<>());
 
             newServiceJourneyActiveDates.forEach(
                     (serviceJourneyId, activeDates) -> {
@@ -108,6 +112,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
                                 .addAll(activeDates);
                     }
             );
+            this.serviceJourneyActiveDates.put(validationReportId, reportServiceJourneyActiveDates);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
@@ -119,7 +124,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
         RLock lock = redissonClient.getLock(validationReportId);
         try {
             lock.lock();
-            var reportDayTypeActiveDates = this.dayTypeActiveDates.get(validationReportId);
+            var reportDayTypeActiveDates = this.dayTypeActiveDates.getOrDefault(validationReportId, new HashMap<>());
 
             dayTypeActiveDates.forEach(
                     (dayTypeRef, activeDates) -> {
@@ -127,6 +132,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
                                 .addAll(activeDates);
                     }
             );
+            this.dayTypeActiveDates.put(validationReportId, reportDayTypeActiveDates);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
