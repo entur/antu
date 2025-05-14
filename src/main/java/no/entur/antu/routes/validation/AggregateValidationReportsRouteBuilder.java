@@ -80,11 +80,14 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
 
   private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
   private final AntuPrometheusMetricsService antuPrometheusMetricsService;
+  private final ValidationStateRepository validationStateRepository;
 
   public AggregateValidationReportsRouteBuilder(
-    AntuPrometheusMetricsService antuPrometheusMetricsService
+    AntuPrometheusMetricsService antuPrometheusMetricsService,
+    ValidationStateRepository validationStateRepository
   ) {
     this.antuPrometheusMetricsService = antuPrometheusMetricsService;
+    this.validationStateRepository = validationStateRepository;
   }
 
   @Override
@@ -162,7 +165,11 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .process(exchange ->
         exchange.setProperty(
           PROP_NETEX_VALIDATION_CALLBACK,
-          new AntuNetexValidationProgressCallback(this, exchange)
+          new AntuNetexValidationProgressCallback(
+            this,
+            exchange,
+            validationStateRepository
+          )
         )
       )
       .bean(
@@ -337,6 +344,10 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       )
       .bean(
         "netexDataRepository",
+        "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})"
+      )
+      .bean(
+        "validationStateRepository",
         "cleanUp(${header." + VALIDATION_REPORT_ID_HEADER + "})"
       )
       .log(LoggingLevel.INFO, correlation() + "Cleaned up cache")

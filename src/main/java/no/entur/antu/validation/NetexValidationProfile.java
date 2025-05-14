@@ -1,10 +1,14 @@
 package no.entur.antu.validation;
 
 import java.util.Map;
+import no.entur.antu.config.cache.ValidationState;
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.routes.validation.ValidationStateRepository;
 import org.entur.netex.validation.validator.NetexValidationProgressCallBack;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validate a NeTEx dataset according to a given validation profile.
@@ -12,16 +16,23 @@ import org.entur.netex.validation.validator.ValidationReport;
  */
 public class NetexValidationProfile {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    NetexValidationProfile.class
+  );
+
   private final Map<ValidationProfile, NetexValidatorsRunner> netexValidatorsRunners;
+  private final ValidationStateRepository validationStateRepository;
   private final boolean skipSchemaValidation;
   private final boolean skipNetexValidators;
 
   public NetexValidationProfile(
     Map<ValidationProfile, NetexValidatorsRunner> netexValidatorsRunners,
+    ValidationStateRepository validationStateRepository,
     boolean skipSchemaValidation,
     boolean skipNetexValidators
   ) {
     this.netexValidatorsRunners = netexValidatorsRunners;
+    this.validationStateRepository = validationStateRepository;
     this.skipSchemaValidation = skipSchemaValidation;
     this.skipNetexValidators = skipNetexValidators;
   }
@@ -54,13 +65,28 @@ public class NetexValidationProfile {
       validationProfile
     );
 
+    ValidationState validationState =
+      validationStateRepository.getValidationState(validationReportId);
+    boolean validationAlreadyComplete = false;
+    boolean hasErrorInCommonFile = false;
+    if (validationState == null) {
+      LOGGER.info("The validation is already complete, ignoring");
+      validationAlreadyComplete = true;
+    } else {
+      hasErrorInCommonFile = validationState.hasErrorInCommonFile();
+      if (hasErrorInCommonFile) {
+        LOGGER.info(
+          "The validation failed in common file, ignoring NeTEx validators"
+        );
+      }
+    }
     return netexValidatorsRunner.validate(
       codespace,
       validationReportId,
       filename,
       fileContent,
-      skipSchemaValidation,
-      skipNetexValidators,
+      skipSchemaValidation || validationAlreadyComplete,
+      skipNetexValidators || validationAlreadyComplete || hasErrorInCommonFile,
       netexValidationProgressCallBack
     );
   }
