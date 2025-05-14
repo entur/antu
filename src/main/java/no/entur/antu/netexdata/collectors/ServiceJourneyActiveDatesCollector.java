@@ -3,6 +3,7 @@ package no.entur.antu.netexdata.collectors;
 import jakarta.xml.bind.JAXBElement;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
+import org.entur.netex.validation.validator.jaxb.support.DatedServiceJourneyUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.rutebanken.netex.model.*;
@@ -17,25 +18,34 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     private final RedissonClient redissonClient;
     private final Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDates;
     private final Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDates;
+    private final Map<String, Map<String, LocalDateTime>> operatingDaysToCalendarDate;
 
     public ServiceJourneyActiveDatesCollector(RedissonClient redissonClient,
                                               // maps validationReportId -> map of dayTypeRef-> activeDate[]
                                               Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
                                               // maps validationReportId -> map of serviceJourney -> activeDate[]
-                                              Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache) {
+                                              Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache,
+                                              // maps validationReportId -> map of operatingDayRef -> activeDate
+                                              Map<String, Map<String, LocalDateTime>> operatingDaysToCalendarDate) {
         this.redissonClient = redissonClient;
         this.dayTypeActiveDates = dayTypeActiveDatesCache;
         this.serviceJourneyActiveDates = serviceJourneyActiveDatesCache;
+        this.operatingDaysToCalendarDate = operatingDaysToCalendarDate;
     }
 
     @Override
     protected void collectDataFromLineFile(JAXBValidationContext jaxbValidationContext) {
+        var commonOperatingDaysToCalendarDate = this.operatingDaysToCalendarDate.getOrDefault(jaxbValidationContext.getValidationReportId(), new HashMap<>());
         var commonDayTypeActiveDates = this.dayTypeActiveDates.getOrDefault(jaxbValidationContext.getValidationReportId(), new HashMap<>());
-        var lineDayTypesToActiveDates = getDayTypesToActiveDates(jaxbValidationContext);
+        Map<String, LocalDateTime> lineOperatingDaysToCalendarDate = getOperatingDaysToCalendarDate(jaxbValidationContext);
+        var lineDayTypesToActiveDates = getDayTypesToActiveDates(jaxbValidationContext, lineOperatingDaysToCalendarDate);
 
         // Så kan vi samle opp daytypes fra servicejourneys + operatingdays fra datedservicejourneys
 
-        Map<String, List<LocalDateTime>> serviceJourneyToDates = jaxbValidationContext.serviceJourneys().stream().map(
+        Map<String, List<LocalDateTime>> serviceJourneyToDates = jaxbValidationContext.serviceJourneys().stream()
+                // daytyperefstructure can be null if serviceJourney is referred to by a datedServiceJourney
+                .filter(serviceJourney -> serviceJourney.getDayTypes() != null)
+                .map(
                 serviceJourney -> {
             DayTypeRefs_RelStructure dayTypeRefsRelStructure = serviceJourney.getDayTypes();
             List<JAXBElement<? extends DayTypeRefStructure>> dayTypeRefs = dayTypeRefsRelStructure.getDayTypeRef();
@@ -61,22 +71,39 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
         // OperatingDay<B, 25.12.25>
         // DatedServiceJourney<A, B>
         // ==> ServiceJourney -> [25.12.25]
+        jaxbValidationContext.datedServiceJourneys().forEach(
+                dsj -> {
+                    var serviceJourneyRef = dsj.getJourneyRef().get(0).getValue().getRef();
+                    var operatingDayRef = dsj.getOperatingDayRef().getRef();
+                    var serviceJourneyDates = serviceJourneyToDates.getOrDefault(serviceJourneyRef, new ArrayList<>());
+                    if (commonOperatingDaysToCalendarDate.containsKey(operatingDayRef)) {
+                        serviceJourneyDates.add(commonOperatingDaysToCalendarDate.get(operatingDayRef));
+                    } else if (lineOperatingDaysToCalendarDate.containsKey(operatingDayRef)) {
+                        serviceJourneyDates.add(lineOperatingDaysToCalendarDate.get(operatingDayRef));
+                    }
+                    serviceJourneyToDates.put(serviceJourneyRef, serviceJourneyDates);
+                }
+        );
         addServiceJourneyActiveDates(jaxbValidationContext.getValidationReportId(), serviceJourneyToDates);
     }
 
     @Override
     protected void collectDataFromCommonFile(JAXBValidationContext jaxbValidationContext) {
-        Map<String, List<LocalDateTime>> dayTypesToActiveDates = getDayTypesToActiveDates(jaxbValidationContext);
+        Map<String, LocalDateTime> operatingDaysToCalendarDate = getOperatingDaysToCalendarDate(jaxbValidationContext);
+        Map<String, List<LocalDateTime>> dayTypesToActiveDates = getDayTypesToActiveDates(jaxbValidationContext, operatingDaysToCalendarDate);
 
         addActiveDates(jaxbValidationContext.getValidationReportId(), dayTypesToActiveDates);
+        addOperatingDays(jaxbValidationContext.getValidationReportId(), operatingDaysToCalendarDate);
     }
 
-    private Map<String, List<LocalDateTime>> getDayTypesToActiveDates(JAXBValidationContext jaxbValidationContext) {
-        var operatingDaysToCalendarDate = jaxbValidationContext.getNetexEntitiesIndex().getOperatingDayIndex().getAll().stream().map(operatingDay -> Map.entry(
+    private Map<String, LocalDateTime> getOperatingDaysToCalendarDate(JAXBValidationContext jaxbValidationContext) {
+        return jaxbValidationContext.getNetexEntitiesIndex().getOperatingDayIndex().getAll().stream().map(operatingDay -> Map.entry(
                 operatingDay.getId(),
                 operatingDay.getCalendarDate()
         )).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 
+    private Map<String, List<LocalDateTime>> getDayTypesToActiveDates(JAXBValidationContext jaxbValidationContext, Map<String, LocalDateTime> operatingDaysToCalendarDate) {
         return jaxbValidationContext.getNetexEntitiesIndex().getDayTypeIndex().getAll().stream().map(dayType -> {
             List<LocalDateTime> dates = new ArrayList<>();
             jaxbValidationContext.getNetexEntitiesIndex().getDayTypeAssignmentsByDayTypeIdIndex().get(dayType.getId()).forEach(dayTypeAssignment -> {
@@ -133,6 +160,22 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
                     }
             );
             this.dayTypeActiveDates.put(validationReportId, reportDayTypeActiveDates);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    private void addOperatingDays(String validationReportId, Map<String, LocalDateTime> operatingDays) {
+        RLock lock = redissonClient.getLock(validationReportId);
+        try {
+            lock.lock();
+            var reportOperatingDaysToCalendarDate = this.operatingDaysToCalendarDate.getOrDefault(validationReportId, new HashMap<>());
+
+            reportOperatingDaysToCalendarDate.putAll(operatingDays);
+
+            this.operatingDaysToCalendarDate.put(validationReportId, reportOperatingDaysToCalendarDate);
         } finally {
             if (lock.isHeldByCurrentThread()) {
                 lock.unlock();

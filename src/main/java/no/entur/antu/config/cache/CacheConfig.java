@@ -49,6 +49,7 @@ public class CacheConfig {
     "organisationAliasCache";
   public static final String ACTIVE_DATES_BY_DAY_TYPE_REF = "activeDatesByDayTypeRefCache";
   public static final String ACTIVE_DATES_BY_SERVICE_JOURNEY_REF = "activeDatesByServiceJourneyRefCache";
+  public static final String ACTIVE_DATE_BY_OPERATING_DAY_REF = "activeDateByOperatingDayRefCache";
 
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
@@ -213,6 +214,15 @@ public class CacheConfig {
     return getOrCreateReportScopedCache(
             redissonClient,
             ACTIVE_DATES_BY_SERVICE_JOURNEY_REF,
+            new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
+    );
+  }
+
+  @Bean(name = ACTIVE_DATE_BY_OPERATING_DAY_REF)
+  public Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache(RedissonClient redissonClient) {
+    return getOrCreateReportScopedCache(
+            redissonClient,
+            ACTIVE_DATE_BY_OPERATING_DAY_REF,
             new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
     );
   }

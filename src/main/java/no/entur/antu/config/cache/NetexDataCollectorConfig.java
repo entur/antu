@@ -60,12 +60,16 @@ public class NetexDataCollectorConfig {
           ) Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
           @Qualifier(
                   ACTIVE_DATES_BY_SERVICE_JOURNEY_REF
-          ) Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache
+          ) Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache,
+          @Qualifier(
+                  ACTIVE_DATE_BY_OPERATING_DAY_REF
+          ) Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
   ) {
     return new ServiceJourneyActiveDatesCollector(
             redissonClient,
             dayTypeActiveDatesCache,
-            serviceJourneyActiveDatesCache
+            serviceJourneyActiveDatesCache,
+            operatingDayActiveDateCache
     );
   }
 }
