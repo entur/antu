@@ -65,20 +65,19 @@ public class NetexValidationProfile {
       validationProfile
     );
 
-    ValidationState validationState =
-      validationStateRepository.getValidationState(validationReportId);
-    boolean validationAlreadyComplete = false;
-    boolean hasErrorInCommonFile = false;
-    if (validationState == null) {
+    boolean validationAlreadyComplete = validationAlreadyComplete(
+      validationReportId
+    );
+    if (validationAlreadyComplete) {
       LOGGER.info("The validation is already complete, ignoring");
-      validationAlreadyComplete = true;
-    } else {
-      hasErrorInCommonFile = validationState.hasErrorInCommonFile();
-      if (hasErrorInCommonFile) {
-        LOGGER.info(
-          "The validation failed in common file, ignoring NeTEx validators"
-        );
-      }
+    }
+    boolean hasErrorInCommonFile = validationHasErrorInCommonFile(
+      validationReportId
+    );
+    if (hasErrorInCommonFile) {
+      LOGGER.info(
+        "The validation failed in common file, ignoring NeTEx validators"
+      );
     }
     return netexValidatorsRunner.validate(
       codespace,
@@ -134,5 +133,21 @@ public class NetexValidationProfile {
       );
     }
     return netexValidatorsRunner;
+  }
+
+  private ValidationState getValidationState(String validationReportId) {
+    return validationStateRepository.getValidationState(validationReportId);
+  }
+
+  private boolean validationAlreadyComplete(String validationReportId) {
+    return getValidationState(validationReportId) == null;
+  }
+
+  private boolean validationHasErrorInCommonFile(String validationReportId) {
+    ValidationState validationState = getValidationState(validationReportId);
+    if (validationState != null) {
+      return validationState.hasErrorInCommonFile();
+    }
+    return false;
   }
 }
