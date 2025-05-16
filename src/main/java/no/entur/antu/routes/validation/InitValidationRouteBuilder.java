@@ -23,6 +23,7 @@ import static no.entur.antu.Constants.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import no.entur.antu.Constants;
+import no.entur.antu.config.cache.ValidationState;
 import no.entur.antu.routes.BaseRouteBuilder;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,14 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
     DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSSSSS");
   private static final String PROP_REPORT_ID_TIMESTAMP = "REPORT_ID_TIMESTAMP";
+
+  private final ValidationStateRepository validationStateRepository;
+
+  public InitValidationRouteBuilder(
+    ValidationStateRepository validationStateRepository
+  ) {
+    this.validationStateRepository = validationStateRepository;
+  }
 
   @Override
   public void configure() throws Exception {
@@ -61,6 +70,16 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
           .append('_')
           .append(exchangeProperty(PROP_REPORT_ID_TIMESTAMP))
       )
+      .process(exchange -> {
+        String validationReportId = exchange
+          .getIn()
+          .getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
+        ValidationState validationState = new ValidationState();
+        validationStateRepository.createValidationStateIfMissing(
+          validationReportId,
+          validationState
+        );
+      })
       .setBody(constant(STATUS_VALIDATION_STARTED))
       .to("direct:notifyStatus")
       .log(LoggingLevel.INFO, correlation() + "Starting validation")

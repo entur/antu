@@ -53,6 +53,13 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
   private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
   private static final String PROP_NETEX_VALIDATION_CALLBACK =
     "PROP_NETEX_VALIDATION_CALLBACK";
+  private ValidationStateRepository validationStateRepository;
+
+  public ValidateFilesRouteBuilder(
+    ValidationStateRepository validationStateRepository
+  ) {
+    this.validationStateRepository = validationStateRepository;
+  }
 
   @Override
   public void configure() throws Exception {
@@ -136,7 +143,11 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .process(exchange ->
         exchange.setProperty(
           PROP_NETEX_VALIDATION_CALLBACK,
-          new AntuNetexValidationProgressCallback(this, exchange)
+          new AntuNetexValidationProgressCallback(
+            this,
+            exchange,
+            validationStateRepository
+          )
         )
       )
       .bean(
