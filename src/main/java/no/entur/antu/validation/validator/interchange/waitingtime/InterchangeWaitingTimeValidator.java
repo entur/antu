@@ -3,6 +3,7 @@ package no.entur.antu.validation.validator.interchange.waitingtime;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,9 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+
+import static org.joda.time.DateTimeConstants.MILLIS_PER_DAY;
+import static org.joda.time.DateTimeConstants.SECONDS_PER_DAY;
 
 public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
 
@@ -228,9 +232,24 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       List<ServiceJourneyStop> fromJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeWithSharedActiveDate.fromJourneyRef());
       List<ServiceJourneyStop> toJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeWithSharedActiveDate.toJourneyRef());
 
-      fromJourneyStops.stream().forEach(serviceJourneyStop -> {
-        serviceJourneyStop.arrivalTime() - serviceJourneyStop.departureTime()
-      });
+      LocalTime arrivalTime =  netexDataRepository.serviceJourneyStops(validationReportId).get(serviceJourneyInterchangeWithSharedActiveDate.fromJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeWithSharedActiveDate.fromStopPoint()).findFirst().orElseThrow().arrivalTime();
+      LocalTime departureTime =  netexDataRepository.serviceJourneyStops(validationReportId).get(serviceJourneyInterchangeWithSharedActiveDate.toJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeWithSharedActiveDate.toStopPoint()).findFirst().orElseThrow().departureTime();
+
+      int actualWaitingTimeInSeconds = departureTime.toSecondOfDay() - arrivalTime.toSecondOfDay();
+      if (actualWaitingTimeInSeconds < 0) {
+        actualWaitingTimeInSeconds += SECONDS_PER_DAY;
+      }
+
+      Duration maximumWaitingTime = serviceJourneyInterchangeWithSharedActiveDate.waitingTime();
+      Duration errorTresholdWaitingTime = maximumWaitingTime.multipliedBy(3);
+      Duration actualWaitingTimeAsDuration = Duration.ofSeconds(actualWaitingTimeInSeconds);
+
+      if (actualWaitingTimeAsDuration.compareTo(errorTresholdWaitingTime) > 0) {
+        // TODO: Give an error due to too long waitingTime
+      }
+      else if (actualWaitingTimeAsDuration.compareTo(maximumWaitingTime) > 0) {
+        // TODO: Give a warning due to too long waitingTime
+      }
 
     }
 
