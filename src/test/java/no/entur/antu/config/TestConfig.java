@@ -1,10 +1,8 @@
 package no.entur.antu.config;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
-import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -32,7 +30,7 @@ public class TestConfig {
   @Bean
   @Primary
   public OrganisationAliasRepository organisationAliasRepository() {
-    return new SimpleOrganisationAliasRepository(new HashSet<>());
+    return new TestOrganisationAliasRepository();
   }
 
   @Bean(name = "stopPlaceRepository")
@@ -135,12 +133,12 @@ public class TestConfig {
 
     @Override
     public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
-      return false;
+      return true;
     }
 
     @Override
     public boolean hasQuayId(QuayId quayId) {
-      return false;
+      return true;
     }
 
     @Override
@@ -165,5 +163,22 @@ public class TestConfig {
 
     @Override
     public void refreshCache() {}
+  }
+
+  private static class TestOrganisationAliasRepository
+    implements OrganisationAliasRepository {
+
+    @Override
+    public boolean hasOrganisationWithAlias(String organisationId) {
+      return true;
+    }
+
+    @Override
+    public void refreshCache() {}
+
+    @Override
+    public boolean isEmpty() {
+      return false;
+    }
   }
 }
