@@ -2,6 +2,7 @@ package no.entur.antu.validation.validator.interchange.waitingtime;
 
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.TestApp;
+import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.config.TestConfig;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import org.entur.netex.validation.validator.SimpleValidationEntryFactory;
@@ -25,17 +26,9 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
+class InterchangeWaitingTimeValidatorTest2 {
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        classes = TestApp.class,
-        properties = { "antu.netex.validation.entries.max=1" }
-)
-@ActiveProfiles("test")
-class InterchangeWaitingTimeValidatorTest2 extends AntuRouteBuilderIntegrationTestBase {
-
-    @Autowired
-    private TestConfig.TestNetexDataRepository netexDataRepository;
+    private TestNetexDataRepository netexDataRepository;
 
     // Constants for test data identification
     private static final String CODESPACE = "codespace";
@@ -54,6 +47,7 @@ class InterchangeWaitingTimeValidatorTest2 extends AntuRouteBuilderIntegrationTe
 
     @BeforeEach
     void setUp() {
+        this.netexDataRepository = new TestNetexDataRepository();
         setupServiceJourneyInterchange();
         setupTestCaseWithUnsatisfiedWaitingTime();
 //        setupTestCaseWithoutWaitingTime();
