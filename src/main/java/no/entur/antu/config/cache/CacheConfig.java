@@ -13,10 +13,7 @@ import no.entur.antu.cache.codec.QuayIdCodec;
 import no.entur.antu.cache.codec.StopPlaceIdCodec;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
-import org.entur.netex.validation.validator.model.QuayId;
-import org.entur.netex.validation.validator.model.SimpleQuay;
-import org.entur.netex.validation.validator.model.SimpleStopPlace;
-import org.entur.netex.validation.validator.model.StopPlaceId;
+import org.entur.netex.validation.validator.model.*;
 import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.options.LocalCachedMapOptions;
@@ -210,7 +207,7 @@ public class CacheConfig {
   }
 
   @Bean(name = ACTIVE_DATES_BY_SERVICE_JOURNEY_REF)
-  public Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache(RedissonClient redissonClient) {
+  public Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> serviceJourneyActiveDatesCache(RedissonClient redissonClient) {
     return getOrCreateReportScopedCache(
             redissonClient,
             ACTIVE_DATES_BY_SERVICE_JOURNEY_REF,

@@ -25,13 +25,13 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   private final Map<String, List<String>> lineInfoCache;
   private final Map<String, Map<String, List<String>>> serviceJourneyStopsCache;
   private final Map<String, List<String>> serviceJourneyInterchangeInfoCache;
-  private final Map<String, Map<String, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache;
+  private final Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache;
 
   public DefaultNetexDataRepository(
     Map<String, List<String>> lineInfoCache,
     Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
     Map<String, List<String>> serviceJourneyInterchangeInfoCache,
-    Map<String, Map<String, List<LocalDateTime>>> activeDatesByServiceJourneyId
+    Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId
   ) {
     this.lineInfoCache = lineInfoCache;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
@@ -108,7 +108,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   }
 
   @Override
-  public Map<String, List<LocalDateTime>> serviceJourneyIdToActiveDates(
+  public Map<ServiceJourneyId, List<LocalDateTime>> serviceJourneyIdToActiveDates(
           String validationReportId
   ) {
     return activeDatesByServiceJourneyIdCache.get(validationReportId);

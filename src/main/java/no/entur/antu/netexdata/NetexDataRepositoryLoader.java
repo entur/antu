@@ -1,6 +1,7 @@
 package no.entur.antu.netexdata;
 
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,5 +16,5 @@ public interface NetexDataRepositoryLoader extends NetexDataRepository {
    */
   void cleanUp(String validationReportId);
 
-  Map<String, List<LocalDateTime>> serviceJourneyIdToActiveDates(String validationReportId);
+  Map<ServiceJourneyId, List<LocalDateTime>> serviceJourneyIdToActiveDates(String validationReportId);
 }

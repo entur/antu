@@ -31,12 +31,12 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       Severity.ERROR
     );
 
-  private final DefaultNetexDataRepository netexDataRepository;
+  private final NetexDataRepository netexDataRepository;
 
   // TODO: Inject NetexDataRepository instead. Ensure serviceJourneyIdToActiveDates is added to the interface in validator lib
   protected InterchangeWaitingTimeValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
-    DefaultNetexDataRepository netexDataRepository
+    NetexDataRepository netexDataRepository
   ) {
     super(validationReportEntryFactory);
     this.netexDataRepository = netexDataRepository;
@@ -49,7 +49,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     return this.netexDataRepository.serviceJourneyIdToActiveDates(
         validationReportId
       )
-      .get(serviceJourneyId.id());
+      .get(serviceJourneyId);
   }
 
   private boolean serviceJourneysHaveSharedActiveDates(
@@ -71,11 +71,11 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
   }
 
   private int arrivalDayOffsetFromScheduledStopPointId(List<ServiceJourneyStop> stops, ScheduledStopPointId scheduledStopPointId) {
-    return stops.stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == scheduledStopPointId).findFirst().orElseThrow().arrivalDayOffset();
+    return stops.stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)).findFirst().orElseThrow().arrivalDayOffset();
   }
 
   private int departureDayOffsetFromScheduledStopPointId(List<ServiceJourneyStop> stops, ScheduledStopPointId scheduledStopPointId) {
-    return stops.stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == scheduledStopPointId).findFirst().orElseThrow().departureDayOffset();
+    return stops.stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)).findFirst().orElseThrow().departureDayOffset();
   }
 
 
@@ -106,68 +106,6 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     return false;
   }
 
-  @Override
-  public ValidationReport validate(ValidationReport validationReport) {
-    String validationReportId = validationReport.getValidationReportId();
-
-
-
-    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfoList =
-      netexDataRepository.serviceJourneyInterchangeInfos(validationReportId);
-    Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStopsByServiceJourneyId = netexDataRepository.serviceJourneyStops(validationReportId);
-
-//    netexDataRepository.serviceJourneyStops(validationReportId).get(0).stream().forEach(entry -> {entry.});
-
-    serviceJourneyInterchangeInfoList
-      .stream()
-      .filter(serviceJourneyInterchangeInfo -> {
-        List<ServiceJourneyStop> fromJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.fromJourneyRef());
-        List<ServiceJourneyStop> toJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.toJourneyRef());
-        int arrivalDayOffset = arrivalDayOffsetFromScheduledStopPointId(fromJourneyStops, serviceJourneyInterchangeInfo.fromStopPoint());
-        int departureDayOffset = departureDayOffsetFromScheduledStopPointId(toJourneyStops, serviceJourneyInterchangeInfo.toStopPoint());
-
-
-
-        serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.fromJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeInfo.fromStopPoint()).findFirst().orElseThrow().arrivalDayOffset();;
-
-        int dayOffsetDiff = departureDayOffset - arrivalDayOffset;
-//fromJourneyStops.get(0).
-
-
-//          int dayOffsetDiff = consumerVJAtStop.getDepartureDayOffset() - feederVJAtStop.getArrivalDayOffset();
-//          long msWait = TimeUtil.toMillisecondsOfDay(consumerVJAtStop.getDepartureTime())- TimeUtil.toMillisecondsOfDay(feederVJAtStop.getArrivalTime());
-//          if (msWait < 0) {
-//              msWait = DateUtils.MILLIS_PER_DAY + msWait;
-//              dayOffsetDiff--;
-//          }
-
-
-            return !serviceJourneysHaveSharedActiveDates(
-              validationReportId,
-              serviceJourneyInterchangeInfo.fromJourneyRef(),
-              serviceJourneyInterchangeInfo.toJourneyRef(),
-                    dayOffsetDiff
-            );
-              }
-      )
-      .forEach(serviceJourneyInterchangeInfo -> {
-        createValidationReportEntry(
-          new ValidationIssue(
-            RULE_SERVICE_JOURNEYS_HAS_SHARED_ACTIVE_DATE,
-            new DataLocation(
-              serviceJourneyInterchangeInfo.interchangeId(),
-              serviceJourneyInterchangeInfo.filename(),
-              null,
-              null
-            )
-          )
-        );
-      });
-
-    return validationReport;
-  }
-
-
 
   private boolean hasSharedActiveDates(List<LocalDateTime> fromJourneyActiveDates, List<LocalDateTime> toJourneyActiveDates, int dayDifference) {
     for (LocalDateTime consumerActiveDate : toJourneyActiveDates) {
@@ -181,7 +119,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
 
 
 
-  public ValidationReport validate2(ValidationReport validationReport) {
+  public ValidationReport validate(ValidationReport validationReport) {
     String validationReportId = validationReport.getValidationReportId();
     List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfoList =
             netexDataRepository.serviceJourneyInterchangeInfos(validationReportId);
@@ -222,7 +160,10 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
                                       serviceJourneyInterchangeWithoutSharedActiveDate.filename(),
                                       null,
                                       null
-                              )
+                              ),
+                              serviceJourneyInterchangeWithoutSharedActiveDate.interchangeId(),
+                              serviceJourneyInterchangeWithoutSharedActiveDate.fromJourneyRef().id(),
+                              serviceJourneyInterchangeWithoutSharedActiveDate.toJourneyRef().id()
                       )
               )
       );
