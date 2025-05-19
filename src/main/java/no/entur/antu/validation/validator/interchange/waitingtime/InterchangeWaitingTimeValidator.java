@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import no.entur.antu.netexdata.DefaultNetexDataRepository;
 import org.apache.commons.lang3.time.DateUtils;
@@ -228,29 +229,30 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     }
 
     for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeWithSharedActiveDate : serviceJourneyInterchangesWithSharedActiveDates) {
-      // TODO: Validate waiting time
-      List<ServiceJourneyStop> fromJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeWithSharedActiveDate.fromJourneyRef());
-      List<ServiceJourneyStop> toJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeWithSharedActiveDate.toJourneyRef());
-
       LocalTime arrivalTime =  netexDataRepository.serviceJourneyStops(validationReportId).get(serviceJourneyInterchangeWithSharedActiveDate.fromJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeWithSharedActiveDate.fromStopPoint()).findFirst().orElseThrow().arrivalTime();
       LocalTime departureTime =  netexDataRepository.serviceJourneyStops(validationReportId).get(serviceJourneyInterchangeWithSharedActiveDate.toJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeWithSharedActiveDate.toStopPoint()).findFirst().orElseThrow().departureTime();
+
 
       int actualWaitingTimeInSeconds = departureTime.toSecondOfDay() - arrivalTime.toSecondOfDay();
       if (actualWaitingTimeInSeconds < 0) {
         actualWaitingTimeInSeconds += SECONDS_PER_DAY;
       }
 
-      Duration maximumWaitingTime = serviceJourneyInterchangeWithSharedActiveDate.waitingTime();
-      Duration errorTresholdWaitingTime = maximumWaitingTime.multipliedBy(3);
-      Duration actualWaitingTimeAsDuration = Duration.ofSeconds(actualWaitingTimeInSeconds);
+      // If maximumWaitTime does not exist, it is assumed that consumer will wait for feeder regardless of delay
+      Optional<Duration> maximumWaitingTimeOptional = serviceJourneyInterchangeWithSharedActiveDate.maximumWaitTime();
+      if (maximumWaitingTimeOptional.isPresent()) {
+        Duration maximumWaitingTime = maximumWaitingTimeOptional.get();
+        Duration errorTresholdWaitingTime = maximumWaitingTime.multipliedBy(3);
+        Duration actualWaitingTimeAsDuration = Duration.ofSeconds(actualWaitingTimeInSeconds);
 
-      if (actualWaitingTimeAsDuration.compareTo(errorTresholdWaitingTime) > 0) {
-        // TODO: Give an error due to too long waitingTime
-      }
-      else if (actualWaitingTimeAsDuration.compareTo(maximumWaitingTime) > 0) {
-        // TODO: Give a warning due to too long waitingTime
-      }
+        if (actualWaitingTimeAsDuration.compareTo(errorTresholdWaitingTime) > 0) {
+          // TODO: Give an error due to too long waitingTime
+        }
+        else if (actualWaitingTimeAsDuration.compareTo(maximumWaitingTime) > 0) {
+          // TODO: Give a warning due to too long waitingTime
+        }
 
+      }
     }
 
     return validationReport;
