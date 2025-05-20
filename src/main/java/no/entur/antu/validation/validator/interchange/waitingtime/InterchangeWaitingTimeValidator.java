@@ -163,6 +163,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
             netexDataRepository.serviceJourneyInterchangeInfos(validationReportId);
     Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStopsByServiceJourneyId = netexDataRepository.serviceJourneyStops(validationReportId);
 
+    List<ServiceJourneyInterchangeInfo> interchangesWithSharedActiveDates = new ArrayList<>();
     for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo : serviceJourneyInterchangeInfoList) {
       List<ServiceJourneyStop> fromJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.fromJourneyRef());
       List<ServiceJourneyStop> toJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.toJourneyRef());
@@ -189,6 +190,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       // Her skal vi gi valideringsfeil kun hvis vi ikke finner en eneste dag hvor de to vil møtes.
       // Den skal også tillate overgang rundt midnatt. DVS at ventetid må være innenfor maximumWaitTime
       boolean doesMeet = hasSharedActiveDates(fromJourneyActiveDates, toJourneyActiveDates, maximumWaitingTime);
+
       if (!doesMeet) {
         validationReport.addValidationReportEntry(
                 createValidationReportEntry(
@@ -206,8 +208,13 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
                         )
                 )
         );
+      } else {
+        interchangesWithSharedActiveDates.add(serviceJourneyInterchangeInfo);
       }
     }
+
+    // TODO: Check waiting times on interchangesWithSharedActiveDates
+
     return validationReport;
   }
 

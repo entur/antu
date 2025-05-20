@@ -33,6 +33,8 @@ class InterchangeWaitingTimeValidatorTest2 {
     private static final String TEST_CASE_NO_SHARED_DATE_WITH_SATISFIED_WAITING_TIME = "idNoSharedActiveDateWithSatisfiedWaitingTime";
     private static final String TEST_CASE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME = "idDayOffsetWithSatisfiedWaitingTime";
     private static final String TEST_CASE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME = "idDayOffsetWithUnsatisfiedWaitingTime";
+    private static final String TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME = "arrivalDayOK";
+    private static final String TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME = "arrivalDayFailure";
 
     // Constants for service journey references
     private static final String SERVICE_JOURNEY_1 = "Test:ServiceJourney:1";
@@ -43,6 +45,10 @@ class InterchangeWaitingTimeValidatorTest2 {
     private static final String SERVICE_JOURNEY_6 = "Test:ServiceJourney:6";
     private static final String SERVICE_JOURNEY_7 = "Test:ServiceJourney:7";
     private static final String SERVICE_JOURNEY_8 = "Test:ServiceJourney:8";
+    private static final String SERVICE_JOURNEY_9 = "Test:ServiceJourney:9";
+    private static final String SERVICE_JOURNEY_10 = "Test:ServiceJourney:10";
+    private static final String SERVICE_JOURNEY_11 = "Test:ServiceJourney:11";
+    private static final String SERVICE_JOURNEY_12 = "Test:ServiceJourney:12";
 
     // Constants for stop points
     private static final int STOP_POINT_1 = 1;
@@ -53,6 +59,10 @@ class InterchangeWaitingTimeValidatorTest2 {
     private static final int STOP_POINT_6 = 6;
     private static final int STOP_POINT_7 = 7;
     private static final int STOP_POINT_8 = 8;
+    private static final int STOP_POINT_9 = 9;
+    private static final int STOP_POINT_10 = 10;
+    private static final int STOP_POINT_11 = 11;
+    private static final int STOP_POINT_12 = 12;
 
     @BeforeEach
     void setUp() {
@@ -257,6 +267,100 @@ class InterchangeWaitingTimeValidatorTest2 {
         );
     }
 
+    private void setupTestCaseWithArrivalDayOffsetAndSatisifiedWaitingTime() {
+        ServiceJourneyInterchange interchange = new ServiceJourneyInterchange()
+                .withId("ServiceJourneyInterchange:5")
+                .withMaximumWaitTime(Duration.ofHours(1))
+                .withFromJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_9).id()))
+                .withToJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_10).id()))
+                .withFromPointRef(createStopPointRef(STOP_POINT_9))
+                .withToPointRef(createStopPointRef(STOP_POINT_10));
+
+        netexDataRepository.addServiceJourneyInterchangeInfo(
+                TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME,
+                ServiceJourneyInterchangeInfo.of("", interchange)
+        );
+
+        Map<ServiceJourneyId, List<LocalDateTime>> activeDatesMap = Map.ofEntries(
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_9),
+                        List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+                ),
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_10),
+                        List.of(LocalDateTime.of(2025, 1, 3, 0, 0, 0))
+                )
+        );
+
+        netexDataRepository.putServiceJourneyIdToActiveDates(
+                TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME,
+                activeDatesMap
+        );
+
+        Map<ServiceJourneyId, List<ServiceJourneyStop>> journeyStopMap = Map.ofEntries(
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_9),
+                        List.of(createServiceJourneyArrivalStop(STOP_POINT_9, 23, 45, 0, Optional.of(1)))
+                ),
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_10),
+                        List.of(createServiceJourneyDepartureStop(STOP_POINT_10, 0, 15, 0, Optional.empty()))
+                )
+        );
+
+        netexDataRepository.putServiceJourneyStop(
+                TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME,
+                journeyStopMap
+        );
+    }
+
+    private void setupTestCaseWithArrivalDayOffsetAndUnsatisifiedWaitingTime() {
+        ServiceJourneyInterchange interchange = new ServiceJourneyInterchange()
+                .withId("ServiceJourneyInterchange:6")
+                .withMaximumWaitTime(Duration.ofMinutes(29))
+                .withFromJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_11).id()))
+                .withToJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_12).id()))
+                .withFromPointRef(createStopPointRef(STOP_POINT_11))
+                .withToPointRef(createStopPointRef(STOP_POINT_12));
+
+        netexDataRepository.addServiceJourneyInterchangeInfo(
+                TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME,
+                ServiceJourneyInterchangeInfo.of("", interchange)
+        );
+
+        Map<ServiceJourneyId, List<LocalDateTime>> activeDatesMap = Map.ofEntries(
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_11),
+                        List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+                ),
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_12),
+                        List.of(LocalDateTime.of(2025, 1, 3, 0, 0, 0))
+                )
+        );
+
+        netexDataRepository.putServiceJourneyIdToActiveDates(
+                TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME,
+                activeDatesMap
+        );
+
+        Map<ServiceJourneyId, List<ServiceJourneyStop>> journeyStopMap = Map.ofEntries(
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_11),
+                        List.of(createServiceJourneyArrivalStop(STOP_POINT_11, 23, 45, 0, Optional.of(1)))
+                ),
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_12),
+                        List.of(createServiceJourneyDepartureStop(STOP_POINT_12, 0, 15, 0, Optional.empty()))
+                )
+        );
+
+        netexDataRepository.putServiceJourneyStop(
+                TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME,
+                journeyStopMap
+        );
+    }
+
     private ServiceJourneyStop createServiceJourneyArrivalStop(int stopPointId, int arrivalHour, int arrivalMinute, int arrivalSecond, Optional<Integer> dayOffset) {
         ScheduledStopPointId stopId = ScheduledStopPointId.of(
                 NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
@@ -305,7 +409,7 @@ class InterchangeWaitingTimeValidatorTest2 {
     }
 
     @Test
-    void testDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
+    void testDepartureDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
         setupTestCaseWithDayOffsetAndSatisifiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, TEST_CASE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME);
@@ -314,10 +418,28 @@ class InterchangeWaitingTimeValidatorTest2 {
     }
 
     @Test
-    void testDayOffsetWithUnsatisfiedWaitingTimeGivesValidationError() {
+    void testDepartureDayOffsetWithUnsatisfiedWaitingTimeGivesValidationError() {
         setupTestCaseWithDayOffsetAndUnsatisifiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, TEST_CASE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME);
+        ValidationReport resultingValidationReport = validator.validate(validationReport);
+        assertEquals(1, resultingValidationReport.getValidationReportEntries().size());
+    }
+
+    @Test
+    void testArrivalDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
+        setupTestCaseWithArrivalDayOffsetAndSatisifiedWaitingTime();
+        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
+        ValidationReport validationReport = new ValidationReport(CODESPACE, TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME);
+        ValidationReport resultingValidationReport = validator.validate(validationReport);
+        assertTrue(resultingValidationReport.getValidationReportEntries().isEmpty());
+    }
+
+    @Test
+    void testArrivalDayOffsetWithUnsatisfiedWaitingTimeGivesValidationError() {
+        setupTestCaseWithArrivalDayOffsetAndUnsatisifiedWaitingTime();
+        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
+        ValidationReport validationReport = new ValidationReport(CODESPACE, TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME);
         ValidationReport resultingValidationReport = validator.validate(validationReport);
         assertEquals(1, resultingValidationReport.getValidationReportEntries().size());
     }
