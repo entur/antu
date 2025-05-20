@@ -173,6 +173,8 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       LocalTime arrivalTime = arrivalTimeFromScheduledStopPointId(fromJourneyStops, serviceJourneyInterchangeInfo.fromStopPoint());
       LocalTime departureTime = departureTimeFromScheduledStopPointId(toJourneyStops, serviceJourneyInterchangeInfo.toStopPoint());
 
+      // The active dates' origin are from the start of the Service Journey. To get the actual arrival time on the correct stop,
+      // we need to add the arrival day offset to the active date, along with the value of arrivalTime.
       List<LocalDateTime> fromJourneyActiveDates =
               getActiveDatesForServiceJourney(validationReportId, serviceJourneyInterchangeInfo.fromJourneyRef()).stream().map(localDateTime ->
                 localDateTime.plusDays(arrivalDayOffset).plusNanos(arrivalTime.toNanoOfDay())
