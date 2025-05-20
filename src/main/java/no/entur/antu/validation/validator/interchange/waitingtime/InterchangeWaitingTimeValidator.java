@@ -70,6 +70,14 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       .anyMatch(toJourneyActiveDates::contains);
   }
 
+  private LocalTime arrivalTimeFromScheduledStopPointId(List<ServiceJourneyStop> stops, ScheduledStopPointId scheduledStopPointId) {
+    return stops.stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)).findFirst().orElseThrow().arrivalTime();
+  }
+
+  private LocalTime departureTimeFromScheduledStopPointId(List<ServiceJourneyStop> stops, ScheduledStopPointId scheduledStopPointId) {
+    return stops.stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)).findFirst().orElseThrow().departureTime();
+  }
+
   private int arrivalDayOffsetFromScheduledStopPointId(List<ServiceJourneyStop> stops, ScheduledStopPointId scheduledStopPointId) {
     return stops.stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)).findFirst().orElseThrow().arrivalDayOffset();
   }
@@ -107,17 +115,47 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
   }
 
 
-  private boolean hasSharedActiveDates(List<LocalDateTime> fromJourneyActiveDates, List<LocalDateTime> toJourneyActiveDates, int dayDifference) {
-    for (LocalDateTime consumerActiveDate : toJourneyActiveDates) {
-      LocalDateTime dateAdjustedForDayDifference = consumerActiveDate.minusDays(dayDifference);
-      if (fromJourneyActiveDates.contains(dateAdjustedForDayDifference)) {
-        return true;
+
+
+//  private boolean hasSharedActiveDates(List<LocalDateTime> fromJourneyActiveDates, List<LocalDateTime> toJourneyActiveDates, int dayDifference) {
+//    for (LocalDateTime consumerActiveDate : toJourneyActiveDates) {
+//      LocalDateTime dateAdjustedForDayDifference = consumerActiveDate.minusDays(dayDifference);
+//      if (fromJourneyActiveDates.contains(dateAdjustedForDayDifference)) {
+//        return true;
+//      }
+//    }
+//    return false;
+//  }
+//
+//  private Duration calculateWaitingTime(LocalTime arrivalTime, LocalTime departureTime, int arrivalDayOffset, int departureDayOffset, LocalDateTime activeDateOfArrival, LocalDateTime activeDateOfDeparture) {
+//    LocalDateTime actualArrivalDate = activeDateOfArrival.plusDays(arrivalDayOffset);
+//    LocalDateTime actualDepartureDate = activeDateOfDeparture.plusDays(departureDayOffset);
+//    LocalDateTime actualArrivalDateWithTime = actualArrivalDate.plusNanos(arrivalTime.toNanoOfDay());
+//    LocalDateTime actualDepartureDateWithTime = actualDepartureDate.plusNanos(departureTime.toNanoOfDay());
+//    return Duration.between(actualArrivalDateWithTime, actualDepartureDateWithTime);
+//  }
+
+  private boolean hasSharedActiveDates(List<LocalDateTime> fromJourneyActiveDates, List<LocalDateTime> toJourneyActiveDates, Duration maximumWaitingTime) {
+    // Her skal vi gi valideringsfeil kun hvis vi ikke finner en eneste dag hvor de to vil møtes.
+    // Den skal også tillate overgang rundt midnatt. DVS at ventetid må være innenfor maximumWaitTime
+    for (LocalDateTime fromJourneyActiveDateTime : fromJourneyActiveDates) {
+      int toJourneyActiveDateIndex = 0;
+      while (toJourneyActiveDateIndex < toJourneyActiveDates.size()) {
+        LocalDateTime toJourneyActiveDateTime = toJourneyActiveDates.get(toJourneyActiveDateIndex);
+        if (toJourneyActiveDateTime.isBefore(fromJourneyActiveDateTime)) {
+          toJourneyActiveDateIndex++;
+          continue;
+        }
+
+        Duration actualWaitTime = Duration.between(fromJourneyActiveDateTime, toJourneyActiveDateTime);
+        if (actualWaitTime.compareTo(maximumWaitingTime) <= 0) {
+          return true;
+        }
+        break;
       }
     }
     return false;
   }
-
-
 
   public ValidationReport validate(ValidationReport validationReport) {
     String validationReportId = validationReport.getValidationReportId();
@@ -125,77 +163,134 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
             netexDataRepository.serviceJourneyInterchangeInfos(validationReportId);
     Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStopsByServiceJourneyId = netexDataRepository.serviceJourneyStops(validationReportId);
 
-    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangesWithSharedActiveDates = new ArrayList<>();
-    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangesWithoutSharedActiveDates = new ArrayList<>();
-
-    serviceJourneyInterchangeInfoList.forEach((serviceJourneyInterchangeInfo) -> {
+    for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo : serviceJourneyInterchangeInfoList) {
       List<ServiceJourneyStop> fromJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.fromJourneyRef());
       List<ServiceJourneyStop> toJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.toJourneyRef());
 
+
       int arrivalDayOffset = arrivalDayOffsetFromScheduledStopPointId(fromJourneyStops, serviceJourneyInterchangeInfo.fromStopPoint());
       int departureDayOffset = departureDayOffsetFromScheduledStopPointId(toJourneyStops, serviceJourneyInterchangeInfo.toStopPoint());
-      int dayDifference = departureDayOffset - arrivalDayOffset;
+      LocalTime arrivalTime = arrivalTimeFromScheduledStopPointId(fromJourneyStops, serviceJourneyInterchangeInfo.fromStopPoint());
+      LocalTime departureTime = departureTimeFromScheduledStopPointId(toJourneyStops, serviceJourneyInterchangeInfo.toStopPoint());
 
       List<LocalDateTime> fromJourneyActiveDates =
-              getActiveDatesForServiceJourney(validationReportId, serviceJourneyInterchangeInfo.fromJourneyRef());
+              getActiveDatesForServiceJourney(validationReportId, serviceJourneyInterchangeInfo.fromJourneyRef()).stream().map(localDateTime ->
+                localDateTime.plusDays(arrivalDayOffset).plusNanos(arrivalTime.toNanoOfDay())
+              ).sorted().toList();
       List<LocalDateTime> toJourneyActiveDates = getActiveDatesForServiceJourney(
               validationReportId,
               serviceJourneyInterchangeInfo.toJourneyRef()
-      );
+      ).stream().map(localDateTime -> localDateTime.plusDays(departureDayOffset).plusNanos(departureTime.toNanoOfDay())).sorted().toList();
 
-      if (hasSharedActiveDates(fromJourneyActiveDates, toJourneyActiveDates, dayDifference)) {
-        serviceJourneyInterchangesWithSharedActiveDates.add(serviceJourneyInterchangeInfo);
-      } else {
-        serviceJourneyInterchangesWithoutSharedActiveDates.add(serviceJourneyInterchangeInfo);
-      }
-    });
+      Duration maximumWaitingTime = serviceJourneyInterchangeInfo.maximumWaitTime().isPresent() ? serviceJourneyInterchangeInfo.maximumWaitTime().get() : Duration.ZERO;
 
-    for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeWithoutSharedActiveDate : serviceJourneyInterchangesWithoutSharedActiveDates) {
-      validationReport.addValidationReportEntry(
-              createValidationReportEntry(
-                      new ValidationIssue(
-                              RULE_SERVICE_JOURNEYS_HAS_SHARED_ACTIVE_DATE,
-                              new DataLocation(
-                                      serviceJourneyInterchangeWithoutSharedActiveDate.interchangeId(),
-                                      serviceJourneyInterchangeWithoutSharedActiveDate.filename(),
-                                      null,
-                                      null
-                              ),
-                              serviceJourneyInterchangeWithoutSharedActiveDate.interchangeId(),
-                              serviceJourneyInterchangeWithoutSharedActiveDate.fromJourneyRef().id(),
-                              serviceJourneyInterchangeWithoutSharedActiveDate.toJourneyRef().id()
-                      )
-              )
-      );
-    }
-
-    for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeWithSharedActiveDate : serviceJourneyInterchangesWithSharedActiveDates) {
-      LocalTime arrivalTime =  netexDataRepository.serviceJourneyStops(validationReportId).get(serviceJourneyInterchangeWithSharedActiveDate.fromJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeWithSharedActiveDate.fromStopPoint()).findFirst().orElseThrow().arrivalTime();
-      LocalTime departureTime =  netexDataRepository.serviceJourneyStops(validationReportId).get(serviceJourneyInterchangeWithSharedActiveDate.toJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeWithSharedActiveDate.toStopPoint()).findFirst().orElseThrow().departureTime();
-
-
-      int actualWaitingTimeInSeconds = departureTime.toSecondOfDay() - arrivalTime.toSecondOfDay();
-      if (actualWaitingTimeInSeconds < 0) {
-        actualWaitingTimeInSeconds += SECONDS_PER_DAY;
-      }
-
-      // If maximumWaitTime does not exist, it is assumed that consumer will wait for feeder regardless of delay
-      Optional<Duration> maximumWaitingTimeOptional = serviceJourneyInterchangeWithSharedActiveDate.maximumWaitTime();
-      if (maximumWaitingTimeOptional.isPresent()) {
-        Duration maximumWaitingTime = maximumWaitingTimeOptional.get();
-        Duration errorTresholdWaitingTime = maximumWaitingTime.multipliedBy(3);
-        Duration actualWaitingTimeAsDuration = Duration.ofSeconds(actualWaitingTimeInSeconds);
-
-        if (actualWaitingTimeAsDuration.compareTo(errorTresholdWaitingTime) > 0) {
-          // TODO: Give an error due to too long waitingTime
-        }
-        else if (actualWaitingTimeAsDuration.compareTo(maximumWaitingTime) > 0) {
-          // TODO: Give a warning due to too long waitingTime
-        }
-
+      // Her skal vi gi valideringsfeil kun hvis vi ikke finner en eneste dag hvor de to vil møtes.
+      // Den skal også tillate overgang rundt midnatt. DVS at ventetid må være innenfor maximumWaitTime
+      boolean doesMeet = hasSharedActiveDates(fromJourneyActiveDates, toJourneyActiveDates, maximumWaitingTime);
+      if (!doesMeet) {
+        validationReport.addValidationReportEntry(
+                createValidationReportEntry(
+                        new ValidationIssue(
+                                RULE_SERVICE_JOURNEYS_HAS_SHARED_ACTIVE_DATE,
+                                new DataLocation(
+                                        serviceJourneyInterchangeInfo.interchangeId(),
+                                        serviceJourneyInterchangeInfo.filename(),
+                                        null,
+                                        null
+                                ),
+                                serviceJourneyInterchangeInfo.interchangeId(),
+                                serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+                                serviceJourneyInterchangeInfo.toJourneyRef().id()
+                        )
+                )
+        );
       }
     }
-
     return validationReport;
   }
+
+//  public ValidationReport validate2(ValidationReport validationReport) {
+//    String validationReportId = validationReport.getValidationReportId();
+//    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfoList =
+//            netexDataRepository.serviceJourneyInterchangeInfos(validationReportId);
+//    Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStopsByServiceJourneyId = netexDataRepository.serviceJourneyStops(validationReportId);
+//
+//    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangesWithSharedActiveDates = new ArrayList<>();
+//    List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangesWithoutSharedActiveDates = new ArrayList<>();
+//
+//    for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo : serviceJourneyInterchangeInfoList) {
+//      List<ServiceJourneyStop> fromJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.fromJourneyRef());
+//      List<ServiceJourneyStop> toJourneyStops = serviceJourneyStopsByServiceJourneyId.get(serviceJourneyInterchangeInfo.toJourneyRef());
+//
+//      int arrivalDayOffset = arrivalDayOffsetFromScheduledStopPointId(fromJourneyStops, serviceJourneyInterchangeInfo.fromStopPoint());
+//      int departureDayOffset = departureDayOffsetFromScheduledStopPointId(toJourneyStops, serviceJourneyInterchangeInfo.toStopPoint());
+//      LocalTime arrivalTime = arrivalTimeFromScheduledStopPointId(fromJourneyStops, serviceJourneyInterchangeInfo.fromStopPoint());
+//      LocalTime departureTime = departureTimeFromScheduledStopPointId(toJourneyStops, serviceJourneyInterchangeInfo.toStopPoint());
+//
+//
+//
+//      int dayDifference = departureDayOffset - arrivalDayOffset;
+//
+//      List<LocalDateTime> fromJourneyActiveDates =
+//              getActiveDatesForServiceJourney(validationReportId, serviceJourneyInterchangeInfo.fromJourneyRef());
+//      List<LocalDateTime> toJourneyActiveDates = getActiveDatesForServiceJourney(
+//              validationReportId,
+//              serviceJourneyInterchangeInfo.toJourneyRef()
+//      );
+//
+//      if (hasSharedActiveDates(fromJourneyActiveDates, toJourneyActiveDates, dayDifference)) {
+//        serviceJourneyInterchangesWithSharedActiveDates.add(serviceJourneyInterchangeInfo);
+//      } else {
+//        serviceJourneyInterchangesWithoutSharedActiveDates.add(serviceJourneyInterchangeInfo);
+//      }
+//    }
+//
+//    for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeWithoutSharedActiveDate : serviceJourneyInterchangesWithoutSharedActiveDates) {
+//      validationReport.addValidationReportEntry(
+//              createValidationReportEntry(
+//                      new ValidationIssue(
+//                              RULE_SERVICE_JOURNEYS_HAS_SHARED_ACTIVE_DATE,
+//                              new DataLocation(
+//                                      serviceJourneyInterchangeWithoutSharedActiveDate.interchangeId(),
+//                                      serviceJourneyInterchangeWithoutSharedActiveDate.filename(),
+//                                      null,
+//                                      null
+//                              ),
+//                              serviceJourneyInterchangeWithoutSharedActiveDate.interchangeId(),
+//                              serviceJourneyInterchangeWithoutSharedActiveDate.fromJourneyRef().id(),
+//                              serviceJourneyInterchangeWithoutSharedActiveDate.toJourneyRef().id()
+//                      )
+//              )
+//      );
+//    }
+//
+//    for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeWithSharedActiveDate : serviceJourneyInterchangesWithSharedActiveDates) {
+//      LocalTime arrivalTime =  netexDataRepository.serviceJourneyStops(validationReportId).get(serviceJourneyInterchangeWithSharedActiveDate.fromJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeWithSharedActiveDate.fromStopPoint()).findFirst().orElseThrow().arrivalTime();
+//      LocalTime departureTime =  netexDataRepository.serviceJourneyStops(validationReportId).get(serviceJourneyInterchangeWithSharedActiveDate.toJourneyRef()).stream().filter(serviceJourneyStop -> serviceJourneyStop.scheduledStopPointId() == serviceJourneyInterchangeWithSharedActiveDate.toStopPoint()).findFirst().orElseThrow().departureTime();
+//
+//
+//      int actualWaitingTimeInSeconds = departureTime.toSecondOfDay() - arrivalTime.toSecondOfDay();
+//      if (actualWaitingTimeInSeconds < 0) {
+//        actualWaitingTimeInSeconds += SECONDS_PER_DAY;
+//      }
+//
+//      // If maximumWaitTime does not exist, it is assumed that consumer will wait for feeder regardless of delay
+//      Optional<Duration> maximumWaitingTimeOptional = serviceJourneyInterchangeWithSharedActiveDate.maximumWaitTime();
+//      if (maximumWaitingTimeOptional.isPresent()) {
+//        Duration maximumWaitingTime = maximumWaitingTimeOptional.get();
+//        Duration errorTresholdWaitingTime = maximumWaitingTime.multipliedBy(3);
+//        Duration actualWaitingTimeAsDuration = Duration.ofSeconds(actualWaitingTimeInSeconds);
+//
+//        if (actualWaitingTimeAsDuration.compareTo(errorTresholdWaitingTime) > 0) {
+//          // TODO: Give an error due to too long waitingTime
+//        }
+//        else if (actualWaitingTimeAsDuration.compareTo(maximumWaitingTime) > 0) {
+//          // TODO: Give a warning due to too long waitingTime
+//        }
+//
+//      }
+//    }
+//
+//    return validationReport;
+//  }
 }

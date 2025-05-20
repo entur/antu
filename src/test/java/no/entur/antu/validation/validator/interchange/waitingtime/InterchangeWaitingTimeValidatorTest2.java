@@ -1,9 +1,6 @@
 package no.entur.antu.validation.validator.interchange.waitingtime;
 
-import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
-import no.entur.antu.TestApp;
 import no.entur.antu.common.repository.TestNetexDataRepository;
-import no.entur.antu.config.TestConfig;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import org.entur.netex.validation.validator.SimpleValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -14,9 +11,6 @@ import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 class InterchangeWaitingTimeValidatorTest2 {
 
@@ -32,8 +27,8 @@ class InterchangeWaitingTimeValidatorTest2 {
 
     // Constants for test data identification
     private static final String CODESPACE = "codespace";
-    private static final String TEST_CASE_NO_SHARED_DATE_WITH_WAITING_TIME = "idNoSharedActiveDateWithUnsatisifiedWaitingTime";
-    private static final String TEST_CASE_NO_SHARED_DATE_WITHOUT_WAITING_TIME = "idNoSharedActiveDateWithoutWaitingTime";
+    private static final String TEST_CASE_NO_SHARED_DATE_WITH_UNSATISIFIED_WAITING_TIME = "idNoSharedActiveDateWithUnsatisifiedWaitingTime";
+    private static final String TEST_CASE_NO_SHARED_DATE_WITH_SATISFIED_WAITING_TIME = "idNoSharedActiveDateWithSatisfiedWaitingTime";
 
     // Constants for service journey references
     private static final String SERVICE_JOURNEY_1 = "Test:ServiceJourney:1";
@@ -44,34 +39,12 @@ class InterchangeWaitingTimeValidatorTest2 {
     // Constants for stop points
     private static final int STOP_POINT_1 = 1;
     private static final int STOP_POINT_2 = 2;
+    private static final int STOP_POINT_3 = 3;
+    private static final int STOP_POINT_4 = 4;
 
     @BeforeEach
     void setUp() {
         this.netexDataRepository = new TestNetexDataRepository();
-        setupServiceJourneyInterchange();
-        setupTestCaseWithUnsatisfiedWaitingTime();
-//        setupTestCaseWithoutWaitingTime();
-        setupServiceJourneyStopData();
-    }
-
-    private void setupServiceJourneyInterchange() {
-        // Create service journey interchange with zero maximum wait time
-        ServiceJourney serviceJourney = new ServiceJourney();
-        serviceJourney.setId(SERVICE_JOURNEY_1);
-
-//        new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_1).id());
-
-        ServiceJourneyInterchange interchange = new ServiceJourneyInterchange()
-                .withId("ServiceJourneyInterchange:1")
-                .withMaximumWaitTime(Duration.ZERO)
-                .withFromJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_1).id()))
-                .withToJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_2).id()))
-                .withFromPointRef(createStopPointRef(STOP_POINT_1))
-                .withToPointRef(createStopPointRef(STOP_POINT_2));
-
-        netexDataRepository.addServiceJourneyInterchangeInfo(
-                ServiceJourneyInterchangeInfo.of("", interchange)
-        );
     }
 
     private VehicleJourneyRefStructure createJourneyRef(String journeyId) {
@@ -84,27 +57,20 @@ class InterchangeWaitingTimeValidatorTest2 {
                 .withRef(NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId).getRef());
     }
 
-    private void setupTestCaseWithUnsatisfiedWaitingTime() {
-        // Setup test case with journeys on different days (no shared active date)
-        Map<ServiceJourneyId, List<LocalDateTime>> activeDatesMap = Map.ofEntries(
-                Map.entry(
-                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_1),
-                        List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-                ),
-                Map.entry(
-                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_2),
-                        List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
-                )
+    private void setupTestCaseWithSatisifiedWaitingTime() {
+        ServiceJourneyInterchange interchange = new ServiceJourneyInterchange()
+                .withId("ServiceJourneyInterchange:2")
+                .withMaximumWaitTime(Duration.ofHours(1))
+                .withFromJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_3).id()))
+                .withToJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_4).id()))
+                .withFromPointRef(createStopPointRef(STOP_POINT_3))
+                .withToPointRef(createStopPointRef(STOP_POINT_4));
+
+        netexDataRepository.addServiceJourneyInterchangeInfo(
+                TEST_CASE_NO_SHARED_DATE_WITH_SATISFIED_WAITING_TIME,
+                ServiceJourneyInterchangeInfo.of("", interchange)
         );
 
-        netexDataRepository.putServiceJourneyIdToActiveDates(
-                TEST_CASE_NO_SHARED_DATE_WITH_WAITING_TIME,
-                activeDatesMap
-        );
-    }
-
-    private void setupTestCaseWithoutWaitingTime() {
-        // Setup test case with different journeys on different days
         Map<ServiceJourneyId, List<LocalDateTime>> activeDatesMap = Map.ofEntries(
                 Map.entry(
                         ServiceJourneyId.ofValidId(SERVICE_JOURNEY_3),
@@ -117,46 +83,114 @@ class InterchangeWaitingTimeValidatorTest2 {
         );
 
         netexDataRepository.putServiceJourneyIdToActiveDates(
-                TEST_CASE_NO_SHARED_DATE_WITH_WAITING_TIME,
+                TEST_CASE_NO_SHARED_DATE_WITH_SATISFIED_WAITING_TIME,
                 activeDatesMap
         );
-    }
 
-    private void setupServiceJourneyStopData() {
-        // Setup service journey stop data with arrival times
         Map<ServiceJourneyId, List<ServiceJourneyStop>> journeyStopMap = Map.ofEntries(
                 Map.entry(
-                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_1),
-                        List.of(createServiceJourneyStop(STOP_POINT_1, 14, 0, 0))
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_3),
+                        List.of(createServiceJourneyArrivalStop(STOP_POINT_3, 23, 45, 0))
                 ),
                 Map.entry(
-                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_2),
-                        List.of(createServiceJourneyStop(STOP_POINT_2, 14, 0, 0))
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_4),
+                        List.of(createServiceJourneyDepartureStop(STOP_POINT_4, 0, 15, 0))
                 )
         );
 
         netexDataRepository.putServiceJourneyStop(
-                TEST_CASE_NO_SHARED_DATE_WITH_WAITING_TIME,
+                TEST_CASE_NO_SHARED_DATE_WITH_SATISFIED_WAITING_TIME,
                 journeyStopMap
         );
     }
 
-    private ServiceJourneyStop createServiceJourneyStop(int stopPointId, int hour, int minute, int second) {
+    private void setupTestCaseWithUnsatisfiedWaitingTime() {
+        ServiceJourney serviceJourney = new ServiceJourney();
+        serviceJourney.setId(SERVICE_JOURNEY_1);
+
+        ServiceJourneyInterchange interchange = new ServiceJourneyInterchange()
+                .withId("ServiceJourneyInterchange:1")
+                .withMaximumWaitTime(Duration.ZERO)
+                .withFromJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_1).id()))
+                .withToJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(SERVICE_JOURNEY_2).id()))
+                .withFromPointRef(createStopPointRef(STOP_POINT_1))
+                .withToPointRef(createStopPointRef(STOP_POINT_2));
+
+        netexDataRepository.addServiceJourneyInterchangeInfo(
+                TEST_CASE_NO_SHARED_DATE_WITH_UNSATISIFIED_WAITING_TIME,
+                ServiceJourneyInterchangeInfo.of("", interchange)
+        );
+
+        Map<ServiceJourneyId, List<LocalDateTime>> activeDatesMap = Map.ofEntries(
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_1),
+                        List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+                ),
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_2),
+                        List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
+                )
+        );
+
+        netexDataRepository.putServiceJourneyIdToActiveDates(
+                TEST_CASE_NO_SHARED_DATE_WITH_UNSATISIFIED_WAITING_TIME,
+                activeDatesMap
+        );
+
+        Map<ServiceJourneyId, List<ServiceJourneyStop>> journeyStopMap = Map.ofEntries(
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_1),
+                        List.of(createServiceJourneyArrivalStop(STOP_POINT_1, 14, 0, 0))
+                ),
+                Map.entry(
+                        ServiceJourneyId.ofValidId(SERVICE_JOURNEY_2),
+                        List.of(createServiceJourneyDepartureStop(STOP_POINT_2, 14, 0, 0))
+                )
+        );
+
+        netexDataRepository.putServiceJourneyStop(
+                TEST_CASE_NO_SHARED_DATE_WITH_UNSATISIFIED_WAITING_TIME,
+                journeyStopMap
+        );
+    }
+
+    private ServiceJourneyStop createServiceJourneyArrivalStop(int stopPointId, int arrivalHour, int arrivalMinute, int arrivalSecond) {
         ScheduledStopPointId stopId = ScheduledStopPointId.of(
                 NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
         );
 
         TimetabledPassingTime passingTime = new TimetabledPassingTime()
-                .withArrivalTime(LocalTime.of(hour, minute, second));
+                .withArrivalTime(LocalTime.of(arrivalHour, arrivalMinute, arrivalSecond));
+
+        return ServiceJourneyStop.of(stopId, passingTime);
+    }
+
+    private ServiceJourneyStop createServiceJourneyDepartureStop(int stopPointId, int departureHour, int departureMinute, int departureSecond) {
+        ScheduledStopPointId stopId = ScheduledStopPointId.of(
+                NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
+        );
+
+        TimetabledPassingTime passingTime = new TimetabledPassingTime()
+                .withDepartureTime(LocalTime.of(departureHour, departureMinute, departureSecond));
 
         return ServiceJourneyStop.of(stopId, passingTime);
     }
 
     @Test
     void testNoSharedActiveDateWithUnsatisfiedWaitingTimeGivesValidationError() {
+        setupTestCaseWithUnsatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, TEST_CASE_NO_SHARED_DATE_WITH_WAITING_TIME);
+        ValidationReport validationReport = new ValidationReport(CODESPACE, TEST_CASE_NO_SHARED_DATE_WITH_UNSATISIFIED_WAITING_TIME);
         ValidationReport resultingValidationReport = validator.validate(validationReport);
-        assertEquals(2, resultingValidationReport.getValidationReportEntries().size());
+        assertEquals(1, resultingValidationReport.getValidationReportEntries().size());
+    }
+
+    @Test
+    void testNoSharedActiveDateWithSatisfiedWaitingTimeGivesNoValidationError() {
+        setupTestCaseWithSatisifiedWaitingTime();
+        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
+        ValidationReport validationReport = new ValidationReport(CODESPACE, TEST_CASE_NO_SHARED_DATE_WITH_SATISFIED_WAITING_TIME);
+        ValidationReport resultingValidationReport = validator.validate(validationReport);
+        assertTrue(resultingValidationReport.getValidationReportEntries().isEmpty());
     }
 }
