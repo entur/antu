@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.services.AntuBlobStoreService;
@@ -32,6 +34,12 @@ public class TestConfig {
   @Primary
   public OrganisationAliasRepository organisationAliasRepository() {
     return new SimpleOrganisationAliasRepository(new HashSet<>());
+  }
+
+  @Bean
+  @Primary
+  public TestNetexDataRepository netexDataRepository() {
+    return new TestNetexDataRepository();
   }
 
   @Bean(name = "stopPlaceRepository")
