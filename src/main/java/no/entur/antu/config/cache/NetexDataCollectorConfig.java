@@ -1,5 +1,6 @@
 package no.entur.antu.config.cache;
 
+import static no.entur.antu.config.cache.CacheConfig.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,8 +13,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import static no.entur.antu.config.cache.CacheConfig.*;
 
 @Configuration
 public class NetexDataCollectorConfig {
@@ -54,22 +53,22 @@ public class NetexDataCollectorConfig {
 
   @Bean
   public ServiceJourneyActiveDatesCollector serviceJourneyActiveDatesCollector(
-          RedissonClient redissonClient,
-          @Qualifier(
-                  ACTIVE_DATES_BY_DAY_TYPE_REF
-          ) Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
-          @Qualifier(
-                  ACTIVE_DATES_BY_SERVICE_JOURNEY_REF
-          ) Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache,
-          @Qualifier(
-                  ACTIVE_DATE_BY_OPERATING_DAY_REF
-          ) Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
+    RedissonClient redissonClient,
+    @Qualifier(
+      ACTIVE_DATES_BY_DAY_TYPE_REF
+    ) Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
+    @Qualifier(
+      ACTIVE_DATES_BY_SERVICE_JOURNEY_REF
+    ) Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache,
+    @Qualifier(
+      ACTIVE_DATE_BY_OPERATING_DAY_REF
+    ) Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
   ) {
     return new ServiceJourneyActiveDatesCollector(
-            redissonClient,
-            dayTypeActiveDatesCache,
-            serviceJourneyActiveDatesCache,
-            operatingDayActiveDateCache
+      redissonClient,
+      dayTypeActiveDatesCache,
+      serviceJourneyActiveDatesCache,
+      operatingDayActiveDateCache
     );
   }
 }

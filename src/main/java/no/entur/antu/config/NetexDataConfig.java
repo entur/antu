@@ -1,5 +1,7 @@
 package no.entur.antu.config;
 
+import static no.entur.antu.config.cache.CacheConfig.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +13,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
-import static no.entur.antu.config.cache.CacheConfig.*;
 
 @Configuration
 public class NetexDataConfig {
@@ -30,7 +30,7 @@ public class NetexDataConfig {
     ) Map<String, List<String>> serviceJourneyInterchangeInfoCache,
     @Qualifier(
       ACTIVE_DATES_BY_SERVICE_JOURNEY_REF
-  ) Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyRefCache
+    ) Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyRefCache
   ) {
     return new RedisNetexDataRepository(
       redissonClient,

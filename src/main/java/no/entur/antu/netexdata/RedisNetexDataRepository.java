@@ -3,7 +3,6 @@ package no.entur.antu.netexdata;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.redisson.api.RedissonClient;
 

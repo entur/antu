@@ -1,5 +1,16 @@
 package no.entur.antu.validation.validator.interchange.waitingtime;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.math.BigInteger;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
 import org.entur.netex.validation.validator.SimpleValidationEntryFactory;
@@ -13,368 +24,598 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.*;
 
-import java.math.BigInteger;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 class InterchangeWaitingTimeValidatorTest {
 
-    private TestNetexDataRepository netexDataRepository;
-    private static final String CODESPACE = "codespace";
+  private TestNetexDataRepository netexDataRepository;
+  private static final String CODESPACE = "codespace";
 
-    // Test case identifiers
-    private static final String NO_SHARED_ACTIVE_DATE_WITH_UNSATISIFIED_WAITING_TIME = "idNoSharedActiveDateWithUnsatisifiedWaitingTime";
-    private static final String NO_SHARED_ACTIVE_DATE_WITH_SATISFIED_WAITING_TIME = "idNoSharedActiveDateWithSatisfiedWaitingTime";
-    private static final String DEPARTURE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME = "idDepartureDayOffsetWithSatisifiedWaitingTime";
-    private static final String DEPARTURE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME = "idDepartureDayOffsetWithUnsatisifiedWaitingTime";
-    private static final String ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME = "idArrivalDayOffsetWithSatisifiedWaitingTime";
-    private static final String ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME = "idArrivalDayOffsetWithUnsatisifiedWaitingTime";
-    private static final String ACTUAL_WAITING_TIME_EXCEEDING_ERROR_TRESHOLD = "idActualWaitingTimeExceedingErrorThreshold";
-    private static final String ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD = "idActualWaitingTimeExceedingWarningThreshold";
-    private static final String NO_INTERCHANGE_POSSIBLE = "idNoInterchangePossible";
+  // Test case identifiers
+  private static final String NO_SHARED_ACTIVE_DATE_WITH_UNSATISIFIED_WAITING_TIME =
+    "idNoSharedActiveDateWithUnsatisifiedWaitingTime";
+  private static final String NO_SHARED_ACTIVE_DATE_WITH_SATISFIED_WAITING_TIME =
+    "idNoSharedActiveDateWithSatisfiedWaitingTime";
+  private static final String DEPARTURE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME =
+    "idDepartureDayOffsetWithSatisifiedWaitingTime";
+  private static final String DEPARTURE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME =
+    "idDepartureDayOffsetWithUnsatisifiedWaitingTime";
+  private static final String ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME =
+    "idArrivalDayOffsetWithSatisifiedWaitingTime";
+  private static final String ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME =
+    "idArrivalDayOffsetWithUnsatisifiedWaitingTime";
+  private static final String ACTUAL_WAITING_TIME_EXCEEDING_ERROR_TRESHOLD =
+    "idActualWaitingTimeExceedingErrorThreshold";
+  private static final String ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD =
+    "idActualWaitingTimeExceedingWarningThreshold";
+  private static final String NO_INTERCHANGE_POSSIBLE =
+    "idNoInterchangePossible";
 
-    private static String serviceJourneyInterchangeId = "ServiceJourneyInterchange:1";
+  private static String serviceJourneyInterchangeId =
+    "ServiceJourneyInterchange:1";
 
-    private static String fromJourneyId = "Test:ServiceJourney:1";
-    private static String toJourneyId = "Test:ServiceJourney:2";
+  private static String fromJourneyId = "Test:ServiceJourney:1";
+  private static String toJourneyId = "Test:ServiceJourney:2";
 
-    private static int fromStopPoint = 1;
-    private static int toStopPoint = 2;
+  private static int fromStopPoint = 1;
+  private static int toStopPoint = 2;
 
-    @BeforeEach
-    void setUp() {
-        this.netexDataRepository = new TestNetexDataRepository();
+  @BeforeEach
+  void setUp() {
+    this.netexDataRepository = new TestNetexDataRepository();
+  }
+
+  private ScheduledStopPointRefStructure createStopPointRef(int stopPointId) {
+    return new ScheduledStopPointRefStructure()
+      .withRef(
+        NetexEntitiesTestFactory
+          .createScheduledStopPointRef(stopPointId)
+          .getRef()
+      );
+  }
+
+  private ServiceJourneyStop createArrivalStop(
+    int stopPointId,
+    int hour,
+    int minute,
+    int second,
+    Optional<Integer> dayOffset
+  ) {
+    ScheduledStopPointId stopId = ScheduledStopPointId.of(
+      NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
+    );
+
+    TimetabledPassingTime passingTime = new TimetabledPassingTime()
+      .withArrivalTime(LocalTime.of(hour, minute, second));
+
+    if (dayOffset.isPresent()) {
+      passingTime =
+        passingTime.withArrivalDayOffset(BigInteger.valueOf(dayOffset.get()));
+    }
+    return ServiceJourneyStop.of(stopId, passingTime);
+  }
+
+  private ServiceJourneyStop createDepartureStop(
+    int stopPointId,
+    int hour,
+    int minute,
+    int second,
+    Optional<Integer> dayOffset
+  ) {
+    ScheduledStopPointId stopId = ScheduledStopPointId.of(
+      NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
+    );
+
+    TimetabledPassingTime passingTime = new TimetabledPassingTime()
+      .withDepartureTime(LocalTime.of(hour, minute, second));
+
+    if (dayOffset.isPresent()) {
+      passingTime =
+        passingTime.withDepartureDayOffset(BigInteger.valueOf(dayOffset.get()));
     }
 
-    private ScheduledStopPointRefStructure createStopPointRef(int stopPointId) {
-        return new ScheduledStopPointRefStructure()
-                .withRef(NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId).getRef());
-    }
+    return ServiceJourneyStop.of(stopId, passingTime);
+  }
 
-    private ServiceJourneyStop createArrivalStop(int stopPointId, int hour, int minute, int second, Optional<Integer> dayOffset) {
-        ScheduledStopPointId stopId = ScheduledStopPointId.of(
-                NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
-        );
+  private ServiceJourneyInterchange createInterchangeWithMaximumWaitTime(
+    Duration maximumWaitTime
+  ) {
+    return new ServiceJourneyInterchange()
+      .withId(serviceJourneyInterchangeId)
+      .withMaximumWaitTime(maximumWaitTime)
+      .withFromJourneyRef(
+        new VehicleJourneyRefStructure()
+          .withRef(ServiceJourneyId.ofValidId(fromJourneyId).id())
+      )
+      .withToJourneyRef(
+        new VehicleJourneyRefStructure()
+          .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
+      )
+      .withFromPointRef(createStopPointRef(fromStopPoint))
+      .withToPointRef(createStopPointRef(toStopPoint));
+  }
 
-        TimetabledPassingTime passingTime = new TimetabledPassingTime()
-                .withArrivalTime(LocalTime.of(hour, minute, second));
+  private void setupTestData(
+    String testCaseId,
+    ServiceJourneyInterchange interchange,
+    Map<String, List<LocalDateTime>> activeDates,
+    Map<String, ServiceJourneyStop> stops
+  ) {
+    // Add interchange info
+    netexDataRepository.addServiceJourneyInterchangeInfo(
+      testCaseId,
+      ServiceJourneyInterchangeInfo.of("", interchange)
+    );
 
-        if (dayOffset.isPresent()) {
-            passingTime = passingTime.withArrivalDayOffset(BigInteger.valueOf(dayOffset.get()));
-        }
-        return ServiceJourneyStop.of(stopId, passingTime);
-    }
+    // Convert and add active dates
+    Map<ServiceJourneyId, List<LocalDateTime>> journeyActiveDates = activeDates
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          entry -> ServiceJourneyId.ofValidId(entry.getKey()),
+          Map.Entry::getValue
+        )
+      );
+    netexDataRepository.putServiceJourneyIdToActiveDates(
+      testCaseId,
+      journeyActiveDates
+    );
 
-    private ServiceJourneyStop createDepartureStop(int stopPointId, int hour, int minute, int second, Optional<Integer> dayOffset) {
-        ScheduledStopPointId stopId = ScheduledStopPointId.of(
-                NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
-        );
+    // Convert and add journey stops
+    Map<ServiceJourneyId, List<ServiceJourneyStop>> journeyStops = stops
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          entry -> ServiceJourneyId.ofValidId(entry.getKey()),
+          entry -> List.of(entry.getValue())
+        )
+      );
+    netexDataRepository.putServiceJourneyStop(testCaseId, journeyStops);
+  }
 
-        TimetabledPassingTime passingTime = new TimetabledPassingTime()
-                .withDepartureTime(LocalTime.of(hour, minute, second));
+  private void setupTestCaseWithNoSharedDateUnsatisfiedWaitingTime() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ZERO);
 
-        if (dayOffset.isPresent()) {
-            passingTime = passingTime.withDepartureDayOffset(BigInteger.valueOf(dayOffset.get()));
-        }
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
+    );
 
-        return ServiceJourneyStop.of(stopId, passingTime);
-    }
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 14, 0, 0, Optional.empty())
+    );
 
-    private ServiceJourneyInterchange createInterchangeWithMaximumWaitTime(Duration maximumWaitTime) {
-        return new ServiceJourneyInterchange()
-                .withId(serviceJourneyInterchangeId)
-                .withMaximumWaitTime(maximumWaitTime)
-                .withFromJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(fromJourneyId).id()))
-                .withToJourneyRef(new VehicleJourneyRefStructure().withRef(ServiceJourneyId.ofValidId(toJourneyId).id()))
-                .withFromPointRef(createStopPointRef(fromStopPoint))
-                .withToPointRef(createStopPointRef(toStopPoint));
-    }
+    setupTestData(
+      NO_SHARED_ACTIVE_DATE_WITH_UNSATISIFIED_WAITING_TIME,
+      interchange,
+      activeDates,
+      stops
+    );
+  }
 
-    private void setupTestData(
-            String testCaseId,
-            ServiceJourneyInterchange interchange,
-            Map<String, List<LocalDateTime>> activeDates,
-            Map<String, ServiceJourneyStop> stops) {
-        // Add interchange info
-        netexDataRepository.addServiceJourneyInterchangeInfo(
-                testCaseId,
-                ServiceJourneyInterchangeInfo.of("", interchange)
-        );
+  private void setupTestCaseWithNoSharedDateSatisfiedWaitingTime() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
 
-        // Convert and add active dates
-        Map<ServiceJourneyId, List<LocalDateTime>> journeyActiveDates = activeDates.entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> ServiceJourneyId.ofValidId(entry.getKey()),
-                        Map.Entry::getValue
-                ));
-        netexDataRepository.putServiceJourneyIdToActiveDates(testCaseId, journeyActiveDates);
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
+    );
 
-        // Convert and add journey stops
-        Map<ServiceJourneyId, List<ServiceJourneyStop>> journeyStops = stops.entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> ServiceJourneyId.ofValidId(entry.getKey()),
-                        entry -> List.of(entry.getValue())
-                ));
-        netexDataRepository.putServiceJourneyStop(testCaseId, journeyStops);
-    }
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 23, 45, 0, Optional.empty()),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 0, 15, 0, Optional.empty())
+    );
 
-    private void setupTestCaseWithNoSharedDateUnsatisfiedWaitingTime() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ZERO);
+    setupTestData(
+      NO_SHARED_ACTIVE_DATE_WITH_SATISFIED_WAITING_TIME,
+      interchange,
+      activeDates,
+      stops
+    );
+  }
 
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
-        );
+  private void setupTestCaseWithDepartureDayOffsetSatisfiedWaitingTime() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
-                toJourneyId, createDepartureStop(toStopPoint, 14, 0, 0, Optional.empty())
-        );
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+    );
 
-        setupTestData(NO_SHARED_ACTIVE_DATE_WITH_UNSATISIFIED_WAITING_TIME, interchange, activeDates, stops);
-    }
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 23, 45, 0, Optional.empty()),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 0, 15, 0, Optional.of(1))
+    );
 
-    private void setupTestCaseWithNoSharedDateSatisfiedWaitingTime() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
+    setupTestData(
+      DEPARTURE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME,
+      interchange,
+      activeDates,
+      stops
+    );
+  }
 
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
-        );
+  private void setupTestCaseWithDepartureDayOffsetUnsatisfiedWaitingTime() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 23, 45, 0, Optional.empty()),
-                toJourneyId, createDepartureStop(toStopPoint, 0, 15, 0, Optional.empty())
-        );
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+    );
 
-        setupTestData(NO_SHARED_ACTIVE_DATE_WITH_SATISFIED_WAITING_TIME, interchange, activeDates, stops);
-    }
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 23, 45, 0, Optional.empty()),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 0, 46, 0, Optional.of(1))
+    );
 
-    private void setupTestCaseWithDepartureDayOffsetSatisfiedWaitingTime() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
+    setupTestData(
+      DEPARTURE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME,
+      interchange,
+      activeDates,
+      stops
+    );
+  }
 
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        );
+  private void setupTestCaseWithArrivalDayOffsetSatisfiedWaitingTime() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 23, 45, 0, Optional.empty()),
-                toJourneyId, createDepartureStop(toStopPoint, 0, 15, 0, Optional.of(1))
-        );
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 3, 0, 0, 0))
+    );
 
-        setupTestData(DEPARTURE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME, interchange, activeDates, stops);
-    }
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 23, 45, 0, Optional.of(1)),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 0, 15, 0, Optional.empty())
+    );
 
-    private void setupTestCaseWithDepartureDayOffsetUnsatisfiedWaitingTime() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
+    setupTestData(
+      ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME,
+      interchange,
+      activeDates,
+      stops
+    );
+  }
 
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        );
+  private void setupTestCaseWithArrivalDayOffsetUnsatisfiedWaitingTime() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ofMinutes(29));
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 23, 45, 0, Optional.empty()),
-                toJourneyId, createDepartureStop(toStopPoint, 0, 46, 0, Optional.of(1))
-        );
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 3, 0, 0, 0))
+    );
 
-        setupTestData(DEPARTURE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME, interchange, activeDates, stops);
-    }
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 23, 45, 0, Optional.of(1)),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 0, 15, 0, Optional.empty())
+    );
 
-    private void setupTestCaseWithArrivalDayOffsetSatisfiedWaitingTime() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
+    setupTestData(
+      ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME,
+      interchange,
+      activeDates,
+      stops
+    );
+  }
 
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 3, 0, 0, 0))
-        );
+  private void setupTestCaseWithActualWaitingTimeExceedingErrorTreshold() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+    );
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 23, 45, 0, Optional.of(1)),
-                toJourneyId, createDepartureStop(toStopPoint, 0, 15, 0, Optional.empty())
-        );
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 17, 0, 0, Optional.empty())
+    );
+    setupTestData(
+      ACTUAL_WAITING_TIME_EXCEEDING_ERROR_TRESHOLD,
+      interchange,
+      activeDates,
+      stops
+    );
+  }
 
-        setupTestData(ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME, interchange, activeDates, stops);
-    }
+  private void setupTestCaseWithActualWaitingTimeExceedingWarningTreshold() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+    );
 
-    private void setupTestCaseWithArrivalDayOffsetUnsatisfiedWaitingTime() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofMinutes(29));
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 16, 59, 0, Optional.empty())
+    );
+    setupTestData(
+      ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD,
+      interchange,
+      activeDates,
+      stops
+    );
+  }
 
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 3, 0, 0, 0))
-        );
+  private void setupTestCaseWithNoInterchangePossible() {
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0)),
+      toJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+    );
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 23, 45, 0, Optional.of(1)),
-                toJourneyId, createDepartureStop(toStopPoint, 0, 15, 0, Optional.empty())
-        );
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
+      toJourneyId,
+      createDepartureStop(toStopPoint, 16, 59, 0, Optional.empty())
+    );
+    setupTestData(NO_INTERCHANGE_POSSIBLE, interchange, activeDates, stops);
+  }
 
-        setupTestData(ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME, interchange, activeDates, stops);
-    }
+  @Test
+  void testNoSharedActiveDateWithUnsatisfiedWaitingTimeGivesValidationError() {
+    setupTestCaseWithNoSharedDateUnsatisfiedWaitingTime();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      NO_SHARED_ACTIVE_DATE_WITH_UNSATISIFIED_WAITING_TIME
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    List<ValidationReportEntry> validationReportEntries = resultingReport
+      .getValidationReportEntries()
+      .stream()
+      .toList();
+    assertEquals(1, validationReportEntries.size());
+    assertEquals(
+      InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR.name(),
+      validationReportEntries.get(0).getName()
+    );
+  }
 
-    private void setupTestCaseWithActualWaitingTimeExceedingErrorTreshold() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        );
+  @Test
+  void testNoSharedActiveDateWithSatisfiedWaitingTimeGivesNoValidationError() {
+    setupTestCaseWithNoSharedDateSatisfiedWaitingTime();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      NO_SHARED_ACTIVE_DATE_WITH_SATISFIED_WAITING_TIME
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    assertTrue(resultingReport.getValidationReportEntries().isEmpty());
+  }
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
-                toJourneyId, createDepartureStop(toStopPoint, 17, 0, 0, Optional.empty())
-        );
-        setupTestData(ACTUAL_WAITING_TIME_EXCEEDING_ERROR_TRESHOLD, interchange, activeDates, stops);
-    }
+  @Test
+  void testDepartureDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
+    setupTestCaseWithDepartureDayOffsetSatisfiedWaitingTime();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      DEPARTURE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    assertTrue(resultingReport.getValidationReportEntries().isEmpty());
+  }
 
-    private void setupTestCaseWithActualWaitingTimeExceedingWarningTreshold() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        );
+  @Test
+  void testDepartureDayOffsetWithUnsatisfiedWaitingTimeButNotExceedingErrorTresholdGivesValidationWarning() {
+    setupTestCaseWithDepartureDayOffsetUnsatisfiedWaitingTime();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      DEPARTURE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    List<ValidationReportEntry> validationReportEntries = resultingReport
+      .getValidationReportEntries()
+      .stream()
+      .toList();
+    assertEquals(1, validationReportEntries.size());
+    assertEquals(
+      InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(),
+      validationReportEntries.get(0).getName()
+    );
+  }
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
-                toJourneyId, createDepartureStop(toStopPoint, 16, 59, 0, Optional.empty())
-        );
-        setupTestData(ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD, interchange, activeDates, stops);
-    }
+  @Test
+  void testArrivalDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
+    setupTestCaseWithArrivalDayOffsetSatisfiedWaitingTime();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    assertTrue(resultingReport.getValidationReportEntries().isEmpty());
+  }
 
-    private void setupTestCaseWithNoInterchangePossible() {
-        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
-        Map<String, List<LocalDateTime>> activeDates = Map.of(
-                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0)),
-                toJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
-        );
+  @Test
+  void testArrivalDayOffsetWithUnsatisfiedWaitingTimeButNotExceedingErrorTresholdGivesValidationWarning() {
+    setupTestCaseWithArrivalDayOffsetUnsatisfiedWaitingTime();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    List<ValidationReportEntry> validationReportEntries = resultingReport
+      .getValidationReportEntries()
+      .stream()
+      .toList();
+    assertEquals(1, validationReportEntries.size());
+    assertEquals(
+      InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(),
+      validationReportEntries.get(0).getName()
+    );
+  }
 
-        Map<String, ServiceJourneyStop> stops = Map.of(
-                fromJourneyId, createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
-                toJourneyId, createDepartureStop(toStopPoint, 16, 59, 0, Optional.empty())
-        );
-        setupTestData(NO_INTERCHANGE_POSSIBLE, interchange, activeDates, stops);
-    }
+  @Test
+  void testActualWaitingTimeExceedingErrorTresholdGivesValidationError() {
+    setupTestCaseWithActualWaitingTimeExceedingErrorTreshold();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      ACTUAL_WAITING_TIME_EXCEEDING_ERROR_TRESHOLD
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    List<ValidationReportEntry> validationReportEntries = resultingReport
+      .getValidationReportEntries()
+      .stream()
+      .toList();
+    assertEquals(1, validationReportEntries.size());
+    assertEquals(
+      InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR.name(),
+      validationReportEntries.get(0).getName()
+    );
+  }
 
-    @Test
-    void testNoSharedActiveDateWithUnsatisfiedWaitingTimeGivesValidationError() {
-        setupTestCaseWithNoSharedDateUnsatisfiedWaitingTime();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, NO_SHARED_ACTIVE_DATE_WITH_UNSATISIFIED_WAITING_TIME);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
-        assertEquals(1, validationReportEntries.size());
-        assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR.name(), validationReportEntries.get(0).getName());
-    }
+  @Test
+  void testActualWaitingTimeExceedingWarningTresholdGivesValidationWarning() {
+    setupTestCaseWithActualWaitingTimeExceedingWarningTreshold();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    List<ValidationReportEntry> validationReportEntries = resultingReport
+      .getValidationReportEntries()
+      .stream()
+      .toList();
+    assertEquals(1, validationReportEntries.size());
+    assertEquals(
+      InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(),
+      validationReportEntries.get(0).getName()
+    );
+  }
 
-    @Test
-    void testNoSharedActiveDateWithSatisfiedWaitingTimeGivesNoValidationError() {
-        setupTestCaseWithNoSharedDateSatisfiedWaitingTime();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, NO_SHARED_ACTIVE_DATE_WITH_SATISFIED_WAITING_TIME);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        assertTrue(resultingReport.getValidationReportEntries().isEmpty());
-    }
+  @Test
+  void testNoInterchangePossible() {
+    setupTestCaseWithNoInterchangePossible();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      NO_INTERCHANGE_POSSIBLE
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    List<ValidationReportEntry> validationReportEntries = resultingReport
+      .getValidationReportEntries()
+      .stream()
+      .toList();
+    assertEquals(1, validationReportEntries.size());
+    assertEquals(
+      InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name(),
+      validationReportEntries.get(0).getName()
+    );
+  }
 
-    @Test
-    void testDepartureDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
-        setupTestCaseWithDepartureDayOffsetSatisfiedWaitingTime();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, DEPARTURE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        assertTrue(resultingReport.getValidationReportEntries().isEmpty());
-    }
-
-    @Test
-    void testDepartureDayOffsetWithUnsatisfiedWaitingTimeButNotExceedingErrorTresholdGivesValidationWarning() {
-        setupTestCaseWithDepartureDayOffsetUnsatisfiedWaitingTime();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, DEPARTURE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
-        assertEquals(1, validationReportEntries.size());
-        assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(), validationReportEntries.get(0).getName());
-    }
-
-    @Test
-    void testArrivalDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
-        setupTestCaseWithArrivalDayOffsetSatisfiedWaitingTime();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        assertTrue(resultingReport.getValidationReportEntries().isEmpty());
-    }
-
-    @Test
-    void testArrivalDayOffsetWithUnsatisfiedWaitingTimeButNotExceedingErrorTresholdGivesValidationWarning() {
-        setupTestCaseWithArrivalDayOffsetUnsatisfiedWaitingTime();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
-        assertEquals(1, validationReportEntries.size());
-        assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(), validationReportEntries.get(0).getName());
-    }
-
-    @Test
-    void testActualWaitingTimeExceedingErrorTresholdGivesValidationError() {
-        setupTestCaseWithActualWaitingTimeExceedingErrorTreshold();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, ACTUAL_WAITING_TIME_EXCEEDING_ERROR_TRESHOLD);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
-        assertEquals(1, validationReportEntries.size());
-        assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR.name(), validationReportEntries.get(0).getName());
-    }
-
-    @Test
-    void testActualWaitingTimeExceedingWarningTresholdGivesValidationWarning() {
-        setupTestCaseWithActualWaitingTimeExceedingWarningTreshold();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
-        assertEquals(1, validationReportEntries.size());
-        assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(), validationReportEntries.get(0).getName());
-    }
-
-    @Test
-    void testNoInterchangePossible() {
-        setupTestCaseWithNoInterchangePossible();
-        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
-        ValidationReport validationReport = new ValidationReport(CODESPACE, NO_INTERCHANGE_POSSIBLE);
-        ValidationReport resultingReport = validator.validate(validationReport);
-        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
-        assertEquals(1, validationReportEntries.size());
-        assertEquals(InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name(), validationReportEntries.get(0).getName());
-    }
-
-    @Test
-    void testMinimumWaitTime() {
-        Duration minimum =
-                new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository)
-                        .getShortestActualWaitingTimeForInterchange(
-                                List.of(
-                                        LocalDateTime.of(2025, 1, 5, 12, 0, 0),
-                                        LocalDateTime.of(2025, 1, 6, 12, 0, 0),
-                                        LocalDateTime.of(2025, 1, 7, 12, 0, 0),
-                                        LocalDateTime.of(2025, 1, 8, 12, 0, 0)
-                                ).stream().sorted().collect(Collectors.toUnmodifiableList()),
-                                List.of(
-                                        LocalDateTime.of(2025, 1, 1, 11, 5, 0),
-                                        LocalDateTime.of(2025, 1, 2, 11, 15, 0),
-                                        LocalDateTime.of(2025, 1, 3, 11, 20, 0),
-                                        LocalDateTime.of(2025, 1, 4, 11, 25, 0)
-                                ).stream().sorted().collect(Collectors.toUnmodifiableList())
-                        );
-        assertEquals(minimum, null);
-    }
+  @Test
+  void testMinimumWaitTime() {
+    Duration minimum = new InterchangeWaitingTimeValidator(
+      new SimpleValidationEntryFactory(),
+      netexDataRepository
+    )
+      .getShortestActualWaitingTimeForInterchange(
+        List
+          .of(
+            LocalDateTime.of(2025, 1, 5, 12, 0, 0),
+            LocalDateTime.of(2025, 1, 6, 12, 0, 0),
+            LocalDateTime.of(2025, 1, 7, 12, 0, 0),
+            LocalDateTime.of(2025, 1, 8, 12, 0, 0)
+          )
+          .stream()
+          .sorted()
+          .collect(Collectors.toUnmodifiableList()),
+        List
+          .of(
+            LocalDateTime.of(2025, 1, 1, 11, 5, 0),
+            LocalDateTime.of(2025, 1, 2, 11, 15, 0),
+            LocalDateTime.of(2025, 1, 3, 11, 20, 0),
+            LocalDateTime.of(2025, 1, 4, 11, 25, 0)
+          )
+          .stream()
+          .sorted()
+          .collect(Collectors.toUnmodifiableList())
+      );
+    assertEquals(minimum, null);
+  }
 }

@@ -109,7 +109,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
 
   @Override
   public Map<ServiceJourneyId, List<LocalDateTime>> serviceJourneyIdToActiveDates(
-          String validationReportId
+    String validationReportId
   ) {
     return activeDatesByServiceJourneyIdCache.get(validationReportId);
   }

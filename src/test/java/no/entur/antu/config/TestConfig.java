@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
 import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
