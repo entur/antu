@@ -48,6 +48,8 @@ class InterchangeWaitingTimeValidatorTest {
     "idActualWaitingTimeExceedingWarningThreshold";
   private static final String NO_INTERCHANGE_POSSIBLE =
     "idNoInterchangePossible";
+  private static final String NO_GUARANTEED_WARNING =
+      "idNoGuaranteedWarning";
 
   private static String serviceJourneyInterchangeId =
     "ServiceJourneyInterchange:1";
@@ -130,7 +132,8 @@ class InterchangeWaitingTimeValidatorTest {
           .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
       )
       .withFromPointRef(createStopPointRef(fromStopPoint))
-      .withToPointRef(createStopPointRef(toStopPoint));
+      .withToPointRef(createStopPointRef(toStopPoint))
+      .withGuaranteed(true);
   }
 
   private void setupTestData(
@@ -617,5 +620,58 @@ class InterchangeWaitingTimeValidatorTest {
           .collect(Collectors.toUnmodifiableList())
       );
     assertEquals(minimum, null);
+  }
+
+  @Test
+  void testNotGuaranteedGivesWarning() {
+    ServiceJourneyInterchange interchange = new ServiceJourneyInterchange().withGuaranteed(false);
+    setupTestData(NO_GUARANTEED_WARNING, interchange, Map.of(), Map.of());
+
+    InterchangeWaitingTimeValidator validator =
+        new InterchangeWaitingTimeValidator(
+            new SimpleValidationEntryFactory(),
+            netexDataRepository
+        );
+    ValidationReport validationReport = new ValidationReport(
+        CODESPACE,
+        NO_GUARANTEED_WARNING
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    List<ValidationReportEntry> validationReportEntries = resultingReport
+        .getValidationReportEntries()
+        .stream()
+        .toList();
+    assertEquals(1, validationReportEntries.size());
+    assertEquals(
+        InterchangeWaitingTimeValidator.RULE_INTERCHANGE_NOT_GUARANTEED.name(),
+        validationReportEntries.get(0).getName()
+    );
+  }
+
+
+  @Test
+  void testGuaranteedUnsetGivesWarning() {
+    ServiceJourneyInterchange interchange = new ServiceJourneyInterchange();
+    setupTestData(NO_GUARANTEED_WARNING, interchange, Map.of(), Map.of());
+
+    InterchangeWaitingTimeValidator validator =
+        new InterchangeWaitingTimeValidator(
+            new SimpleValidationEntryFactory(),
+            netexDataRepository
+        );
+    ValidationReport validationReport = new ValidationReport(
+        CODESPACE,
+        NO_GUARANTEED_WARNING
+    );
+    ValidationReport resultingReport = validator.validate(validationReport);
+    List<ValidationReportEntry> validationReportEntries = resultingReport
+        .getValidationReportEntries()
+        .stream()
+        .toList();
+    assertEquals(1, validationReportEntries.size());
+    assertEquals(
+        InterchangeWaitingTimeValidator.RULE_INTERCHANGE_NOT_GUARANTEED.name(),
+        validationReportEntries.get(0).getName()
+    );
   }
 }

@@ -25,8 +25,15 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
   static final ValidationRule RULE_NO_INTERCHANGE_POSSIBLE = new ValidationRule(
     "RULE_NO_INTERCHANGE_POSSIBLE",
     "Feeder and consumer vehicle journeys have no interchange possibilities",
-    "ServiceJourneyInterchange %s have no interchange possibilities for vehicle journey %s and consumer vehicle journey %s",
+    "ServiceJourneyInterchange %s has no interchange possibilities for vehicle journey %s and consumer vehicle journey %s",
     Severity.ERROR
+  );
+
+  static final ValidationRule RULE_INTERCHANGE_NOT_GUARANTEED = new ValidationRule(
+      "RULE_INTERCHANGE_NOT_GUARANTEED",
+      "The interchange is not guaranteed, which in effect makes it just a suggestion",
+      "ServiceJourneyInterchange %s is not guaranteed, which means we do not take it into account when routing",
+      Severity.WARNING
   );
 
   static final ValidationRule RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING =
@@ -161,10 +168,30 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     String validationReportId = validationReport.getValidationReportId();
     List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfoList =
       netexDataRepository.serviceJourneyInterchangeInfos(validationReportId);
+
     Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStopsByServiceJourneyId =
       netexDataRepository.serviceJourneyStops(validationReportId);
 
     for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo : serviceJourneyInterchangeInfoList) {
+
+      if (serviceJourneyInterchangeInfo.guaranteed() == null || !serviceJourneyInterchangeInfo.guaranteed()) {
+        validationReport.addValidationReportEntry(
+            createValidationReportEntry(
+                new ValidationIssue(
+                    RULE_INTERCHANGE_NOT_GUARANTEED,
+                    new DataLocation(
+                        serviceJourneyInterchangeInfo.interchangeId(),
+                        serviceJourneyInterchangeInfo.filename(),
+                        null,
+                        null
+                    ),
+                    serviceJourneyInterchangeInfo.interchangeId()
+                )
+            )
+        );
+        continue;
+      }
+
       List<ServiceJourneyStop> fromJourneyStops =
         serviceJourneyStopsByServiceJourneyId.get(
           serviceJourneyInterchangeInfo.fromJourneyRef()
