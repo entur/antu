@@ -2,6 +2,7 @@ package no.entur.antu.validation.validator.interchange.waitingtime;
 
 import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
+import org.assertj.core.api.Assertions;
 import org.entur.netex.validation.validator.SimpleValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
@@ -19,6 +20,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -442,5 +444,26 @@ class InterchangeWaitingTimeValidatorTest2 {
         ValidationReport validationReport = new ValidationReport(CODESPACE, TEST_CASE_ARRIVAL_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME);
         ValidationReport resultingValidationReport = validator.validate(validationReport);
         assertEquals(1, resultingValidationReport.getValidationReportEntries().size());
+    }
+
+    @Test
+    void testMinimumWaitTime() {
+        Duration minimum =
+                new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository)
+                        .getShortestActualWaitingTimeForInterchange(
+                                List.of(
+                                        LocalDateTime.of(2025, 1, 5, 12, 0, 0),
+                                        LocalDateTime.of(2025, 1, 6, 12, 0, 0),
+                                        LocalDateTime.of(2025, 1, 7, 12, 0, 0),
+                                        LocalDateTime.of(2025, 1, 8, 12, 0, 0)
+                                ).stream().sorted().collect(Collectors.toUnmodifiableList()),
+                                List.of(
+                                        LocalDateTime.of(2025, 1, 1, 11, 5, 0),
+                                        LocalDateTime.of(2025, 1, 2, 11, 15, 0),
+                                        LocalDateTime.of(2025, 1, 3, 11, 20, 0),
+                                        LocalDateTime.of(2025, 1, 4, 11, 25, 0)
+                                ).stream().sorted().collect(Collectors.toUnmodifiableList())
+                        );
+        assertEquals(minimum, null);
     }
 }

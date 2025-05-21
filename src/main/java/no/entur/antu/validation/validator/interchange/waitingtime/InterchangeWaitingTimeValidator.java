@@ -99,6 +99,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     return minimumDuration;
   }
 
+  // TODO: if guaranteed is set to false, we should give the user a warning
   public ValidationReport validate(ValidationReport validationReport) {
     String validationReportId = validationReport.getValidationReportId();
     List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfoList =
@@ -148,47 +149,48 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         continue;
       }
 
-      // TODO: if maximumWaitTime does not exist, it is assumed that consumer will wait for feeder regardless of delay.
-      // TODO: if guaranteed is set to false and there is no maximumWaitTime, we should give the user a warning
-      Duration maximumWaitingTime = serviceJourneyInterchangeInfo.maximumWaitTime().isPresent() ? serviceJourneyInterchangeInfo.maximumWaitTime().get() : Duration.ZERO;
-      Duration shortestActualWaitingTime = getShortestActualWaitingTimeForInterchange(fromJourneyActiveDates, toJourneyActiveDates);
-      Duration errorTresholdWaitingTime = maximumWaitingTime.multipliedBy(3);
+      Duration maximumWaitingTime = serviceJourneyInterchangeInfo.maximumWaitTime().isPresent() ? serviceJourneyInterchangeInfo.maximumWaitTime().get() : null;
+      // if maximumWaitTime does not exist, it is assumed that consumer will wait for feeder regardless of delay.
+      if (maximumWaitingTime != null) {
+        Duration shortestActualWaitingTime = getShortestActualWaitingTimeForInterchange(fromJourneyActiveDates, toJourneyActiveDates);
+        Duration errorTresholdWaitingTime = maximumWaitingTime.multipliedBy(3);
 
-      // If the shortest actual waiting time is 3 times the maximum waiting time, give an error
-      if (shortestActualWaitingTime.compareTo(errorTresholdWaitingTime) >= 0) {
-        validationReport.addValidationReportEntry(
-                createValidationReportEntry(
-                new ValidationIssue(
-                        RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR,
-                        new DataLocation(
-                                        serviceJourneyInterchangeInfo.interchangeId(),
-                                        serviceJourneyInterchangeInfo.filename(),
-                                        null,
-                                        null
-                                ),
-                                serviceJourneyInterchangeInfo.interchangeId(),
-                                serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-                                serviceJourneyInterchangeInfo.toJourneyRef().id()
-                ))
-        );
-      }
-      // If shortest actual waiting time is above maximum waiting time, but less than error treshold, give a warning
-      else if (shortestActualWaitingTime.compareTo(maximumWaitingTime) > 0) {
-        validationReport.addValidationReportEntry(
-                createValidationReportEntry(
-                        new ValidationIssue(
-                                RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING,
-                                new DataLocation(
-                                        serviceJourneyInterchangeInfo.interchangeId(),
-                                        serviceJourneyInterchangeInfo.filename(),
-                                        null,
-                                        null
-                                ),
-                                serviceJourneyInterchangeInfo.interchangeId(),
-                                serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-                                serviceJourneyInterchangeInfo.toJourneyRef().id()
-                        ))
-        );
+        // If the shortest actual waiting time is 3 times the maximum waiting time, give an error
+        if (shortestActualWaitingTime.compareTo(errorTresholdWaitingTime) >= 0) {
+          validationReport.addValidationReportEntry(
+                  createValidationReportEntry(
+                  new ValidationIssue(
+                          RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR,
+                          new DataLocation(
+                                          serviceJourneyInterchangeInfo.interchangeId(),
+                                          serviceJourneyInterchangeInfo.filename(),
+                                          null,
+                                          null
+                                  ),
+                                  serviceJourneyInterchangeInfo.interchangeId(),
+                                  serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+                                  serviceJourneyInterchangeInfo.toJourneyRef().id()
+                  ))
+          );
+        }
+        // If shortest actual waiting time is above maximum waiting time, but less than error treshold, give a warning
+        else if (shortestActualWaitingTime.compareTo(maximumWaitingTime) > 0) {
+          validationReport.addValidationReportEntry(
+                  createValidationReportEntry(
+                          new ValidationIssue(
+                                  RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING,
+                                  new DataLocation(
+                                          serviceJourneyInterchangeInfo.interchangeId(),
+                                          serviceJourneyInterchangeInfo.filename(),
+                                          null,
+                                          null
+                                  ),
+                                  serviceJourneyInterchangeInfo.interchangeId(),
+                                  serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+                                  serviceJourneyInterchangeInfo.toJourneyRef().id()
+                          ))
+          );
+        }
       }
     }
     return validationReport;
