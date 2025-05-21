@@ -51,18 +51,6 @@ class InterchangeWaitingTimeValidatorTest {
     @BeforeEach
     void setUp() {
         this.netexDataRepository = new TestNetexDataRepository();
-        setupAllTestCases();
-    }
-
-    private void setupAllTestCases() {
-        setupTestCaseWithNoSharedDateUnsatisfiedWaitingTime();
-        setupTestCaseWithNoSharedDateSatisfiedWaitingTime();
-        setupTestCaseWithDepartureDayOffsetSatisfiedWaitingTime();
-        setupTestCaseWithDepartureDayOffsetUnsatisfiedWaitingTime();
-        setupTestCaseWithArrivalDayOffsetSatisfiedWaitingTime();
-        setupTestCaseWithArrivalDayOffsetUnsatisfiedWaitingTime();
-        setupTestCaseWithActualWaitingTimeExceedingErrorTreshold();
-        setupTestCaseWithActualWaitingTimeExceedingWarningTreshold();
     }
 
     private ScheduledStopPointRefStructure createStopPointRef(int stopPointId) {
@@ -263,6 +251,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     @Test
     void testNoSharedActiveDateWithUnsatisfiedWaitingTimeGivesValidationError() {
+        setupTestCaseWithNoSharedDateUnsatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, NO_SHARED_ACTIVE_DATE_WITH_UNSATISIFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
@@ -271,6 +260,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     @Test
     void testNoSharedActiveDateWithSatisfiedWaitingTimeGivesNoValidationError() {
+        setupTestCaseWithNoSharedDateSatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, NO_SHARED_ACTIVE_DATE_WITH_SATISFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
@@ -279,6 +269,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     @Test
     void testDepartureDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
+        setupTestCaseWithDepartureDayOffsetSatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, DEPARTURE_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
@@ -287,6 +278,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     @Test
     void testDepartureDayOffsetWithUnsatisfiedWaitingTimeGivesValidationError() {
+        setupTestCaseWithDepartureDayOffsetUnsatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, DEPARTURE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
@@ -295,6 +287,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     @Test
     void testArrivalDayOffsetWithSatisfiedWaitingTimeGivesNoValidationError() {
+        setupTestCaseWithArrivalDayOffsetSatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, ARRIVAL_DAY_OFFSET_WITH_SATISFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
@@ -303,6 +296,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     @Test
     void testArrivalDayOffsetWithUnsatisfiedWaitingTimeGivesValidationError() {
+        setupTestCaseWithArrivalDayOffsetUnsatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
@@ -311,6 +305,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     @Test
     void testActualWaitingTimeExceedingErrorTresholdGivesValidationError() {
+        setupTestCaseWithActualWaitingTimeExceedingErrorTreshold();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, ACTUAL_WAITING_TIME_EXCEEDING_ERROR_TRESHOLD);
         ValidationReport resultingReport = validator.validate(validationReport);
@@ -321,6 +316,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     @Test
     void testActualWaitingTimeExceedingWarningTresholdGivesValidationWarning() {
+        setupTestCaseWithActualWaitingTimeExceedingWarningTreshold();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD);
         ValidationReport resultingReport = validator.validate(validationReport);
