@@ -39,6 +39,7 @@ class InterchangeWaitingTimeValidatorTest {
     private static final String ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME = "idArrivalDayOffsetWithUnsatisifiedWaitingTime";
     private static final String ACTUAL_WAITING_TIME_EXCEEDING_ERROR_TRESHOLD = "idActualWaitingTimeExceedingErrorThreshold";
     private static final String ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD = "idActualWaitingTimeExceedingWarningThreshold";
+    private static final String NO_INTERCHANGE_POSSIBLE = "idNoInterchangePossible";
 
     private static String serviceJourneyInterchangeId = "ServiceJourneyInterchange:1";
 
@@ -249,13 +250,29 @@ class InterchangeWaitingTimeValidatorTest {
         setupTestData(ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD, interchange, activeDates, stops);
     }
 
+    private void setupTestCaseWithNoInterchangePossible() {
+        ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime(Duration.ofHours(1));
+        Map<String, List<LocalDateTime>> activeDates = Map.of(
+                fromJourneyId, List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0)),
+                toJourneyId, List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+        );
+
+        Map<String, ServiceJourneyStop> stops = Map.of(
+                fromJourneyId, createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
+                toJourneyId, createDepartureStop(toStopPoint, 16, 59, 0, Optional.empty())
+        );
+        setupTestData(NO_INTERCHANGE_POSSIBLE, interchange, activeDates, stops);
+    }
+
     @Test
     void testNoSharedActiveDateWithUnsatisfiedWaitingTimeGivesValidationError() {
         setupTestCaseWithNoSharedDateUnsatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, NO_SHARED_ACTIVE_DATE_WITH_UNSATISIFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
-        assertEquals(1, resultingReport.getValidationReportEntries().size());
+        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
+        assertEquals(1, validationReportEntries.size());
+        assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR.name(), validationReportEntries.get(0).getName());
     }
 
     @Test
@@ -277,12 +294,14 @@ class InterchangeWaitingTimeValidatorTest {
     }
 
     @Test
-    void testDepartureDayOffsetWithUnsatisfiedWaitingTimeGivesValidationError() {
+    void testDepartureDayOffsetWithUnsatisfiedWaitingTimeButNotExceedingErrorTresholdGivesValidationWarning() {
         setupTestCaseWithDepartureDayOffsetUnsatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, DEPARTURE_DAY_OFFSET_WITH_UNSATISFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
-        assertEquals(1, resultingReport.getValidationReportEntries().size());
+        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
+        assertEquals(1, validationReportEntries.size());
+        assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(), validationReportEntries.get(0).getName());
     }
 
     @Test
@@ -295,12 +314,14 @@ class InterchangeWaitingTimeValidatorTest {
     }
 
     @Test
-    void testArrivalDayOffsetWithUnsatisfiedWaitingTimeGivesValidationError() {
+    void testArrivalDayOffsetWithUnsatisfiedWaitingTimeButNotExceedingErrorTresholdGivesValidationWarning() {
         setupTestCaseWithArrivalDayOffsetUnsatisfiedWaitingTime();
         InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
         ValidationReport validationReport = new ValidationReport(CODESPACE, ARRIVAL_DAY_OFF_SET_WITH_UNSATISFIED_WAITING_TIME);
         ValidationReport resultingReport = validator.validate(validationReport);
-        assertEquals(1, resultingReport.getValidationReportEntries().size());
+        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
+        assertEquals(1, validationReportEntries.size());
+        assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(), validationReportEntries.get(0).getName());
     }
 
     @Test
@@ -323,6 +344,17 @@ class InterchangeWaitingTimeValidatorTest {
         List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
         assertEquals(1, validationReportEntries.size());
         assertEquals(InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(), validationReportEntries.get(0).getName());
+    }
+
+    @Test
+    void testNoInterchangePossible() {
+        setupTestCaseWithNoInterchangePossible();
+        InterchangeWaitingTimeValidator validator = new InterchangeWaitingTimeValidator(new SimpleValidationEntryFactory(), netexDataRepository);
+        ValidationReport validationReport = new ValidationReport(CODESPACE, NO_INTERCHANGE_POSSIBLE);
+        ValidationReport resultingReport = validator.validate(validationReport);
+        List<ValidationReportEntry> validationReportEntries = resultingReport.getValidationReportEntries().stream().toList();
+        assertEquals(1, validationReportEntries.size());
+        assertEquals(InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name(), validationReportEntries.get(0).getName());
     }
 
     @Test
