@@ -44,13 +44,7 @@ public class TestNetexDataRepository implements NetexDataRepositoryLoader {
         } else {
             serviceJourneyInterchangeInfoList.add(serviceJourneyInterchangeInfo);
             this.serviceJourneyInterchangeInfos.put(validationReportId, serviceJourneyInterchangeInfoList);
-            this.serviceJourneyInterchangeInfos.get(validationReportId).add(serviceJourneyInterchangeInfo);
         }
-//        if (this.serviceJourneyInterchangeInfos == null) {
-//            this.serviceJourneyInterchangeInfos = new ArrayList<>();
-//            this.serviceJourneyInterchangeInfos.put(validationReportId, serviceJourneyInterchangeInfo);
-//        }
-//        this.serviceJourneyInterchangeInfos.add(serviceJourneyInterchangeInfo);
     }
 
     @Override
