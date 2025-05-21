@@ -13,8 +13,16 @@ import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 
+/**
+ * Validates that the ServiceJourneys referred to by a ServiceJourneyInterchange have possibilities
+ * of making interchanges, and that the actual waiting time between service journeys do not exceed
+ * the maximumWaitTime specified in ServiceJourneyInterchange.
+ *
+ * Chouette reference: 3-Interchange-8-1, 3-Interchange-8-2, 3-Interchange-10
+ */
 public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
 
+  // Closest resemblance to 3-Interchange-10, but validated differently
   static final ValidationRule RULE_NO_INTERCHANGE_POSSIBLE =
           new ValidationRule(
                   "RULE_NO_INTERCHANGE_POSSIBLE",
