@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
@@ -29,27 +30,12 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     Severity.ERROR
   );
 
-  static final ValidationRule RULE_INTERCHANGE_NOT_GUARANTEED = new ValidationRule(
-      "RULE_INTERCHANGE_NOT_GUARANTEED",
-      "The interchange is not guaranteed, which in effect makes it just a suggestion",
-      "ServiceJourneyInterchange %s is not guaranteed, which means we do not take it into account when routing",
-      Severity.WARNING
-  );
-
   static final ValidationRule RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING =
     new ValidationRule(
       "RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING",
       "Waiting time between feeder and consumer vehicle journeys exceed warning treshold",
       "Waiting time between service journeys in ServiceJourneyInterchange %s exceeds warning treshold",
       Severity.WARNING
-    );
-
-  static final ValidationRule RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR =
-    new ValidationRule(
-      "RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR",
-      "Waiting time between feeder and consumer vehicle journeys exceed error treshold",
-      "Waiting time between service journeys in ServiceJourneyInterchange %s exceeds error treshold",
-      Severity.ERROR
     );
 
   private final NetexDataRepository netexDataRepository;
@@ -73,7 +59,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       .get(serviceJourneyId);
   }
 
-  private LocalTime arrivalTimeFromScheduledStopPointId(
+  private ServiceJourneyStop getServiceJourneyStopByScheduledStopPointId(
     List<ServiceJourneyStop> stops,
     ScheduledStopPointId scheduledStopPointId
   ) {
@@ -83,53 +69,10 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)
       )
       .findFirst()
-      .orElseThrow()
-      .arrivalTime();
+      .orElseThrow();
   }
 
-  private LocalTime departureTimeFromScheduledStopPointId(
-    List<ServiceJourneyStop> stops,
-    ScheduledStopPointId scheduledStopPointId
-  ) {
-    return stops
-      .stream()
-      .filter(serviceJourneyStop ->
-        serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)
-      )
-      .findFirst()
-      .orElseThrow()
-      .departureTime();
-  }
-
-  private int arrivalDayOffsetFromScheduledStopPointId(
-    List<ServiceJourneyStop> stops,
-    ScheduledStopPointId scheduledStopPointId
-  ) {
-    return stops
-      .stream()
-      .filter(serviceJourneyStop ->
-        serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)
-      )
-      .findFirst()
-      .orElseThrow()
-      .arrivalDayOffset();
-  }
-
-  private int departureDayOffsetFromScheduledStopPointId(
-    List<ServiceJourneyStop> stops,
-    ScheduledStopPointId scheduledStopPointId
-  ) {
-    return stops
-      .stream()
-      .filter(serviceJourneyStop ->
-        serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)
-      )
-      .findFirst()
-      .orElseThrow()
-      .departureDayOffset();
-  }
-
-  public Duration getShortestActualWaitingTimeForInterchange(
+  static Duration getShortestActualWaitingTimeForInterchange(
     List<LocalDateTime> fromJourneyActiveDates,
     List<LocalDateTime> toJourneyActiveDates
   ) {
@@ -163,6 +106,89 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     return minimumDuration;
   }
 
+  static LocalDateTime createLocalDateTimeFromDayOffsetAndPassingTime(LocalDateTime localDateTime, int dayOffset, LocalTime passingTime) {
+    return localDateTime.plusDays(dayOffset).plusNanos(passingTime.toNanoOfDay());
+  }
+
+  static List<LocalDateTime> sortedLocalDateTimesForServiceJourneyAtStop(
+    List<LocalDateTime> activeDates,
+    int dayOffset,
+    LocalTime passingTime
+  ) {
+    return activeDates
+      .stream()
+      .map(localDateTime -> createLocalDateTimeFromDayOffsetAndPassingTime(localDateTime, dayOffset, passingTime))
+      .sorted()
+      .toList();
+  }
+
+  static ValidationIssue validateServiceJourneyInterchangeInfo(
+      ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+      List<LocalDateTime> fromJourneyActiveDates,
+      List<LocalDateTime> toJourneyActiveDates,
+      ServiceJourneyStop fromJourneyStop,
+      ServiceJourneyStop toJourneyStop) {
+
+    List<LocalDateTime> sortedFromJourneySortedLocalDateTimes =
+        sortedLocalDateTimesForServiceJourneyAtStop(
+            fromJourneyActiveDates,
+            fromJourneyStop.arrivalDayOffset(),
+            fromJourneyStop.arrivalTime()
+        );
+
+    List<LocalDateTime> sortedToJourneySortedLocalDateTimes =
+        sortedLocalDateTimesForServiceJourneyAtStop(
+            toJourneyActiveDates,
+            toJourneyStop.departureDayOffset(),
+            toJourneyStop.departureTime()
+        );
+
+    // If the latest arrival is later than the earliest departure, there will never be an interchange
+    LocalDateTime earliestArrivalTime = sortedFromJourneySortedLocalDateTimes.get(0);
+    LocalDateTime latestDepartureTime = sortedToJourneySortedLocalDateTimes.get(
+        toJourneyActiveDates.size() - 1
+    );
+    if (earliestArrivalTime.isAfter(latestDepartureTime)) {
+      return
+              new ValidationIssue(
+                  RULE_NO_INTERCHANGE_POSSIBLE,
+                  new DataLocation(
+                      serviceJourneyInterchangeInfo.interchangeId(),
+                      serviceJourneyInterchangeInfo.filename(),
+                      null,
+                      null
+                  ),
+                  serviceJourneyInterchangeInfo.interchangeId(),
+                  serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+                  serviceJourneyInterchangeInfo.toJourneyRef().id()
+              );
+    }
+
+    Duration shortestActualWaitingTime =
+        getShortestActualWaitingTimeForInterchange(
+            sortedFromJourneySortedLocalDateTimes,
+            sortedToJourneySortedLocalDateTimes
+        );
+
+    // If the shortest actual waiting time is over 3 hours, we give a warning
+    if (shortestActualWaitingTime.compareTo(Duration.ofHours(3)) > 0) {
+      return new ValidationIssue(
+                  RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING,
+                  new DataLocation(
+                      serviceJourneyInterchangeInfo.interchangeId(),
+                      serviceJourneyInterchangeInfo.filename(),
+                      null,
+                      null
+                  ),
+                  serviceJourneyInterchangeInfo.interchangeId(),
+                  serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+                  serviceJourneyInterchangeInfo.toJourneyRef().id()
+              );
+    }
+    return null;
+  }
+
+
   // TODO: if guaranteed is set to false, we should give the user a warning
   public ValidationReport validate(ValidationReport validationReport) {
     String validationReportId = validationReport.getValidationReportId();
@@ -173,160 +199,36 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       netexDataRepository.serviceJourneyStops(validationReportId);
 
     for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo : serviceJourneyInterchangeInfoList) {
-
-      if (serviceJourneyInterchangeInfo.guaranteed() == null || !serviceJourneyInterchangeInfo.guaranteed()) {
-        validationReport.addValidationReportEntry(
-            createValidationReportEntry(
-                new ValidationIssue(
-                    RULE_INTERCHANGE_NOT_GUARANTEED,
-                    new DataLocation(
-                        serviceJourneyInterchangeInfo.interchangeId(),
-                        serviceJourneyInterchangeInfo.filename(),
-                        null,
-                        null
-                    ),
-                    serviceJourneyInterchangeInfo.interchangeId()
-                )
-            )
-        );
-        continue;
-      }
-
-      List<ServiceJourneyStop> fromJourneyStops =
+      ServiceJourneyStop fromJourneyStop = getServiceJourneyStopByScheduledStopPointId(
         serviceJourneyStopsByServiceJourneyId.get(
           serviceJourneyInterchangeInfo.fromJourneyRef()
-        );
-      List<ServiceJourneyStop> toJourneyStops =
+        ), serviceJourneyInterchangeInfo.fromStopPoint());
+      ServiceJourneyStop toJourneyStop = getServiceJourneyStopByScheduledStopPointId(
         serviceJourneyStopsByServiceJourneyId.get(
           serviceJourneyInterchangeInfo.toJourneyRef()
-        );
+        ), serviceJourneyInterchangeInfo.toStopPoint());
 
-      int arrivalDayOffset = arrivalDayOffsetFromScheduledStopPointId(
-        fromJourneyStops,
-        serviceJourneyInterchangeInfo.fromStopPoint()
-      );
-      int departureDayOffset = departureDayOffsetFromScheduledStopPointId(
-        toJourneyStops,
-        serviceJourneyInterchangeInfo.toStopPoint()
-      );
-      LocalTime arrivalTime = arrivalTimeFromScheduledStopPointId(
-        fromJourneyStops,
-        serviceJourneyInterchangeInfo.fromStopPoint()
-      );
-      LocalTime departureTime = departureTimeFromScheduledStopPointId(
-        toJourneyStops,
-        serviceJourneyInterchangeInfo.toStopPoint()
-      );
-
-      // The active dates' origin are from the start of the Service Journey. To get the actual arrival time on the correct stop,
-      // we need to add the arrival day offset to the active date, along with the value of arrivalTime.
-      List<LocalDateTime> fromJourneyActiveDates =
-        getActiveDatesForServiceJourney(
+      List<LocalDateTime> fromJourneyActiveDates = getActiveDatesForServiceJourney(
           validationReportId,
           serviceJourneyInterchangeInfo.fromJourneyRef()
-        )
-          .stream()
-          .map(localDateTime ->
-            localDateTime
-              .plusDays(arrivalDayOffset)
-              .plusNanos(arrivalTime.toNanoOfDay())
-          )
-          .sorted()
-          .toList();
-      List<LocalDateTime> toJourneyActiveDates =
-        getActiveDatesForServiceJourney(
+        );
+
+      List<LocalDateTime> toJourneyActiveDates = getActiveDatesForServiceJourney(
           validationReportId,
           serviceJourneyInterchangeInfo.toJourneyRef()
-        )
-          .stream()
-          .map(localDateTime ->
-            localDateTime
-              .plusDays(departureDayOffset)
-              .plusNanos(departureTime.toNanoOfDay())
-          )
-          .sorted()
-          .toList();
-
-      // If the latest arrival is later than the earliest departure, there will never be an interchange
-      LocalDateTime earliestArrivalTime = fromJourneyActiveDates.get(0);
-      LocalDateTime latestDepartureTime = toJourneyActiveDates.get(
-        toJourneyActiveDates.size() - 1
-      );
-      if (earliestArrivalTime.isAfter(latestDepartureTime)) {
-        validationReport.addValidationReportEntry(
-          createValidationReportEntry(
-            new ValidationIssue(
-              RULE_NO_INTERCHANGE_POSSIBLE,
-              new DataLocation(
-                serviceJourneyInterchangeInfo.interchangeId(),
-                serviceJourneyInterchangeInfo.filename(),
-                null,
-                null
-              ),
-              serviceJourneyInterchangeInfo.interchangeId(),
-              serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-              serviceJourneyInterchangeInfo.toJourneyRef().id()
-            )
-          )
         );
-        // No reason to check waiting times when the service journeys never interchange
-        continue;
-      }
 
-      Duration maximumWaitingTime = serviceJourneyInterchangeInfo
-          .maximumWaitTime()
-          .isPresent()
-        ? serviceJourneyInterchangeInfo.maximumWaitTime().get()
-        : null;
-      // if maximumWaitTime does not exist, it is assumed that consumer will wait for feeder regardless of delay.
-      if (maximumWaitingTime != null) {
-        Duration shortestActualWaitingTime =
-          getShortestActualWaitingTimeForInterchange(
-            fromJourneyActiveDates,
-            toJourneyActiveDates
-          );
-        Duration errorTresholdWaitingTime = maximumWaitingTime.multipliedBy(3);
-
-        // If the shortest actual waiting time is 3 times the maximum waiting time, give an error
-        if (
-          shortestActualWaitingTime.compareTo(errorTresholdWaitingTime) >= 0
-        ) {
-          validationReport.addValidationReportEntry(
-            createValidationReportEntry(
-              new ValidationIssue(
-                RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_ERROR,
-                new DataLocation(
-                  serviceJourneyInterchangeInfo.interchangeId(),
-                  serviceJourneyInterchangeInfo.filename(),
-                  null,
-                  null
-                ),
-                serviceJourneyInterchangeInfo.interchangeId(),
-                serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-                serviceJourneyInterchangeInfo.toJourneyRef().id()
-              )
-            )
-          );
-        }
-        // If shortest actual waiting time is above maximum waiting time, but less than error treshold, give a warning
-        else if (shortestActualWaitingTime.compareTo(maximumWaitingTime) > 0) {
-          validationReport.addValidationReportEntry(
-            createValidationReportEntry(
-              new ValidationIssue(
-                RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING,
-                new DataLocation(
-                  serviceJourneyInterchangeInfo.interchangeId(),
-                  serviceJourneyInterchangeInfo.filename(),
-                  null,
-                  null
-                ),
-                serviceJourneyInterchangeInfo.interchangeId(),
-                serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-                serviceJourneyInterchangeInfo.toJourneyRef().id()
-              )
-            )
-          );
-        }
+      ValidationIssue validationIssue = validateServiceJourneyInterchangeInfo(
+        serviceJourneyInterchangeInfo,
+        fromJourneyActiveDates,
+        toJourneyActiveDates,
+        fromJourneyStop,
+        toJourneyStop
+      );
+      if (validationIssue != null) {
+        validationReport.addValidationReportEntry(
+          createValidationReportEntry(validationIssue)
+        );
       }
     }
     return validationReport;
