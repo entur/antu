@@ -32,8 +32,7 @@ class InterchangeWaitingTimeValidatorTest {
   private static final String CODESPACE = "codespace";
 
   // Test case identifiers
-  private static final String SATISFIED_WAITING_TIME =
-    "satisfiedWaitingTime";
+  private static final String SATISFIED_WAITING_TIME = "satisfiedWaitingTime";
   private static final String ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD =
     "idActualWaitingTimeExceedingWarningThreshold";
   private static final String NO_INTERCHANGE_POSSIBLE =
@@ -160,7 +159,6 @@ class InterchangeWaitingTimeValidatorTest {
     netexDataRepository.putServiceJourneyStop(testCaseId, journeyStops);
   }
 
-
   private void setupTestCaseSatisfiedWaitingTime() {
     ServiceJourneyInterchange interchange =
       createInterchangeWithMaximumWaitTime();
@@ -174,21 +172,17 @@ class InterchangeWaitingTimeValidatorTest {
 
     Map<String, ServiceJourneyStop> stops = Map.of(
       fromJourneyId,
-      createArrivalStop(fromStopPoint, 21, 0, 0, Optional.of(1)),
+      createArrivalStop(fromStopPoint, 21, 0, 0, Optional.empty()),
       toJourneyId,
       createDepartureStop(toStopPoint, 22, 59, 0, Optional.empty())
     );
 
-    setupTestData(
-      SATISFIED_WAITING_TIME,
-      interchange,
-      activeDates,
-      stops
-    );
+    setupTestData(SATISFIED_WAITING_TIME, interchange, activeDates, stops);
   }
 
   private void setupTestCaseWithActualWaitingTimeExceedingWarningTreshold() {
-    ServiceJourneyInterchange interchange = createInterchangeWithMaximumWaitTime();
+    ServiceJourneyInterchange interchange =
+      createInterchangeWithMaximumWaitTime();
     Map<String, List<LocalDateTime>> activeDates = Map.of(
       fromJourneyId,
       List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
@@ -200,7 +194,7 @@ class InterchangeWaitingTimeValidatorTest {
       fromJourneyId,
       createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty()),
       toJourneyId,
-      createDepartureStop(toStopPoint, 17, 0, 1, Optional.empty())
+      createDepartureStop(toStopPoint, 16, 0, 1, Optional.empty())
     );
     setupTestData(
       ACTUAL_WAITING_TIME_EXCEEDING_WARNING_TRESHOLD,
@@ -228,7 +222,6 @@ class InterchangeWaitingTimeValidatorTest {
     );
     setupTestData(NO_INTERCHANGE_POSSIBLE, interchange, activeDates, stops);
   }
-
 
   @Test
   void testSatisfiedWaitingTimeGivesNoValidationWarning() {
@@ -296,8 +289,8 @@ class InterchangeWaitingTimeValidatorTest {
 
   @Test
   void testMinimumWaitTimeIsNullWhenImpossible() {
-    Duration minimum = InterchangeWaitingTimeValidator
-      .getShortestActualWaitingTimeForInterchange(
+    Duration minimum =
+      InterchangeWaitingTimeValidator.getShortestActualWaitingTimeForInterchange(
         Stream
           .of(
             LocalDateTime.of(2025, 1, 5, 12, 0, 0),
@@ -320,134 +313,153 @@ class InterchangeWaitingTimeValidatorTest {
     assertEquals(null, minimum);
   }
 
-
   @Test
   void testMinimumWaitTime() {
-    Duration minimum = InterchangeWaitingTimeValidator
-        .getShortestActualWaitingTimeForInterchange(
-            Stream
-                .of(
-                    LocalDateTime.of(2025, 1, 1, 11, 0, 0),
-                    LocalDateTime.of(2025, 1, 2, 11, 0, 0),
-                    LocalDateTime.of(2025, 1, 3, 11, 0, 0),
-                    LocalDateTime.of(2025, 1, 4, 11, 0, 0)
-                )
-                .sorted()
-                .toList(),
-            Stream
-                .of(
-                    LocalDateTime.of(2025, 1, 2, 11, 0, 0),
-                    LocalDateTime.of(2025, 1, 3, 11, 0, 0),
-                    LocalDateTime.of(2025, 1, 4, 11, 0, 0),
-                    LocalDateTime.of(2025, 1, 5, 11, 0, 0),
-                    LocalDateTime.of(2025, 1, 6, 11, 0, 0)
-                )
-                .sorted()
-                .toList()
-        );
+    Duration minimum =
+      InterchangeWaitingTimeValidator.getShortestActualWaitingTimeForInterchange(
+        Stream
+          .of(
+            LocalDateTime.of(2025, 1, 1, 11, 0, 0),
+            LocalDateTime.of(2025, 1, 2, 11, 0, 0),
+            LocalDateTime.of(2025, 1, 3, 11, 0, 0),
+            LocalDateTime.of(2025, 1, 4, 11, 0, 0)
+          )
+          .sorted()
+          .toList(),
+        Stream
+          .of(
+            LocalDateTime.of(2025, 1, 2, 11, 0, 0),
+            LocalDateTime.of(2025, 1, 3, 11, 0, 0),
+            LocalDateTime.of(2025, 1, 4, 11, 0, 0),
+            LocalDateTime.of(2025, 1, 5, 11, 0, 0),
+            LocalDateTime.of(2025, 1, 6, 11, 0, 0)
+          )
+          .sorted()
+          .toList()
+      );
     assertEquals(Duration.ofDays(0), minimum);
   }
 
   @Test
   void testValidateServiceJourneyInterchangeInfo() {
-    var interchangeInfo = ServiceJourneyInterchangeInfo.of("", new ServiceJourneyInterchange());
+    var interchangeInfo = ServiceJourneyInterchangeInfo.of(
+      "",
+      new ServiceJourneyInterchange()
+    );
     var fromActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
     var toActiveDates = List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
     var fromStop = createArrivalStop(1, 23, 45, 0, Optional.empty());
     var toStop = createDepartureStop(2, 0, 15, 0, Optional.empty());
 
-    var validationIssue = InterchangeWaitingTimeValidator.validateServiceJourneyInterchangeInfo(
-      interchangeInfo,
-      fromActiveDates,
-      toActiveDates,
-      fromStop,
-      toStop
-    );
-    assertTrue(validationIssue == null);
-  }
-
-  @Test
-  void testValidateServiceJourneyInterchangeInfoLongWaitTimeGivesWarning() {
-    var interchangeInfo = ServiceJourneyInterchangeInfo.of("", new ServiceJourneyInterchange()
-        .withId(serviceJourneyInterchangeId)
-        .withFromJourneyRef(
-            new VehicleJourneyRefStructure()
-                .withRef(ServiceJourneyId.ofValidId(fromJourneyId).id())
-        )
-        .withToJourneyRef(
-            new VehicleJourneyRefStructure()
-                .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
-        )
-        .withFromPointRef(createStopPointRef(fromStopPoint))
-        .withToPointRef(createStopPointRef(toStopPoint)));
-
-    var fromActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
-    var toActiveDates = List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
-    var fromStop = createArrivalStop(1, 23, 45, 0, Optional.empty());
-    var toStop = createDepartureStop(2, 4, 15, 0, Optional.empty());
-
-    var validationIssue = InterchangeWaitingTimeValidator.validateServiceJourneyInterchangeInfo(
+    var validationIssue =
+      InterchangeWaitingTimeValidator.validateServiceJourneyInterchangeInfo(
         interchangeInfo,
         fromActiveDates,
         toActiveDates,
         fromStop,
         toStop
+      );
+    assertTrue(validationIssue == null);
+  }
+
+  @Test
+  void testValidateServiceJourneyInterchangeInfoLongWaitTimeGivesWarning() {
+    var interchangeInfo = ServiceJourneyInterchangeInfo.of(
+      "",
+      new ServiceJourneyInterchange()
+        .withId(serviceJourneyInterchangeId)
+        .withFromJourneyRef(
+          new VehicleJourneyRefStructure()
+            .withRef(ServiceJourneyId.ofValidId(fromJourneyId).id())
+        )
+        .withToJourneyRef(
+          new VehicleJourneyRefStructure()
+            .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
+        )
+        .withFromPointRef(createStopPointRef(fromStopPoint))
+        .withToPointRef(createStopPointRef(toStopPoint))
     );
+
+    var fromActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
+    var toActiveDates = List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
+    var fromStop = createArrivalStop(1, 23, 45, 0, Optional.empty());
+    var toStop = createDepartureStop(2, 1, 46, 0, Optional.empty());
+
+    var validationIssue =
+      InterchangeWaitingTimeValidator.validateServiceJourneyInterchangeInfo(
+        interchangeInfo,
+        fromActiveDates,
+        toActiveDates,
+        fromStop,
+        toStop
+      );
     assertTrue(validationIssue != null);
-    assertEquals(validationIssue.rule().name(), InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name());
+    assertEquals(
+      validationIssue.rule().name(),
+      InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name()
+    );
     assertEquals(validationIssue.rule().severity(), Severity.WARNING);
   }
 
   @Test
   void testValidateServiceJourneyWithNoPossibleInterchangeGivesError() {
-    var interchangeInfo = ServiceJourneyInterchangeInfo.of("", new ServiceJourneyInterchange()
+    var interchangeInfo = ServiceJourneyInterchangeInfo.of(
+      "",
+      new ServiceJourneyInterchange()
         .withId(serviceJourneyInterchangeId)
         .withFromJourneyRef(
-            new VehicleJourneyRefStructure()
-                .withRef(ServiceJourneyId.ofValidId(fromJourneyId).id())
+          new VehicleJourneyRefStructure()
+            .withRef(ServiceJourneyId.ofValidId(fromJourneyId).id())
         )
         .withToJourneyRef(
-            new VehicleJourneyRefStructure()
-                .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
+          new VehicleJourneyRefStructure()
+            .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
         )
         .withFromPointRef(createStopPointRef(fromStopPoint))
-        .withToPointRef(createStopPointRef(toStopPoint)));
+        .withToPointRef(createStopPointRef(toStopPoint))
+    );
 
     var fromActiveDates = List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
     var toActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
     var fromStop = createArrivalStop(1, 23, 45, 0, Optional.empty());
     var toStop = createDepartureStop(2, 4, 15, 0, Optional.empty());
 
-    var validationIssue = InterchangeWaitingTimeValidator.validateServiceJourneyInterchangeInfo(
+    var validationIssue =
+      InterchangeWaitingTimeValidator.validateServiceJourneyInterchangeInfo(
         interchangeInfo,
         fromActiveDates,
         toActiveDates,
         fromStop,
         toStop
-    );
+      );
     assertTrue(validationIssue != null);
-    assertEquals(validationIssue.rule().name(), InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name());
+    assertEquals(
+      validationIssue.rule().name(),
+      InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name()
+    );
     assertEquals(validationIssue.rule().severity(), Severity.ERROR);
   }
 
   @Test
   void testCreateLocalDateTimeFromDayOffsetAndPassingTime() {
-    var localDateTime = InterchangeWaitingTimeValidator.createLocalDateTimeFromDayOffsetAndPassingTime(
+    var localDateTime =
+      InterchangeWaitingTimeValidator.createLocalDateTimeFromDayOffsetAndPassingTime(
         LocalDateTime.of(2025, 1, 1, 0, 0, 0),
         0,
         LocalTime.of(23, 45, 0)
-    );
+      );
 
     assertEquals(LocalDateTime.of(2025, 1, 1, 23, 45, 0), localDateTime);
   }
 
   @Test
   void testCreateLocalDateTimeFromDayOffsetAndPassingTimeWithDayOffset() {
-    var localDateTime = InterchangeWaitingTimeValidator.createLocalDateTimeFromDayOffsetAndPassingTime(
+    var localDateTime =
+      InterchangeWaitingTimeValidator.createLocalDateTimeFromDayOffsetAndPassingTime(
         LocalDateTime.of(2025, 1, 1, 0, 0, 0),
         1,
         LocalTime.of(23, 45, 0)
-    );
+      );
 
     assertEquals(LocalDateTime.of(2025, 1, 2, 23, 45, 0), localDateTime);
   }
@@ -463,7 +475,9 @@ class InterchangeWaitingTimeValidatorTest {
       LocalTime.of(12, 0)
     );
     assertTrue(
-      sortedLocalDateTimes.get(0).equals(LocalDateTime.of(2024, 12, 31, 12, 0, 0))
+      sortedLocalDateTimes
+        .get(0)
+        .equals(LocalDateTime.of(2024, 12, 31, 12, 0, 0))
     );
     assertTrue(
       sortedLocalDateTimes.get(1).equals(LocalDateTime.of(2025, 1, 1, 12, 0, 0))

@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
@@ -106,8 +105,14 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     return minimumDuration;
   }
 
-  static LocalDateTime createLocalDateTimeFromDayOffsetAndPassingTime(LocalDateTime localDateTime, int dayOffset, LocalTime passingTime) {
-    return localDateTime.plusDays(dayOffset).plusNanos(passingTime.toNanoOfDay());
+  static LocalDateTime createLocalDateTimeFromDayOffsetAndPassingTime(
+    LocalDateTime localDateTime,
+    int dayOffset,
+    LocalTime passingTime
+  ) {
+    return localDateTime
+      .plusDays(dayOffset)
+      .plusNanos(passingTime.toNanoOfDay());
   }
 
   static List<LocalDateTime> sortedLocalDateTimesForServiceJourneyAtStop(
@@ -117,77 +122,82 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
   ) {
     return activeDates
       .stream()
-      .map(localDateTime -> createLocalDateTimeFromDayOffsetAndPassingTime(localDateTime, dayOffset, passingTime))
+      .map(localDateTime ->
+        createLocalDateTimeFromDayOffsetAndPassingTime(
+          localDateTime,
+          dayOffset,
+          passingTime
+        )
+      )
       .sorted()
       .toList();
   }
 
   static ValidationIssue validateServiceJourneyInterchangeInfo(
-      ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
-      List<LocalDateTime> fromJourneyActiveDates,
-      List<LocalDateTime> toJourneyActiveDates,
-      ServiceJourneyStop fromJourneyStop,
-      ServiceJourneyStop toJourneyStop) {
-
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+    List<LocalDateTime> fromJourneyActiveDates,
+    List<LocalDateTime> toJourneyActiveDates,
+    ServiceJourneyStop fromJourneyStop,
+    ServiceJourneyStop toJourneyStop
+  ) {
     List<LocalDateTime> sortedFromJourneySortedLocalDateTimes =
-        sortedLocalDateTimesForServiceJourneyAtStop(
-            fromJourneyActiveDates,
-            fromJourneyStop.arrivalDayOffset(),
-            fromJourneyStop.arrivalTime()
-        );
+      sortedLocalDateTimesForServiceJourneyAtStop(
+        fromJourneyActiveDates,
+        fromJourneyStop.arrivalDayOffset(),
+        fromJourneyStop.arrivalTime()
+      );
 
     List<LocalDateTime> sortedToJourneySortedLocalDateTimes =
-        sortedLocalDateTimesForServiceJourneyAtStop(
-            toJourneyActiveDates,
-            toJourneyStop.departureDayOffset(),
-            toJourneyStop.departureTime()
-        );
+      sortedLocalDateTimesForServiceJourneyAtStop(
+        toJourneyActiveDates,
+        toJourneyStop.departureDayOffset(),
+        toJourneyStop.departureTime()
+      );
 
     // If the latest arrival is later than the earliest departure, there will never be an interchange
-    LocalDateTime earliestArrivalTime = sortedFromJourneySortedLocalDateTimes.get(0);
+    LocalDateTime earliestArrivalTime =
+      sortedFromJourneySortedLocalDateTimes.get(0);
     LocalDateTime latestDepartureTime = sortedToJourneySortedLocalDateTimes.get(
-        toJourneyActiveDates.size() - 1
+      toJourneyActiveDates.size() - 1
     );
     if (earliestArrivalTime.isAfter(latestDepartureTime)) {
-      return
-              new ValidationIssue(
-                  RULE_NO_INTERCHANGE_POSSIBLE,
-                  new DataLocation(
-                      serviceJourneyInterchangeInfo.interchangeId(),
-                      serviceJourneyInterchangeInfo.filename(),
-                      null,
-                      null
-                  ),
-                  serviceJourneyInterchangeInfo.interchangeId(),
-                  serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-                  serviceJourneyInterchangeInfo.toJourneyRef().id()
-              );
+      return new ValidationIssue(
+        RULE_NO_INTERCHANGE_POSSIBLE,
+        new DataLocation(
+          serviceJourneyInterchangeInfo.interchangeId(),
+          serviceJourneyInterchangeInfo.filename(),
+          null,
+          null
+        ),
+        serviceJourneyInterchangeInfo.interchangeId(),
+        serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+        serviceJourneyInterchangeInfo.toJourneyRef().id()
+      );
     }
 
     Duration shortestActualWaitingTime =
-        getShortestActualWaitingTimeForInterchange(
-            sortedFromJourneySortedLocalDateTimes,
-            sortedToJourneySortedLocalDateTimes
-        );
+      getShortestActualWaitingTimeForInterchange(
+        sortedFromJourneySortedLocalDateTimes,
+        sortedToJourneySortedLocalDateTimes
+      );
 
     // If the shortest actual waiting time is over 3 hours, we give a warning
-    if (shortestActualWaitingTime.compareTo(Duration.ofHours(3)) > 0) {
+    if (shortestActualWaitingTime.compareTo(Duration.ofHours(2)) > 0) {
       return new ValidationIssue(
-                  RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING,
-                  new DataLocation(
-                      serviceJourneyInterchangeInfo.interchangeId(),
-                      serviceJourneyInterchangeInfo.filename(),
-                      null,
-                      null
-                  ),
-                  serviceJourneyInterchangeInfo.interchangeId(),
-                  serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-                  serviceJourneyInterchangeInfo.toJourneyRef().id()
-              );
+        RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING,
+        new DataLocation(
+          serviceJourneyInterchangeInfo.interchangeId(),
+          serviceJourneyInterchangeInfo.filename(),
+          null,
+          null
+        ),
+        serviceJourneyInterchangeInfo.interchangeId(),
+        serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+        serviceJourneyInterchangeInfo.toJourneyRef().id()
+      );
     }
     return null;
   }
-
 
   // TODO: if guaranteed is set to false, we should give the user a warning
   public ValidationReport validate(ValidationReport validationReport) {
@@ -199,21 +209,29 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       netexDataRepository.serviceJourneyStops(validationReportId);
 
     for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo : serviceJourneyInterchangeInfoList) {
-      ServiceJourneyStop fromJourneyStop = getServiceJourneyStopByScheduledStopPointId(
-        serviceJourneyStopsByServiceJourneyId.get(
-          serviceJourneyInterchangeInfo.fromJourneyRef()
-        ), serviceJourneyInterchangeInfo.fromStopPoint());
-      ServiceJourneyStop toJourneyStop = getServiceJourneyStopByScheduledStopPointId(
-        serviceJourneyStopsByServiceJourneyId.get(
-          serviceJourneyInterchangeInfo.toJourneyRef()
-        ), serviceJourneyInterchangeInfo.toStopPoint());
+      ServiceJourneyStop fromJourneyStop =
+        getServiceJourneyStopByScheduledStopPointId(
+          serviceJourneyStopsByServiceJourneyId.get(
+            serviceJourneyInterchangeInfo.fromJourneyRef()
+          ),
+          serviceJourneyInterchangeInfo.fromStopPoint()
+        );
+      ServiceJourneyStop toJourneyStop =
+        getServiceJourneyStopByScheduledStopPointId(
+          serviceJourneyStopsByServiceJourneyId.get(
+            serviceJourneyInterchangeInfo.toJourneyRef()
+          ),
+          serviceJourneyInterchangeInfo.toStopPoint()
+        );
 
-      List<LocalDateTime> fromJourneyActiveDates = getActiveDatesForServiceJourney(
+      List<LocalDateTime> fromJourneyActiveDates =
+        getActiveDatesForServiceJourney(
           validationReportId,
           serviceJourneyInterchangeInfo.fromJourneyRef()
         );
 
-      List<LocalDateTime> toJourneyActiveDates = getActiveDatesForServiceJourney(
+      List<LocalDateTime> toJourneyActiveDates =
+        getActiveDatesForServiceJourney(
           validationReportId,
           serviceJourneyInterchangeInfo.toJourneyRef()
         );
