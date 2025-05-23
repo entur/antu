@@ -29,7 +29,7 @@ public class NetexDataConfig {
       SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE
     ) Map<String, List<String>> serviceJourneyInterchangeInfoCache,
     @Qualifier(
-      ACTIVE_DATES_BY_SERVICE_JOURNEY_REF
+      ACTIVE_DATES_BY_SERVICE_JOURNEY_ID
     ) Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyRefCache
   ) {
     return new RedisNetexDataRepository(

@@ -27,6 +27,7 @@ import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterch
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
 import no.entur.antu.validation.validator.interchange.stoppoints.StopPointsInVehicleJourneyValidator;
+import no.entur.antu.validation.validator.interchange.waitingtime.InterchangeWaitingTimeValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.identicalstoppoints.IdenticalStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRefValidator;
@@ -98,6 +99,19 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public InterchangeWaitingTimeValidator interchangeWaitingTimeValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    NetexDataRepository netexDataRepository
+  ) {
+    return new InterchangeWaitingTimeValidator(
+      validationReportEntryFactory,
+      netexDataRepository
+    );
+  }
+
+  @Bean
   public DuplicateLineNameValidator duplicateLineNameValidator(
     @Qualifier(
       "validationReportEntryFactory"
@@ -129,6 +143,7 @@ public class TimetableDataValidatorConfig {
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
+    InterchangeWaitingTimeValidator interchangeWaitingTimeValidator,
     LineInfoCollector lineInfoCollector,
     ServiceJourneyStopsCollector serviceJourneyStopsCollector,
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
@@ -170,7 +185,8 @@ public class TimetableDataValidatorConfig {
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
       duplicateLineNameValidator,
-      stopPointsInVehicleJourneyValidator
+      stopPointsInVehicleJourneyValidator,
+      interchangeWaitingTimeValidator
     );
 
     List<NetexDataCollector> commonDataCollectors = List.of(

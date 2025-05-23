@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.jaxb.support.DatedServiceJourneyUtils;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.rutebanken.netex.model.*;
@@ -16,7 +17,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
 
   private final RedissonClient redissonClient;
   private final Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDates;
-  private final Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDates;
+  private final Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> serviceJourneyActiveDates;
   private final Map<String, Map<String, LocalDateTime>> operatingDaysToCalendarDate;
 
   public ServiceJourneyActiveDatesCollector(
@@ -24,7 +25,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     // maps validationReportId -> map of dayTypeRef-> activeDate[]
     Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
     // maps validationReportId -> map of serviceJourney -> activeDate[]
-    Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache,
+    Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> serviceJourneyActiveDatesCache,
     // maps validationReportId -> map of operatingDayRef -> activeDate
     Map<String, Map<String, LocalDateTime>> operatingDaysToCalendarDate
   ) {
@@ -57,7 +58,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
 
     // Så kan vi samle opp daytypes fra servicejourneys + operatingdays fra datedservicejourneys
 
-    Map<String, List<LocalDateTime>> serviceJourneyToDates =
+    Map<ServiceJourneyId, List<LocalDateTime>> serviceJourneyToDates =
       jaxbValidationContext
         .serviceJourneys()
         .stream()
@@ -78,7 +79,10 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
               serviceJourneyDates.addAll(lineDayTypesToActiveDates.get(dtId));
             }
           });
-          return Map.entry(serviceJourney.getId(), serviceJourneyDates);
+          return Map.entry(
+            ServiceJourneyId.ofNullable(serviceJourney.getId()),
+            serviceJourneyDates
+          );
         })
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -108,7 +112,10 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
             lineOperatingDaysToCalendarDate.get(operatingDayRef)
           );
         }
-        serviceJourneyToDates.put(serviceJourneyRef, serviceJourneyDates);
+        serviceJourneyToDates.put(
+          ServiceJourneyId.ofNullable(serviceJourneyRef),
+          serviceJourneyDates
+        );
       });
     addServiceJourneyActiveDates(
       jaxbValidationContext.getValidationReportId(),
@@ -206,7 +213,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
 
   private void addServiceJourneyActiveDates(
     String validationReportId,
-    Map<String, List<LocalDateTime>> newServiceJourneyActiveDates
+    Map<ServiceJourneyId, List<LocalDateTime>> newServiceJourneyActiveDates
   ) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {

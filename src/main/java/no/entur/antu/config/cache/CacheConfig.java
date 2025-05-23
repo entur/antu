@@ -46,8 +46,8 @@ public class CacheConfig {
     "organisationAliasCache";
   public static final String ACTIVE_DATES_BY_DAY_TYPE_REF =
     "activeDatesByDayTypeRefCache";
-  public static final String ACTIVE_DATES_BY_SERVICE_JOURNEY_REF =
-    "activeDatesByServiceJourneyRefCache";
+  public static final String ACTIVE_DATES_BY_SERVICE_JOURNEY_ID =
+    "activeDatesByServiceJourneyIdCache";
   public static final String ACTIVE_DATE_BY_OPERATING_DAY_REF =
     "activeDateByOperatingDayRefCache";
 
@@ -211,13 +211,13 @@ public class CacheConfig {
     );
   }
 
-  @Bean(name = ACTIVE_DATES_BY_SERVICE_JOURNEY_REF)
+  @Bean(name = ACTIVE_DATES_BY_SERVICE_JOURNEY_ID)
   public Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> serviceJourneyActiveDatesCache(
     RedissonClient redissonClient
   ) {
     return getOrCreateReportScopedCache(
       redissonClient,
-      ACTIVE_DATES_BY_SERVICE_JOURNEY_REF,
+      ACTIVE_DATES_BY_SERVICE_JOURNEY_ID,
       new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
     );
   }

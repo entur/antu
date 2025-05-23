@@ -9,6 +9,7 @@ import no.entur.antu.netexdata.collectors.LineInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyActiveDatesCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -58,8 +59,8 @@ public class NetexDataCollectorConfig {
       ACTIVE_DATES_BY_DAY_TYPE_REF
     ) Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
     @Qualifier(
-      ACTIVE_DATES_BY_SERVICE_JOURNEY_REF
-    ) Map<String, Map<String, List<LocalDateTime>>> serviceJourneyActiveDatesCache,
+      ACTIVE_DATES_BY_SERVICE_JOURNEY_ID
+    ) Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> serviceJourneyActiveDatesCache,
     @Qualifier(
       ACTIVE_DATE_BY_OPERATING_DAY_REF
     ) Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache

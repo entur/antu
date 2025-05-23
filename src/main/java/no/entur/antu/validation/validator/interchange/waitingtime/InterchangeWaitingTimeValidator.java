@@ -33,14 +33,16 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     new ValidationRule(
       "RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING",
       "Waiting time between feeder and consumer vehicle journeys exceed warning treshold",
-      "Waiting time between service journeys in ServiceJourneyInterchange %s exceeds warning treshold",
+      "ServiceJourneyInterchange %s has waiting time of %s seconds which exceeds waiting time threshold of %s seconds",
       Severity.WARNING
     );
 
   private final NetexDataRepository netexDataRepository;
 
+  static final Duration waitingTimeWarningThreshold = Duration.ofHours(2);
+
   // TODO: Inject NetexDataRepository instead. Ensure serviceJourneyIdToActiveDates is added to the interface in validator lib
-  protected InterchangeWaitingTimeValidator(
+  public InterchangeWaitingTimeValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     NetexDataRepository netexDataRepository
   ) {
@@ -140,11 +142,14 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     ServiceJourneyStop fromJourneyStop,
     ServiceJourneyStop toJourneyStop
   ) {
+    LocalTime arrivalTime = fromJourneyStop.arrivalTime() == null
+      ? fromJourneyStop.departureTime()
+      : fromJourneyStop.arrivalTime();
     List<LocalDateTime> sortedFromJourneySortedLocalDateTimes =
       sortedLocalDateTimesForServiceJourneyAtStop(
         fromJourneyActiveDates,
         fromJourneyStop.arrivalDayOffset(),
-        fromJourneyStop.arrivalTime()
+        arrivalTime
       );
 
     List<LocalDateTime> sortedToJourneySortedLocalDateTimes =
@@ -181,8 +186,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         sortedToJourneySortedLocalDateTimes
       );
 
-    // If the shortest actual waiting time is over 3 hours, we give a warning
-    if (shortestActualWaitingTime.compareTo(Duration.ofHours(2)) > 0) {
+    if (shortestActualWaitingTime.compareTo(waitingTimeWarningThreshold) > 0) {
       return new ValidationIssue(
         RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING,
         new DataLocation(
@@ -192,14 +196,13 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
           null
         ),
         serviceJourneyInterchangeInfo.interchangeId(),
-        serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-        serviceJourneyInterchangeInfo.toJourneyRef().id()
+        shortestActualWaitingTime.getSeconds(),
+        waitingTimeWarningThreshold.getSeconds()
       );
     }
     return null;
   }
 
-  // TODO: if guaranteed is set to false, we should give the user a warning
   public ValidationReport validate(ValidationReport validationReport) {
     String validationReportId = validationReport.getValidationReportId();
     List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfoList =
