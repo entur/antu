@@ -57,7 +57,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
       .collect(
         Collectors.toMap(
           e -> ServiceJourneyId.ofValidId(e.getKey()),
-            Map.Entry::getValue,
+          Map.Entry::getValue,
           (p, n) -> n
         )
       );
@@ -103,8 +103,8 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   public void cleanUp(String validationReportId) {
     lineInfoCache.remove(validationReportId);
     serviceJourneyStopsCache
-        .keySet()
-        .removeIf(k -> k.startsWith(validationReportId));
+      .keySet()
+      .removeIf(k -> k.startsWith(validationReportId));
     serviceJourneyInterchangeInfoCache
       .keySet()
       .removeIf(k -> k.startsWith(validationReportId));
