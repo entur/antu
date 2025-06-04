@@ -31,7 +31,7 @@ Content-Type: application/json
       "attributes": {
         "EnturValidationClient": "Marduk",
         "EnturValidationCorrelationId": "14f2ba67-ce75-4be2-8052-6a0938069bc1",
-        "EnturValidationDatasetFileHandle": "inbound/received/rut/Entur-1148-2025-03-31-netex.zip",
+        "EnturValidationDatasetFileHandle": "inbound/received/rut/rb_rut-aggregated-netex.zip",
         "EnturValidationImportType": "ImportType_netex_flex",
         "EnturValidationProfile": "Timetable",
         "EnturValidationStage": "EnturValidationStagePrevalidation",

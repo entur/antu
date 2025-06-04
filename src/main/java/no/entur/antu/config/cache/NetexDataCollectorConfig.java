@@ -9,6 +9,7 @@ import java.util.Map;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
+import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +44,7 @@ public class NetexDataCollectorConfig {
     RedissonClient redissonClient,
     @Qualifier(
       SERVICE_JOURNEY_STOPS_CACHE
-    ) Map<String, Map<String, List<String>>> serviceJourneyStopsCache
+    ) Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache
   ) {
     return new ServiceJourneyStopsCollector(
       redissonClient,

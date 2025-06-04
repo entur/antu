@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import no.entur.antu.netexdata.RedisNetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +25,7 @@ public class NetexDataConfig {
     @Qualifier(LINE_INFO_CACHE) Map<String, List<String>> lineInfoCache,
     @Qualifier(
       SERVICE_JOURNEY_STOPS_CACHE
-    ) Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
+    ) Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache,
     @Qualifier(
       SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE
     ) Map<String, List<String>> serviceJourneyInterchangeInfoCache
