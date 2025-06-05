@@ -11,7 +11,6 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Validates that the ServiceJourneys referred to by a ServiceJourneyInterchange have possibilities
@@ -27,7 +26,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     "RULE_NO_INTERCHANGE_POSSIBLE",
     "Feeder and consumer vehicle journeys have no interchange possibilities",
     "ServiceJourneyInterchange %s has no interchange possibilities for vehicle journey %s and consumer vehicle journey %s",
-    Severity.ERROR
+    Severity.WARNING
   );
 
   static final ValidationRule RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING =
@@ -42,7 +41,6 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
 
   static final Duration waitingTimeWarningThreshold = Duration.ofHours(2);
 
-  // TODO: Inject NetexDataRepository instead. Ensure serviceJourneyIdToActiveDates is added to the interface in validator lib
   public InterchangeWaitingTimeValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     NetexDataRepository netexDataRepository
@@ -78,8 +76,6 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     List<LocalDateTime> fromJourneyActiveDates,
     List<LocalDateTime> toJourneyActiveDates
   ) {
-    // Her skal vi gi valideringsfeil kun hvis vi ikke finner en eneste dag hvor de to vil møtes.
-    // Den skal også tillate overgang rundt midnatt. DVS at ventetid må være innenfor maximumWaitTime
     Duration minimumDuration = null;
     int toJourneyActiveDateIndex = 0;
     for (LocalDateTime fromJourneyActiveDateTime : fromJourneyActiveDates) {
