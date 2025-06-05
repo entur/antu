@@ -19,11 +19,11 @@ import org.springframework.stereotype.Component;
 public class ServiceJourneyStopsCollector extends NetexDataCollector {
 
   private final RedissonClient redissonClient;
-  private final Map<String, Map<String, List<String>>> serviceJourneyStopsCache;
+  private final Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache;
 
   public ServiceJourneyStopsCollector(
     RedissonClient redissonClient,
-    Map<String, Map<String, List<String>>> serviceJourneyStopsCache
+    Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache
   ) {
     this.redissonClient = redissonClient;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
@@ -38,33 +38,33 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
     //  service journeys in them?
     // if (validationContext.serviceJourneyInterchanges().findAny().isPresent()) {}
 
-    Map<String, List<String>> serviceJourneyStops = validationContext
-      .serviceJourneys()
-      .stream()
-      .map(serviceJourney -> {
-        Map<String, ScheduledStopPointId> scheduledStopPointIdMap =
-          NetexUtils.scheduledStopPointIdByStopPointId(
-            validationContext.journeyPattern(serviceJourney)
-          );
-        return Map.entry(
-          serviceJourney.getId(),
-          validationContext
-            .timetabledPassingTimes(serviceJourney)
-            .stream()
-            .map(passingTime ->
-              ServiceJourneyStop.of(
-                scheduledStopPointIdMap.get(
-                  NetexUtils.stopPointRef(passingTime)
-                ),
-                passingTime
+    Map<String, List<ServiceJourneyStop>> serviceJourneyStops =
+      validationContext
+        .serviceJourneys()
+        .stream()
+        .map(serviceJourney -> {
+          Map<String, ScheduledStopPointId> scheduledStopPointIdMap =
+            NetexUtils.scheduledStopPointIdByStopPointId(
+              validationContext.journeyPattern(serviceJourney)
+            );
+          return Map.entry(
+            serviceJourney.getId(),
+            validationContext
+              .timetabledPassingTimes(serviceJourney)
+              .stream()
+              .map(passingTime ->
+                ServiceJourneyStop.of(
+                  scheduledStopPointIdMap.get(
+                    NetexUtils.stopPointRef(passingTime)
+                  ),
+                  passingTime
+                )
               )
-            )
-            .filter(ServiceJourneyStop::isValid)
-            .map(ServiceJourneyStop::toString)
-            .toList()
-        );
-      })
-      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+              .filter(ServiceJourneyStop::isValid)
+              .toList()
+          );
+        })
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     addServiceJourneyStops(
       validationContext.getValidationReportId(),
@@ -83,7 +83,7 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
   private void addServiceJourneyStops(
     String validationReportId,
     String filename,
-    Map<String, List<String>> serviceJourneyStops
+    Map<String, List<ServiceJourneyStop>> serviceJourneyStops
   ) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {
@@ -92,9 +92,8 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
       String keyName =
         validationReportId + "_" + SERVICE_JOURNEY_STOPS_CACHE + "_" + filename;
 
-      RMap<String, List<String>> serviceJourneyStopsMap = redissonClient.getMap(
-        keyName
-      );
+      RMap<String, List<ServiceJourneyStop>> serviceJourneyStopsMap =
+        redissonClient.getMap(keyName);
       serviceJourneyStopsMap.putAll(serviceJourneyStops);
       serviceJourneyStopsCache.put(keyName, serviceJourneyStopsMap);
     } finally {
