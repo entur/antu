@@ -437,7 +437,7 @@ class InterchangeWaitingTimeValidatorTest {
       validationIssue.rule().name(),
       InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name()
     );
-    assertEquals(validationIssue.rule().severity(), Severity.ERROR);
+    assertEquals(validationIssue.rule().severity(), Severity.WARNING);
   }
 
   @Test
