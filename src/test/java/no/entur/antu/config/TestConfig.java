@@ -1,21 +1,11 @@
 package no.entur.antu.config;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import no.entur.antu.common.repository.TestNetexDataRepository;
-import no.entur.antu.netexdata.NetexDataRepositoryLoader;
-import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
-import no.entur.antu.services.AntuBlobStoreService;
-import no.entur.antu.services.AntuExchangeBlobStoreService;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.*;
 import org.entur.netex.validation.validator.model.*;
-import org.rutebanken.helper.storage.repository.BlobStoreRepository;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -31,14 +21,14 @@ public class TestConfig {
 
   @Bean
   @Primary
-  public OrganisationAliasRepository organisationAliasRepository() {
-    return new SimpleOrganisationAliasRepository(new HashSet<>());
+  public NetexDataRepository netexDataRepository() {
+    return new TestNetexDataRepository();
   }
 
   @Bean
   @Primary
-  public TestNetexDataRepository netexDataRepository() {
-    return new TestNetexDataRepository();
+  public OrganisationAliasRepository organisationAliasRepository() {
+    return new TestOrganisationAliasRepository();
   }
 
   @Bean(name = "stopPlaceRepository")
@@ -94,12 +84,12 @@ public class TestConfig {
 
     @Override
     public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
-      return false;
+      return true;
     }
 
     @Override
     public boolean hasQuayId(QuayId quayId) {
-      return false;
+      return true;
     }
 
     @Override
@@ -124,5 +114,22 @@ public class TestConfig {
 
     @Override
     public void refreshCache() {}
+  }
+
+  private static class TestOrganisationAliasRepository
+    implements OrganisationAliasRepository {
+
+    @Override
+    public boolean hasOrganisationWithAlias(String organisationId) {
+      return true;
+    }
+
+    @Override
+    public void refreshCache() {}
+
+    @Override
+    public boolean isEmpty() {
+      return false;
+    }
   }
 }

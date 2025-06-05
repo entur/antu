@@ -51,6 +51,8 @@ public class CacheConfig {
   public static final String ACTIVE_DATE_BY_OPERATING_DAY_REF =
     "activeDateByOperatingDayRefCache";
 
+  public static final String VALIDATION_STATE_CACHE = "validationProgressCache";
+
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
   /**
@@ -160,6 +162,17 @@ public class CacheConfig {
   @Bean(name = ORGANISATION_ALIAS_CACHE)
   public Set<String> organisationAliasCache(RedissonClient redissonClient) {
     return redissonClient.getSet(ORGANISATION_ALIAS_CACHE);
+  }
+
+  @Bean(name = VALIDATION_STATE_CACHE)
+  public Map<String, no.entur.antu.config.cache.ValidationState> validationStateCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      VALIDATION_STATE_CACHE,
+      DEFAULT_CODEC
+    );
   }
 
   /**

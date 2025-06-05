@@ -24,6 +24,7 @@ data:
     antu.camel.redelivery.max=0
     
     # Agreement registry
+    antu.organisation.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
     antu.agreement.registry.url={{ .Values.agreementRegistryUrl }}
 
     # Stop place register

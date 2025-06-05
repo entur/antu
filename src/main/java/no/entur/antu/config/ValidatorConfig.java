@@ -21,6 +21,7 @@ import static no.entur.antu.validation.ValidationProfile.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import no.entur.antu.routes.validation.ValidationStateRepository;
 import no.entur.antu.validation.NetexValidationProfile;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.id.ReferenceToNsrValidator;
@@ -157,7 +158,8 @@ public class ValidatorConfig {
     ) boolean skipSchemaValidation,
     @Value(
       "${antu.netex.validation.validators.skip:false}"
-    ) boolean skipNetexValidators
+    ) boolean skipNetexValidators,
+    ValidationStateRepository validationStateRepository
   ) {
     return new NetexValidationProfile(
       Map.of(
@@ -176,6 +178,7 @@ public class ValidatorConfig {
         STOP,
         stopDataValidatorsRunner
       ),
+      validationStateRepository,
       skipSchemaValidation,
       skipNetexValidators
     );
