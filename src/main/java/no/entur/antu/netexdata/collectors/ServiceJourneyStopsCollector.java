@@ -13,6 +13,7 @@ import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.redisson.api.RLock;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.rutebanken.netex.model.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +28,64 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
   ) {
     this.redissonClient = redissonClient;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
+  }
+
+  protected List<StopPointInJourneyPattern_VersionedChildStructure> getStopPointInJourneyPattern(
+    JAXBValidationContext validationContext,
+    ServiceJourney serviceJourney,
+    TimetabledPassingTime timetabledPassingTime
+  ) {
+    String stopPointInJourneyPatternRef = timetabledPassingTime
+      .getPointInJourneyPatternRef()
+      .getValue()
+      .getRef();
+    JourneyPattern journeyPattern = validationContext.journeyPattern(
+      serviceJourney
+    );
+    List<StopPointInJourneyPattern_VersionedChildStructure> stopPointsInJourneyPattern =
+      journeyPattern
+        .getPointsInSequence()
+        .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+        .stream()
+        .filter(pointInLinkSequenceVersionedChildStructure ->
+          pointInLinkSequenceVersionedChildStructure
+            .getId()
+            .equals(stopPointInJourneyPatternRef)
+        )
+        .filter(pointInLinkSequenceVersionedChildStructure ->
+          pointInLinkSequenceVersionedChildStructure instanceof StopPointInJourneyPattern_VersionedChildStructure
+        )
+        .map(stopPointInJourneyPattern ->
+          (StopPointInJourneyPattern_VersionedChildStructure) stopPointInJourneyPattern
+        )
+        .toList();
+    return stopPointsInJourneyPattern;
+  }
+
+  protected boolean isForAlighting(
+    List<StopPointInJourneyPattern_VersionedChildStructure> stopPointsInJourneyPattern
+  ) {
+    return stopPointsInJourneyPattern
+      .stream()
+      .anyMatch(stopPointInJourneyPattern -> {
+        return (
+          stopPointInJourneyPattern.isForAlighting() == null ||
+          stopPointInJourneyPattern.isForAlighting()
+        );
+      });
+  }
+
+  protected boolean isForBoarding(
+    List<StopPointInJourneyPattern_VersionedChildStructure> stopPointsInJourneyPattern
+  ) {
+    return stopPointsInJourneyPattern
+      .stream()
+      .anyMatch(stopPointInJourneyPattern -> {
+        return (
+          stopPointInJourneyPattern.isForBoarding() == null ||
+          stopPointInJourneyPattern.isForBoarding()
+        );
+      });
   }
 
   @Override
@@ -52,14 +111,30 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
             validationContext
               .timetabledPassingTimes(serviceJourney)
               .stream()
-              .map(passingTime ->
-                ServiceJourneyStop.of(
+              .map(passingTime -> {
+                List<StopPointInJourneyPattern_VersionedChildStructure> stopPointsInJourneyPattern =
+                  getStopPointInJourneyPattern(
+                    validationContext,
+                    serviceJourney,
+                    passingTime
+                  );
+
+                boolean isForAlighting = isForAlighting(
+                  stopPointsInJourneyPattern
+                );
+                boolean isForBoarding = isForBoarding(
+                  stopPointsInJourneyPattern
+                );
+
+                return ServiceJourneyStop.of(
                   scheduledStopPointIdMap.get(
                     NetexUtils.stopPointRef(passingTime)
                   ),
-                  passingTime
-                )
-              )
+                  passingTime,
+                  isForAlighting,
+                  isForBoarding
+                );
+              })
               .filter(ServiceJourneyStop::isValid)
               .toList()
           );
