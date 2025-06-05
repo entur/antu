@@ -193,7 +193,12 @@ public class TimetableDataValidatorConfig {
     );
 
     if (interchangeWaitingTimeValidationEnabled) {
-      netexTimetableDatasetValidators.add(interchangeWaitingTimeValidator);
+      netexTimetableDatasetValidators =
+        List.of(
+          duplicateLineNameValidator,
+          stopPointsInVehicleJourneyValidator,
+          interchangeWaitingTimeValidator
+        );
     }
 
     List<NetexDataCollector> commonDataCollectors = List.of(
