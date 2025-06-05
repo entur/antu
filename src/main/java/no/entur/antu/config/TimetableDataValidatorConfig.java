@@ -22,6 +22,7 @@ import no.entur.antu.netexdata.collectors.LineInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
+import no.entur.antu.validation.validator.interchange.boarding.InterchangeForAlightingValidator;
 import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterchangeDistanceValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
@@ -42,7 +43,6 @@ import no.entur.antu.validation.validator.servicejourney.transportmode.Mismatche
 import no.entur.antu.validation.validator.servicelink.distance.UnexpectedDistanceInServiceLinkValidator;
 import no.entur.antu.validation.validator.servicelink.stoppoints.MismatchedStopPointsValidator;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
-import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.id.NetexIdUniquenessValidator;
 import org.entur.netex.validation.validator.id.NetexReferenceValidator;
@@ -97,6 +97,19 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public InterchangeForAlightingValidator interchangeForAlightingValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    NetexDataRepository netexDataRepository
+  ) {
+    return new InterchangeForAlightingValidator(
+      netexDataRepository,
+      validationReportEntryFactory
+    );
+  }
+
+  @Bean
   public DuplicateLineNameValidator duplicateLineNameValidator(
     @Qualifier(
       "validationReportEntryFactory"
@@ -127,6 +140,7 @@ public class TimetableDataValidatorConfig {
       "netexIdUniquenessValidator"
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
+    InterchangeForAlightingValidator interchangeForAlightingValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
     LineInfoCollector lineInfoCollector,
     ServiceJourneyStopsCollector serviceJourneyStopsCollector,
@@ -168,7 +182,8 @@ public class TimetableDataValidatorConfig {
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
       duplicateLineNameValidator,
-      stopPointsInVehicleJourneyValidator
+      stopPointsInVehicleJourneyValidator,
+      interchangeForAlightingValidator
     );
 
     List<NetexDataCollector> commonDataCollectors = List.of(
