@@ -61,11 +61,15 @@ import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TimetableDataValidatorConfig {
+
+  @Value("${interchange-waiting-time-validation-enabled:false}")
+  private Boolean interchangeWaitingTimeValidationEnabled;
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(
@@ -185,9 +189,12 @@ public class TimetableDataValidatorConfig {
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
       duplicateLineNameValidator,
-      stopPointsInVehicleJourneyValidator,
-      interchangeWaitingTimeValidator
+      stopPointsInVehicleJourneyValidator
     );
+
+    if (interchangeWaitingTimeValidationEnabled) {
+      netexTimetableDatasetValidators.add(interchangeWaitingTimeValidator);
+    }
 
     List<NetexDataCollector> commonDataCollectors = List.of(
       lineInfoCollector,

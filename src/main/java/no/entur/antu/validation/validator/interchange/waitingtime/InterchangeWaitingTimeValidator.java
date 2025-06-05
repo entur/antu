@@ -11,6 +11,7 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Validates that the ServiceJourneys referred to by a ServiceJourneyInterchange have possibilities
