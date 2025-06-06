@@ -11,6 +11,8 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Validates that the ServiceJourneys referred to by a ServiceJourneyInterchange have possibilities
@@ -38,6 +40,10 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     );
 
   private final NetexDataRepository netexDataRepository;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    InterchangeWaitingTimeValidator.class
+  );
 
   static final Duration waitingTimeWarningThreshold = Duration.ofHours(2);
 
@@ -201,6 +207,8 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
   }
 
   public ValidationReport validate(ValidationReport validationReport) {
+    LOGGER.info("Starting validation of interchange waiting times");
+
     String validationReportId = validationReport.getValidationReportId();
     List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfoList =
       netexDataRepository.serviceJourneyInterchangeInfos(validationReportId);
@@ -249,6 +257,8 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         );
       }
     }
+
+    LOGGER.info("Completed validation of interchange waiting times");
     return validationReport;
   }
 }
