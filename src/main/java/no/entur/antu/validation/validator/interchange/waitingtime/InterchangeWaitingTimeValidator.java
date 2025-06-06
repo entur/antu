@@ -14,8 +14,8 @@ import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 
 /**
  * Validates that the ServiceJourneys referred to by a ServiceJourneyInterchange have possibilities
- * of making interchanges, and that the actual waiting time between service journeys do not exceed
- * the maximumWaitTime specified in ServiceJourneyInterchange.
+ * of making interchanges, and that the shortest actual waiting time between the service journeys
+ * do not exceed a duration of two hours.
  *
  * Chouette reference: 3-Interchange-8-1, 3-Interchange-8-2, 3-Interchange-10
  */

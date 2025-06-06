@@ -13,6 +13,10 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.rutebanken.netex.model.*;
 
+/**
+ * Collects active dates in the dataset and connects them to their respective ServiceJourneys and DatedServiceJourneys.
+ * Gets active dates as referred to by DayTypeRefs, and in the case of DatedServiceJourneys, OperatingDayRefs.
+ **/
 public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
 
   private final RedissonClient redissonClient;
@@ -56,8 +60,6 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
       lineOperatingDaysToCalendarDate
     );
 
-    // Så kan vi samle opp daytypes fra servicejourneys + operatingdays fra datedservicejourneys
-
     Map<ServiceJourneyId, List<LocalDateTime>> serviceJourneyToDates =
       jaxbValidationContext
         .serviceJourneys()
@@ -86,12 +88,6 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
         })
         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    // For hver datedservicejourney må vi også legge til datoene som er referert til av operating day ref til i mappet
-    // for servicejourneytodates. For eksempel kan vi ha:
-    // ServiceJourney<A>
-    // OperatingDay<B, 25.12.25>
-    // DatedServiceJourney<A, B>
-    // ==> ServiceJourney -> [25.12.25]
     jaxbValidationContext
       .datedServiceJourneys()
       .forEach(dsj -> {
