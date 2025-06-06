@@ -145,6 +145,21 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     ServiceJourneyStop fromJourneyStop,
     ServiceJourneyStop toJourneyStop
   ) {
+    if (fromJourneyActiveDates.isEmpty() || toJourneyActiveDates.isEmpty()) {
+      return new ValidationIssue(
+        RULE_NO_INTERCHANGE_POSSIBLE,
+        new DataLocation(
+          serviceJourneyInterchangeInfo.interchangeId(),
+          serviceJourneyInterchangeInfo.filename(),
+          null,
+          null
+        ),
+        serviceJourneyInterchangeInfo.interchangeId(),
+        serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+        serviceJourneyInterchangeInfo.toJourneyRef().id()
+      );
+    }
+
     LocalTime arrivalTime = fromJourneyStop.arrivalTime() == null
       ? fromJourneyStop.departureTime()
       : fromJourneyStop.arrivalTime();
