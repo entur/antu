@@ -7,11 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.PointsInJourneyPattern_RelStructure;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.*;
 
 public class NetexUtils {
 

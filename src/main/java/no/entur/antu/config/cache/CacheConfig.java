@@ -3,6 +3,7 @@ package no.entur.antu.config.cache;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.*;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,10 +13,7 @@ import no.entur.antu.cache.codec.QuayIdCodec;
 import no.entur.antu.cache.codec.StopPlaceIdCodec;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
-import org.entur.netex.validation.validator.model.QuayId;
-import org.entur.netex.validation.validator.model.SimpleQuay;
-import org.entur.netex.validation.validator.model.SimpleStopPlace;
-import org.entur.netex.validation.validator.model.StopPlaceId;
+import org.entur.netex.validation.validator.model.*;
 import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.options.LocalCachedMapOptions;
@@ -46,6 +44,12 @@ public class CacheConfig {
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
   public static final String ORGANISATION_ALIAS_CACHE =
     "organisationAliasCache";
+  public static final String ACTIVE_DATES_BY_DAY_TYPE_REF =
+    "activeDatesByDayTypeRefCache";
+  public static final String ACTIVE_DATES_BY_SERVICE_JOURNEY_ID =
+    "activeDatesByServiceJourneyIdCache";
+  public static final String ACTIVE_DATE_BY_OPERATING_DAY_REF =
+    "activeDateByOperatingDayRefCache";
 
   public static final String VALIDATION_STATE_CACHE = "validationProgressCache";
 
@@ -206,6 +210,39 @@ public class CacheConfig {
       redissonClient,
       SERVICE_JOURNEY_STOPS_CACHE,
       new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+    );
+  }
+
+  @Bean(name = ACTIVE_DATES_BY_DAY_TYPE_REF)
+  public Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      ACTIVE_DATES_BY_DAY_TYPE_REF,
+      new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
+    );
+  }
+
+  @Bean(name = ACTIVE_DATES_BY_SERVICE_JOURNEY_ID)
+  public Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> serviceJourneyActiveDatesCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      ACTIVE_DATES_BY_SERVICE_JOURNEY_ID,
+      new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
+    );
+  }
+
+  @Bean(name = ACTIVE_DATE_BY_OPERATING_DAY_REF)
+  public Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      ACTIVE_DATE_BY_OPERATING_DAY_REF,
+      new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
     );
   }
 

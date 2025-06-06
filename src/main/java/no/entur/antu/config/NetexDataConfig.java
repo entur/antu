@@ -1,13 +1,13 @@
 package no.entur.antu.config;
 
-import static no.entur.antu.config.cache.CacheConfig.LINE_INFO_CACHE;
-import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE;
-import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_STOPS_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import no.entur.antu.netexdata.RedisNetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
+import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -27,13 +27,17 @@ public class NetexDataConfig {
     ) Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
     @Qualifier(
       SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE
-    ) Map<String, List<String>> serviceJourneyInterchangeInfoCache
+    ) Map<String, List<String>> serviceJourneyInterchangeInfoCache,
+    @Qualifier(
+      ACTIVE_DATES_BY_SERVICE_JOURNEY_ID
+    ) Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyRefCache
   ) {
     return new RedisNetexDataRepository(
       redissonClient,
       lineInfoCache,
       serviceJourneyStopsCache,
-      serviceJourneyInterchangeInfoCache
+      serviceJourneyInterchangeInfoCache,
+      activeDatesByServiceJourneyRefCache
     );
   }
 }
