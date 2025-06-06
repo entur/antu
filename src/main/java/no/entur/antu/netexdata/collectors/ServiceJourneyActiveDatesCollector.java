@@ -144,15 +144,32 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
   private Map<String, LocalDateTime> getOperatingDaysToCalendarDate(
     JAXBValidationContext jaxbValidationContext
   ) {
-    return jaxbValidationContext
+    var serviceCalendar = jaxbValidationContext
       .getNetexEntitiesIndex()
-      .getOperatingDayIndex()
-      .getAll()
+      .getServiceCalendarFrames()
       .stream()
-      .map(operatingDay ->
-        Map.entry(operatingDay.getId(), operatingDay.getCalendarDate())
+      .map(ServiceCalendarFrame_VersionFrameStructure::getServiceCalendar)
+      .findFirst();
+
+    // If no service calendar is found, return an empty map
+    return serviceCalendar
+      .map(calendar ->
+        calendar
+          .getOperatingDays()
+          .getOperatingDayRefOrOperatingDay()
+          .stream()
+          .filter(operatingDayRefOrOperatingDay ->
+            operatingDayRefOrOperatingDay instanceof OperatingDay
+          )
+          .map(operatingDayRefOrOperatingDay ->
+            (OperatingDay) operatingDayRefOrOperatingDay
+          )
+          .map(operatingDay ->
+            Map.entry(operatingDay.getId(), operatingDay.getCalendarDate())
+          )
+          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
       )
-      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+      .orElse(Collections.emptyMap());
   }
 
   private Map<String, List<LocalDateTime>> getDayTypesToActiveDates(
