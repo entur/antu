@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -402,7 +403,7 @@ class InterchangeWaitingTimeValidatorTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithNoPossibleInterchangeGivesError() {
+  void testValidateServiceJourneyWithNoPossibleInterchangeGivesWarning() {
     var interchangeInfo = ServiceJourneyInterchangeInfo.of(
       "",
       new ServiceJourneyInterchange()
@@ -431,6 +432,78 @@ class InterchangeWaitingTimeValidatorTest {
         toActiveDates,
         fromStop,
         toStop
+      );
+    assertTrue(validationIssue != null);
+    assertEquals(
+      validationIssue.rule().name(),
+      InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name()
+    );
+    assertEquals(validationIssue.rule().severity(), Severity.WARNING);
+  }
+
+  @Test
+  void testValidateServiceJourneyWithNoPossibleInterchangeDueToMissingFromStopGivesWarning() {
+    var interchangeInfo = ServiceJourneyInterchangeInfo.of(
+      "",
+      new ServiceJourneyInterchange()
+        .withId(serviceJourneyInterchangeId)
+        .withFromJourneyRef(
+          new VehicleJourneyRefStructure()
+            .withRef(ServiceJourneyId.ofValidId(fromJourneyId).id())
+        )
+        .withToJourneyRef(
+          new VehicleJourneyRefStructure()
+            .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
+        )
+    );
+
+    var toStop = createDepartureStop(1, 14, 0, 0, Optional.empty());
+
+    var validationIssue =
+      InterchangeWaitingTimeValidator.validateServiceJourneyInterchangeInfo(
+        interchangeInfo,
+        Collections.emptyList(),
+        Collections.emptyList(),
+        null,
+        toStop
+      );
+    assertTrue(validationIssue != null);
+    assertEquals(
+      validationIssue.rule().name(),
+      InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name()
+    );
+    assertEquals(validationIssue.rule().severity(), Severity.WARNING);
+  }
+
+  @Test
+  void testValidateServiceJourneyWithNoPossibleInterchangeDueToMissingToStopGivesWarning() {
+    var interchangeInfo = ServiceJourneyInterchangeInfo.of(
+      "",
+      new ServiceJourneyInterchange()
+        .withId(serviceJourneyInterchangeId)
+        .withFromJourneyRef(
+          new VehicleJourneyRefStructure()
+            .withRef(ServiceJourneyId.ofValidId(fromJourneyId).id())
+        )
+        .withToJourneyRef(
+          new VehicleJourneyRefStructure()
+            .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
+        )
+        .withFromPointRef(createStopPointRef(9999))
+        .withToPointRef(createStopPointRef(toStopPoint))
+    );
+
+    var fromActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
+    var toActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
+    var fromStop = createArrivalStop(1, 14, 0, 0, Optional.empty());
+
+    var validationIssue =
+      InterchangeWaitingTimeValidator.validateServiceJourneyInterchangeInfo(
+        interchangeInfo,
+        fromActiveDates,
+        toActiveDates,
+        fromStop,
+        null
       );
     assertTrue(validationIssue != null);
     assertEquals(
