@@ -162,12 +162,6 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     ServiceJourneyStop fromJourneyStop,
     ServiceJourneyStop toJourneyStop
   ) {
-    if (fromJourneyStop == null || toJourneyStop == null) {
-      return createNoInterchangePossibleValidationIssue(
-        serviceJourneyInterchangeInfo
-      );
-    }
-
     if (fromJourneyActiveDates.isEmpty() || toJourneyActiveDates.isEmpty()) {
       return createNoInterchangePossibleValidationIssue(
         serviceJourneyInterchangeInfo
@@ -251,6 +245,12 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
           ),
           serviceJourneyInterchangeInfo.toStopPoint()
         );
+
+      if (fromJourneyStop == null || toJourneyStop == null) {
+        // If the ScheduledStopPoint does not exist for the referred ServiceJourney, no interchange is possible.
+        // However: we do not want to validate this here, because it is a follow-up error to validation errors already caught by StopPointsInVehicleJourneyValidator.
+        break;
+      }
 
       List<LocalDateTime> fromJourneyActiveDates =
         getActiveDatesForServiceJourney(
