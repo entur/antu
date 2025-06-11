@@ -178,11 +178,14 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         arrivalTime
       );
 
+    LocalTime departureTime = toJourneyStop.departureTime() == null
+      ? toJourneyStop.arrivalTime()
+      : toJourneyStop.departureTime();
     List<LocalDateTime> sortedToJourneySortedLocalDateTimes =
       sortedLocalDateTimesForServiceJourneyAtStop(
         toJourneyActiveDates,
         toJourneyStop.departureDayOffset(),
-        toJourneyStop.departureTime()
+        departureTime
       );
 
     // If the latest arrival is later than the earliest departure, there will never be an interchange
