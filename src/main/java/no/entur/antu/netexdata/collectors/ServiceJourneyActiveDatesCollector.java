@@ -140,43 +140,6 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     );
   }
 
-  private Map<String, LocalDateTime> getOperatingDaysFromServiceCalendar(
-    JAXBValidationContext jaxbValidationContext
-  ) {
-    var serviceCalendar = jaxbValidationContext
-      .getNetexEntitiesIndex()
-      .getServiceCalendarFrames()
-      .stream()
-      .map(ServiceCalendarFrame_VersionFrameStructure::getServiceCalendar)
-      .filter(Objects::nonNull)
-      .findFirst();
-
-    if (serviceCalendar.isEmpty()) {
-      return Collections.emptyMap();
-    }
-
-    // If no service calendar is found, return an empty map
-    return serviceCalendar
-      .filter(calendar -> calendar.getOperatingDays() != null)
-      .map(calendar ->
-        calendar
-          .getOperatingDays()
-          .getOperatingDayRefOrOperatingDay()
-          .stream()
-          .filter(operatingDayRefOrOperatingDay ->
-            operatingDayRefOrOperatingDay instanceof OperatingDay
-          )
-          .map(operatingDayRefOrOperatingDay ->
-            (OperatingDay) operatingDayRefOrOperatingDay
-          )
-          .map(operatingDay ->
-            Map.entry(operatingDay.getId(), operatingDay.getCalendarDate())
-          )
-          .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-      )
-      .orElse(Collections.emptyMap());
-  }
-
   private Map<String, LocalDateTime> getOperatingDaysFromOperatingDaysIndex(
     JAXBValidationContext jaxbValidationContext
   ) {
@@ -194,14 +157,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
   private Map<String, LocalDateTime> getOperatingDaysToCalendarDate(
     JAXBValidationContext jaxbValidationContext
   ) {
-    Map<String, LocalDateTime> operatingDaysFromServiceCalendar =
-      getOperatingDaysFromServiceCalendar(jaxbValidationContext);
-    Map<String, LocalDateTime> operatingDaysFromIndex =
-      getOperatingDaysFromOperatingDaysIndex(jaxbValidationContext);
-    Map<String, LocalDateTime> allOperatingDaysToCalendarDate = new HashMap<>();
-    allOperatingDaysToCalendarDate.putAll(operatingDaysFromServiceCalendar);
-    allOperatingDaysToCalendarDate.putAll(operatingDaysFromIndex);
-    return allOperatingDaysToCalendarDate;
+    return getOperatingDaysFromOperatingDaysIndex(jaxbValidationContext);
   }
 
   private Map<String, List<LocalDateTime>> getDayTypesToActiveDates(
