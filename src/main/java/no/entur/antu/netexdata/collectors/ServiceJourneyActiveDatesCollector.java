@@ -93,7 +93,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
         var serviceJourneyRef = dsj.getJourneyRef().get(0).getValue().getRef();
         var operatingDayRef = dsj.getOperatingDayRef().getRef();
         var serviceJourneyDates = serviceJourneyToDates.getOrDefault(
-          serviceJourneyRef,
+          ServiceJourneyId.ofValidId(serviceJourneyRef),
           new ArrayList<>()
         );
         if (commonOperatingDaysToCalendarDate.containsKey(operatingDayRef)) {
