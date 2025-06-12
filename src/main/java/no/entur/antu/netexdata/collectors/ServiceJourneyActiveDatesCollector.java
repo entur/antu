@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
-import org.entur.netex.validation.validator.jaxb.support.DatedServiceJourneyUtils;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -94,7 +93,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
         var serviceJourneyRef = dsj.getJourneyRef().get(0).getValue().getRef();
         var operatingDayRef = dsj.getOperatingDayRef().getRef();
         var serviceJourneyDates = serviceJourneyToDates.getOrDefault(
-          serviceJourneyRef,
+          ServiceJourneyId.ofValidId(serviceJourneyRef),
           new ArrayList<>()
         );
         if (commonOperatingDaysToCalendarDate.containsKey(operatingDayRef)) {
@@ -141,7 +140,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     );
   }
 
-  private Map<String, LocalDateTime> getOperatingDaysToCalendarDate(
+  private Map<String, LocalDateTime> getOperatingDaysFromOperatingDaysIndex(
     JAXBValidationContext jaxbValidationContext
   ) {
     return jaxbValidationContext
@@ -153,6 +152,12 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
         Map.entry(operatingDay.getId(), operatingDay.getCalendarDate())
       )
       .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  private Map<String, LocalDateTime> getOperatingDaysToCalendarDate(
+    JAXBValidationContext jaxbValidationContext
+  ) {
+    return getOperatingDaysFromOperatingDaysIndex(jaxbValidationContext);
   }
 
   private Map<String, List<LocalDateTime>> getDayTypesToActiveDates(

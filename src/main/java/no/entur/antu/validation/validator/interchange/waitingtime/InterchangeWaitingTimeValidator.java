@@ -75,7 +75,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         serviceJourneyStop.scheduledStopPointId().equals(scheduledStopPointId)
       )
       .findFirst()
-      .orElseThrow();
+      .orElse(null);
   }
 
   static Duration getShortestActualWaitingTimeForInterchange(
@@ -138,6 +138,23 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       .toList();
   }
 
+  static ValidationIssue createNoInterchangePossibleValidationIssue(
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo
+  ) {
+    return new ValidationIssue(
+      RULE_NO_INTERCHANGE_POSSIBLE,
+      new DataLocation(
+        serviceJourneyInterchangeInfo.interchangeId(),
+        serviceJourneyInterchangeInfo.filename(),
+        null,
+        null
+      ),
+      serviceJourneyInterchangeInfo.interchangeId(),
+      serviceJourneyInterchangeInfo.fromJourneyRef().id(),
+      serviceJourneyInterchangeInfo.toJourneyRef().id()
+    );
+  }
+
   static ValidationIssue validateServiceJourneyInterchangeInfo(
     ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
     List<LocalDateTime> fromJourneyActiveDates,
@@ -146,17 +163,8 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
     ServiceJourneyStop toJourneyStop
   ) {
     if (fromJourneyActiveDates.isEmpty() || toJourneyActiveDates.isEmpty()) {
-      return new ValidationIssue(
-        RULE_NO_INTERCHANGE_POSSIBLE,
-        new DataLocation(
-          serviceJourneyInterchangeInfo.interchangeId(),
-          serviceJourneyInterchangeInfo.filename(),
-          null,
-          null
-        ),
-        serviceJourneyInterchangeInfo.interchangeId(),
-        serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-        serviceJourneyInterchangeInfo.toJourneyRef().id()
+      return createNoInterchangePossibleValidationIssue(
+        serviceJourneyInterchangeInfo
       );
     }
 
@@ -170,11 +178,14 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         arrivalTime
       );
 
+    LocalTime departureTime = toJourneyStop.departureTime() == null
+      ? toJourneyStop.arrivalTime()
+      : toJourneyStop.departureTime();
     List<LocalDateTime> sortedToJourneySortedLocalDateTimes =
       sortedLocalDateTimesForServiceJourneyAtStop(
         toJourneyActiveDates,
         toJourneyStop.departureDayOffset(),
-        toJourneyStop.departureTime()
+        departureTime
       );
 
     // If the latest arrival is later than the earliest departure, there will never be an interchange
@@ -184,17 +195,8 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       toJourneyActiveDates.size() - 1
     );
     if (earliestArrivalTime.isAfter(latestDepartureTime)) {
-      return new ValidationIssue(
-        RULE_NO_INTERCHANGE_POSSIBLE,
-        new DataLocation(
-          serviceJourneyInterchangeInfo.interchangeId(),
-          serviceJourneyInterchangeInfo.filename(),
-          null,
-          null
-        ),
-        serviceJourneyInterchangeInfo.interchangeId(),
-        serviceJourneyInterchangeInfo.fromJourneyRef().id(),
-        serviceJourneyInterchangeInfo.toJourneyRef().id()
+      return createNoInterchangePossibleValidationIssue(
+        serviceJourneyInterchangeInfo
       );
     }
 
@@ -246,6 +248,12 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
           ),
           serviceJourneyInterchangeInfo.toStopPoint()
         );
+
+      if (fromJourneyStop == null || toJourneyStop == null) {
+        // If the ScheduledStopPoint does not exist for the referred ServiceJourney, no interchange is possible.
+        // However: we do not want to validate this here, because it is a follow-up error to validation errors already caught by StopPointsInVehicleJourneyValidator.
+        break;
+      }
 
       List<LocalDateTime> fromJourneyActiveDates =
         getActiveDatesForServiceJourney(

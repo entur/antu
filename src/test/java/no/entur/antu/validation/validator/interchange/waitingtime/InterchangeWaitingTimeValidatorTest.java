@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -402,7 +403,7 @@ class InterchangeWaitingTimeValidatorTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithNoPossibleInterchangeGivesError() {
+  void testValidateServiceJourneyWithNoPossibleInterchangeGivesWarning() {
     var interchangeInfo = ServiceJourneyInterchangeInfo.of(
       "",
       new ServiceJourneyInterchange()
