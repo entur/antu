@@ -1,5 +1,6 @@
 package no.entur.antu.netexdata;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
@@ -21,16 +22,19 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   private final Map<String, List<String>> lineInfoCache;
   private final Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache;
   private final Map<String, List<String>> serviceJourneyInterchangeInfoCache;
+  private final Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache;
 
   public DefaultNetexDataRepository(
     Map<String, List<String>> lineInfoCache,
     Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache,
-    Map<String, List<String>> serviceJourneyInterchangeInfoCache
+    Map<String, List<String>> serviceJourneyInterchangeInfoCache,
+    Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId
   ) {
     this.lineInfoCache = lineInfoCache;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
     this.serviceJourneyInterchangeInfoCache =
       serviceJourneyInterchangeInfoCache;
+    this.activeDatesByServiceJourneyIdCache = activeDatesByServiceJourneyId;
   }
 
   @Override
@@ -97,6 +101,13 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
     String validationReportId
   ) {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Map<ServiceJourneyId, List<LocalDateTime>> serviceJourneyIdToActiveDates(
+    String validationReportId
+  ) {
+    return activeDatesByServiceJourneyIdCache.get(validationReportId);
   }
 
   @Override

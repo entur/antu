@@ -19,6 +19,7 @@ package no.entur.antu.config;
 import java.util.List;
 import java.util.Set;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
+import no.entur.antu.netexdata.collectors.ServiceJourneyActiveDatesCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
@@ -27,6 +28,7 @@ import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterch
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
 import no.entur.antu.validation.validator.interchange.stoppoints.StopPointsInVehicleJourneyValidator;
+import no.entur.antu.validation.validator.interchange.waitingtime.InterchangeWaitingTimeValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.identicalstoppoints.IdenticalStopPointsValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.samequayref.SameQuayRefValidator;
@@ -59,11 +61,15 @@ import org.entur.netex.validation.validator.xpath.ValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidator;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TimetableDataValidatorConfig {
+
+  @Value("${interchange-waiting-time-validation-enabled:false}")
+  private Boolean interchangeWaitingTimeValidationEnabled;
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(
@@ -91,6 +97,19 @@ public class TimetableDataValidatorConfig {
     NetexDataRepository netexDataRepository
   ) {
     return new StopPointsInVehicleJourneyValidator(
+      validationReportEntryFactory,
+      netexDataRepository
+    );
+  }
+
+  @Bean
+  public InterchangeWaitingTimeValidator interchangeWaitingTimeValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    NetexDataRepository netexDataRepository
+  ) {
+    return new InterchangeWaitingTimeValidator(
       validationReportEntryFactory,
       netexDataRepository
     );
@@ -142,12 +161,14 @@ public class TimetableDataValidatorConfig {
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     InterchangeForAlightingAndBoardingValidator interchangeForAlightingAndBoardingValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
+    InterchangeWaitingTimeValidator interchangeWaitingTimeValidator,
     LineInfoCollector lineInfoCollector,
     ServiceJourneyStopsCollector serviceJourneyStopsCollector,
     ServiceJourneyInterchangeInfoCollector serviceJourneyInterchangeInfoCollector,
     CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
-    StopPlaceRepository stopPlaceRepository
+    StopPlaceRepository stopPlaceRepository,
+    ServiceJourneyActiveDatesCollector serviceJourneyActiveDatesCollector
   ) {
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
 
@@ -186,10 +207,20 @@ public class TimetableDataValidatorConfig {
       interchangeForAlightingAndBoardingValidator
     );
 
+    if (interchangeWaitingTimeValidationEnabled) {
+      netexTimetableDatasetValidators =
+        List.of(
+          duplicateLineNameValidator,
+          stopPointsInVehicleJourneyValidator,
+          interchangeWaitingTimeValidator
+        );
+    }
+
     List<NetexDataCollector> commonDataCollectors = List.of(
       lineInfoCollector,
       serviceJourneyInterchangeInfoCollector,
-      serviceJourneyStopsCollector
+      serviceJourneyStopsCollector,
+      serviceJourneyActiveDatesCollector
     );
 
     return NetexValidatorsRunner

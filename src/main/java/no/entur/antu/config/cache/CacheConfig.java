@@ -3,6 +3,7 @@ package no.entur.antu.config.cache;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.*;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +44,12 @@ public class CacheConfig {
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
   public static final String ORGANISATION_ALIAS_CACHE =
     "organisationAliasCache";
+  public static final String ACTIVE_DATES_BY_DAY_TYPE_REF =
+    "activeDatesByDayTypeRefCache";
+  public static final String ACTIVE_DATES_BY_SERVICE_JOURNEY_ID =
+    "activeDatesByServiceJourneyIdCache";
+  public static final String ACTIVE_DATE_BY_OPERATING_DAY_REF =
+    "activeDateByOperatingDayRefCache";
 
   public static final String VALIDATION_STATE_CACHE = "validationProgressCache";
 
@@ -202,6 +209,39 @@ public class CacheConfig {
     return getOrCreateReportScopedCache(
       redissonClient,
       SERVICE_JOURNEY_STOPS_CACHE,
+      new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
+    );
+  }
+
+  @Bean(name = ACTIVE_DATES_BY_DAY_TYPE_REF)
+  public Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      ACTIVE_DATES_BY_DAY_TYPE_REF,
+      new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
+    );
+  }
+
+  @Bean(name = ACTIVE_DATES_BY_SERVICE_JOURNEY_ID)
+  public Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> serviceJourneyActiveDatesCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      ACTIVE_DATES_BY_SERVICE_JOURNEY_ID,
+      new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
+    );
+  }
+
+  @Bean(name = ACTIVE_DATE_BY_OPERATING_DAY_REF)
+  public Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      ACTIVE_DATE_BY_OPERATING_DAY_REF,
       new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
     );
   }

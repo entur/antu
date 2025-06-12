@@ -1,8 +1,6 @@
 package no.entur.antu.config;
 
-import java.util.List;
-import java.util.Map;
-import no.entur.antu.netexdata.NetexDataRepositoryLoader;
+import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -76,53 +74,6 @@ public class TestConfig {
       String validationReportId,
       NetexEntitiesIndex netexEntitiesIndex
     ) {}
-
-    @Override
-    public void cleanUp(String validationReportId) {}
-  }
-
-  private static class TestNetexDataRepository
-    implements NetexDataRepositoryLoader {
-
-    @Override
-    public List<SimpleLine> lineNames(String validationReportId) {
-      return List.of();
-    }
-
-    @Override
-    public Map<ServiceJourneyId, List<ServiceJourneyStop>> serviceJourneyStops(
-      String validationReportId
-    ) {
-      return Map.of();
-    }
-
-    @Override
-    public List<ServiceJourneyInterchangeInfo> serviceJourneyInterchangeInfos(
-      String validationReportId
-    ) {
-      return List.of();
-    }
-
-    @Override
-    public Map<ServiceJourneyId, List<DayTypeId>> serviceJourneyDayTypes(
-      String validationReportId
-    ) {
-      return Map.of();
-    }
-
-    @Override
-    public Map<ActiveDatesId, ActiveDates> activeDates(
-      String validationReportId
-    ) {
-      return Map.of();
-    }
-
-    @Override
-    public Map<ServiceJourneyId, List<OperatingDayId>> serviceJourneyOperatingDays(
-      String validationReportId
-    ) {
-      return Map.of();
-    }
 
     @Override
     public void cleanUp(String validationReportId) {}

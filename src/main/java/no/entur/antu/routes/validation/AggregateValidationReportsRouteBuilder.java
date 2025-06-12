@@ -46,6 +46,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.entur.antu.Constants;
+import no.entur.antu.exception.AntuException;
+import no.entur.antu.exception.RetryableAntuException;
 import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.metrics.AntuPrometheusMetricsService;
 import no.entur.antu.routes.BaseRouteBuilder;
@@ -57,8 +59,12 @@ import org.apache.camel.Message;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
 import org.apache.camel.util.StopWatch;
+import org.entur.netex.validation.exception.RetryableNetexValidationException;
+import org.entur.netex.validation.validator.DataLocation;
+import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.redisson.client.RedisException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -172,6 +178,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
           )
         )
       )
+      .doTry()
       .bean(
         "netexValidationProfile",
         "validateDataset(" +
@@ -186,8 +193,46 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() + "Completed all NeTEx dataset validators"
       )
+      .doCatch(
+        InterruptedException.class,
+        RetryableNetexValidationException.class,
+        RetryableAntuException.class,
+        // TODO: Temporary fix to ensure intermittent failures towards Redis are retried.
+        RedisException.class
+      )
+      .log(
+        LoggingLevel.INFO,
+        correlation() +
+        "Retryable exception while running dataset validation. Validation will be retried later: ${exception.message} stacktrace: ${exception.stacktrace}"
+      )
+      .throwException(new AntuException("Dataset validation failed"))
+      .doCatch(Exception.class)
+      .log(
+        LoggingLevel.ERROR,
+        correlation() +
+        "System error while running dataset validation: ${exception.message} stacktrace: ${exception.stacktrace}"
+      )
+      .to("direct:appendSystemErrorToReport")
+      // end catch
+      .end()
       .to("direct:completeValidation")
       .routeId("validate-dataset");
+
+    from("direct:appendSystemErrorToReport")
+      .process(exchange -> {
+        ValidationReport validationReport = exchange
+          .getIn()
+          .getBody(ValidationReport.class);
+        ValidationReportEntry validationReportEntry = new ValidationReportEntry(
+          "System error while running cross-validation of files in the dataset",
+          "SYSTEM_ERROR",
+          Severity.ERROR,
+          new DataLocation(null, "N/A", null, null)
+        );
+        validationReport.addValidationReportEntry(validationReportEntry);
+        exchange.getIn().setBody(validationReport, ValidationReport.class);
+      })
+      .routeId("append-system-error-to-report");
 
     from("direct:completeValidation")
       .choice()
