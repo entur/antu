@@ -8,7 +8,8 @@ import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 
-public class InterchangeForAlightingAndBoardingValidator extends AbstractDatasetValidator {
+public class InterchangeForAlightingAndBoardingValidator
+  extends AbstractDatasetValidator {
 
   private final NetexDataRepository netexDataRepository;
 
@@ -68,25 +69,25 @@ public class InterchangeForAlightingAndBoardingValidator extends AbstractDataset
         .toList();
 
       if (feederStopsWithMatchingId.size() >= 1) {
-        for (ServiceJourneyStop serviceJourneyFromStop : feederStopsWithMatchingId) {
-          if (!serviceJourneyFromStop.isForAlighting()) {
-            validationReport.addValidationReportEntry(
-              createValidationReportEntry(
-                new ValidationIssue(
-                  ALIGHTING_RULE,
-                  new DataLocation(
-                    serviceJourneyInterchangeInfo.interchangeId(),
-                    serviceJourneyInterchangeInfo.filename(),
-                    null,
-                    null
-                  ),
+        ServiceJourneyStop serviceJourneyFromStop =
+          feederStopsWithMatchingId.get(0);
+        if (!serviceJourneyFromStop.isForAlighting()) {
+          validationReport.addValidationReportEntry(
+            createValidationReportEntry(
+              new ValidationIssue(
+                ALIGHTING_RULE,
+                new DataLocation(
                   serviceJourneyInterchangeInfo.interchangeId(),
-                  fromStopPointRef,
-                  fromJourneyRef.id()
-                )
+                  serviceJourneyInterchangeInfo.filename(),
+                  null,
+                  null
+                ),
+                serviceJourneyInterchangeInfo.interchangeId(),
+                fromStopPointRef,
+                fromJourneyRef.id()
               )
-            );
-          }
+            )
+          );
         }
       }
 
@@ -96,25 +97,25 @@ public class InterchangeForAlightingAndBoardingValidator extends AbstractDataset
         .toList();
 
       if (consumerStopsWithMatchingId.size() >= 1) {
-        for (ServiceJourneyStop serviceJourneyToStop : consumerStopsWithMatchingId) {
-          if (!serviceJourneyToStop.isForBoarding()) {
-            validationReport.addValidationReportEntry(
-              createValidationReportEntry(
-                new ValidationIssue(
-                  BOARDING_RULE,
-                  new DataLocation(
-                    serviceJourneyInterchangeInfo.interchangeId(),
-                    serviceJourneyInterchangeInfo.filename(),
-                    null,
-                    null
-                  ),
+        ServiceJourneyStop serviceJourneyToStop =
+          consumerStopsWithMatchingId.get(0);
+        if (!serviceJourneyToStop.isForBoarding()) {
+          validationReport.addValidationReportEntry(
+            createValidationReportEntry(
+              new ValidationIssue(
+                BOARDING_RULE,
+                new DataLocation(
                   serviceJourneyInterchangeInfo.interchangeId(),
-                  toStopPointRef,
-                  toJourneyRef.id()
-                )
+                  serviceJourneyInterchangeInfo.filename(),
+                  null,
+                  null
+                ),
+                serviceJourneyInterchangeInfo.interchangeId(),
+                toStopPointRef,
+                toJourneyRef.id()
               )
-            );
-          }
+            )
+          );
         }
       }
     }

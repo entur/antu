@@ -212,6 +212,7 @@ public class TimetableDataValidatorConfig {
         List.of(
           duplicateLineNameValidator,
           stopPointsInVehicleJourneyValidator,
+          interchangeForAlightingAndBoardingValidator,
           interchangeWaitingTimeValidator
         );
     }
