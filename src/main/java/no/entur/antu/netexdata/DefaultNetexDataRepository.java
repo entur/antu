@@ -1,7 +1,7 @@
 package no.entur.antu.netexdata;
 
-import java.util.*;
 import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.validation.validator.model.ActiveDates;
@@ -26,7 +26,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
 
   public DefaultNetexDataRepository(
     Map<String, List<String>> lineInfoCache,
-    Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
+    Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache,
     Map<String, List<String>> serviceJourneyInterchangeInfoCache,
     Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId
   ) {
