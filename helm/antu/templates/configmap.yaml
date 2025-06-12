@@ -108,6 +108,9 @@ data:
     logging.level.org.apache=INFO
     logging.level.org.apache.camel.component.http.HttpComponent=WARN
 
+    # Feature flags
+    interchange-waiting-time-validation-enabled={{ .Values.interchangeWaitingTimeValidationEnabled }}
+
 kind: ConfigMap
 metadata:
   name: {{ template "antu.name" . }}-config
