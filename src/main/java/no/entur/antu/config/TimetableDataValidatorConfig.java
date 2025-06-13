@@ -16,6 +16,7 @@
 
 package no.entur.antu.config;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
@@ -70,6 +71,9 @@ public class TimetableDataValidatorConfig {
 
   @Value("${interchange-waiting-time-validation-enabled:false}")
   private Boolean interchangeWaitingTimeValidationEnabled;
+
+  @Value("${interchange-alighting-and-boarding-validation-enabled:false}")
+  private Boolean interchangeAlightingAndBoardingValidationEnabled;
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(
@@ -201,20 +205,18 @@ public class TimetableDataValidatorConfig {
       new UnexpectedInterchangeDistanceValidator()
     );
 
-    List<DatasetValidator> netexTimetableDatasetValidators = List.of(
-      duplicateLineNameValidator,
-      stopPointsInVehicleJourneyValidator,
-      interchangeForAlightingAndBoardingValidator
-    );
+    List<DatasetValidator> netexTimetableDatasetValidators = new ArrayList<>();
+    netexTimetableDatasetValidators.add(duplicateLineNameValidator);
+    netexTimetableDatasetValidators.add(stopPointsInVehicleJourneyValidator);
+
+    if (interchangeAlightingAndBoardingValidationEnabled) {
+      netexTimetableDatasetValidators.add(
+        interchangeForAlightingAndBoardingValidator
+      );
+    }
 
     if (interchangeWaitingTimeValidationEnabled) {
-      netexTimetableDatasetValidators =
-        List.of(
-          duplicateLineNameValidator,
-          stopPointsInVehicleJourneyValidator,
-          interchangeForAlightingAndBoardingValidator,
-          interchangeWaitingTimeValidator
-        );
+      netexTimetableDatasetValidators.add(interchangeWaitingTimeValidator);
     }
 
     List<NetexDataCollector> commonDataCollectors = List.of(
