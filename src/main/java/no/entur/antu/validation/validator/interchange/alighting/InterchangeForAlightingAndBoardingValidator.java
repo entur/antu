@@ -8,6 +8,12 @@ import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 
+/**
+ * This validator checks that alighting is allowed for the FromStopPoint referred to by a ServiceJourneyInterchange.
+ * It also checks that boarding is allowed for the ToStopPoint, also referred to from ServiceJourneyInterchange.
+ *
+ * Chouette reference: 3-Interchange-9-1, 3-Interchange-9-2
+ */
 public class InterchangeForAlightingAndBoardingValidator
   extends AbstractDatasetValidator {
 
