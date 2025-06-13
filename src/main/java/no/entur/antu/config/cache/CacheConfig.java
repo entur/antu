@@ -203,13 +203,13 @@ public class CacheConfig {
   }
 
   @Bean(name = SERVICE_JOURNEY_STOPS_CACHE)
-  public Map<String, Map<String, List<String>>> serviceJourneyStopsCache(
+  public Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache(
     RedissonClient redissonClient
   ) {
     return getOrCreateReportScopedCache(
       redissonClient,
       SERVICE_JOURNEY_STOPS_CACHE,
-      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
+      new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
     );
   }
 

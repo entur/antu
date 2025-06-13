@@ -1,10 +1,7 @@
 package no.entur.antu.netexdata;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
 import org.entur.netex.validation.validator.model.ActiveDates;
@@ -23,13 +20,13 @@ import org.entur.netex.validation.validator.model.SimpleLine;
 public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
 
   private final Map<String, List<String>> lineInfoCache;
-  private final Map<String, Map<String, List<String>>> serviceJourneyStopsCache;
+  private final Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache;
   private final Map<String, List<String>> serviceJourneyInterchangeInfoCache;
   private final Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache;
 
   public DefaultNetexDataRepository(
     Map<String, List<String>> lineInfoCache,
-    Map<String, Map<String, List<String>>> serviceJourneyStopsCache,
+    Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache,
     Map<String, List<String>> serviceJourneyInterchangeInfoCache,
     Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId
   ) {
@@ -63,9 +60,8 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
       .flatMap(m -> m.entrySet().stream())
       .collect(
         Collectors.toMap(
-          k -> ServiceJourneyId.ofValidId(k.getKey()),
-          v ->
-            v.getValue().stream().map(ServiceJourneyStop::fromString).toList(),
+          e -> ServiceJourneyId.ofValidId(e.getKey()),
+          Map.Entry::getValue,
           (p, n) -> n
         )
       );
