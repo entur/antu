@@ -7,7 +7,6 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -80,7 +79,7 @@ class InterchangeWaitingTimeValidatorTest {
       passingTime =
         passingTime.withArrivalDayOffset(BigInteger.valueOf(dayOffset.get()));
     }
-    return ServiceJourneyStop.of(stopId, passingTime);
+    return ServiceJourneyStop.of(stopId, passingTime, null, null);
   }
 
   private ServiceJourneyStop createDepartureStop(
@@ -102,7 +101,7 @@ class InterchangeWaitingTimeValidatorTest {
         passingTime.withDepartureDayOffset(BigInteger.valueOf(dayOffset.get()));
     }
 
-    return ServiceJourneyStop.of(stopId, passingTime);
+    return ServiceJourneyStop.of(stopId, passingTime, null, null);
   }
 
   private ServiceJourneyInterchange createInterchangeWithMaximumWaitTime() {
@@ -157,7 +156,7 @@ class InterchangeWaitingTimeValidatorTest {
           entry -> List.of(entry.getValue())
         )
       );
-    netexDataRepository.putServiceJourneyStop(testCaseId, journeyStops);
+    netexDataRepository.putServiceJourneyStops(testCaseId, journeyStops);
   }
 
   private void setupTestCaseSatisfiedWaitingTime() {
