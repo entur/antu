@@ -156,7 +156,7 @@ class InterchangeWaitingTimeValidatorTest {
           entry -> List.of(entry.getValue())
         )
       );
-    netexDataRepository.putServiceJourneyStops(testCaseId, journeyStops);
+    netexDataRepository.putServiceJourneyStop(testCaseId, journeyStops);
   }
 
   private void setupTestCaseSatisfiedWaitingTime() {

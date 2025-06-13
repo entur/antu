@@ -56,6 +56,176 @@ class InterchangeForAlightingAndBoardingValidatorTest {
       );
   }
 
+  @Test
+  void testValidatorWhenAlightingAndBoardingValuesAreValid() {
+    ServiceJourneyStop fromStopPoint = createFromPointStop(true, false);
+    ServiceJourneyStop toStopPoint = createToPointStop(false, true);
+
+    this.netexDataRepository.putServiceJourneyStop(
+        validationReportId,
+        Map.of(
+          fromServiceJourneyId,
+          List.of(fromStopPoint),
+          toServiceJourneyId,
+          List.of(toStopPoint)
+        )
+      );
+
+    ValidationReport validationReport = validator.validate(
+      initialValidationReport
+    );
+    Assertions.assertEquals(
+      0,
+      validationReport.getValidationReportEntries().size()
+    );
+  }
+
+  @Test
+  void testValidatorWhenAlightingAndBoardingValuesAreInvalid() {
+    ServiceJourneyStop fromStopPoint = createFromPointStop(false, true);
+    ServiceJourneyStop toStopPoint = createToPointStop(true, false);
+
+    this.netexDataRepository.putServiceJourneyStop(
+        validationReportId,
+        Map.of(
+          fromServiceJourneyId,
+          List.of(fromStopPoint),
+          toServiceJourneyId,
+          List.of(toStopPoint)
+        )
+      );
+
+    ValidationReport validationReport = validator.validate(
+      initialValidationReport
+    );
+    Assertions.assertEquals(
+      2,
+      validationReport.getValidationReportEntries().size()
+    );
+    Assertions.assertEquals(
+      1,
+      validationReport
+        .getNumberOfValidationEntriesPerRule()
+        .get(ALIGHTING_RULE.name())
+    );
+    Assertions.assertEquals(
+      1,
+      validationReport
+        .getNumberOfValidationEntriesPerRule()
+        .get(BOARDING_RULE.name())
+    );
+  }
+
+  @Test
+  void testValidationWhenAlightingIsAllowedOnAlightingStop() {
+    ServiceJourneyStop fromStopPoint = createFromPointStop(true, false);
+    ValidationReport validationReport = new ValidationReport(
+      "tst",
+      validationReportId
+    );
+    ValidationReport resultingValidationReport = validator.validateAlighting(
+      validationReport,
+      createServiceJourneyInterchangeInfo(),
+      List.of(fromStopPoint)
+    );
+    Assertions.assertEquals(
+      0,
+      resultingValidationReport.getValidationReportEntries().size()
+    );
+
+    fromStopPoint = createFromPointStop(null, false);
+    validationReport = new ValidationReport("tst", validationReportId);
+    resultingValidationReport =
+      validator.validateAlighting(
+        validationReport,
+        createServiceJourneyInterchangeInfo(),
+        List.of(fromStopPoint)
+      );
+    Assertions.assertEquals(
+      0,
+      resultingValidationReport.getValidationReportEntries().size()
+    );
+  }
+
+  @Test
+  void testValidationWhenAlightingIsDisallowedOnAlightingStop() {
+    ServiceJourneyStop fromStopPoint = createFromPointStop(false, true);
+    ValidationReport validationReport = new ValidationReport(
+      "tst",
+      validationReportId
+    );
+    ValidationReport resultingValidationReport = validator.validateAlighting(
+      validationReport,
+      createServiceJourneyInterchangeInfo(),
+      List.of(fromStopPoint)
+    );
+    Assertions.assertEquals(
+      1,
+      resultingValidationReport.getValidationReportEntries().size()
+    );
+    Assertions.assertEquals(
+      1,
+      validationReport
+        .getNumberOfValidationEntriesPerRule()
+        .get(ALIGHTING_RULE.name())
+    );
+  }
+
+  @Test
+  void testValidationWhenBoardingIsAllowedOnBoardingStop() {
+    ServiceJourneyStop toStopPoint = createFromPointStop(false, true);
+    ValidationReport validationReport = new ValidationReport(
+      "tst",
+      validationReportId
+    );
+    ValidationReport resultingValidationReport = validator.validateBoarding(
+      validationReport,
+      createServiceJourneyInterchangeInfo(),
+      List.of(toStopPoint)
+    );
+    Assertions.assertEquals(
+      0,
+      resultingValidationReport.getValidationReportEntries().size()
+    );
+
+    toStopPoint = createFromPointStop(false, null);
+    validationReport = new ValidationReport("tst", validationReportId);
+    resultingValidationReport =
+      validator.validateBoarding(
+        validationReport,
+        createServiceJourneyInterchangeInfo(),
+        List.of(toStopPoint)
+      );
+    Assertions.assertEquals(
+      0,
+      resultingValidationReport.getValidationReportEntries().size()
+    );
+  }
+
+  @Test
+  void testValidationWhenBoardingIsDisallowedOnBoardingStop() {
+    ServiceJourneyStop toStopPoint = createToPointStop(true, false);
+    ValidationReport validationReport = new ValidationReport(
+      "tst",
+      validationReportId
+    );
+    ValidationReport resultingValidationReport = validator.validateBoarding(
+      validationReport,
+      createServiceJourneyInterchangeInfo(),
+      List.of(toStopPoint)
+    );
+    Assertions.assertEquals(
+      1,
+      resultingValidationReport.getValidationReportEntries().size()
+    );
+    Assertions.assertEquals(
+      1,
+      validationReport
+        .getNumberOfValidationEntriesPerRule()
+        .get(BOARDING_RULE.name())
+    );
+  }
+
   private ServiceJourneyStop createServiceJourneyStop(
     int stopPointId,
     Boolean isForAlighting,
@@ -119,114 +289,6 @@ class InterchangeForAlightingAndBoardingValidatorTest {
         )
         .withFromPointRef(createStopPointRef(fromStopPointId))
         .withToPointRef(createStopPointRef(toStopPointId))
-    );
-  }
-
-  @Test
-  void testValidationWhenAlightingAndBoardingValuesAreValid() {
-    ServiceJourneyStop fromStopPoint = createFromPointStop(true, false);
-    ServiceJourneyStop toStopPoint = createToPointStop(false, true);
-
-    this.netexDataRepository.putServiceJourneyStop(
-        validationReportId,
-        Map.of(
-          fromServiceJourneyId,
-          List.of(fromStopPoint),
-          toServiceJourneyId,
-          List.of(toStopPoint)
-        )
-      );
-
-    ValidationReport validationReport = validator.validate(
-      initialValidationReport
-    );
-    Assertions.assertEquals(
-      0,
-      validationReport.getValidationReportEntries().size()
-    );
-  }
-
-  @Test
-  void testValidationWhenAlightingIsDisallowedOnAlightingStop() {
-    ServiceJourneyStop fromStopPoint = createFromPointStop(false, false);
-    ServiceJourneyStop toStopPoint = createToPointStop(false, true);
-
-    this.netexDataRepository.putServiceJourneyStop(
-        validationReportId,
-        Map.of(
-          fromServiceJourneyId,
-          List.of(fromStopPoint),
-          toServiceJourneyId,
-          List.of(toStopPoint)
-        )
-      );
-
-    ValidationReport validationReport = validator.validate(
-      initialValidationReport
-    );
-    Assertions.assertEquals(
-      1,
-      validationReport.getValidationReportEntries().size()
-    );
-    Assertions.assertEquals(
-      1,
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .get(ALIGHTING_RULE.name())
-    );
-  }
-
-  @Test
-  void testValidationWhenBoardingIsDisallowedOnBoardingStop() {
-    ServiceJourneyStop fromStopPoint = createFromPointStop(true, false);
-    ServiceJourneyStop toStopPoint = createToPointStop(false, false);
-
-    this.netexDataRepository.putServiceJourneyStop(
-        validationReportId,
-        Map.of(
-          fromServiceJourneyId,
-          List.of(fromStopPoint),
-          toServiceJourneyId,
-          List.of(toStopPoint)
-        )
-      );
-
-    ValidationReport validationReport = validator.validate(
-      initialValidationReport
-    );
-    Assertions.assertEquals(
-      1,
-      validationReport.getValidationReportEntries().size()
-    );
-    Assertions.assertEquals(
-      1,
-      validationReport
-        .getNumberOfValidationEntriesPerRule()
-        .get(BOARDING_RULE.name())
-    );
-  }
-
-  @Test
-  void testValidationWhenBoardingAndAlightingAreNull() {
-    ServiceJourneyStop fromStopPoint = createFromPointStop(null, null);
-    ServiceJourneyStop toStopPoint = createToPointStop(null, null);
-
-    this.netexDataRepository.putServiceJourneyStop(
-        validationReportId,
-        Map.of(
-          fromServiceJourneyId,
-          List.of(fromStopPoint),
-          toServiceJourneyId,
-          List.of(toStopPoint)
-        )
-      );
-
-    ValidationReport validationReport = validator.validate(
-      initialValidationReport
-    );
-    Assertions.assertEquals(
-      0,
-      validationReport.getValidationReportEntries().size()
     );
   }
 }

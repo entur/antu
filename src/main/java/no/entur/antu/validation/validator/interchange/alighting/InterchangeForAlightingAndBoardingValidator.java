@@ -55,11 +55,6 @@ public class InterchangeForAlightingAndBoardingValidator
       ServiceJourneyId fromJourneyRef =
         serviceJourneyInterchangeInfo.fromJourneyRef();
 
-      String toStopPointRef = serviceJourneyInterchangeInfo.toStopPoint().id();
-      String fromStopPointRef = serviceJourneyInterchangeInfo
-        .fromStopPoint()
-        .id();
-
       List<ServiceJourneyStop> feederStops = serviceJourneyStopsCache.get(
         fromJourneyRef
       );
@@ -67,65 +62,130 @@ public class InterchangeForAlightingAndBoardingValidator
         toJourneyRef
       );
 
-      List<ServiceJourneyStop> feederStopsWithMatchingId = feederStops
-        .stream()
-        .filter(stop ->
-          stop.scheduledStopPointId().id().equals(fromStopPointRef)
-        )
-        .toList();
-
-      if (feederStopsWithMatchingId.size() >= 1) {
-        ServiceJourneyStop serviceJourneyFromStop =
-          feederStopsWithMatchingId.get(0);
-        if (!serviceJourneyFromStop.isForAlighting()) {
-          validationReport.addValidationReportEntry(
-            createValidationReportEntry(
-              new ValidationIssue(
-                ALIGHTING_RULE,
-                new DataLocation(
-                  serviceJourneyInterchangeInfo.interchangeId(),
-                  serviceJourneyInterchangeInfo.filename(),
-                  null,
-                  null
-                ),
-                serviceJourneyInterchangeInfo.interchangeId(),
-                fromStopPointRef,
-                fromJourneyRef.id()
-              )
-            )
-          );
-        }
-      }
-
-      List<ServiceJourneyStop> consumerStopsWithMatchingId = consumerStops
-        .stream()
-        .filter(stop -> stop.scheduledStopPointId().id().equals(toStopPointRef))
-        .toList();
-
-      if (consumerStopsWithMatchingId.size() >= 1) {
-        ServiceJourneyStop serviceJourneyToStop =
-          consumerStopsWithMatchingId.get(0);
-        if (!serviceJourneyToStop.isForBoarding()) {
-          validationReport.addValidationReportEntry(
-            createValidationReportEntry(
-              new ValidationIssue(
-                BOARDING_RULE,
-                new DataLocation(
-                  serviceJourneyInterchangeInfo.interchangeId(),
-                  serviceJourneyInterchangeInfo.filename(),
-                  null,
-                  null
-                ),
-                serviceJourneyInterchangeInfo.interchangeId(),
-                toStopPointRef,
-                toJourneyRef.id()
-              )
-            )
-          );
-        }
-      }
+      validationReport =
+        validateAlighting(
+          validationReport,
+          serviceJourneyInterchangeInfo,
+          feederStops
+        );
+      validationReport =
+        validateBoarding(
+          validationReport,
+          serviceJourneyInterchangeInfo,
+          consumerStops
+        );
     }
 
     return validationReport;
+  }
+
+  ValidationReport validateAlighting(
+    ValidationReport validationReport,
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+    List<ServiceJourneyStop> fromStopPoints
+  ) {
+    String fromStopPointRef = serviceJourneyInterchangeInfo
+      .fromStopPoint()
+      .id();
+    List<ServiceJourneyStop> feederStopsWithMatchingId = fromStopPoints
+      .stream()
+      .filter(stop -> stop.scheduledStopPointId().id().equals(fromStopPointRef))
+      .toList();
+
+    if (feederStopsWithMatchingId.size() >= 1) {
+      // checking the first element is sufficient because ServiceJourneyStopsCollector
+      // aggregate forAlighting values for all stop points matching fromStopPoint in interchange
+      ServiceJourneyStop serviceJourneyFromStop = feederStopsWithMatchingId.get(
+        0
+      );
+      if (!serviceJourneyFromStop.isForAlighting()) {
+        validationReport.addValidationReportEntry(
+          createAlightingValidationReportEntry(
+            serviceJourneyInterchangeInfo,
+            fromStopPointRef,
+            serviceJourneyInterchangeInfo.fromJourneyRef()
+          )
+        );
+      }
+    }
+    return validationReport;
+  }
+
+  ValidationReport validateBoarding(
+    ValidationReport validationReport,
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+    List<ServiceJourneyStop> toStopPoints
+  ) {
+    String toStopPointRef = serviceJourneyInterchangeInfo.toStopPoint().id();
+    List<ServiceJourneyStop> consumerStopsWithMatchingId = toStopPoints
+      .stream()
+      .filter(stop -> stop.scheduledStopPointId().id().equals(toStopPointRef))
+      .toList();
+
+    if (consumerStopsWithMatchingId.size() >= 1) {
+      // checking the first element is sufficient because ServiceJourneyStopsCollector
+      // aggregate forBoarding values for all stop points matching fromStopPoint in interchange
+      ServiceJourneyStop serviceJourneyToStop = consumerStopsWithMatchingId.get(
+        0
+      );
+      if (!serviceJourneyToStop.isForBoarding()) {
+        validationReport.addValidationReportEntry(
+          createBoardingValidationReportEntry(
+            serviceJourneyInterchangeInfo,
+            toStopPointRef,
+            serviceJourneyInterchangeInfo.toJourneyRef()
+          )
+        );
+      }
+    }
+    return validationReport;
+  }
+
+  private ValidationReportEntry createValidationReportEntry(
+    ValidationRule validationRule,
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+    String stopPointRef,
+    String journeyRef
+  ) {
+    return createValidationReportEntry(
+      new ValidationIssue(
+        validationRule,
+        new DataLocation(
+          serviceJourneyInterchangeInfo.interchangeId(),
+          serviceJourneyInterchangeInfo.filename(),
+          null,
+          null
+        ),
+        serviceJourneyInterchangeInfo.interchangeId(),
+        stopPointRef,
+        journeyRef
+      )
+    );
+  }
+
+  private ValidationReportEntry createBoardingValidationReportEntry(
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+    String stopPointRef,
+    ServiceJourneyId journeyRef
+  ) {
+    return createValidationReportEntry(
+      BOARDING_RULE,
+      serviceJourneyInterchangeInfo,
+      stopPointRef,
+      journeyRef.id()
+    );
+  }
+
+  private ValidationReportEntry createAlightingValidationReportEntry(
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+    String stopPointRef,
+    ServiceJourneyId journeyRef
+  ) {
+    return createValidationReportEntry(
+      ALIGHTING_RULE,
+      serviceJourneyInterchangeInfo,
+      stopPointRef,
+      journeyRef.id()
+    );
   }
 }
