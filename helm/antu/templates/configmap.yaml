@@ -110,6 +110,7 @@ data:
 
     # Feature flags
     interchange-waiting-time-validation-enabled={{ .Values.interchangeWaitingTimeValidationEnabled }}
+    interchange-alighting-and-boarding-validation-enabled={{ .Values.alightingAndBoardingValidationEnabled }}
 
 kind: ConfigMap
 metadata:

@@ -32,7 +32,9 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
             null,
             null,
             0,
-            0
+            0,
+            true,
+            true
           )
         ),
         ServiceJourneyId.ofValidId("TST:ServiceJourney:2"),
@@ -42,13 +44,15 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
             null,
             null,
             0,
-            0
+            0,
+            true,
+            true
           )
         )
       )
     );
 
-    ValidationReport validationReport = runTestFor(1, 2, 1, 2);
+    ValidationReport validationReport = runTestFor();
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
   }
@@ -65,13 +69,15 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
             null,
             null,
             0,
-            0
+            0,
+            true,
+            true
           )
         )
       )
     );
 
-    ValidationReport validationReport = runTestFor(1, 2, 1, 2);
+    ValidationReport validationReport = runTestFor();
 
     Collection<ValidationReportEntry> validationReportEntries =
       validationReport.getValidationReportEntries();
@@ -127,13 +133,15 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
             null,
             null,
             0,
-            0
+            0,
+            true,
+            true
           )
         )
       )
     );
 
-    ValidationReport validationReport = runTestFor(1, 2, 1, 2);
+    ValidationReport validationReport = runTestFor();
 
     Collection<ValidationReportEntry> validationReportEntries =
       validationReport.getValidationReportEntries();
@@ -148,31 +156,15 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
     );
   }
 
-  private ValidationReport runTestFor(
-    int fromServiceJourneyId,
-    int toServiceJourneyId,
-    int fromPointRefId,
-    int toPointRefId
-  ) {
-    assert fromServiceJourneyId != toServiceJourneyId;
-    assert fromPointRefId != toPointRefId;
-
+  private ValidationReport runTestFor() {
     NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
 
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
       .createServiceJourneyInterchange()
-      .withFromPointRef(
-        NetexEntitiesTestFactory.createScheduledStopPointRef(fromPointRefId)
-      )
-      .withToPointRef(
-        NetexEntitiesTestFactory.createScheduledStopPointRef(toPointRefId)
-      )
-      .withFromJourneyRef(
-        NetexEntitiesTestFactory.createServiceJourneyRef(fromServiceJourneyId)
-      )
-      .withToJourneyRef(
-        NetexEntitiesTestFactory.createServiceJourneyRef(toServiceJourneyId)
-      )
+      .withFromPointRef(NetexEntitiesTestFactory.createScheduledStopPointRef(1))
+      .withToPointRef(NetexEntitiesTestFactory.createScheduledStopPointRef(2))
+      .withFromJourneyRef(NetexEntitiesTestFactory.createServiceJourneyRef(1))
+      .withToJourneyRef(NetexEntitiesTestFactory.createServiceJourneyRef(2))
       .create();
 
     mockGetServiceJourneyInterchangeInfo(
