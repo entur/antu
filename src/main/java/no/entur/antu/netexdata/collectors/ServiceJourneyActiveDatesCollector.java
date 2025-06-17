@@ -204,7 +204,13 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
                   )
                   .toList()
               );
-              dates.addAll(computeDatesForPeriodAndWeekday(period, daysOfWeek));
+              dates.addAll(
+                computeDatesForPeriodAndWeekday(
+                  period,
+                  daysOfWeek,
+                  operatingDaysToCalendarDate
+                )
+              );
             }
           });
         return Map.entry(dayType.getId(), dates);
@@ -293,14 +299,45 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     }
   }
 
+  private LocalDateTime getFromDateFromOperatingPeriod(
+    OperatingPeriod operatingPeriod,
+    Map<String, LocalDateTime> operatingDayRefsToCalendarDate
+  ) {
+    if (operatingPeriod.getFromDate() != null) {
+      return operatingPeriod.getFromDate();
+    }
+    return operatingDayRefsToCalendarDate.get(
+      operatingPeriod.getFromOperatingDayRef().getRef()
+    );
+  }
+
+  private LocalDateTime getToDateFromOperatingPeriod(
+    OperatingPeriod operatingPeriod,
+    Map<String, LocalDateTime> operatingDayRefsToCalendarDate
+  ) {
+    if (operatingPeriod.getToDate() != null) {
+      return operatingPeriod.getToDate();
+    }
+    return operatingDayRefsToCalendarDate.get(
+      operatingPeriod.getToOperatingDayRef().getRef()
+    );
+  }
+
   private Set<LocalDateTime> computeDatesForPeriodAndWeekday(
     OperatingPeriod period,
-    Set<DayOfWeekEnumeration> daysOfWeekEnumeration
+    Set<DayOfWeekEnumeration> daysOfWeekEnumeration,
+    Map<String, LocalDateTime> operatingDayRefsToCalendarDate
   ) {
     Set<DayOfWeek> daysOfWeek = mapDayOfWeeks(daysOfWeekEnumeration);
     Set<LocalDateTime> dates = new HashSet<>();
-    LocalDateTime fromDate = period.getFromDate();
-    LocalDateTime toDate = period.getToDate();
+    LocalDateTime fromDate = getFromDateFromOperatingPeriod(
+      period,
+      operatingDayRefsToCalendarDate
+    );
+    LocalDateTime toDate = getToDateFromOperatingPeriod(
+      period,
+      operatingDayRefsToCalendarDate
+    );
     for (LocalDateTime d = fromDate; d.isBefore(toDate); d = d.plusDays(1)) {
       if (daysOfWeek.contains(d.getDayOfWeek())) {
         dates.add(d);
