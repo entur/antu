@@ -17,7 +17,7 @@ tiamatUrl: http://tiamat.tst.entur.internal
 agreementRegistryUrl: https://api.entur.io/agreements/v1
 
 interchangeWaitingTimeValidationEnabled: true
-alightingAndBoardingValidationEnabled: false
+alightingAndBoardingValidationEnabled: true
 
 baba:
   service: http://baba.tst.entur.internal
