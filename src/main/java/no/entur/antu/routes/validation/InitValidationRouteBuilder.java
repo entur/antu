@@ -96,7 +96,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
 
     from("direct:processJob")
       .validate(header(JOB_TYPE).isNotNull())
-      .filter(this::validationAlreadyComplete)
+      .filter(this::isDuplicatedValidationJob)
       .log(
         LoggingLevel.INFO,
         correlation() +
@@ -146,12 +146,29 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .routeId("notify-status");
   }
 
-  private boolean validationAlreadyComplete(Exchange exchange) {
+  /**
+   * Return true if the exchange refers to a validation job that has already been run (duplicated message).
+   *
+   * <ul>
+   *     <li>
+   *      If the exchange does not contain a reference to a validation report id,
+   *      this is not a validation job (examples: refresh stop place cache).
+   *      In this case the method always return false.
+   *     </li>
+   *     <li>
+   *      If the ValidationState repository does not contain a ValidationState for this validation report id, it means
+   *      that the validation is complete and the ValidationState has been removed from the repository. In this case the
+   *      method returns true.
+   *     </li>
+   * </ul>
+   *
+   *
+   */
+  private boolean isDuplicatedValidationJob(Exchange exchange) {
     String validationReportId = exchange
       .getIn()
       .getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
-    // if the job is not a validation job (examples: refresh stop place cache), the validation report id is not set.
-    // in this case we do not want to reject the message.
+
     return (
       validationReportId != null &&
       !validationStateRepository.hasValidationState(validationReportId)
