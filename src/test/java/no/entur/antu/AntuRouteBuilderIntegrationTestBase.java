@@ -109,18 +109,14 @@ public abstract class AntuRouteBuilderIntegrationTestBase {
   }
 
   @AfterAll
-  public static void tearDown() {
+  public static void stopEmulator() {
     pubsubEmulator.stop();
-  }
-
-  @AfterEach
-  public void teardown() {
-    enturGooglePubSubAdmin.deleteAllSubscriptions();
   }
 
   @AfterEach
   void stopContext() {
     context.stop();
+    enturGooglePubSubAdmin.deleteAllSubscriptions();
   }
 
   @DynamicPropertySource
