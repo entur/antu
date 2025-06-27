@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import no.entur.antu.Constants;
 import no.entur.antu.config.cache.ValidationState;
 import no.entur.antu.routes.BaseRouteBuilder;
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +66,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
         () -> DATE_TIME_FORMATTER.format(LocalDateTime.now())
       )
       .setHeader(
-        Constants.VALIDATION_REPORT_ID_HEADER,
+        VALIDATION_REPORT_ID_HEADER,
         header(DATASET_REFERENTIAL)
           .append('_')
           .append(exchangeProperty(PROP_REPORT_ID_TIMESTAMP))
@@ -94,6 +95,20 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .routeId("process-job-queue-pubsub");
 
     from("direct:processJob")
+      .validate(header(JOB_TYPE).isNotNull())
+      .filter(this::validationAlreadyComplete)
+      .log(
+        LoggingLevel.INFO,
+        correlation() +
+        "Report ${header." +
+        VALIDATION_REPORT_ID_HEADER +
+        "} is already complete. Ignoring job ${header." +
+        JOB_TYPE +
+        "}."
+      )
+      .stop()
+      //end filter
+      .end()
       .choice()
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_SPLIT))
       .to("direct:splitDataset")
@@ -129,5 +144,17 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
         "google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue"
       )
       .routeId("notify-status");
+  }
+
+  private boolean validationAlreadyComplete(Exchange exchange) {
+    String validationReportId = exchange
+      .getIn()
+      .getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
+    // if the job is not a validation job (examples: refresh stop place cache), the validation report id is not set.
+    // in this case we do not want to reject the message.
+    return (
+      validationReportId != null &&
+      !validationStateRepository.hasValidationState(validationReportId)
+    );
   }
 }

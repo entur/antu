@@ -492,7 +492,7 @@ class InitValidationRouteBuilderTest
     );
 
     notifyStatus.expectedMessageCount(2);
-    notifyStatus.setResultWaitTime(300000);
+    notifyStatus.setResultWaitTime(60_000);
 
     InputStream testDatasetAsStream = getClass()
       .getResourceAsStream('/' + TEST_DATASET_NO_DUPLICATED_ID);
@@ -616,7 +616,7 @@ class InitValidationRouteBuilderTest
     );
 
     notifyStatus.expectedMessageCount(2);
-    notifyStatus.setResultWaitTime(300000);
+    notifyStatus.setResultWaitTime(60_000);
 
     InputStream testDatasetAsStream = getClass()
       .getResourceAsStream('/' + TEST_DATASET_DUPLICATED_ID);
