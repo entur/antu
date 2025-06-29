@@ -9,6 +9,10 @@ import no.entur.antu.config.cache.ValidationState;
 public interface ValidationStateRepository {
   ValidationState getValidationState(String validationReportId);
 
+  default boolean hasValidationState(String validationReportId) {
+    return getValidationState(validationReportId) != null;
+  }
+
   void updateValidationState(
     String validationReportId,
     ValidationState validationState
