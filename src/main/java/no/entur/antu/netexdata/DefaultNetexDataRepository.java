@@ -119,5 +119,11 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
     serviceJourneyInterchangeInfoCache
       .keySet()
       .removeIf(k -> k.startsWith(validationReportId));
+    activeDatesByServiceJourneyIdCache
+      .keySet()
+      .removeIf(k -> k.startsWith(validationReportId));
+    serviceJourneyStopsCache
+      .keySet()
+      .removeIf(k -> k.startsWith(validationReportId));
   }
 }
