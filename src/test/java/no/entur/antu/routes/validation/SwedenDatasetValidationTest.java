@@ -121,7 +121,7 @@ class SwedenDatasetValidationTest extends AntuRouteBuilderIntegrationTestBase {
     );
 
     notifyStatus.expectedMessageCount(2);
-    notifyStatus.setResultWaitTime(150000);
+    notifyStatus.setResultWaitTime(120_000);
 
     InputStream testDatasetAsStream = getClass()
       .getResourceAsStream('/' + TEST_DATASET_SWEDEN_VALIDATION_FILE_NAME);

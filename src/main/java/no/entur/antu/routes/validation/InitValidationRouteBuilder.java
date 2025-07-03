@@ -25,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 import no.entur.antu.Constants;
 import no.entur.antu.config.cache.ValidationState;
 import no.entur.antu.routes.BaseRouteBuilder;
+import org.apache.camel.Exchange;
 import org.apache.camel.LoggingLevel;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +66,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
         () -> DATE_TIME_FORMATTER.format(LocalDateTime.now())
       )
       .setHeader(
-        Constants.VALIDATION_REPORT_ID_HEADER,
+        VALIDATION_REPORT_ID_HEADER,
         header(DATASET_REFERENTIAL)
           .append('_')
           .append(exchangeProperty(PROP_REPORT_ID_TIMESTAMP))
@@ -94,6 +95,20 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .routeId("process-job-queue-pubsub");
 
     from("direct:processJob")
+      .validate(header(JOB_TYPE).isNotNull())
+      .filter(this::isDuplicatedValidationJob)
+      .log(
+        LoggingLevel.INFO,
+        correlation() +
+        "Report ${header." +
+        VALIDATION_REPORT_ID_HEADER +
+        "} is already complete. Ignoring job ${header." +
+        JOB_TYPE +
+        "}."
+      )
+      .stop()
+      //end filter
+      .end()
       .choice()
       .when(header(JOB_TYPE).isEqualTo(JOB_TYPE_SPLIT))
       .to("direct:splitDataset")
@@ -129,5 +144,34 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
         "google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationStatusQueue"
       )
       .routeId("notify-status");
+  }
+
+  /**
+   * Return true if the exchange refers to a validation job that has already been run (duplicated message).
+   *
+   * <ul>
+   *     <li>
+   *      If the exchange does not contain a reference to a validation report id,
+   *      this is not a validation job (examples: refresh stop place cache).
+   *      In this case the method always return false.
+   *     </li>
+   *     <li>
+   *      If the ValidationState repository does not contain a ValidationState for this validation report id, it means
+   *      that the validation is complete and the ValidationState has been removed from the repository. In this case the
+   *      method returns true.
+   *     </li>
+   * </ul>
+   *
+   *
+   */
+  private boolean isDuplicatedValidationJob(Exchange exchange) {
+    String validationReportId = exchange
+      .getIn()
+      .getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
+
+    return (
+      validationReportId != null &&
+      !validationStateRepository.hasValidationState(validationReportId)
+    );
   }
 }
