@@ -47,13 +47,17 @@ public class OrganisationAliasRouteBuilder extends BaseRouteBuilder {
       "master:lockOnAntuRefreshOrganisationAliasCachePeriodically:quartz://antu/refreshOrganisationAliasCache?" +
       quartzTrigger
     )
+      .to("direct:scheduleRefreshOrganisationCache")
+      .routeId("refresh-organisation-alias-cache-quartz");
+
+    from("direct:scheduleRefreshOrganisationCache")
       .setHeader(JOB_TYPE, simple(JOB_TYPE_REFRESH_ORGANISATION_ALIAS_CACHE))
       .log(
         LoggingLevel.INFO,
         correlation() + "Scheduling organisation alias cache refresh job"
       )
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
-      .routeId("refresh-organisation-alias-cache-quartz");
+      .routeId("schedule-refresh-organisation-cache");
 
     from(
       "master:lockOnAntuRefreshOrganisationAliasCachePeriodically:timer://antu/refreshOrganisationAliasCacheAtStartup?repeatCount=1&delay=5000"
