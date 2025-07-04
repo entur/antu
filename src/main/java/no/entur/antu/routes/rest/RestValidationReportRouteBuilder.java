@@ -182,7 +182,25 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .code(200)
       .message("Command accepted")
       .endResponseMessage()
-      .to("direct:adminCacheDumpKeys");
+      .to("direct:adminCacheDumpKeys")
+      .post("/refresh-stop-cache")
+      .description("Refresh the stop cache")
+      .consumes(PLAIN)
+      .produces(PLAIN)
+      .responseMessage()
+      .code(200)
+      .message("Command accepted")
+      .endResponseMessage()
+      .to("direct:adminRefreshStopCache")
+      .post("/refresh-organisation-cache")
+      .description("Refresh the organisation cache")
+      .consumes(PLAIN)
+      .produces(PLAIN)
+      .responseMessage()
+      .code(200)
+      .message("Command accepted")
+      .endResponseMessage()
+      .to("direct:adminRefreshOrganisationCache");
 
     from("direct:adminRouteAuthorizeGet")
       .throwException(new NotFoundException())
@@ -253,6 +271,28 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .bean("cacheAdmin", "dumpKeys")
       .log(LoggingLevel.INFO, correlation() + "Dumped keys")
       .routeId("admin-cache-dump-keys");
+
+    from("direct:adminRefreshStopCache")
+      .to("direct:authorizeAdminRequest")
+      .log(LoggingLevel.INFO, correlation() + "Scheduling stop cache refresh")
+      .process(this::removeAllCamelHttpHeaders)
+      .to("direct:scheduleRefreshStopCache")
+      .log(LoggingLevel.INFO, correlation() + "Scheduled stop cache refresh")
+      .routeId("admin-refresh-stop-cache");
+
+    from("direct:adminRefreshOrganisationCache")
+      .to("direct:authorizeAdminRequest")
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Scheduling organisation cache refresh"
+      )
+      .process(this::removeAllCamelHttpHeaders)
+      .to("direct:scheduleRefreshOrganisationCache")
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Scheduled organisation cache refresh"
+      )
+      .routeId("admin-refresh-organisation-cache");
 
     from("direct:authorizeEditorRequest")
       .validate(header(CODESPACE_PARAM).isNotNull())

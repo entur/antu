@@ -48,13 +48,17 @@ public class StopRouteBuilder extends BaseRouteBuilder {
       "master:lockOnAntuRefreshStopCachePeriodically:quartz://antu/refreshStopPlaceCachePeriodically?" +
       quartzTrigger
     )
+      .to("direct:scheduleRefreshStopCache")
+      .routeId("refresh-stop-cache-periodically");
+
+    from("direct:scheduleRefreshStopCache")
       .log(
         LoggingLevel.INFO,
         correlation() + "Scheduling stop place cache refresh job"
       )
       .setHeader(JOB_TYPE, simple(JOB_TYPE_REFRESH_STOP_CACHE))
       .to("google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue")
-      .routeId("refresh-stop-cache-periodically");
+      .routeId("schedule-refresh-stop-cache");
 
     from(
       "master:lockOnAntuRefreshStopCachePeriodically:timer://antu/refreshStopPlaceCacheAtStartup?repeatCount=1&delay=5000"
