@@ -25,7 +25,7 @@
     <properties>
         <java.version>17</java.version>
         <camel.version>4.10.6</camel.version>
-        <entur.helpers.version>5.18.0</entur.helpers.version>
+        <entur.helpers.version>5.22.0</entur.helpers.version>
         <netex-validator-java.version>10.3.0</netex-validator-java.version>
         <netex-parser-java.version>3.1.52</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
