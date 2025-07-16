@@ -23,7 +23,7 @@ import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
-import static no.entur.antu.routes.memorystore.MemoryStoreRoute.MEMORY_STORE_FILE_NAME;
+import static no.entur.antu.routes.memorystore.MemoryStoreRouteBuilder.MEMORY_STORE_FILE_NAME;
 
 import no.entur.antu.Constants;
 import no.entur.antu.exception.AntuException;

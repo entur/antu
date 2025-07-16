@@ -58,7 +58,7 @@ import org.springframework.boot.test.context.SpringBootTest;
   classes = TestApp.class,
   properties = { "antu.netex.validation.entries.max=1" }
 )
-class ValidateFileRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
+class MemoryStoreRouteBuilderTest extends AntuRouteBuilderIntegrationTestBase {
 
   @Produce("direct:saveValidationReport")
   protected ProducerTemplate saveValidationReport;
