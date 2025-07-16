@@ -70,8 +70,8 @@ public class RedisNetexIdRepository implements NetexIdRepository {
       RSet<String> localNetexIds = redissonClient.getSet(netexLocalIdsKey);
       RSet<String> duplicatedIds = redissonClient.getSet(duplicatedNetexIdsKey);
       if (localNetexIds.isExists()) {
-        LOGGER.warn(
-          "Validation already run for file {} in report {}",
+        LOGGER.info(
+          "Validation already run for file {} in report {}. Ignoring",
           filename,
           reportId
         );

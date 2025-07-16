@@ -44,8 +44,8 @@ public record UnexpectedDistanceInServiceLinkContext(
       QuayId toQuayId = getQuayId(serviceLink.getToPointRef());
 
       if (fromQuayId == null || toQuayId == null) {
-        LOGGER.warn(
-          "Could not find quayId for either, from stopPoint or to stopPoint in serviceLink {}",
+        LOGGER.info(
+          "Could not find quayId for either 'from' stopPoint or 'to' stopPoint in serviceLink {}",
           serviceLink.getId()
         );
         return null;

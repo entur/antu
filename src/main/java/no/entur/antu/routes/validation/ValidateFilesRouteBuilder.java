@@ -82,7 +82,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       // it does not exist anymore after the report is generated and all temporary files are deleted
       .doCatch(AntuMemoryStoreFileNotFoundException.class)
       .log(
-        LoggingLevel.WARN,
+        LoggingLevel.INFO,
         correlation() +
         "NeTEx file ${header." +
         FILE_HANDLE +

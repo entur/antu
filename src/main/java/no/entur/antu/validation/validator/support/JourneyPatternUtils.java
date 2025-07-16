@@ -25,7 +25,7 @@ public class JourneyPatternUtils {
       .getRef();
 
     if (scheduledStopPointRef == null) {
-      log.warn(
+      log.info(
         "Scheduled stop point ref is null for stop point {}",
         stopPointInJourneyPattern.getId()
       );
@@ -41,7 +41,7 @@ public class JourneyPatternUtils {
     );
 
     if (quayId == null) {
-      log.warn(
+      log.info(
         "Quay ID not found for scheduled stop point id {}",
         scheduledStopPointId
       );
@@ -52,7 +52,7 @@ public class JourneyPatternUtils {
       validationContext.coordinatesForQuayId(quayId);
 
     if (coordinatesForQuayId == null) {
-      log.warn("Quay coordinates not found for quay id {}", quayId);
+      log.info("Quay coordinates not found for quay id {}", quayId);
       return null;
     }
 
