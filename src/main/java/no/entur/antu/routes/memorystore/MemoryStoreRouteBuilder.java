@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * Using a memory store gives better performance than storing temporary files in Google Cloud Storage.
  */
 @Component
-public class MemoryStoreRoute extends BaseRouteBuilder {
+public class MemoryStoreRouteBuilder extends BaseRouteBuilder {
 
   public static final String MEMORY_STORE_FILE_NAME = "MemoryStoreFileName";
 

@@ -81,9 +81,9 @@ public class OrganisationAliasRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() + "Refreshing organisation alias cache"
       )
-      .process(this::extendAckDeadline)
+      .to("direct:extendAckDeadline")
       .bean("organisationAliasRepository", "refreshCache")
-      .process(this::extendAckDeadline)
+      .to("direct:extendAckDeadline")
       .log(
         LoggingLevel.INFO,
         correlation() + "Refreshed organisation alias cache"

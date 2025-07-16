@@ -23,7 +23,7 @@ import static no.entur.antu.Constants.FILE_HANDLE;
 import static no.entur.antu.Constants.NETEX_FILE_NAME;
 import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
 import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
-import static no.entur.antu.routes.memorystore.MemoryStoreRoute.MEMORY_STORE_FILE_NAME;
+import static no.entur.antu.routes.memorystore.MemoryStoreRouteBuilder.MEMORY_STORE_FILE_NAME;
 
 import no.entur.antu.Constants;
 import no.entur.antu.exception.AntuException;
@@ -70,7 +70,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}"
       )
-      .process(this::extendAckDeadline)
+      .to("direct:extendAckDeadline")
       .setProperty(PROP_STOP_WATCH, StopWatch::new)
       .setProperty(PROP_ALL_NETEX_FILE_NAMES, body())
       .doTry()
