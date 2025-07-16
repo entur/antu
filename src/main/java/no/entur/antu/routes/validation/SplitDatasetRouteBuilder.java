@@ -130,7 +130,7 @@ public class SplitDatasetRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() + "Uploaded ${header.CamelSplitIndex} NeTEx files"
       )
-      .process(this::extendAckDeadline)
+      .to("direct:extendAckDeadline")
       .end()
       .log(
         LoggingLevel.DEBUG,

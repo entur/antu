@@ -70,7 +70,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() + "Validating NeTEx file ${header." + FILE_HANDLE + "}"
       )
-      .process(this::extendAckDeadline)
+      .to("direct:extendAckDeadline")
       .setProperty(PROP_STOP_WATCH, StopWatch::new)
       .setProperty(PROP_ALL_NETEX_FILE_NAMES, body())
       .doTry()
