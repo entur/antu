@@ -48,7 +48,6 @@ import java.util.stream.Stream;
 import no.entur.antu.Constants;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.exception.RetryableAntuException;
-import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.metrics.AntuPrometheusMetricsService;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validation.AntuNetexValidationProgressCallback;
@@ -278,15 +277,18 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       )
       .doTry()
       .to("direct:downloadBlobFromMemoryStore")
-      .doCatch(AntuMemoryStoreFileNotFoundException.class)
+      // The file could be missing if this exchange is triggered by a duplicated PubSub message received
+      // after the validation is complete. At that point in time, all temporary files are already deleted.
+      .filter(body().isNull())
       .log(
-        LoggingLevel.WARN,
+        LoggingLevel.INFO,
         correlation() +
         "Line validation report ${header." +
         FILE_HANDLE +
         "} has already been aggregated and removed from the memory store. Ignoring."
       )
       .stop()
+      // end filter
       .end()
       .log(
         LoggingLevel.DEBUG,

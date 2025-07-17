@@ -1,14 +1,12 @@
 package no.entur.antu.routes.validation;
 
 import static no.entur.antu.Constants.*;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
 import java.util.Map;
 import no.entur.antu.AntuRouteBuilderIntegrationTestBase;
 import no.entur.antu.TestApp;
-import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Produce;
@@ -89,9 +87,9 @@ class ValidateFilesRouteBuilderTest
 
   @Test
   void validateMissingFile() throws InterruptedException {
-    downloadSingleNetexFileFromMemoryStore.whenAnyExchangeReceived(exchange -> {
-      throw new AntuMemoryStoreFileNotFoundException("file not found");
-    });
+    downloadSingleNetexFileFromMemoryStore.whenAnyExchangeReceived(exchange ->
+      exchange.getIn().setBody(null)
+    );
     reportSystemError.expectedMessageCount(0);
     notifyValidationReportAggregator.expectedMessageCount(0);
     context.start();
@@ -124,7 +122,7 @@ class ValidateFilesRouteBuilderTest
     });
 
     reportSystemError.expectedMessageCount(1);
-    reportSystemError.whenAnyExchangeReceived(exchange -> {
+    reportSystemError.whenAnyExchangeReceived(exchange ->
       exchange
         .getIn()
         .setBody(
@@ -134,8 +132,8 @@ class ValidateFilesRouteBuilderTest
               .getIn()
               .getHeader(VALIDATION_REPORT_ID_HEADER, String.class)
           )
-        );
-    });
+        )
+    );
     notifyValidationReportAggregator.expectedMessageCount(1);
     context.start();
     validateNetex.sendBodyAndHeaders(" ", headers);

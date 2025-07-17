@@ -1,5 +1,7 @@
 package no.entur.antu.memorystore;
 
+import javax.annotation.Nullable;
+
 /**
  * A repository used to store temporary files created during the validation process.
  */
@@ -14,9 +16,9 @@ public interface TemporaryFileRepository {
 
   /**
    * Download a file from the temporary file repository.
-   * @param validationReportId the report id.
-   * @param fileName the name of the temporary file.
+   * Return null if the file does not exist.
    */
+  @Nullable
   byte[] download(String validationReportId, String fileName);
 
   /**
