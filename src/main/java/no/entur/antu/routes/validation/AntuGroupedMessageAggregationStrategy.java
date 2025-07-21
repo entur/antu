@@ -12,12 +12,23 @@ import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for message aggregator containing logic for propagating message headers into the aggregated message.
  */
 public abstract class AntuGroupedMessageAggregationStrategy
   extends GroupedMessageAggregationStrategy {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    AntuGroupedMessageAggregationStrategy.class
+  );
+
+  @Override
+  public void timeout(Exchange exchange, int index, int total, long timeout) {
+    LOGGER.error("A timeout occurred during aggregation");
+  }
 
   /**
    * Copy the validation headers that should be propagated into the aggregated message.
