@@ -240,10 +240,6 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         );
       // If the fromJourneyStops is null or empty, no interchange is possible.
       if (fromJourneyStops == null || fromJourneyStops.isEmpty()) {
-        LOGGER.info(
-          "Skipping interchange waiting time validation for {} as no from journey stops are available",
-          serviceJourneyInterchangeInfo.interchangeId()
-        );
         continue;
       }
       ServiceJourneyStop fromJourneyStop =
@@ -258,10 +254,6 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
         );
       // If the fromJourneyStops is null or empty, no interchange is possible.
       if (toJourneyStops == null || toJourneyStops.isEmpty()) {
-        LOGGER.info(
-          "Skipping interchange waiting time validation for {} as no to journey stops are available",
-          serviceJourneyInterchangeInfo.interchangeId()
-        );
         continue;
       }
       ServiceJourneyStop toJourneyStop =
