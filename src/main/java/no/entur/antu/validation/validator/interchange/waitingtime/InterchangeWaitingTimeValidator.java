@@ -266,9 +266,7 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       }
       ServiceJourneyStop toJourneyStop =
         getServiceJourneyStopByScheduledStopPointId(
-          serviceJourneyStopsByServiceJourneyId.get(
-            serviceJourneyInterchangeInfo.toJourneyRef()
-          ),
+          toJourneyStops,
           serviceJourneyInterchangeInfo.toStopPoint()
         );
 
