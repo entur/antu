@@ -14,6 +14,8 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
@@ -54,11 +56,14 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
     ValidationReport validationReport = runTestFor();
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+    Assertions.assertEquals(
+      0,
+      validationReport.getValidationReportEntries().size()
+    );
   }
 
   @Test
-  void interchangeFromStopPointIsNotAPartOfVehicleJourneys() {
+  void interchangeWithNoExistingFromServiceJourneyGiveNoErrors() {
     // Mocking only the toPointRef, to test that the fromPointRef is not part of the vehicle journey
     mockGetServiceJourneyStops(
       Map.of(
@@ -81,15 +86,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
     Collection<ValidationReportEntry> validationReportEntries =
       validationReport.getValidationReportEntries();
-    assertThat(validationReportEntries.size(), is(1));
-    validationReportEntries.forEach(entry ->
-      assertThat(
-        entry.getName(),
-        is(
-          StopPointsInVehicleJourneyValidator.RULE_FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF.name()
-        )
-      )
-    );
+    Assertions.assertEquals(0, validationReportEntries.size());
   }
 
   @Test
@@ -98,7 +95,10 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       StopPointsInVehicleJourneyValidator.class
     );
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+    Assertions.assertEquals(
+      0,
+      validationReport.getValidationReportEntries().size()
+    );
   }
 
   @Test
@@ -118,11 +118,14 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
       StopPointsInVehicleJourneyValidator.class
     );
 
-    assertThat(validationReport.getValidationReportEntries().size(), is(0));
+    Assertions.assertEquals(
+      0,
+      validationReport.getValidationReportEntries().size()
+    );
   }
 
   @Test
-  void interchangeToStopPointIsNotAPartOfVehicleJourneys() {
+  void interchangeWithNoExistingToServiceJourneyGiveNoErrors() {
     // Mocking only the fromPointRef, to test that the toPointRef is not part of the vehicle journey
     mockGetServiceJourneyStops(
       Map.of(
@@ -145,14 +148,86 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
     Collection<ValidationReportEntry> validationReportEntries =
       validationReport.getValidationReportEntries();
-    assertThat(validationReportEntries.size(), is(1));
-    validationReportEntries.forEach(entry ->
-      assertThat(
-        entry.getName(),
-        is(
-          StopPointsInVehicleJourneyValidator.RULE_TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF.name()
+    Assertions.assertEquals(0, validationReportEntries.size());
+  }
+
+  @Test
+  void interchangeWithNoMatchingFromStopsGivesValidationError() {
+    mockGetServiceJourneyStops(
+      Map.of(
+        ServiceJourneyId.ofValidId("TST:ServiceJourney:1"),
+        List.of(
+          new ServiceJourneyStop(
+            new ScheduledStopPointId("TST:ScheduledStopPoint:999"),
+            null,
+            null,
+            0,
+            0,
+            true,
+            true
+          )
         )
       )
+    );
+
+    ValidationReport validationReport = runTestFor();
+    Assertions.assertEquals(
+      1,
+      validationReport.getValidationReportEntries().size()
+    );
+    var validationReportEntry = validationReport
+      .getValidationReportEntries()
+      .iterator()
+      .next();
+    Assertions.assertEquals(
+      StopPointsInVehicleJourneyValidator.RULE_FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF.name(),
+      validationReportEntry.getName()
+    );
+  }
+
+  @Test
+  void interchangeWithNoMatchingToStopsGivesValidationError() {
+    mockGetServiceJourneyStops(
+      Map.of(
+        ServiceJourneyId.ofValidId("TST:ServiceJourney:1"),
+        List.of(
+          new ServiceJourneyStop(
+            new ScheduledStopPointId("TST:ScheduledStopPoint:1"),
+            null,
+            null,
+            0,
+            0,
+            true,
+            true
+          )
+        ),
+        ServiceJourneyId.ofValidId("TST:ServiceJourney:2"),
+        List.of(
+          new ServiceJourneyStop(
+            new ScheduledStopPointId("TST:ScheduledStopPoint:999"),
+            null,
+            null,
+            0,
+            0,
+            true,
+            true
+          )
+        )
+      )
+    );
+
+    ValidationReport validationReport = runTestFor();
+    Assertions.assertEquals(
+      1,
+      validationReport.getValidationReportEntries().size()
+    );
+    var validationReportEntry = validationReport
+      .getValidationReportEntries()
+      .iterator()
+      .next();
+    Assertions.assertEquals(
+      StopPointsInVehicleJourneyValidator.RULE_TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF.name(),
+      validationReportEntry.getName()
     );
   }
 

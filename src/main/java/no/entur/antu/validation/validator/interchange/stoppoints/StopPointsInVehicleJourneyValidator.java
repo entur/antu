@@ -94,8 +94,11 @@ public class StopPointsInVehicleJourneyValidator
   private ValidationReportEntry validateStopPoint(
     StopPointsInVehicleJourneyContext context
   ) {
+    if (context.serviceJourneyStopsForFromJourneyRef() == null) {
+      return null;
+    }
+
     if (
-      context.serviceJourneyStopsForFromJourneyRef() == null ||
       context
         .serviceJourneyStopsForFromJourneyRef()
         .stream()
@@ -116,8 +119,11 @@ public class StopPointsInVehicleJourneyValidator
       );
     }
 
+    if (context.serviceJourneyStopsForToJourneyRef() == null) {
+      return null;
+    }
+
     if (
-      context.serviceJourneyStopsForToJourneyRef() == null ||
       context
         .serviceJourneyStopsForToJourneyRef()
         .stream()
