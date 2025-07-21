@@ -66,7 +66,7 @@ public class InterchangeForAlightingAndBoardingValidator
         fromJourneyRef
       );
       if (feederStops == null || feederStops.isEmpty()) {
-        LOGGER.error(
+        LOGGER.warn(
           "No feeder stops found in cache for interchange {} from journey {}",
           serviceJourneyInterchangeInfo.interchangeId(),
           fromJourneyRef.id()
@@ -78,7 +78,7 @@ public class InterchangeForAlightingAndBoardingValidator
         toJourneyRef
       );
       if (consumerStops == null || consumerStops.isEmpty()) {
-        LOGGER.error(
+        LOGGER.warn(
           "No consumer stops found in cache for interchange {} from journey {}",
           serviceJourneyInterchangeInfo.interchangeId(),
           toJourneyRef.id()
