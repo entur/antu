@@ -206,8 +206,7 @@ public class TimetableDataValidatorConfig {
     );
 
     List<DatasetValidator> netexTimetableDatasetValidators = new ArrayList<>();
-    // temporarily disabled due to error
-    // netexTimetableDatasetValidators.add(duplicateLineNameValidator);
+    netexTimetableDatasetValidators.add(duplicateLineNameValidator);
     netexTimetableDatasetValidators.add(stopPointsInVehicleJourneyValidator);
 
     if (interchangeAlightingAndBoardingValidationEnabled) {

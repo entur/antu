@@ -142,8 +142,7 @@ public class TimetableDataFinlandValidatorConfig {
     );
 
     List<DatasetValidator> netexTimetableDatasetValidators = List.of(
-      // temporarily disabled due to error
-      // duplicateLineNameValidator,
+      duplicateLineNameValidator,
       stopPointsInVehicleJourneyValidator
     );
 
