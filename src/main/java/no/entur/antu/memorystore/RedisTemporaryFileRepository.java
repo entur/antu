@@ -36,7 +36,13 @@ public class RedisTemporaryFileRepository implements TemporaryFileRepository {
     if (temporaryFile.isExists()) {
       return (byte[]) temporaryFile.get();
     } else {
-      return null;
+      throw new AntuMemoryStoreFileNotFoundException(
+        "File " +
+        fileName +
+        " for validation report " +
+        validationReportId +
+        " not found in the memory store"
+      );
     }
   }
 

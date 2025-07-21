@@ -28,6 +28,7 @@ import static no.entur.antu.routes.memorystore.MemoryStoreRouteBuilder.MEMORY_ST
 import no.entur.antu.Constants;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.exception.RetryableAntuException;
+import no.entur.antu.memorystore.AntuMemoryStoreFileNotFoundException;
 import no.entur.antu.routes.BaseRouteBuilder;
 import no.entur.antu.validation.AntuNetexValidationProgressCallback;
 import no.entur.antu.validation.ValidationReportTransformer;
@@ -52,7 +53,7 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
   private static final String PROP_STOP_WATCH = "PROP_STOP_WATCH";
   private static final String PROP_NETEX_VALIDATION_CALLBACK =
     "PROP_NETEX_VALIDATION_CALLBACK";
-  private final ValidationStateRepository validationStateRepository;
+  private ValidationStateRepository validationStateRepository;
 
   public ValidateFilesRouteBuilder(
     ValidationStateRepository validationStateRepository
@@ -75,9 +76,11 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
       .doTry()
       .setHeader(MEMORY_STORE_FILE_NAME, header(NETEX_FILE_NAME))
       .to("direct:downloadSingleNetexFileFromMemoryStore")
-      // The file could be missing if this exchange is triggered by a duplicated PubSub message received
-      // after the validation is complete. At that point in time, all temporary files are already deleted.
-      .filter(body().isNull())
+      .setProperty(Constants.PROP_NETEX_FILE_CONTENT, body())
+      .to("direct:runNetexValidators")
+      // Duplicated PubSub messages are detected when trying to download the NeTEx file:
+      // it does not exist anymore after the report is generated and all temporary files are deleted
+      .doCatch(AntuMemoryStoreFileNotFoundException.class)
       .log(
         LoggingLevel.INFO,
         correlation() +
@@ -86,11 +89,6 @@ public class ValidateFilesRouteBuilder extends BaseRouteBuilder {
         "} has already been validated and removed from the memory store. Ignoring."
       )
       .stop()
-      // end filter
-      .end()
-      .setProperty(Constants.PROP_NETEX_FILE_CONTENT, body())
-      .to("direct:runNetexValidators")
-      .endDoTry()
       .doCatch(
         InterruptedException.class,
         RetryableNetexValidationException.class,
