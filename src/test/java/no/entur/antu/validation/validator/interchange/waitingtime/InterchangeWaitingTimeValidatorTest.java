@@ -264,17 +264,27 @@ class InterchangeWaitingTimeValidatorTest {
 
   private void setupTestCaseWithReferenceToNonExistentToServiceJourney() {
     var nonExistentToJourneyId = "Test:ServiceJourney:999";
-    var interchange = new ServiceJourneyInterchange()
-      .withId(serviceJourneyInterchangeId)
-      .withFromJourneyRef(
+    var interchange = createInterchangeWithMaximumWaitTime()
+      .withToJourneyRef(
         new VehicleJourneyRefStructure()
           .withRef(ServiceJourneyId.ofValidId(nonExistentToJourneyId).id())
       );
+
+    Map<String, List<LocalDateTime>> activeDates = Map.of(
+      fromJourneyId,
+      List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
+    );
+
+    Map<String, ServiceJourneyStop> stops = Map.of(
+      fromJourneyId,
+      createArrivalStop(fromStopPoint, 14, 0, 0, Optional.empty())
+    );
+
     setupTestData(
       REFERENCE_TO_NON_EXISTENT_TO_SERVICE_JOURNEY,
       interchange,
-      Map.of(),
-      Map.of()
+      activeDates,
+      stops
     );
   }
 
