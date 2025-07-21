@@ -22,7 +22,7 @@ data:
     # the Camel shutdown timeout must be shorter than the Kubernetes terminationGracePeriod
     antu.shutdown.timeout=175
     antu.camel.redelivery.max=0
-    
+
     # Agreement registry
     antu.organisation.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
     antu.agreement.registry.url={{ .Values.agreementRegistryUrl }}
@@ -45,8 +45,6 @@ data:
     antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}
     spring.cloud.gcp.project-id=${antu.pubsub.project.id}
     camel.component.google-pubsub.synchronous-pull-retryable-codes=DEADLINE_EXCEEDED
-    # extend the ACK deadline to 200s to be able to validate XML schema on large files
-    antu.camel.pubsub.deadline.extension=200
 
     #OAuth2 Resource Server
     antu.oauth2.resourceserver.auth0.ror.claim.namespace=https://ror.entur.io/
