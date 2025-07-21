@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;
+import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.rutebanken.netex.model.*;
 
 /**
@@ -26,6 +27,7 @@ public class NetexTestDataSample {
   static final String FLEXIBLE_STOP_PLACE_ID = "RUT:FlexibleStopPlace:1";
   static final String LINE_ID = "RUT:Line:1";
   static final String ROUTE_ID = "RUT:Route:1";
+  static final String INTERCHANGE_ID = "RUT:ServiceJourneyInterchange:1";
 
   private static JAXBElement<ScheduledStopPointRefStructure> createScheduledStopPointRef(
     String id
@@ -305,5 +307,20 @@ public class NetexTestDataSample {
         new TimetabledPassingTimes_RelStructure()
           .withTimetabledPassingTime(inconsistentPassingTime)
       );
+  }
+
+  public static ServiceJourneyInterchange defaultServiceJourneyInterchange() {
+    return new ServiceJourneyInterchange().withId(INTERCHANGE_ID);
+  }
+
+  public static ServiceJourneyInterchange serviceJourneyInterchangeWithServiceJourneyRefs(
+    String fromJourneyRef,
+    String toJourneyRef
+  ) {
+    return defaultServiceJourneyInterchange()
+      .withFromJourneyRef(
+        new VehicleJourneyRefStructure().withRef(fromJourneyRef)
+      )
+      .withToJourneyRef(new VehicleJourneyRefStructure().withRef(toJourneyRef));
   }
 }
