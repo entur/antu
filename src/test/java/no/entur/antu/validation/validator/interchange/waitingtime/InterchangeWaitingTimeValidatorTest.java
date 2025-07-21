@@ -22,6 +22,7 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.*;
@@ -37,6 +38,10 @@ class InterchangeWaitingTimeValidatorTest {
     "idActualWaitingTimeExceedingWarningThreshold";
   private static final String NO_INTERCHANGE_POSSIBLE =
     "idNoInterchangePossible";
+  private static final String REFERENCE_TO_NON_EXISTENT_FROM_SERVICE_JOURNEY =
+    "referenceToNonExistentFromServiceJourney";
+  private static final String REFERENCE_TO_NON_EXISTENT_TO_SERVICE_JOURNEY =
+    "referenceToNonExistentToServiceJourney";
 
   private static String serviceJourneyInterchangeId =
     "ServiceJourneyInterchange:1";
@@ -221,6 +226,74 @@ class InterchangeWaitingTimeValidatorTest {
       createDepartureStop(toStopPoint, 16, 59, 0, Optional.empty())
     );
     setupTestData(NO_INTERCHANGE_POSSIBLE, interchange, activeDates, stops);
+  }
+
+  private void setupTestCaseWithReferenceToNonExistentFromServiceJourney() {
+    var nonExistentFromJourneyId = "Test:ServiceJourney:999";
+    var interchange = new ServiceJourneyInterchange()
+      .withId(serviceJourneyInterchangeId)
+      .withFromJourneyRef(
+        new VehicleJourneyRefStructure()
+          .withRef(ServiceJourneyId.ofValidId(nonExistentFromJourneyId).id())
+      );
+    setupTestData(
+      REFERENCE_TO_NON_EXISTENT_FROM_SERVICE_JOURNEY,
+      interchange,
+      Map.of(),
+      Map.of()
+    );
+  }
+
+  @Test
+  void testInterchangeReferringToNonExistentFromServiceJourneyDoesNotThrow() {
+    setupTestCaseWithReferenceToNonExistentFromServiceJourney();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      REFERENCE_TO_NON_EXISTENT_FROM_SERVICE_JOURNEY
+    );
+    Assertions.assertEquals(
+      validationReport,
+      validator.validate(validationReport)
+    );
+  }
+
+  private void setupTestCaseWithReferenceToNonExistentToServiceJourney() {
+    var nonExistentToJourneyId = "Test:ServiceJourney:999";
+    var interchange = new ServiceJourneyInterchange()
+      .withId(serviceJourneyInterchangeId)
+      .withFromJourneyRef(
+        new VehicleJourneyRefStructure()
+          .withRef(ServiceJourneyId.ofValidId(nonExistentToJourneyId).id())
+      );
+    setupTestData(
+      REFERENCE_TO_NON_EXISTENT_TO_SERVICE_JOURNEY,
+      interchange,
+      Map.of(),
+      Map.of()
+    );
+  }
+
+  @Test
+  void testInterchangeReferringToNonExistentToServiceJourneyDoesNotThrow() {
+    setupTestCaseWithReferenceToNonExistentToServiceJourney();
+    InterchangeWaitingTimeValidator validator =
+      new InterchangeWaitingTimeValidator(
+        new SimpleValidationEntryFactory(),
+        netexDataRepository
+      );
+    ValidationReport validationReport = new ValidationReport(
+      CODESPACE,
+      REFERENCE_TO_NON_EXISTENT_TO_SERVICE_JOURNEY
+    );
+    Assertions.assertEquals(
+      validationReport,
+      validator.validate(validationReport)
+    );
   }
 
   @Test
