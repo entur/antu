@@ -83,7 +83,9 @@ public class InterchangeServiceJourneyReferencesExistValidator
 
   @Override
   public ValidationReport validate(ValidationReport validationReport) {
-    LOGGER.info("Starting validation of interchange waiting times");
+    LOGGER.info(
+      "Starting validation of service journey references in interchanges"
+    );
 
     String validationReportId = validationReport.getValidationReportId();
 
@@ -105,6 +107,7 @@ public class InterchangeServiceJourneyReferencesExistValidator
       );
     }
 
+    LOGGER.info("Done validating service journey references in interchanges");
     return validationReport;
   }
 }
