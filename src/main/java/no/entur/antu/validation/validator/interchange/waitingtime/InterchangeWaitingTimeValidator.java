@@ -234,13 +234,36 @@ public class InterchangeWaitingTimeValidator extends AbstractDatasetValidator {
       netexDataRepository.serviceJourneyStops(validationReportId);
 
     for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo : serviceJourneyInterchangeInfoList) {
+      List<ServiceJourneyStop> fromJourneyStops =
+        serviceJourneyStopsByServiceJourneyId.get(
+          serviceJourneyInterchangeInfo.fromJourneyRef()
+        );
+      // If the fromJourneyStops is null or empty, no interchange is possible.
+      if (fromJourneyStops == null || fromJourneyStops.isEmpty()) {
+        LOGGER.info(
+          "Skipping interchange waiting time validation for {} as no from journey stops are available",
+          serviceJourneyInterchangeInfo.interchangeId()
+        );
+        continue;
+      }
       ServiceJourneyStop fromJourneyStop =
         getServiceJourneyStopByScheduledStopPointId(
-          serviceJourneyStopsByServiceJourneyId.get(
-            serviceJourneyInterchangeInfo.fromJourneyRef()
-          ),
+          fromJourneyStops,
           serviceJourneyInterchangeInfo.fromStopPoint()
         );
+
+      List<ServiceJourneyStop> toJourneyStops =
+        serviceJourneyStopsByServiceJourneyId.get(
+          serviceJourneyInterchangeInfo.toJourneyRef()
+        );
+      // If the fromJourneyStops is null or empty, no interchange is possible.
+      if (toJourneyStops == null || toJourneyStops.isEmpty()) {
+        LOGGER.info(
+          "Skipping interchange waiting time validation for {} as no to journey stops are available",
+          serviceJourneyInterchangeInfo.interchangeId()
+        );
+        continue;
+      }
       ServiceJourneyStop toJourneyStop =
         getServiceJourneyStopByScheduledStopPointId(
           serviceJourneyStopsByServiceJourneyId.get(
