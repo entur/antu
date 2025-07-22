@@ -71,15 +71,15 @@ import org.springframework.context.annotation.Configuration;
 public class TimetableDataValidatorConfig {
 
   @Value("${interchange-waiting-time-validation-enabled:false}")
-  private Boolean interchangeWaitingTimeValidationEnabled;
+  private boolean interchangeWaitingTimeValidationEnabled;
 
   @Value("${interchange-alighting-and-boarding-validation-enabled:false}")
-  private Boolean interchangeAlightingAndBoardingValidationEnabled;
+  private boolean interchangeAlightingAndBoardingValidationEnabled;
 
   @Value(
     "${interchange-service-journey-references-exist-validator-enabled:false}"
   )
-  private Boolean interchangeServiceJourneyReferencesExistValidatorEnabled;
+  private boolean interchangeServiceJourneyReferencesExistValidatorEnabled;
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(

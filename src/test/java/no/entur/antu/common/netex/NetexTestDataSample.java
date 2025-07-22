@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;
-import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.rutebanken.netex.model.*;
 
 /**

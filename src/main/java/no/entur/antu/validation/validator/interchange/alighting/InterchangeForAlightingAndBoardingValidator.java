@@ -2,14 +2,11 @@ package no.entur.antu.validation.validator.interchange.alighting;
 
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.validation.validator.interchange.waitingtime.InterchangeWaitingTimeValidator;
 import org.entur.netex.validation.validator.*;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This validator checks that alighting is allowed for the FromStopPoint referred to by a ServiceJourneyInterchange.
@@ -19,10 +16,6 @@ import org.slf4j.LoggerFactory;
  */
 public class InterchangeForAlightingAndBoardingValidator
   extends AbstractDatasetValidator {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    InterchangeForAlightingAndBoardingValidator.class
-  );
 
   private final NetexDataRepository netexDataRepository;
 
