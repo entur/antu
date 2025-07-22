@@ -28,6 +28,7 @@ import no.entur.antu.validation.validator.interchange.alighting.InterchangeForAl
 import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterchangeDistanceValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
+import no.entur.antu.validation.validator.interchange.refs.InterchangeServiceJourneyReferencesExistValidator;
 import no.entur.antu.validation.validator.interchange.stoppoints.StopPointsInVehicleJourneyValidator;
 import no.entur.antu.validation.validator.interchange.waitingtime.InterchangeWaitingTimeValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
@@ -70,10 +71,15 @@ import org.springframework.context.annotation.Configuration;
 public class TimetableDataValidatorConfig {
 
   @Value("${interchange-waiting-time-validation-enabled:false}")
-  private Boolean interchangeWaitingTimeValidationEnabled;
+  private boolean interchangeWaitingTimeValidationEnabled;
 
   @Value("${interchange-alighting-and-boarding-validation-enabled:false}")
-  private Boolean interchangeAlightingAndBoardingValidationEnabled;
+  private boolean interchangeAlightingAndBoardingValidationEnabled;
+
+  @Value(
+    "${interchange-service-journey-references-exist-validator-enabled:false}"
+  )
+  private boolean interchangeServiceJourneyReferencesExistValidatorEnabled;
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(
@@ -146,6 +152,19 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
+  public InterchangeServiceJourneyReferencesExistValidator interchangeServiceJourneyReferencesExistValidator(
+    @Qualifier(
+      "validationReportEntryFactory"
+    ) ValidationReportEntryFactory validationReportEntryFactory,
+    NetexDataRepository netexDataRepository
+  ) {
+    return new InterchangeServiceJourneyReferencesExistValidator(
+      validationReportEntryFactory,
+      netexDataRepository
+    );
+  }
+
+  @Bean
   public NetexValidatorsRunner timetableDataValidatorsRunner(
     @Qualifier(
       "validationReportEntryFactory"
@@ -164,6 +183,7 @@ public class TimetableDataValidatorConfig {
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     InterchangeForAlightingAndBoardingValidator interchangeForAlightingAndBoardingValidator,
+    InterchangeServiceJourneyReferencesExistValidator interchangeServiceJourneyReferencesExistValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
     InterchangeWaitingTimeValidator interchangeWaitingTimeValidator,
     LineInfoCollector lineInfoCollector,
@@ -217,6 +237,12 @@ public class TimetableDataValidatorConfig {
 
     if (interchangeWaitingTimeValidationEnabled) {
       netexTimetableDatasetValidators.add(interchangeWaitingTimeValidator);
+    }
+
+    if (interchangeServiceJourneyReferencesExistValidatorEnabled) {
+      netexTimetableDatasetValidators.add(
+        interchangeServiceJourneyReferencesExistValidator
+      );
     }
 
     List<NetexDataCollector> commonDataCollectors = List.of(

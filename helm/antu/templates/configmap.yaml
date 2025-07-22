@@ -109,6 +109,7 @@ data:
     # Feature flags
     interchange-waiting-time-validation-enabled={{ .Values.interchangeWaitingTimeValidationEnabled }}
     interchange-alighting-and-boarding-validation-enabled={{ .Values.alightingAndBoardingValidationEnabled }}
+    interchange-service-journey-references-exist-validator-enabled={{ .Values.interchangeServiceJourneyReferencesExistValidatorEnabled }}
 
 kind: ConfigMap
 metadata:
