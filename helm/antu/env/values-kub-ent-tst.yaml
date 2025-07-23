@@ -18,7 +18,7 @@ agreementRegistryUrl: https://api.entur.io/agreements/v1
 
 interchangeWaitingTimeValidationEnabled: true
 alightingAndBoardingValidationEnabled: true
-interchangeServiceJourneyReferencesExistValidatorEnabled: false
+interchangeServiceJourneyReferencesExistValidatorEnabled: true
 
 baba:
   service: http://baba.tst.entur.internal
