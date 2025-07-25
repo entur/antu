@@ -1,14 +1,6 @@
 package no.entur.antu.routes.validation;
 
-import static no.entur.antu.Constants.DATASET_CODESPACE;
-import static no.entur.antu.Constants.DATASET_REFERENTIAL;
-import static no.entur.antu.Constants.VALIDATION_CLIENT_HEADER;
-import static no.entur.antu.Constants.VALIDATION_CORRELATION_ID_HEADER;
-import static no.entur.antu.Constants.VALIDATION_DATASET_FILE_HANDLE_HEADER;
-import static no.entur.antu.Constants.VALIDATION_IMPORT_TYPE;
-import static no.entur.antu.Constants.VALIDATION_PROFILE_HEADER;
-import static no.entur.antu.Constants.VALIDATION_REPORT_ID_HEADER;
-import static no.entur.antu.Constants.VALIDATION_STAGE_HEADER;
+import static no.entur.antu.Constants.*;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.processor.aggregate.GroupedMessageAggregationStrategy;
@@ -27,7 +19,19 @@ public abstract class AntuGroupedMessageAggregationStrategy
 
   @Override
   public void timeout(Exchange exchange, int index, int total, long timeout) {
-    LOGGER.error("A timeout occurred during aggregation");
+    String reportId = exchange
+      .getIn()
+      .getHeader(VALIDATION_REPORT_ID_HEADER, String.class);
+    String referential = exchange
+      .getIn()
+      .getHeader(DATASET_REFERENTIAL, String.class);
+    String jobType = exchange.getIn().getHeader(JOB_TYPE, String.class);
+    LOGGER.error(
+      "A timeout occurred during aggregation [reportId = {}, referential = {}, jobType = {}]",
+      reportId,
+      referential,
+      jobType
+    );
   }
 
   /**
