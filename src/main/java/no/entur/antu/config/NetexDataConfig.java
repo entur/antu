@@ -31,14 +31,22 @@ public class NetexDataConfig {
     ) Map<String, List<String>> serviceJourneyInterchangeInfoCache,
     @Qualifier(
       ACTIVE_DATES_BY_SERVICE_JOURNEY_ID
-    ) Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyRefCache
+    ) Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyRefCache,
+    @Qualifier(
+      ACTIVE_DATES_BY_DAY_TYPE_REF
+    ) Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
+    @Qualifier(
+      ACTIVE_DATE_BY_OPERATING_DAY_REF
+    ) Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
   ) {
     return new RedisNetexDataRepository(
       redissonClient,
       lineInfoCache,
       serviceJourneyStopsCache,
       serviceJourneyInterchangeInfoCache,
-      activeDatesByServiceJourneyRefCache
+      activeDatesByServiceJourneyRefCache,
+      dayTypeActiveDatesCache,
+      operatingDayActiveDateCache
     );
   }
 }

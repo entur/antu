@@ -16,13 +16,17 @@ public class RedisNetexDataRepository extends DefaultNetexDataRepository {
     Map<String, List<String>> lineInfoCache,
     Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache,
     Map<String, List<String>> serviceJourneyInterchangeInfoCache,
-    Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache
+    Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache,
+    Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
+    Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
   ) {
     super(
       lineInfoCache,
       serviceJourneyStopsCache,
       serviceJourneyInterchangeInfoCache,
-      activeDatesByServiceJourneyIdCache
+      activeDatesByServiceJourneyIdCache,
+      dayTypeActiveDatesCache,
+      operatingDayActiveDateCache
     );
     this.redissonClient = redissonClient;
   }
