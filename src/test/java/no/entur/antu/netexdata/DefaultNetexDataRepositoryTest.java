@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 class DefaultNetexDataRepositoryTest {
 
-  private final String REPORT_ID = "report1";
+  private final String validationReportId = "report1";
 
   private DefaultNetexDataRepository repository;
 
@@ -25,13 +25,13 @@ class DefaultNetexDataRepositoryTest {
   private Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     lineInfoCache = new HashMap<>();
-    lineInfoCache.put(REPORT_ID, List.of("TST:Line:1", "TST:Line:2"));
+    lineInfoCache.put(validationReportId, List.of("TST:Line:1", "TST:Line:2"));
 
     serviceJourneyStopsCache = new HashMap<>();
     serviceJourneyStopsCache.put(
-      REPORT_ID,
+      validationReportId,
       Map.of(
         "TST:ServiceJourney:1",
         List.of(new ServiceJourneyStop(null, null, null, 0, 0, true, true))
@@ -40,13 +40,13 @@ class DefaultNetexDataRepositoryTest {
 
     serviceJourneyInterchangeInfoCache = new HashMap<>();
     serviceJourneyInterchangeInfoCache.put(
-      REPORT_ID,
+      validationReportId,
       List.of("TST:ServiceJourneyInterchange:1")
     );
 
     activeDatesByServiceJourneyId = new HashMap<>();
     activeDatesByServiceJourneyId.put(
-      REPORT_ID,
+      validationReportId,
       Map.of(
         new ServiceJourneyId("TST:ServiceJourney:1"),
         List.of(LocalDateTime.now())
@@ -55,13 +55,13 @@ class DefaultNetexDataRepositoryTest {
 
     dayTypeActiveDatesCache = new HashMap<>();
     dayTypeActiveDatesCache.put(
-      REPORT_ID,
+      validationReportId,
       Map.of("DayType1", List.of(LocalDateTime.now()))
     );
 
     operatingDayActiveDateCache = new HashMap<>();
     operatingDayActiveDateCache.put(
-      REPORT_ID,
+      validationReportId,
       Map.of("OperatingDay1", LocalDateTime.now())
     );
 
@@ -78,7 +78,7 @@ class DefaultNetexDataRepositoryTest {
 
   @Test
   void testCleanUp() {
-    repository.cleanUp(REPORT_ID);
+    repository.cleanUp(validationReportId);
     assertTrue(lineInfoCache.isEmpty());
     assertTrue(serviceJourneyStopsCache.isEmpty());
     assertTrue(serviceJourneyInterchangeInfoCache.isEmpty());
@@ -90,7 +90,7 @@ class DefaultNetexDataRepositoryTest {
   @Test
   void testServiceJourneyStops() {
     Map<ServiceJourneyId, List<ServiceJourneyStop>> stops =
-      repository.serviceJourneyStops(REPORT_ID);
+      repository.serviceJourneyStops(validationReportId);
     assertNotNull(stops);
     assertFalse(stops.isEmpty());
     assertTrue(stops.containsKey(new ServiceJourneyId("TST:ServiceJourney:1")));
@@ -103,7 +103,7 @@ class DefaultNetexDataRepositoryTest {
   @Test
   void testActiveDatesByServiceJourneyId() {
     Map<ServiceJourneyId, List<LocalDateTime>> activeDates =
-      repository.serviceJourneyIdToActiveDates(REPORT_ID);
+      repository.serviceJourneyIdToActiveDates(validationReportId);
     assertNotNull(activeDates);
     assertFalse(activeDates.isEmpty());
     assertTrue(
