@@ -23,18 +23,24 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   private final Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache;
   private final Map<String, List<String>> serviceJourneyInterchangeInfoCache;
   private final Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache;
+  private final Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache;
+  private final Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache;
 
   public DefaultNetexDataRepository(
     Map<String, List<String>> lineInfoCache,
     Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache,
     Map<String, List<String>> serviceJourneyInterchangeInfoCache,
-    Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId
+    Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId,
+    Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
+    Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
   ) {
     this.lineInfoCache = lineInfoCache;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
     this.serviceJourneyInterchangeInfoCache =
       serviceJourneyInterchangeInfoCache;
     this.activeDatesByServiceJourneyIdCache = activeDatesByServiceJourneyId;
+    this.dayTypeActiveDatesCache = dayTypeActiveDatesCache;
+    this.operatingDayActiveDateCache = operatingDayActiveDateCache;
   }
 
   @Override
@@ -113,16 +119,14 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   @Override
   public void cleanUp(String validationReportId) {
     lineInfoCache.remove(validationReportId);
+    activeDatesByServiceJourneyIdCache.remove(validationReportId);
+    dayTypeActiveDatesCache.remove(validationReportId);
+    operatingDayActiveDateCache.remove(validationReportId);
+
     serviceJourneyStopsCache
       .keySet()
       .removeIf(k -> k.startsWith(validationReportId));
     serviceJourneyInterchangeInfoCache
-      .keySet()
-      .removeIf(k -> k.startsWith(validationReportId));
-    activeDatesByServiceJourneyIdCache
-      .keySet()
-      .removeIf(k -> k.startsWith(validationReportId));
-    serviceJourneyStopsCache
       .keySet()
       .removeIf(k -> k.startsWith(validationReportId));
   }
