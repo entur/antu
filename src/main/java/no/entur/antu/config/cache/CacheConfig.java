@@ -273,17 +273,19 @@ public class CacheConfig {
     return redissonClient.getLocalCachedMap(options);
   }
 
-  private static <K, V> RLocalCachedMap<K, V> getOrCreateReportScopedCacheWithExperimentalOptions(
-      RedissonClient redissonClient,
-      String cacheKey,
-      Codec codec
+  private static <
+    K, V
+  > RLocalCachedMap<K, V> getOrCreateReportScopedCacheWithExperimentalOptions(
+    RedissonClient redissonClient,
+    String cacheKey,
+    Codec codec
   ) {
     LocalCachedMapOptions<K, V> options = LocalCachedMapOptions
-        .<K, V>name(cacheKey)
-        .codec(codec)
-        .timeToLive(Duration.ofHours(1))
-        .maxIdle(Duration.ofHours(1))
-        .syncStrategy(LocalCachedMapOptions.SyncStrategy.UPDATE);
+      .<K, V>name(cacheKey)
+      .codec(codec)
+      .timeToLive(Duration.ofHours(1))
+      .maxIdle(Duration.ofHours(1))
+      .syncStrategy(LocalCachedMapOptions.SyncStrategy.UPDATE);
     return redissonClient.getLocalCachedMap(options);
   }
 
