@@ -228,7 +228,7 @@ public class CacheConfig {
   public Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> serviceJourneyActiveDatesCache(
     RedissonClient redissonClient
   ) {
-    return getOrCreateReportScopedCache(
+    return getOrCreateReportScopedCacheWithExperimentalOptions(
       redissonClient,
       ACTIVE_DATES_BY_SERVICE_JOURNEY_ID,
       new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
@@ -270,6 +270,22 @@ public class CacheConfig {
       .<K, V>name(cacheKey)
       .codec(codec)
       .timeToLive(Duration.ofHours(1));
+    return redissonClient.getLocalCachedMap(options);
+  }
+
+  private static <
+    K, V
+  > RLocalCachedMap<K, V> getOrCreateReportScopedCacheWithExperimentalOptions(
+    RedissonClient redissonClient,
+    String cacheKey,
+    Codec codec
+  ) {
+    LocalCachedMapOptions<K, V> options = LocalCachedMapOptions
+      .<K, V>name(cacheKey)
+      .codec(codec)
+      .timeToLive(Duration.ofHours(1))
+      .maxIdle(Duration.ofHours(1))
+      .syncStrategy(LocalCachedMapOptions.SyncStrategy.UPDATE);
     return redissonClient.getLocalCachedMap(options);
   }
 
