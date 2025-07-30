@@ -18,4 +18,16 @@ public interface CacheAdmin {
    * Return the list of keys present in the cache.
    */
   String dumpKeys();
+
+  /**
+   * Get detailed content of a specific cache key.
+   * Returns the actual data stored in the cache for debugging purposes.
+   */
+  String inspectKey(String key);
+
+  /**
+   * Get keys matching a pattern with their content preview.
+   * Useful for debugging cache content for specific validation reports.
+   */
+  String inspectKeysByPattern(String pattern);
 }

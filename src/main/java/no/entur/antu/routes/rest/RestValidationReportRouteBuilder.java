@@ -43,6 +43,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
   private static final String CODESPACE_PARAM = "codespace";
   private static final String VALIDATION_REPORT_ID_PARAM = "id";
   private static final String PATTERN_PARAM = "PATTERN";
+  private static final String KEY_PARAM = "KEY";
 
   private final AntuAuthorizationService antuAuthorizationService;
   private final String host;
@@ -175,7 +176,7 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .endResponseMessage()
       .to("direct:adminCacheDeleteByPattern")
       .get("/dump-keys")
-      .description("Clear the cache")
+      .description("Dump all cache keys")
       .consumes(PLAIN)
       .produces(PLAIN)
       .responseMessage()
@@ -183,6 +184,38 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .message("Command accepted")
       .endResponseMessage()
       .to("direct:adminCacheDumpKeys")
+      .get("/inspect-key/{" + KEY_PARAM + "}")
+      .description("Inspect specific cache key content")
+      .param()
+      .name(KEY_PARAM)
+      .type(RestParamType.path)
+      .description("Redis key to inspect")
+      .dataType(SWAGGER_DATA_TYPE_STRING)
+      .required(true)
+      .endParam()
+      .consumes(PLAIN)
+      .produces(PLAIN)
+      .responseMessage()
+      .code(200)
+      .message("Key content")
+      .endResponseMessage()
+      .to("direct:adminCacheInspectKey")
+      .get("/inspect-pattern/{" + PATTERN_PARAM + "}")
+      .description("Inspect keys matching pattern with content")
+      .param()
+      .name(PATTERN_PARAM)
+      .type(RestParamType.path)
+      .description("Key pattern to inspect")
+      .dataType(SWAGGER_DATA_TYPE_STRING)
+      .required(true)
+      .endParam()
+      .consumes(PLAIN)
+      .produces(PLAIN)
+      .responseMessage()
+      .code(200)
+      .message("Keys content")
+      .endResponseMessage()
+      .to("direct:adminCacheInspectPattern")
       .post("/refresh-stop-cache")
       .description("Refresh the stop cache")
       .consumes(PLAIN)
@@ -271,6 +304,37 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .bean("cacheAdmin", "dumpKeys")
       .log(LoggingLevel.INFO, correlation() + "Dumped keys")
       .routeId("admin-cache-dump-keys");
+
+    from("direct:adminCacheInspectKey")
+      .to("direct:authorizeAdminRequest")
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Inspecting key ${header." + KEY_PARAM + "}"
+      )
+      .process(this::removeAllCamelHttpHeaders)
+      .bean("cacheAdmin", "inspectKey(${header." + KEY_PARAM + "})")
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Inspected key ${header." + KEY_PARAM + "}"
+      )
+      .routeId("admin-cache-inspect-key");
+
+    from("direct:adminCacheInspectPattern")
+      .to("direct:authorizeAdminRequest")
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Inspecting pattern ${header." + PATTERN_PARAM + "}"
+      )
+      .process(this::removeAllCamelHttpHeaders)
+      .bean(
+        "cacheAdmin",
+        "inspectKeysByPattern(${header." + PATTERN_PARAM + "})"
+      )
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Inspected pattern ${header." + PATTERN_PARAM + "}"
+      )
+      .routeId("admin-cache-inspect-pattern");
 
     from("direct:adminRefreshStopCache")
       .to("direct:authorizeAdminRequest")
