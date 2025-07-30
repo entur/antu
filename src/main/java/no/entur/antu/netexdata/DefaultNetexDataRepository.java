@@ -12,6 +12,8 @@ import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.entur.netex.validation.validator.model.SimpleLine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of NetexDataRepository.
@@ -25,6 +27,10 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   private final Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache;
   private final Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache;
   private final Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache;
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    DefaultNetexDataRepository.class
+  );
 
   public DefaultNetexDataRepository(
     Map<String, List<String>> lineInfoCache,
@@ -118,6 +124,11 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
 
   @Override
   public void cleanUp(String validationReportId) {
+    LOGGER.info(
+      "Clearing caches for validation report: {}",
+      validationReportId
+    );
+
     lineInfoCache.remove(validationReportId);
     activeDatesByServiceJourneyIdCache.remove(validationReportId);
     dayTypeActiveDatesCache.remove(validationReportId);
@@ -129,5 +140,10 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
     serviceJourneyInterchangeInfoCache
       .keySet()
       .removeIf(k -> k.startsWith(validationReportId));
+
+    LOGGER.info(
+      "Done clearing caches for validation report: {}",
+      validationReportId
+    );
   }
 }
