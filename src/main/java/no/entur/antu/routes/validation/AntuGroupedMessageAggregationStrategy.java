@@ -26,7 +26,7 @@ public abstract class AntuGroupedMessageAggregationStrategy
       .getIn()
       .getHeader(DATASET_REFERENTIAL, String.class);
     String jobType = exchange.getIn().getHeader(JOB_TYPE, String.class);
-    LOGGER.error(
+    LOGGER.warn(
       "A timeout occurred during aggregation [reportId = {}, referential = {}, jobType = {}]",
       reportId,
       referential,
