@@ -107,6 +107,12 @@
             <version>${entur.helpers.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.entur.ror.helpers</groupId>
+            <artifactId>stopplace-changelog-starter</artifactId>
+            <version>5.44.0</version>
+        </dependency>
+
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

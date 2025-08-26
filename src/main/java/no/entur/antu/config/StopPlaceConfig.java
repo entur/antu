@@ -16,28 +16,24 @@
 
 package no.entur.antu.config;
 
-import static no.entur.antu.Constants.ET_CLIENT_NAME_HEADER;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.QUAY_CACHE;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_CACHE;
 
 import java.util.Map;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.DefaultStopPlaceResource;
+import no.entur.antu.stop.StopPlaceRepositoryLoader;
+import no.entur.antu.stop.changelog.DefaultStopPlaceRepositoryUpdater;
+import no.entur.antu.stop.changelog.StopPlaceRepositoryUpdater;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
-import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.ClientHttpConnector;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class StopPlaceConfig {
@@ -54,7 +50,7 @@ public class StopPlaceConfig {
 
   @Bean
   @Profile("!test")
-  StopPlaceRepository stopPlaceRepository(
+  StopPlaceRepositoryLoader stopPlaceRepository(
     @Qualifier(
       STOP_PLACE_CACHE
     ) Map<StopPlaceId, SimpleStopPlace> stopPlaceCache,
@@ -68,5 +64,13 @@ public class StopPlaceConfig {
       stopPlaceCache,
       quayCache
     );
+  }
+
+  @Profile("!stop-place-changelog")
+  @Bean
+  StopPlaceRepositoryUpdater stopPlaceRepositoryUpdater(
+    StopPlaceRepositoryLoader stopPlaceRepositoryLoader
+  ) {
+    return new DefaultStopPlaceRepositoryUpdater(stopPlaceRepositoryLoader);
   }
 }
