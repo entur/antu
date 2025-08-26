@@ -15,6 +15,7 @@
 
 package no.entur.antu.stop;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -93,7 +94,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
   }
 
   @Override
-  public void refreshCache() {
+  public Instant refreshCache() {
     stopPlaceResource.clear();
     Map<StopPlaceId, SimpleStopPlace> newStopPlaceCache =
       stopPlaceResource.getStopPlaces();
@@ -116,13 +117,32 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     }
     LOGGER.info("Updated Quay cache");
 
+    Instant publicationTime = stopPlaceResource.getPublicationTime();
+
     stopPlaceResource.clear();
 
     LOGGER.info(
-      "Updated cache with " + "{} stop places ids, " + "{} quays ids ",
+      "Updated cache with " +
+      "{} stop places ids, " +
+      "{} quays ids. Publication time: {} ",
       stopPlaceCache.size(),
-      quayCache.size()
+      quayCache.size(),
+      publicationTime
     );
+    return publicationTime;
+  }
+
+  @Override
+  public void createOrUpdateQuay(QuayId id, SimpleQuay quay) {
+    quayCache.put(id, quay);
+  }
+
+  @Override
+  public void createOrUpdateStopPlace(
+    StopPlaceId id,
+    SimpleStopPlace stopPlace
+  ) {
+    stopPlaceCache.put(id, stopPlace);
   }
 
   private Optional<SimpleQuay> getQuay(QuayId quayId) {
