@@ -17,17 +17,12 @@
 package no.entur.antu.config;
 
 import static no.entur.antu.Constants.ET_CLIENT_NAME_HEADER;
-import static no.entur.antu.config.cache.CacheConfig.QUAY_ID_NOT_FOUND_CACHE;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.QUAY_CACHE;
 import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_CACHE;
 
 import java.util.Map;
-import java.util.Set;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.DefaultStopPlaceResource;
-import no.entur.antu.stop.fetcher.QuayFetcher;
-import no.entur.antu.stop.fetcher.StopPlaceFetcher;
-import no.entur.antu.stop.fetcher.StopPlaceForQuayIdFetcher;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.entur.netex.validation.validator.model.QuayId;
@@ -64,10 +59,6 @@ public class StopPlaceConfig {
       STOP_PLACE_CACHE
     ) Map<StopPlaceId, SimpleStopPlace> stopPlaceCache,
     @Qualifier(QUAY_CACHE) Map<QuayId, SimpleQuay> quayCache,
-    @Qualifier(QUAY_ID_NOT_FOUND_CACHE) Set<QuayId> quayIdNotFoundCache,
-    StopPlaceFetcher stopPlaceFetcher,
-    QuayFetcher quayFetcher,
-    StopPlaceForQuayIdFetcher stopPlaceForQuayIdFetcher,
     @Qualifier(
       "stopPlaceResource"
     ) DefaultStopPlaceResource defaultStopPlaceResource
@@ -75,30 +66,7 @@ public class StopPlaceConfig {
     return new DefaultStopPlaceRepository(
       defaultStopPlaceResource,
       stopPlaceCache,
-      quayCache,
-      quayFetcher,
-      stopPlaceFetcher,
-      stopPlaceForQuayIdFetcher,
-      quayIdNotFoundCache
+      quayCache
     );
-  }
-
-  @Bean("stopPlaceWebClient")
-  WebClient stopPlaceWebClient(
-    @Value(
-      "${stopplace.registry.url:https://api.dev.entur.io/stop-places/v1/read}"
-    ) String stopPlaceRegistryUrl,
-    @Value("${http.client.name:antu}") String clientName,
-    @Value("${http.client.id:antu}") String clientId,
-    ClientHttpConnector clientHttpConnector
-  ) {
-    return WebClient
-      .builder()
-      .baseUrl(stopPlaceRegistryUrl)
-      .clientConnector(clientHttpConnector)
-      .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE)
-      .defaultHeader(ET_CLIENT_NAME_HEADER, clientName)
-      .defaultHeader(ET_CLIENT_ID_HEADER, clientId)
-      .build();
   }
 }
