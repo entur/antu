@@ -15,11 +15,15 @@
 
 package no.entur.antu.stop;
 
-import java.util.*;
-import no.entur.antu.stop.fetcher.NetexEntityFetcher;
-import org.entur.netex.validation.validator.model.*;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.StopPlace;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import org.entur.netex.validation.validator.model.QuayCoordinates;
+import org.entur.netex.validation.validator.model.QuayId;
+import org.entur.netex.validation.validator.model.SimpleQuay;
+import org.entur.netex.validation.validator.model.SimpleStopPlace;
+import org.entur.netex.validation.validator.model.StopPlaceId;
+import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,48 +40,22 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
   public static final String STOP_PLACE_CACHE = "stopPlaceCache";
 
   private final StopPlaceResource stopPlaceResource;
-  private final NetexEntityFetcher<Quay, QuayId> quayFetcher;
-  private final NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher;
-  private final NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher;
   private final Map<StopPlaceId, SimpleStopPlace> stopPlaceCache;
   private final Map<QuayId, SimpleQuay> quayCache;
-  private final Set<QuayId> quayIdNotFoundCache;
 
   public DefaultStopPlaceRepository(
     StopPlaceResource stopPlaceResource,
     Map<StopPlaceId, SimpleStopPlace> stopPlaceCache,
-    Map<QuayId, SimpleQuay> quayCache,
-    NetexEntityFetcher<Quay, QuayId> quayFetcher,
-    NetexEntityFetcher<StopPlace, StopPlaceId> stopPlaceFetcher,
-    NetexEntityFetcher<StopPlace, QuayId> stopPlaceForQuayIdFetcher,
-    Set<QuayId> quayIdNotFoundCache
+    Map<QuayId, SimpleQuay> quayCache
   ) {
     this.stopPlaceResource = stopPlaceResource;
     this.stopPlaceCache = Objects.requireNonNull(stopPlaceCache);
     this.quayCache = Objects.requireNonNull(quayCache);
-    this.quayIdNotFoundCache = quayIdNotFoundCache;
-    this.quayFetcher = quayFetcher;
-    this.stopPlaceFetcher = stopPlaceFetcher;
-    this.stopPlaceForQuayIdFetcher = stopPlaceForQuayIdFetcher;
   }
 
   @Override
   public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
-    if (stopPlaceCache.containsKey(stopPlaceId)) {
-      return true;
-    }
-    StopPlace stopPlace = stopPlaceFetcher.tryFetch(stopPlaceId);
-    if (stopPlace != null) {
-      stopPlaceCache.put(
-        stopPlaceId,
-        new SimpleStopPlace(
-          stopPlace.getName().getValue(),
-          TransportModeAndSubMode.of(stopPlace)
-        )
-      );
-      return true;
-    }
-    return false;
+    return stopPlaceCache.containsKey(stopPlaceId);
   }
 
   @Override
@@ -138,7 +116,6 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     }
     LOGGER.info("Updated Quay cache");
 
-    quayIdNotFoundCache.clear();
     stopPlaceResource.clear();
 
     LOGGER.info(
@@ -153,40 +130,6 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     if (quayFromCache != null) {
       return Optional.of(quayFromCache);
     }
-    Quay quayFromReadApi = tryFetchWithNotFoundCheck(quayId, quayFetcher);
-    if (quayFromReadApi != null) {
-      StopPlace stopPlaceFromReadApi = stopPlaceForQuayIdFetcher.tryFetch(
-        quayId
-      );
-      StopPlaceId stopPlaceId = new StopPlaceId(stopPlaceFromReadApi.getId());
-      SimpleQuay simpleQuay = new SimpleQuay(
-        QuayCoordinates.of(quayFromReadApi),
-        stopPlaceId
-      );
-      quayCache.put(quayId, simpleQuay);
-      stopPlaceCache.put(
-        stopPlaceId,
-        new SimpleStopPlace(
-          stopPlaceFromReadApi.getName().getValue(),
-          TransportModeAndSubMode.of(stopPlaceFromReadApi)
-        )
-      );
-      return Optional.of(simpleQuay);
-    }
     return Optional.empty();
-  }
-
-  private <R> R tryFetchWithNotFoundCheck(
-    QuayId quayId,
-    NetexEntityFetcher<R, QuayId> fetcherFunction
-  ) {
-    if (!quayIdNotFoundCache.contains(quayId)) {
-      R result = fetcherFunction.tryFetch(quayId);
-      if (result == null) {
-        quayIdNotFoundCache.add(quayId);
-      }
-      return result;
-    }
-    return null;
   }
 }
