@@ -69,15 +69,16 @@ public class StopRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() + "Stop place cache is empty, priming cache"
       )
-      .bean("stopPlaceRepository", "refreshCache")
+      .to("direct:refreshStopCache")
       .otherwise()
       .log(LoggingLevel.INFO, correlation() + "Existing stop place cache found")
+      .bean("stopPlaceRepositoryUpdater", "init")
       .routeId("prime-stop-cache");
 
     from("direct:refreshStopCache")
       .log(LoggingLevel.INFO, correlation() + "Refreshing stop place cache")
       .to("direct:extendAckDeadline")
-      .bean("stopPlaceRepository", "refreshCache")
+      .bean("stopPlaceRepositoryUpdater", "createOrUpdate")
       .to("direct:extendAckDeadline")
       .log(LoggingLevel.INFO, correlation() + "Refreshed stop place cache")
       .routeId("refresh-stop-cache");
