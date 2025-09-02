@@ -1,5 +1,6 @@
 package no.entur.antu.stop;
 
+import java.time.Instant;
 import java.util.Map;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -21,6 +22,8 @@ public interface StopPlaceResource {
    * Only data relevant to validation is kept.
    */
   Map<QuayId, SimpleQuay> getQuays();
+
+  Instant getPublicationTime();
 
   /**
    * Clear the maps of StopPlaces and Quays.
