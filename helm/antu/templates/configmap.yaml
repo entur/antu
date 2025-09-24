@@ -39,7 +39,7 @@ data:
     org.rutebanken.helper.stopplace.changelog.kafka.topic={{ .Values.kafka.changelogTopic }}
     org.rutebanken.helper.stopplace.changelog.kafka.security-protocol=SASL_SSL
     org.rutebanken.helper.stopplace.changelog.kafka.sasl-mechanism=SCRAM-SHA-512
-    org.rutebanken.helper.stopplace.changelog.kafka.sasl-jaas-config=org.apache.kafka.common.security.scram.ScramLoginModule required username="your-username" password="your-password";
+    org.rutebanken.helper.stopplace.changelog.kafka.sasl-jaas-config=org.apache.kafka.common.security.scram.ScramLoginModule required username="${KAFKAUSERNAME}" password="${KAFKAPASSWORD}";
     org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-info=${KAFKAUSERNAME}:${KAFKAPASSWORD}
     org.rutebanken.helper.stopplace.changelog.repository.url={{ .Values.tiamatUrl }}
     org.rutebanken.helper.stopplace.changelog.repository.allVersions=false
