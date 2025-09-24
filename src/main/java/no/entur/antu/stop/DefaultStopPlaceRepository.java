@@ -123,8 +123,8 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
 
     LOGGER.info(
       "Updated cache with " +
-      "{} stop places ids, " +
-      "{} quays ids. Publication time: {} ",
+      "{} stop place ids, " +
+      "{} quay ids. Publication time: {} ",
       stopPlaceCache.size(),
       quayCache.size(),
       publicationTime

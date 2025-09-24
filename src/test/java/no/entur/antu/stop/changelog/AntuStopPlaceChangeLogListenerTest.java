@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
+import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
@@ -64,12 +65,12 @@ class AntuStopPlaceChangeLogListenerTest {
                     """;
 
   @Test
-  void test() {
-    Map<StopPlaceId, SimpleStopPlace> stoPlaceCache = new HashMap<>();
+  void createStopPlace() {
+    Map<StopPlaceId, SimpleStopPlace> stopPlaceCache = new HashMap<>();
     Map<QuayId, SimpleQuay> quayCache = new HashMap<>();
     StopPlaceRepositoryLoader loader = new DefaultStopPlaceRepository(
       null,
-      stoPlaceCache,
+      stopPlaceCache,
       quayCache
     );
     ChangelogUpdateTimestampRepository timestampRepository =
@@ -89,20 +90,29 @@ class AntuStopPlaceChangeLogListenerTest {
     AntuStopPlaceChangeLogListener listener =
       new AntuStopPlaceChangeLogListener(loader, timestampRepository);
 
-    InputStream inputStreaam = new ByteArrayInputStream(
-      SITE_FRAME.getBytes(StandardCharsets.UTF_8)
+    listener.onStopPlaceCreated(
+      "id",
+      new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
     );
-    listener.onStopPlaceCreated("id", inputStreaam);
-    Instant expected = LocalDateTime
+    Instant expectedPublicationTimestamp = LocalDateTime
       .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
       .atZone(ZoneId.of("Europe/Oslo"))
       .toInstant();
-    assertEquals(expected, timestampRepository.getTimestamp());
-    assertEquals(1, stoPlaceCache.size());
-    assertTrue(
-      stoPlaceCache.containsKey(new StopPlaceId("NSR:StopPlace:58586"))
+    assertEquals(
+      expectedPublicationTimestamp,
+      timestampRepository.getTimestamp()
     );
+    assertEquals(1, stopPlaceCache.size());
+    StopPlaceId stopPlaceId = new StopPlaceId("NSR:StopPlace:58586");
+    assertTrue(stopPlaceCache.containsKey(stopPlaceId));
+    assertEquals("Sandefjord lufthavn", stopPlaceCache.get(stopPlaceId).name());
     assertEquals(1, quayCache.size());
-    assertTrue(quayCache.containsKey(new QuayId("NSR:Quay:100310")));
+    QuayId quayId = new QuayId("NSR:Quay:100310");
+    assertTrue(quayCache.containsKey(quayId));
+    assertEquals(
+      new QuayCoordinates(10.253157, 59.179070),
+      quayCache.get(quayId).quayCoordinates()
+    );
+    assertEquals(stopPlaceId, quayCache.get(quayId).stopPlaceId());
   }
 }

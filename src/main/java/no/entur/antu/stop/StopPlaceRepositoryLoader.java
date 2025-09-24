@@ -24,7 +24,14 @@ public interface StopPlaceRepositoryLoader extends StopPlaceRepository {
    */
   Instant refreshCache();
 
+  /**
+   * Create a quay or update it if it is already present in the cache.
+   */
   void createOrUpdateQuay(QuayId quayId, SimpleQuay quay);
 
+  /**
+   * Create a stop place or update it if it is already present in the cache.
+   * This does not update the quays attached to this stop place.
+   */
   void createOrUpdateStopPlace(StopPlaceId id, SimpleStopPlace stopPlace);
 }
