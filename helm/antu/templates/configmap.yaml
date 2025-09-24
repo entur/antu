@@ -27,11 +27,28 @@ data:
     antu.organisation.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
     antu.agreement.registry.url={{ .Values.agreementRegistryUrl }}
 
-    # Stop place register
-    antu.stop.registry.id.url={{ .Values.tiamatUrl }}/services/stop_places
+    # Stop place dataset import
     # Refresh stop place cache at 01:00 and 14:00 every day
     antu.stop.refresh.interval={{ .Values.stopPlaceCacheRefreshCron }}
-    stopplace.registry.url={{ .Values.stopplaceRegistryUrl }}
+
+    # Stop place changelog
+    org.rutebanken.helper.stopplace.changelog.enabled=true
+    org.rutebanken.helper.stopplace.changelog.kafka.autostartup=false
+    org.rutebanken.helper.stopplace.changelog.kafka.bootstrap-servers={{ .Values.kafka.brokers }}
+    org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-url={{ .Values.kafka.registry }}
+    org.rutebanken.helper.stopplace.changelog.kafka.topic={{ .Values.kafka.changelogTopic }}
+    org.rutebanken.helper.stopplace.changelog.kafka.security-protocol=SASL_SSL
+    org.rutebanken.helper.stopplace.changelog.kafka.sasl-mechanism=SCRAM-SHA-512
+    org.rutebanken.helper.stopplace.changelog.kafka.sasl-jaas-config=org.apache.kafka.common.security.scram.ScramLoginModule required username="your-username" password="your-password";
+    org.rutebanken.helper.stopplace.changelog.kafka.schema-registry-basic-auth-user-info=username:password
+    org.rutebanken.helper.stopplace.changelog.repository.url={{ .Values.tiamatUrl }}
+    org.rutebanken.helper.stopplace.changelog.repository.allVersions=false
+    org.rutebanken.helper.stopplace.changelog.repository.topographicPlaceExportMode=NONE
+    org.rutebanken.helper.stopplace.changelog.repository.tariffZoneExportMode=NONE
+    org.rutebanken.helper.stopplace.changelog.repository.groupOfTariffZonesExportMode=NONE
+    org.rutebanken.helper.stopplace.changelog.repository.fareZoneExportMode=NONE
+    org.rutebanken.helper.stopplace.changelog.repository.groupOfStopPlacesExportMode=NONE
+
 
 
     # Validators

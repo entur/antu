@@ -1,5 +1,6 @@
 package no.entur.antu.config;
 
+import java.time.Instant;
 import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
@@ -31,9 +32,9 @@ public class TestConfig {
     return new TestOrganisationAliasRepository();
   }
 
-  @Bean(name = "stopPlaceRepository")
+  @Bean
   @Primary
-  public StopPlaceRepository stopPlaceRepository() {
+  public StopPlaceRepositoryLoader stopPlaceRepository() {
     return new TestStopPlaceRepository();
   }
 
@@ -113,7 +114,18 @@ public class TestConfig {
     }
 
     @Override
-    public void refreshCache() {}
+    public Instant refreshCache() {
+      return null;
+    }
+
+    @Override
+    public void createOrUpdateQuay(QuayId quayId, SimpleQuay quay) {}
+
+    @Override
+    public void createOrUpdateStopPlace(
+      StopPlaceId id,
+      SimpleStopPlace stopPlace
+    ) {}
   }
 
   private static class TestOrganisationAliasRepository

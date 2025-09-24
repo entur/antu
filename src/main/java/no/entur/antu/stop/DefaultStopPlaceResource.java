@@ -1,11 +1,19 @@
 package no.entur.antu.stop;
 
+import static no.entur.antu.stop.changelog.support.ChangeLogUtils.parsePublicationTime;
+
 import jakarta.xml.bind.JAXBElement;
+import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.entur.netex.validation.validator.model.*;
+import org.entur.netex.validation.validator.model.QuayCoordinates;
+import org.entur.netex.validation.validator.model.QuayId;
+import org.entur.netex.validation.validator.model.SimpleQuay;
+import org.entur.netex.validation.validator.model.SimpleStopPlace;
+import org.entur.netex.validation.validator.model.StopPlaceId;
+import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +23,13 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
   private static final Logger LOGGER = LoggerFactory.getLogger(
     DefaultStopPlaceResource.class
   );
+
   private final StopPlacesDatasetLoader stopPlacesDatasetLoader;
 
   private Map<StopPlaceId, SimpleStopPlace> stopPlaces;
   private Map<QuayId, SimpleQuay> quays;
   private boolean parsedDataset;
+  private Instant publicationTime;
 
   public DefaultStopPlaceResource(
     StopPlacesDatasetLoader stopPlacesDatasetLoader
@@ -40,10 +50,17 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
   }
 
   @Override
+  public synchronized Instant getPublicationTime() {
+    init();
+    return publicationTime;
+  }
+
+  @Override
   public synchronized void clear() {
     quays = null;
     stopPlaces = null;
     parsedDataset = false;
+    publicationTime = null;
   }
 
   private void init() {
@@ -54,6 +71,7 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
       stopPlacesDatasetLoader.loadNetexEntitiesIndex();
     quays = initQuays(netexEntitiesIndex);
     stopPlaces = initStopPlaces(netexEntitiesIndex);
+    publicationTime = parsePublicationTime(netexEntitiesIndex);
     parsedDataset = true;
     LOGGER.info(
       "Loaded {} stop places and {} quays from NeTEx dataset",

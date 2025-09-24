@@ -12,7 +12,7 @@ gcp:
     bucketName: ror-antu-gcp2-dev
     exchangeBucketName: ror-antu-exchange-gcp2-dev
 
-tiamatUrl: http://tiamat.dev.entur.internal
+tiamatUrl: https://api.dev.entur.io/stop-places/v1
 
 agreementRegistryUrl: https://api.entur.io/agreements/v1
 
@@ -22,6 +22,12 @@ interchangeServiceJourneyReferencesExistValidatorEnabled: true
 
 baba:
   service: http://baba.dev.entur.internal
+
+kafka:
+  brokers: entur-kafka-test-ext-entur-test.aivencloud.com:11877
+  registry: https://entur-kafka-test-ext-entur-test.aivencloud.com:11867
+  changelogTopic: ror-stop-place-changelog-dev
+
 
 auth0:
   ror:
@@ -50,5 +56,3 @@ ingress:
 
 horizontalPodAutoscaler:
   project: ent-antu-dev
-
-stopplaceRegistryUrl: https://api.dev.entur.io/stop-places/v1/read
