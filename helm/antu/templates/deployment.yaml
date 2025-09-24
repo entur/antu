@@ -58,6 +58,8 @@ spec:
                 name: antu-auth-secret
             - secretRef:
                 name: auth0
+            - secretRef:
+                name: kafka
           ports:
             - containerPort: {{ .Values.service.http.internalPort }}
               name: http
