@@ -89,6 +89,8 @@ public class AntuWebSecurityConfiguration {
             AntPathRequestMatcher.antMatcher("/actuator/health/readiness")
           )
           .permitAll()
+          .requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/info"))
+          .permitAll()
           .anyRequest()
           .authenticated()
       )

@@ -63,6 +63,10 @@ public class StopRouteBuilder extends BaseRouteBuilder {
     from(
       "master:lockOnAntuRefreshStopCachePeriodically:timer://antu/refreshStopPlaceCacheAtStartup?repeatCount=1&delay=5000"
     )
+      .log(
+        LoggingLevel.INFO,
+        correlation() + "Refreshing stop place cache at startup"
+      )
       .choice()
       .when(method("stopPlaceRepository", "isEmpty"))
       .log(
@@ -71,7 +75,11 @@ public class StopRouteBuilder extends BaseRouteBuilder {
       )
       .to("direct:refreshStopCache")
       .otherwise()
-      .log(LoggingLevel.INFO, correlation() + "Existing stop place cache found")
+      .log(
+        LoggingLevel.INFO,
+        correlation() +
+        "Existing stop place cache found: Keep cache and initialize the stop place updater"
+      )
       .bean("stopPlaceRepositoryUpdater", "init")
       .routeId("prime-stop-cache");
 
