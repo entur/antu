@@ -110,7 +110,7 @@
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>stopplace-changelog-starter</artifactId>
-            <version>5.44.0</version>
+            <version>5.46.0</version>
         </dependency>
 
         <!-- Spring Boot -->
