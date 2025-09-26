@@ -107,12 +107,13 @@ data:
 
     # Actuator
     management.endpoints.access.default=none
+    management.endpoint.info.enabled=true
     management.endpoint.health.enabled=true
     management.health.defaults.enabled=false
     management.endpoint.health.probes.enabled=true
     management.endpoint.health.group.readiness.include=readinessState
     management.endpoint.prometheus.enabled=true
-    management.endpoints.web.exposure.include=health,prometheus
+    management.endpoints.web.exposure.include=health,prometheus,info
     management.endpoints.jmx.exposure.exclude=*
 
 

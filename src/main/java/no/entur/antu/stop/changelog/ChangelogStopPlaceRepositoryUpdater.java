@@ -5,6 +5,8 @@ import java.time.Instant;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelog;
 import org.rutebanken.helper.stopplace.changelog.kafka.ChangelogConsumerController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Create or update the stop repository from a NeTEx archive and maintain it up to date
@@ -12,6 +14,10 @@ import org.rutebanken.helper.stopplace.changelog.kafka.ChangelogConsumerControll
  */
 public class ChangelogStopPlaceRepositoryUpdater
   implements StopPlaceRepositoryUpdater {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    ChangelogStopPlaceRepositoryUpdater.class
+  );
 
   private final StopPlaceRepositoryLoader stopPlaceRepositoryLoader;
   private final AntuPublicationTimeRecordFilterStrategy antuPublicationTimeRecordFilterStrategy;
@@ -40,6 +46,7 @@ public class ChangelogStopPlaceRepositoryUpdater
 
   @Override
   public void init() {
+    LOGGER.info("Initializing Changelog Stop Place Repository Updater");
     Instant timestamp = changelogUpdateTimestampRepository.getTimestamp();
     if (timestamp == null) {
       timestamp = Instant.now().minus(Duration.ofDays(1));
@@ -47,6 +54,10 @@ public class ChangelogStopPlaceRepositoryUpdater
     antuPublicationTimeRecordFilterStrategy.setPublicationTime(timestamp);
     stopPlaceChangelog.registerStopPlaceChangelogListener(handler);
     changelogConsumerController.start();
+    LOGGER.info(
+      "Changelog Stop Place Repository Updater initialized with publication timestamp {}",
+      timestamp
+    );
   }
 
   @Override
