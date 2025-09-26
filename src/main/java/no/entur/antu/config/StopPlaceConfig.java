@@ -38,8 +38,6 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class StopPlaceConfig {
 
-  private static final String ET_CLIENT_ID_HEADER = "ET-Client-ID";
-
   @Bean
   @Profile("!test")
   DefaultStopPlaceResource stopPlaceResource(
