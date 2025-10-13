@@ -27,7 +27,7 @@
         <camel.version>4.10.7</camel.version>
         <entur.helpers.version>5.47.0</entur.helpers.version>
         <netex-validator-java.version>10.4.11</netex-validator-java.version>
-        <netex-parser-java.version>3.1.61</netex-parser-java.version>
+        <netex-parser-java.version>3.1.62</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
         <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.17</zt-zip.version>
