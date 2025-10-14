@@ -19,7 +19,6 @@ package no.entur.antu.sweden.config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.sweden.stop.RedisSwedenStopPlaceNetexIdRepository;
 import no.entur.antu.sweden.stop.SwedenStopPlaceNetexIdRepository;
@@ -84,7 +83,9 @@ public class TimetableDataSwedenValidatorConfig {
   public ValidationTreeFactory swedenTimetableDataValidationTreeFactory(
     ValidationParametersConfig validationParametersConfig
   ) {
-    return new EnturTimetableDataSwedenValidationTreeFactory(validationParametersConfig);
+    return new EnturTimetableDataSwedenValidationTreeFactory(
+      validationParametersConfig
+    );
   }
 
   @Bean

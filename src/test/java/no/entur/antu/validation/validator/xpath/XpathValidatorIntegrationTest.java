@@ -28,7 +28,8 @@ class XpathValidatorIntegrationTest {
       new SimpleOrganisationAliasRepository(new HashSet<>());
     ValidationTreeFactory validationTreeFactory =
       new EnturTimetableDataValidationTreeFactory(
-        stubOrganisationAliasRepository, new ValidationParametersConfig()
+        stubOrganisationAliasRepository,
+        new ValidationParametersConfig()
       );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     XPathRuleValidator xPathValidator = new XPathRuleValidator(

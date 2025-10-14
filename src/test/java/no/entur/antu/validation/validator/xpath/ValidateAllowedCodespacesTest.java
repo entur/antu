@@ -3,7 +3,6 @@ package no.entur.antu.validation.validator.xpath;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import no.entur.antu.validation.NetexCodespace;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
 import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
@@ -59,7 +58,7 @@ class ValidateAllowedCodespacesTest {
     additionalAllowedCodespaces.add(nsrNetexCodespace);
     String publicationDeliveryWithValidCodespace = NETEX_FRAGMENT.replace(
       "${XML_NAMESPACE_URL}",
-            nsrNetexCodespace.xmlnsUrl()
+      nsrNetexCodespace.xmlnsUrl()
     );
     ValidateAllowedCodespaces validateAllowedCodespaces =
       new ValidateAllowedCodespaces(additionalAllowedCodespaces);

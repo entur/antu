@@ -26,7 +26,9 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
 
   private final Set<NetexCodespace> additionalAllowedCodespaces;
 
-  public ValidateAllowedCodespaces(Set<NetexCodespace> additionalAllowedCodespaces) {
+  public ValidateAllowedCodespaces(
+    Set<NetexCodespace> additionalAllowedCodespaces
+  ) {
     this.additionalAllowedCodespaces = additionalAllowedCodespaces;
   }
 
@@ -44,7 +46,10 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
     Objects.requireNonNull(validationContext);
     List<ValidationIssue> validationReportEntries = new ArrayList<>();
     String codespace = validationContext.getCodespace();
-    Set<NetexCodespace> validCodespaces = CodespaceUtils.getValidCodespacesFor(codespace, additionalAllowedCodespaces);
+    Set<NetexCodespace> validCodespaces = CodespaceUtils.getValidCodespacesFor(
+      codespace,
+      additionalAllowedCodespaces
+    );
     try {
       XPathSelector selector = validationContext
         .getNetexXMLParser()
@@ -82,7 +87,7 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
             new ValidationIssue(
               RULE,
               dataLocation,
-                    netexCodespace,
+              netexCodespace,
               validCodespaces
                 .stream()
                 .map(NetexCodespace::toString)

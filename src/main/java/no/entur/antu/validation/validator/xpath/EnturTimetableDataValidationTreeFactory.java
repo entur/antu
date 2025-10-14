@@ -36,9 +36,10 @@ public class EnturTimetableDataValidationTreeFactory
     // Validation against Norwegian codespaces
     compositeFrameValidationTreeBuilder().withRule(new ValidateNSRCodespace());
 
-    ValidateAllowedCodespaces validateAllowedCodespaces = new ValidateAllowedCodespaces(
+    ValidateAllowedCodespaces validateAllowedCodespaces =
+      new ValidateAllowedCodespaces(
         validationParametersConfig.getAdditionalAllowedCodespaces()
-    );
+      );
     rootValidationTreeBuilder().withRule(validateAllowedCodespaces);
 
     // Disabling check of duplicate ServiceJourney with different versions (slow test)

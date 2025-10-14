@@ -84,11 +84,11 @@ public class NetexIdValidator implements XPathValidator {
   private List<NetexCodespace> getValidCodespacesFor(String codespace) {
     List<NetexCodespace> validCodespaces = new ArrayList<>();
     if (additionalAllowedCodespaces != null) {
-        validCodespaces.addAll(additionalAllowedCodespaces);
+      validCodespaces.addAll(additionalAllowedCodespaces);
     }
     validCodespaces.add(NetexCodespace.rutebanken(codespace));
     return validCodespaces;
-    }
+  }
 
   @Override
   public List<ValidationIssue> validate(
@@ -97,7 +97,7 @@ public class NetexIdValidator implements XPathValidator {
     List<ValidationIssue> validationIssues = new ArrayList<>();
     String codespace = validationContext.getCodespace();
     Set<String> validNetexCodespaces = CodespaceUtils
-            .getValidCodespacesFor(codespace, additionalAllowedCodespaces)
+      .getValidCodespacesFor(codespace, additionalAllowedCodespaces)
       .stream()
       .map(NetexCodespace::xmlns)
       .collect(Collectors.toSet());

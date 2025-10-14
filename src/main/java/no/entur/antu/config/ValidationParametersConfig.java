@@ -1,21 +1,23 @@
 package no.entur.antu.config;
 
+import java.util.Set;
 import no.entur.antu.validation.NetexCodespace;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
-
 @Component
 @ConfigurationProperties(prefix = "antu.validation")
 public class ValidationParametersConfig {
-    private Set<NetexCodespace> additionalAllowedCodespaces;
 
-    public Set<NetexCodespace> getAdditionalAllowedCodespaces() {
-        return additionalAllowedCodespaces;
-    }
+  private Set<NetexCodespace> additionalAllowedCodespaces;
 
-    public void setAdditionalAllowedCodespaces(Set<NetexCodespace> additionalAllowedCodespaces) {
-        this.additionalAllowedCodespaces = additionalAllowedCodespaces;
-    }
+  public Set<NetexCodespace> getAdditionalAllowedCodespaces() {
+    return additionalAllowedCodespaces;
+  }
+
+  public void setAdditionalAllowedCodespaces(
+    Set<NetexCodespace> additionalAllowedCodespaces
+  ) {
+    this.additionalAllowedCodespaces = additionalAllowedCodespaces;
+  }
 }

@@ -18,8 +18,13 @@ import org.entur.netex.validation.validator.xpath.tree.ValidationTreeBuilder;
 public class EnturTimetableDataFinlandValidationTreeFactory
   extends EnturTimetableDataValidationTreeFactory {
 
-  public EnturTimetableDataFinlandValidationTreeFactory() {
-    super(new SimpleOrganisationAliasRepository(new HashSet<>()), new ValidationParametersConfig());
+  public EnturTimetableDataFinlandValidationTreeFactory(
+    ValidationParametersConfig validationParametersConfig
+  ) {
+    super(
+      new SimpleOrganisationAliasRepository(new HashSet<>()),
+      validationParametersConfig
+    );
   }
 
   @Override
