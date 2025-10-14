@@ -2,10 +2,7 @@ package no.entur.antu.validation.validator.xpath.rules;
 
 import static org.entur.netex.validation.xml.NetexXMLParser.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -13,6 +10,7 @@ import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import no.entur.antu.validation.NetexCodespace;
+import no.entur.antu.validation.utilities.CodespaceUtils;
 import org.entur.netex.validation.exception.NetexValidationException;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
@@ -25,6 +23,12 @@ import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
  * Validate that the dataset references only the codespace it has access to.
  */
 public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
+
+  private final Set<NetexCodespace> additionalAllowedCodespaces;
+
+  public ValidateAllowedCodespaces(Set<NetexCodespace> additionalAllowedCodespaces) {
+    this.additionalAllowedCodespaces = additionalAllowedCodespaces;
+  }
 
   static final ValidationRule RULE = new ValidationRule(
     "CODESPACE",
@@ -39,10 +43,8 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
   ) {
     Objects.requireNonNull(validationContext);
     List<ValidationIssue> validationReportEntries = new ArrayList<>();
-    Set<NetexCodespace> validCodespaces =
-      NetexCodespace.getValidNetexCodespacesFor(
-        validationContext.getCodespace()
-      );
+    String codespace = validationContext.getCodespace();
+    Set<NetexCodespace> validCodespaces = CodespaceUtils.getValidCodespacesFor(codespace, additionalAllowedCodespaces);
     try {
       XPathSelector selector = validationContext
         .getNetexXMLParser()
@@ -80,7 +82,7 @@ public class ValidateAllowedCodespaces extends AbstractXPathValidationRule {
             new ValidationIssue(
               RULE,
               dataLocation,
-              netexCodespace,
+                    netexCodespace,
               validCodespaces
                 .stream()
                 .map(NetexCodespace::toString)

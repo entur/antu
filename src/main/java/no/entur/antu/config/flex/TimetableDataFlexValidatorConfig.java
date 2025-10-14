@@ -19,6 +19,8 @@ package no.entur.antu.config.flex;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.validation.flex.validator.EnturFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.flex.validator.EnturImportFlexTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.flex.validator.FileNameValidator;
@@ -59,10 +61,12 @@ public class TimetableDataFlexValidatorConfig {
 
   @Bean
   public ValidationTreeFactory flexTimetableDataValidationTreeFactory(
-    OrganisationAliasRepository organisationAliasRepository
+    OrganisationAliasRepository organisationAliasRepository,
+    ValidationParametersConfig validationParametersConfig
   ) {
     return new EnturFlexTimetableDataValidationTreeFactory(
-      organisationAliasRepository
+      organisationAliasRepository,
+      validationParametersConfig
     );
   }
 
@@ -91,10 +95,12 @@ public class TimetableDataFlexValidatorConfig {
 
   @Bean
   public ValidationTreeFactory importFlexTimetableDataValidationTreeFactory(
-    OrganisationAliasRepository organisationAliasRepository
+    OrganisationAliasRepository organisationAliasRepository,
+    ValidationParametersConfig validationParametersConfig
   ) {
     return new EnturImportFlexTimetableDataValidationTreeFactory(
-      organisationAliasRepository
+      organisationAliasRepository,
+      validationParametersConfig
     );
   }
 
@@ -117,9 +123,9 @@ public class TimetableDataFlexValidatorConfig {
   }
 
   @Bean
-  public NetexIdValidator flexNetexIdValidator() {
+  public NetexIdValidator flexNetexIdValidator(ValidationParametersConfig validationParametersConfig) {
     // TODO temporarily ignore unapproved codespace for Operator
-    return new NetexIdValidator(Set.of("Operator"));
+    return new NetexIdValidator(Set.of("Operator"), validationParametersConfig.additionalAllowedCodespaces);
   }
 
   @Bean

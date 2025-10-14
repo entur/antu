@@ -129,6 +129,11 @@ data:
     interchange-alighting-and-boarding-validation-enabled={{ .Values.alightingAndBoardingValidationEnabled }}
     interchange-service-journey-references-exist-validator-enabled={{ .Values.interchangeServiceJourneyReferencesExistValidatorEnabled }}
 
+    # Validation parameters
+    antu.validation.additional-allowed-codespaces[0].xmlns=NSR
+    antu.validation.additional-allowed-codespaces[0].xmlns-url=http://www.rutebanken.org/ns/nsr
+    antu.validation.additional-allowed-codespaces[1].xmlns=PEN
+    antu.validation.additional-allowed-codespaces[1].xmlns-url=http://www.rutebanken.org/ns/pen
 kind: ConfigMap
 metadata:
   name: {{ template "antu.name" . }}-config

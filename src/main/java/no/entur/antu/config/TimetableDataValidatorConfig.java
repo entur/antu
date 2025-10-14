@@ -83,10 +83,12 @@ public class TimetableDataValidatorConfig {
 
   @Bean
   public ValidationTreeFactory timetableDataValidationTreeFactory(
-    OrganisationAliasRepository organisationAliasRepository
+    OrganisationAliasRepository organisationAliasRepository,
+    ValidationParametersConfig validationParametersConfig
   ) {
     return new EnturTimetableDataValidationTreeFactory(
-      organisationAliasRepository
+      organisationAliasRepository,
+      validationParametersConfig
     );
   }
 

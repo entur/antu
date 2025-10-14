@@ -1,5 +1,6 @@
 package no.entur.antu.validation.flex.validator;
 
+import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
@@ -14,9 +15,10 @@ public class EnturImportFlexTimetableDataValidationTreeFactory
   public static final String CODE_LINE_10 = "LINE_10";
 
   public EnturImportFlexTimetableDataValidationTreeFactory(
-    OrganisationAliasRepository organisationAliasRepository
+    OrganisationAliasRepository organisationAliasRepository,
+    ValidationParametersConfig validationParametersConfig
   ) {
-    super(organisationAliasRepository);
+    super(organisationAliasRepository, validationParametersConfig);
   }
 
   @Override

@@ -79,8 +79,8 @@ public class ValidatorConfig {
   }
 
   @Bean
-  public NetexIdValidator netexIdValidator() {
-    return new NetexIdValidator();
+  public NetexIdValidator netexIdValidator(ValidationParametersConfig validationParametersConfig) {
+    return new NetexIdValidator(validationParametersConfig.additionalAllowedCodespaces);
   }
 
   @Bean

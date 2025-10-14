@@ -4,6 +4,8 @@ import static org.entur.netex.validation.validator.xpath.tree.DefaultCompositeFr
 
 import java.util.HashSet;
 import java.util.Map;
+
+import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
@@ -28,8 +30,8 @@ public class EnturTimetableDataSwedenValidationTreeFactory
     "VALIDITY_CONDITIONS_IN_COMMON_FILE_SE_1";
   public static final String CODE_COMPOSITE_FRAME_SE_1 = "COMPOSITE_FRAME_SE_1";
 
-  public EnturTimetableDataSwedenValidationTreeFactory() {
-    super(new SimpleOrganisationAliasRepository(new HashSet<>()));
+  public EnturTimetableDataSwedenValidationTreeFactory(ValidationParametersConfig validationParametersConfig) {
+    super(new SimpleOrganisationAliasRepository(new HashSet<>()), validationParametersConfig);
   }
 
   @Override
