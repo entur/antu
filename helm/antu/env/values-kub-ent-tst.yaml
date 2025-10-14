@@ -1,6 +1,14 @@
 env: test
 replicas: 2
 
+antu:
+  validation:
+    additionalAllowedCodespaces:
+      - xmlns: NSR
+        xmlnsUrl: http://www.rutebanken.org/ns/nsr
+      - xmlns: PEN
+        xmlnsUrl: http://www.rutebanken.org/ns/pen
+
 gcp:
   blobstoreProjectId: entur-ror-test
   pubsubProjectId: ent-antu-tst
