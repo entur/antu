@@ -81,15 +81,6 @@ public class NetexIdValidator implements XPathValidator {
     this.additionalAllowedCodespaces = additionalAllowedCodespaces;
   }
 
-  private List<NetexCodespace> getValidCodespacesFor(String codespace) {
-    List<NetexCodespace> validCodespaces = new ArrayList<>();
-    if (additionalAllowedCodespaces != null) {
-      validCodespaces.addAll(additionalAllowedCodespaces);
-    }
-    validCodespaces.add(NetexCodespace.rutebanken(codespace));
-    return validCodespaces;
-  }
-
   @Override
   public List<ValidationIssue> validate(
     XPathValidationContext validationContext
