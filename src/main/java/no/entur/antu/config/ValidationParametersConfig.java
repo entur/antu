@@ -9,5 +9,13 @@ import java.util.Set;
 @Component
 @ConfigurationProperties(prefix = "antu.validation")
 public class ValidationParametersConfig {
-    public Set<NetexCodespace> additionalAllowedCodespaces;
+    private Set<NetexCodespace> additionalAllowedCodespaces;
+
+    public Set<NetexCodespace> getAdditionalAllowedCodespaces() {
+        return additionalAllowedCodespaces;
+    }
+
+    public void setAdditionalAllowedCodespaces(Set<NetexCodespace> additionalAllowedCodespaces) {
+        this.additionalAllowedCodespaces = additionalAllowedCodespaces;
+    }
 }

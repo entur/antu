@@ -37,7 +37,7 @@ public class EnturTimetableDataValidationTreeFactory
     compositeFrameValidationTreeBuilder().withRule(new ValidateNSRCodespace());
 
     ValidateAllowedCodespaces validateAllowedCodespaces = new ValidateAllowedCodespaces(
-        validationParametersConfig.additionalAllowedCodespaces
+        validationParametersConfig.getAdditionalAllowedCodespaces()
     );
     rootValidationTreeBuilder().withRule(validateAllowedCodespaces);
 

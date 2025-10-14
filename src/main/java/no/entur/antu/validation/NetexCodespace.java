@@ -3,7 +3,7 @@ package no.entur.antu.validation;
 import java.util.Locale;
 
 /**
- * A Rutebanken codespace, identified by its namespace and its URL.
+ * A Netex codespace, identified by its namespace and its URL.
  */
 public record NetexCodespace(String xmlns, String xmlnsUrl) {
     public static NetexCodespace rutebanken(String namespace) {

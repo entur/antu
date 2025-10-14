@@ -39,7 +39,7 @@ public class TestConfig {
   @Primary
   public ValidationParametersConfig validationParametersConfig() {
       ValidationParametersConfig validationParametersConfig = new ValidationParametersConfig();
-        validationParametersConfig.additionalAllowedCodespaces = Set.of(NetexCodespace.rutebanken("nsr"), NetexCodespace.rutebanken("pen"));
+        validationParametersConfig.setAdditionalAllowedCodespaces(Set.of(NetexCodespace.rutebanken("nsr"), NetexCodespace.rutebanken("pen")));
         return validationParametersConfig;
   }
 

@@ -125,7 +125,7 @@ public class TimetableDataFlexValidatorConfig {
   @Bean
   public NetexIdValidator flexNetexIdValidator(ValidationParametersConfig validationParametersConfig) {
     // TODO temporarily ignore unapproved codespace for Operator
-    return new NetexIdValidator(Set.of("Operator"), validationParametersConfig.additionalAllowedCodespaces);
+    return new NetexIdValidator(Set.of("Operator"), validationParametersConfig.getAdditionalAllowedCodespaces());
   }
 
   @Bean
