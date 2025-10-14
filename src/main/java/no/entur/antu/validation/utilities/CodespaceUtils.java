@@ -6,6 +6,8 @@ import no.entur.antu.validation.NetexCodespace;
 
 public class CodespaceUtils {
 
+  private CodespaceUtils() {}
+
   public static Set<NetexCodespace> getValidCodespacesFor(
     String validatingCodespace,
     Set<NetexCodespace> additionalCodespaces
