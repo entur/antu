@@ -16,7 +16,7 @@ public class InterchangeServiceJourneyReferencesExistValidator
       "RULE_NON_EXISTING_SERVICE_JOURNEY_REF",
       "ServiceJourneyInterchange refers to non-existing service journey",
       "ServiceJourneyInterchange %s refers to non-existing service journey %s",
-      Severity.WARNING
+      Severity.ERROR
     );
 
   private final NetexDataRepository netexDataRepository;

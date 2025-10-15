@@ -12,7 +12,8 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 
 /**
  * Validator for mandatory fields in interchange.
- * Chouette reference:
+ * For validation of whether referred ServiceJourneys exist, see InterchangeServiceJourneyReferencesExistValidator.
+ * Chouette reference (partially implemented here):
  *  3-Interchange-1,
  *  3-Interchange-2,
  *  3-Interchange-3,
@@ -23,27 +24,27 @@ public class MandatoryFieldsValidator implements JAXBValidator {
   static final ValidationRule RULE_MISSING_FROM_STOP_POINT_IN_INTERCHANGE =
     new ValidationRule(
       "MISSING_FROM_STOP_POINT_IN_INTERCHANGE",
-      "FromPointRef or stop point is missing",
+      "Mandatory field FromPointRef is missing in ServiceJourneyInterchange",
       Severity.ERROR
     );
 
   static final ValidationRule RULE_MISSING_TO_STOP_POINT_IN_INTERCHANGE =
     new ValidationRule(
       "MISSING_TO_STOP_POINT_IN_INTERCHANGE",
-      "ToPointRef or stop point is missing",
+      "Mandatory field ToPointRef is missing in ServiceJourneyInterchange",
       Severity.ERROR
     );
   static final ValidationRule RULE_MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE =
     new ValidationRule(
       "MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE",
-      "FromJourneyRef or service journey is missing",
+      "Mandatory field FromJourneyRef is missing in ServiceJourneyInterchange",
       Severity.ERROR
     );
 
   static final ValidationRule RULE_MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE =
     new ValidationRule(
       "MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE",
-      "ToJourneyRef or service journey is missing",
+      "Mandatory field ToJourneyRef is missing in ServiceJourneyInterchange",
       Severity.ERROR
     );
 
