@@ -1,8 +1,10 @@
 package no.entur.antu.config;
 
 import java.time.Instant;
+import java.util.Set;
 import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
+import no.entur.antu.validation.NetexCodespace;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.*;
@@ -30,6 +32,17 @@ public class TestConfig {
   @Primary
   public OrganisationAliasRepository organisationAliasRepository() {
     return new TestOrganisationAliasRepository();
+  }
+
+  @Bean
+  @Primary
+  public ValidationParametersConfig validationParametersConfig() {
+    ValidationParametersConfig validationParametersConfig =
+      new ValidationParametersConfig();
+    validationParametersConfig.setAdditionalAllowedCodespaces(
+      Set.of(NetexCodespace.rutebanken("nsr"), NetexCodespace.rutebanken("pen"))
+    );
+    return validationParametersConfig;
   }
 
   @Bean

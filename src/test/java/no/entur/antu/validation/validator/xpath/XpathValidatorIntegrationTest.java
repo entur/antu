@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import net.sf.saxon.s9api.XdmNode;
+import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.organisation.SimpleOrganisationAliasRepository;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.validation.validator.ValidationIssue;
@@ -27,7 +28,8 @@ class XpathValidatorIntegrationTest {
       new SimpleOrganisationAliasRepository(new HashSet<>());
     ValidationTreeFactory validationTreeFactory =
       new EnturTimetableDataValidationTreeFactory(
-        stubOrganisationAliasRepository
+        stubOrganisationAliasRepository,
+        new ValidationParametersConfig()
       );
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
     XPathRuleValidator xPathValidator = new XPathRuleValidator(

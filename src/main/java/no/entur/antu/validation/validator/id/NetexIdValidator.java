@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import no.entur.antu.validation.NetexCodespace;
+import no.entur.antu.validation.utilities.CodespaceUtils;
 import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
@@ -63,18 +64,21 @@ public class NetexIdValidator implements XPathValidator {
   );
 
   private final Set<String> entityTypesReportedAsWarningForUnapprovedCodespace;
+  private final Set<NetexCodespace> additionalAllowedCodespaces;
 
-  public NetexIdValidator() {
-    this(Set.of());
+  public NetexIdValidator(Set<NetexCodespace> additionalAllowedCodespaces) {
+    this(Set.of(), additionalAllowedCodespaces);
   }
 
   public NetexIdValidator(
-    Set<String> entityTypesReportedAsWarningForUnapprovedCodespace
+    Set<String> entityTypesReportedAsWarningForUnapprovedCodespace,
+    Set<NetexCodespace> additionalAllowedCodespaces
   ) {
     this.entityTypesReportedAsWarningForUnapprovedCodespace =
       Objects.requireNonNull(
         entityTypesReportedAsWarningForUnapprovedCodespace
       );
+    this.additionalAllowedCodespaces = additionalAllowedCodespaces;
   }
 
   @Override
@@ -82,9 +86,9 @@ public class NetexIdValidator implements XPathValidator {
     XPathValidationContext validationContext
   ) {
     List<ValidationIssue> validationIssues = new ArrayList<>();
-
-    Set<String> validNetexCodespaces = NetexCodespace
-      .getValidNetexCodespacesFor(validationContext.getCodespace())
+    String codespace = validationContext.getCodespace();
+    Set<String> validNetexCodespaces = CodespaceUtils
+      .getValidCodespacesFor(codespace, additionalAllowedCodespaces)
       .stream()
       .map(NetexCodespace::xmlns)
       .collect(Collectors.toSet());

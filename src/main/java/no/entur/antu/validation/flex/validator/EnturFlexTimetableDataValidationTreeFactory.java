@@ -1,5 +1,6 @@
 package no.entur.antu.validation.flex.validator;
 
+import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import no.entur.antu.validation.validator.xpath.EnturTimetableDataValidationTreeFactory;
 import org.entur.netex.validation.validator.Severity;
@@ -17,9 +18,10 @@ public class EnturFlexTimetableDataValidationTreeFactory
     "STOP_PLACE_IN_FLEX_COMMON_FILE";
 
   public EnturFlexTimetableDataValidationTreeFactory(
-    OrganisationAliasRepository organisationAliasRepository
+    OrganisationAliasRepository organisationAliasRepository,
+    ValidationParametersConfig validationParametersConfig
   ) {
-    super(organisationAliasRepository);
+    super(organisationAliasRepository, validationParametersConfig);
   }
 
   @Override

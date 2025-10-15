@@ -1,5 +1,6 @@
 package no.entur.antu.validation.validator.id;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.entur.netex.validation.validator.ValidationIssue;
@@ -36,7 +37,7 @@ class NetexIdValidatorTest {
 
   @BeforeEach
   void setUpTest() {
-    netexIdValidator = new NetexIdValidator();
+    netexIdValidator = new NetexIdValidator(new HashSet<>());
   }
 
   @Test
@@ -136,7 +137,8 @@ class NetexIdValidatorTest {
   void testUnapprovedCodespaceWarning() {
     netexIdValidator =
       new NetexIdValidator(
-        Set.of(TEST_ENTITY_TYPE_REPORTED_AS_WARNING_FOR_UNAPPROVED_CODESPACE)
+        Set.of(TEST_ENTITY_TYPE_REPORTED_AS_WARNING_FOR_UNAPPROVED_CODESPACE),
+        new HashSet<>()
       );
 
     IdVersion idVersion1 = new IdVersion(

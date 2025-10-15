@@ -129,6 +129,11 @@ data:
     interchange-alighting-and-boarding-validation-enabled={{ .Values.alightingAndBoardingValidationEnabled }}
     interchange-service-journey-references-exist-validator-enabled={{ .Values.interchangeServiceJourneyReferencesExistValidatorEnabled }}
 
+    # Additional allowed codespaces for Antu validation
+    {{- range $index, $allowedCodespace := .Values.antu.validation.additionalAllowedCodespaces }}
+    antu.validation.additional-allowed-codespaces[{{ $index }}].xmlns={{ $allowedCodespace.xmlns }}
+    antu.validation.additional-allowed-codespaces[{{ $index }}].xmlnsUrl={{ $allowedCodespace.xmlnsUrl }}
+    {{- end }}
 kind: ConfigMap
 metadata:
   name: {{ template "antu.name" . }}-config

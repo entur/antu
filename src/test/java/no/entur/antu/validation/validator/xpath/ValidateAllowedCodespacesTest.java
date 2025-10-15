@@ -1,8 +1,9 @@
 package no.entur.antu.validation.validator.xpath;
 
-import static no.entur.antu.validation.NetexCodespace.NSR_NETEX_CODESPACE;
-
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import no.entur.antu.validation.NetexCodespace;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
 import org.entur.netex.validation.test.xpath.support.TestValidationContextBuilder;
 import org.entur.netex.validation.validator.ValidationIssue;
@@ -37,7 +38,7 @@ class ValidateAllowedCodespacesTest {
       "http://www.rutebanken.org/ns/nsr-invalid"
     );
     ValidateAllowedCodespaces validateAllowedCodespaces =
-      new ValidateAllowedCodespaces();
+      new ValidateAllowedCodespaces(new HashSet<>());
 
     XPathRuleValidationContext xpathValidationContext =
       TestValidationContextBuilder
@@ -52,12 +53,15 @@ class ValidateAllowedCodespacesTest {
 
   @Test
   void testValidCodeSpace() {
+    NetexCodespace nsrNetexCodespace = NetexCodespace.rutebanken("nsr");
+    Set<NetexCodespace> additionalAllowedCodespaces = new HashSet<>();
+    additionalAllowedCodespaces.add(nsrNetexCodespace);
     String publicationDeliveryWithValidCodespace = NETEX_FRAGMENT.replace(
       "${XML_NAMESPACE_URL}",
-      NSR_NETEX_CODESPACE.xmlnsUrl()
+      nsrNetexCodespace.xmlnsUrl()
     );
     ValidateAllowedCodespaces validateAllowedCodespaces =
-      new ValidateAllowedCodespaces();
+      new ValidateAllowedCodespaces(additionalAllowedCodespaces);
     XPathRuleValidationContext xpathValidationContext =
       TestValidationContextBuilder
         .ofNetexFragment(publicationDeliveryWithValidCodespace)

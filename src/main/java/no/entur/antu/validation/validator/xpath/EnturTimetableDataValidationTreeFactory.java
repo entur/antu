@@ -1,5 +1,6 @@
 package no.entur.antu.validation.validator.xpath;
 
+import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoAlightingAtFirstStopPoint;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoBoardingAtLastStopPoint;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
@@ -17,11 +18,14 @@ public class EnturTimetableDataValidationTreeFactory
   extends PublicationDeliveryValidationTreeFactory {
 
   private final OrganisationAliasRepository organisationAliasRepository;
+  private final ValidationParametersConfig validationParametersConfig;
 
   public EnturTimetableDataValidationTreeFactory(
-    OrganisationAliasRepository organisationAliasRepository
+    OrganisationAliasRepository organisationAliasRepository,
+    ValidationParametersConfig validationParametersConfig
   ) {
     this.organisationAliasRepository = organisationAliasRepository;
+    this.validationParametersConfig = validationParametersConfig;
   }
 
   @Override
@@ -31,7 +35,12 @@ public class EnturTimetableDataValidationTreeFactory
       .withRule(new ValidateAuthorityRef(organisationAliasRepository));
     // Validation against Norwegian codespaces
     compositeFrameValidationTreeBuilder().withRule(new ValidateNSRCodespace());
-    rootValidationTreeBuilder().withRule(new ValidateAllowedCodespaces());
+
+    ValidateAllowedCodespaces validateAllowedCodespaces =
+      new ValidateAllowedCodespaces(
+        validationParametersConfig.getAdditionalAllowedCodespaces()
+      );
+    rootValidationTreeBuilder().withRule(validateAllowedCodespaces);
 
     // Disabling check of duplicate ServiceJourney with different versions (slow test)
     timetableFrameValidationTreeBuilder()

@@ -17,6 +17,7 @@
 package no.entur.antu.finland.config;
 
 import java.util.List;
+import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.finland.validator.EnturTimetableDataFinlandValidationTreeFactory;
 import no.entur.antu.netexdata.collectors.LineInfoCollector;
 import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
@@ -70,8 +71,12 @@ import org.springframework.context.annotation.Configuration;
 public class TimetableDataFinlandValidatorConfig {
 
   @Bean
-  public ValidationTreeFactory finlandTimetableDataValidationTreeFactory() {
-    return new EnturTimetableDataFinlandValidationTreeFactory();
+  public ValidationTreeFactory finlandTimetableDataValidationTreeFactory(
+    ValidationParametersConfig validationParametersConfig
+  ) {
+    return new EnturTimetableDataFinlandValidationTreeFactory(
+      validationParametersConfig
+    );
   }
 
   @Bean
