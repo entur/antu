@@ -5,10 +5,8 @@ import static no.entur.antu.config.cache.CacheConfig.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.netexdata.collectors.LineInfoCollector;
-import no.entur.antu.netexdata.collectors.ServiceJourneyActiveDatesCollector;
-import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
-import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
+import java.util.Set;
+import no.entur.antu.netexdata.collectors.*;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.redisson.api.RedissonClient;
@@ -71,6 +69,19 @@ public class NetexDataCollectorConfig {
       dayTypeActiveDatesCache,
       serviceJourneyActiveDatesCache,
       operatingDayActiveDateCache
+    );
+  }
+
+  @Bean
+  public ScheduledStopPointIdCollector scheduledStopPointIdCollector(
+    RedissonClient redissonClient,
+    @Qualifier(
+      SCHEDULED_STOP_POINT_ID_CACHE
+    ) Map<String, Set<String>> scheduledStopPointIdsCache
+  ) {
+    return new ScheduledStopPointIdCollector(
+      redissonClient,
+      scheduledStopPointIdsCache
     );
   }
 }

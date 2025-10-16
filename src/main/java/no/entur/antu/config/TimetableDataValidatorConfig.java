@@ -19,16 +19,13 @@ package no.entur.antu.config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import no.entur.antu.netexdata.collectors.LineInfoCollector;
-import no.entur.antu.netexdata.collectors.ServiceJourneyActiveDatesCollector;
-import no.entur.antu.netexdata.collectors.ServiceJourneyInterchangeInfoCollector;
-import no.entur.antu.netexdata.collectors.ServiceJourneyStopsCollector;
+import no.entur.antu.netexdata.collectors.*;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.interchange.alighting.InterchangeForAlightingAndBoardingValidator;
 import no.entur.antu.validation.validator.interchange.distance.UnexpectedInterchangeDistanceValidator;
 import no.entur.antu.validation.validator.interchange.duplicate.DuplicateInterchangesValidator;
 import no.entur.antu.validation.validator.interchange.mandatoryfields.MandatoryFieldsValidator;
-import no.entur.antu.validation.validator.interchange.refs.InterchangeServiceJourneyReferencesExistValidator;
+import no.entur.antu.validation.validator.interchange.refs.ServiceJourneyInterchangeReferencesExistValidator;
 import no.entur.antu.validation.validator.interchange.stoppoints.StopPointsInVehicleJourneyValidator;
 import no.entur.antu.validation.validator.interchange.waitingtime.InterchangeWaitingTimeValidator;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.UnexpectedDistanceBetweenStopPointsValidator;
@@ -152,13 +149,13 @@ public class TimetableDataValidatorConfig {
   }
 
   @Bean
-  public InterchangeServiceJourneyReferencesExistValidator interchangeServiceJourneyReferencesExistValidator(
+  public ServiceJourneyInterchangeReferencesExistValidator interchangeServiceJourneyReferencesExistValidator(
     @Qualifier(
       "validationReportEntryFactory"
     ) ValidationReportEntryFactory validationReportEntryFactory,
     NetexDataRepository netexDataRepository
   ) {
-    return new InterchangeServiceJourneyReferencesExistValidator(
+    return new ServiceJourneyInterchangeReferencesExistValidator(
       validationReportEntryFactory,
       netexDataRepository
     );
@@ -183,7 +180,7 @@ public class TimetableDataValidatorConfig {
     ) NetexIdUniquenessValidator netexIdUniquenessValidator,
     StopPointsInVehicleJourneyValidator stopPointsInVehicleJourneyValidator,
     InterchangeForAlightingAndBoardingValidator interchangeForAlightingAndBoardingValidator,
-    InterchangeServiceJourneyReferencesExistValidator interchangeServiceJourneyReferencesExistValidator,
+    ServiceJourneyInterchangeReferencesExistValidator serviceJourneyInterchangeReferencesExistValidator,
     DuplicateLineNameValidator duplicateLineNameValidator,
     InterchangeWaitingTimeValidator interchangeWaitingTimeValidator,
     LineInfoCollector lineInfoCollector,
@@ -192,7 +189,8 @@ public class TimetableDataValidatorConfig {
     CommonDataRepositoryLoader commonDataRepository,
     NetexDataRepository netexDataRepository,
     StopPlaceRepository stopPlaceRepository,
-    ServiceJourneyActiveDatesCollector serviceJourneyActiveDatesCollector
+    ServiceJourneyActiveDatesCollector serviceJourneyActiveDatesCollector,
+    ScheduledStopPointIdCollector scheduledStopPointIdCollector
   ) {
     NetexXMLParser netexXMLParser = new NetexXMLParser(Set.of("SiteFrame"));
 
@@ -241,7 +239,7 @@ public class TimetableDataValidatorConfig {
 
     if (interchangeServiceJourneyReferencesExistValidatorEnabled) {
       netexTimetableDatasetValidators.add(
-        interchangeServiceJourneyReferencesExistValidator
+        serviceJourneyInterchangeReferencesExistValidator
       );
     }
 
@@ -249,7 +247,8 @@ public class TimetableDataValidatorConfig {
       lineInfoCollector,
       serviceJourneyInterchangeInfoCollector,
       serviceJourneyStopsCollector,
-      serviceJourneyActiveDatesCollector
+      serviceJourneyActiveDatesCollector,
+      scheduledStopPointIdCollector
     );
 
     return NetexValidatorsRunner

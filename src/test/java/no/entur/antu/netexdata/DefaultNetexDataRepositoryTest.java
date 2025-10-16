@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ class DefaultNetexDataRepositoryTest {
   private Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId;
   private Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache;
   private Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache;
+  private Map<String, Set<String>> scheduledStopPointIdsCache;
 
   @BeforeEach
   void setUp() {
@@ -65,6 +67,8 @@ class DefaultNetexDataRepositoryTest {
       Map.of("OperatingDay1", LocalDateTime.now())
     );
 
+    scheduledStopPointIdsCache = new HashMap<>();
+
     this.repository =
       new DefaultNetexDataRepository(
         lineInfoCache,
@@ -72,7 +76,8 @@ class DefaultNetexDataRepositoryTest {
         serviceJourneyInterchangeInfoCache,
         activeDatesByServiceJourneyId,
         dayTypeActiveDatesCache,
-        operatingDayActiveDateCache
+        operatingDayActiveDateCache,
+        scheduledStopPointIdsCache
       );
   }
 
@@ -85,6 +90,7 @@ class DefaultNetexDataRepositoryTest {
     assertTrue(activeDatesByServiceJourneyId.isEmpty());
     assertTrue(dayTypeActiveDatesCache.isEmpty());
     assertTrue(operatingDayActiveDateCache.isEmpty());
+    assertTrue(scheduledStopPointIdsCache.isEmpty());
   }
 
   @Test

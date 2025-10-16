@@ -3,6 +3,7 @@ package no.entur.antu.netexdata;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.redisson.api.RedissonClient;
@@ -18,7 +19,8 @@ public class RedisNetexDataRepository extends DefaultNetexDataRepository {
     Map<String, List<String>> serviceJourneyInterchangeInfoCache,
     Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache,
     Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
-    Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
+    Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache,
+    Map<String, Set<String>> scheduledStopPointIdsCache
   ) {
     super(
       lineInfoCache,
@@ -26,7 +28,8 @@ public class RedisNetexDataRepository extends DefaultNetexDataRepository {
       serviceJourneyInterchangeInfoCache,
       activeDatesByServiceJourneyIdCache,
       dayTypeActiveDatesCache,
-      operatingDayActiveDateCache
+      operatingDayActiveDateCache,
+      scheduledStopPointIdsCache
     );
     this.redissonClient = redissonClient;
   }

@@ -5,6 +5,7 @@ import static no.entur.antu.config.cache.CacheConfig.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import no.entur.antu.netexdata.RedisNetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
@@ -37,7 +38,10 @@ public class NetexDataConfig {
     ) Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
     @Qualifier(
       ACTIVE_DATE_BY_OPERATING_DAY_REF
-    ) Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
+    ) Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache,
+    @Qualifier(
+      SCHEDULED_STOP_POINT_ID_CACHE
+    ) Map<String, Set<String>> scheduledStopPointIdsCache
   ) {
     return new RedisNetexDataRepository(
       redissonClient,
@@ -46,7 +50,8 @@ public class NetexDataConfig {
       serviceJourneyInterchangeInfoCache,
       activeDatesByServiceJourneyRefCache,
       dayTypeActiveDatesCache,
-      operatingDayActiveDateCache
+      operatingDayActiveDateCache,
+      scheduledStopPointIdsCache
     );
   }
 }

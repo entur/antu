@@ -1,10 +1,7 @@
 package no.entur.antu.common.repository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import org.entur.netex.validation.validator.model.*;
 
@@ -91,6 +88,11 @@ public class TestNetexDataRepository implements NetexDataRepositoryLoader {
     return serviceJourneyIdToActiveDatesByValidationReportId.get(
       validationReportId
     );
+  }
+
+  @Override
+  public Set<String> scheduledStopPointIds(String validationReportId) {
+    return Set.of();
   }
 
   public void putServiceJourneyIdToActiveDates(

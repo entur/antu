@@ -27,6 +27,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   private final Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache;
   private final Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache;
   private final Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache;
+  private final Map<String, Set<String>> scheduledStopPointIdsCache;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     DefaultNetexDataRepository.class
@@ -38,7 +39,8 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
     Map<String, List<String>> serviceJourneyInterchangeInfoCache,
     Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId,
     Map<String, Map<String, List<LocalDateTime>>> dayTypeActiveDatesCache,
-    Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache
+    Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache,
+    Map<String, Set<String>> scheduledStopPointIdsCache
   ) {
     this.lineInfoCache = lineInfoCache;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
@@ -47,6 +49,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
     this.activeDatesByServiceJourneyIdCache = activeDatesByServiceJourneyId;
     this.dayTypeActiveDatesCache = dayTypeActiveDatesCache;
     this.operatingDayActiveDateCache = operatingDayActiveDateCache;
+    this.scheduledStopPointIdsCache = scheduledStopPointIdsCache;
   }
 
   @Override
@@ -123,6 +126,11 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   }
 
   @Override
+  public Set<String> scheduledStopPointIds(String validationReportId) {
+    return scheduledStopPointIdsCache.get(validationReportId);
+  }
+
+  @Override
   public void cleanUp(String validationReportId) {
     LOGGER.info(
       "Clearing caches for validation report: {}",
@@ -134,6 +142,9 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
     dayTypeActiveDatesCache.remove(validationReportId);
     operatingDayActiveDateCache.remove(validationReportId);
 
+    scheduledStopPointIdsCache
+      .keySet()
+      .removeIf(k -> k.startsWith(validationReportId));
     serviceJourneyStopsCache
       .keySet()
       .removeIf(k -> k.startsWith(validationReportId));
