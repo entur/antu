@@ -314,12 +314,20 @@ public class NetexTestDataSample {
 
   public static ServiceJourneyInterchange serviceJourneyInterchangeWithServiceJourneyRefs(
     String fromJourneyRef,
-    String toJourneyRef
+    String toJourneyRef,
+    String fromStopPointRef,
+    String toStopPointRef
   ) {
     return defaultServiceJourneyInterchange()
       .withFromJourneyRef(
         new VehicleJourneyRefStructure().withRef(fromJourneyRef)
       )
-      .withToJourneyRef(new VehicleJourneyRefStructure().withRef(toJourneyRef));
+      .withToJourneyRef(new VehicleJourneyRefStructure().withRef(toJourneyRef))
+      .withFromPointRef(
+        new ScheduledStopPointRefStructure().withRef(fromStopPointRef)
+      )
+      .withToPointRef(
+        new ScheduledStopPointRefStructure().withRef(toStopPointRef)
+      );
   }
 }
