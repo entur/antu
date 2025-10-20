@@ -121,9 +121,7 @@ public class AntuStopPlaceChangeLogListener
           stopPlace.getName().getValue(),
           TransportModeAndSubMode.of(stopPlace),
           StopPlaceUtils.isParentStopPlace(stopPlace),
-          netexEntitiesIndex
-            .getQuayIdsByStopPlaceIdIndex()
-            .get(stopPlace.getId())
+          StopPlaceUtils.getQuayIdsForStopPlace(stopPlace)
         );
         stopPlaceRepositoryLoader.createOrUpdateStopPlace(
           stopPlaceId,

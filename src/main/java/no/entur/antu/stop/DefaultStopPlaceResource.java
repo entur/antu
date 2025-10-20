@@ -95,9 +95,9 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
         Collectors.toUnmodifiableMap(
           stopPlace -> new StopPlaceId(stopPlace.getId()),
           stopPlace -> {
-            Set<String> quayIds = netexEntitiesIndex
-              .getQuayIdsByStopPlaceIdIndex()
-              .get(stopPlace.getId());
+            Set<String> quayIds = StopPlaceUtils.getQuayIdsForStopPlace(
+              stopPlace
+            );
             if (quayIds == null) {
               quayIds = Set.of();
             }
