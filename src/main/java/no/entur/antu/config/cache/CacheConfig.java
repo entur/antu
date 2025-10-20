@@ -50,6 +50,8 @@ public class CacheConfig {
     "activeDatesByServiceJourneyIdCache";
   public static final String ACTIVE_DATE_BY_OPERATING_DAY_REF =
     "activeDateByOperatingDayRefCache";
+  public static final String SCHEDULED_STOP_POINT_ID_CACHE =
+    "scheduledStopPointIdCache";
 
   public static final String VALIDATION_STATE_CACHE = "validationProgressCache";
 
@@ -243,6 +245,17 @@ public class CacheConfig {
       redissonClient,
       ACTIVE_DATE_BY_OPERATING_DAY_REF,
       new CompositeCodec(new StringCodec(), DEFAULT_CODEC)
+    );
+  }
+
+  @Bean(name = SCHEDULED_STOP_POINT_ID_CACHE)
+  public Map<String, Set<String>> scheduledStopPointIdCache(
+    RedissonClient redissonClient
+  ) {
+    return getOrCreateReportScopedCache(
+      redissonClient,
+      SCHEDULED_STOP_POINT_ID_CACHE,
+      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
     );
   }
 

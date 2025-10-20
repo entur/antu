@@ -8,7 +8,7 @@ import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InterchangeServiceJourneyReferencesExistValidator
+public class ServiceJourneyInterchangeReferencesExistValidator
   extends AbstractDatasetValidator {
 
   static final ValidationRule RULE_NON_EXISTING_SERVICE_JOURNEY_REF =
@@ -19,13 +19,21 @@ public class InterchangeServiceJourneyReferencesExistValidator
       Severity.ERROR
     );
 
+  static final ValidationRule RULE_NON_EXISTING_STOP_POINT_REF =
+    new ValidationRule(
+      "RULE_NON_EXISTING_STOP_POINT_REF",
+      "ServiceJourneyInterchange refers to non-existing scheduled stop point",
+      "ServiceJourneyInterchange %s refers to non-existing scheduled stop point %s",
+      Severity.ERROR
+    );
+
   private final NetexDataRepository netexDataRepository;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
-    InterchangeServiceJourneyReferencesExistValidator.class
+    ServiceJourneyInterchangeReferencesExistValidator.class
   );
 
-  public InterchangeServiceJourneyReferencesExistValidator(
+  public ServiceJourneyInterchangeReferencesExistValidator(
     ValidationReportEntryFactory validationReportEntryFactory,
     NetexDataRepository netexDataRepository
   ) {
@@ -33,7 +41,53 @@ public class InterchangeServiceJourneyReferencesExistValidator
     this.netexDataRepository = netexDataRepository;
   }
 
-  static ValidationIssue createValidationIssue(
+  static ValidationIssue createValidationIssueOnMissingStopPoint(
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+    String scheduledStopPointId
+  ) {
+    return new ValidationIssue(
+      RULE_NON_EXISTING_STOP_POINT_REF,
+      new DataLocation(
+        serviceJourneyInterchangeInfo.interchangeId(),
+        serviceJourneyInterchangeInfo.filename(),
+        null,
+        null
+      ),
+      serviceJourneyInterchangeInfo.interchangeId(),
+      scheduledStopPointId
+    );
+  }
+
+  static List<ValidationIssue> validateStopPointRefsExists(
+    ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
+    Set<String> stopPointIds
+  ) {
+    List<ValidationIssue> issues = new ArrayList<>();
+    String fromPointRef = serviceJourneyInterchangeInfo.fromStopPoint().id();
+    String toPointRef = serviceJourneyInterchangeInfo.toStopPoint().id();
+
+    if (!stopPointIds.contains(fromPointRef)) {
+      issues.add(
+        createValidationIssueOnMissingStopPoint(
+          serviceJourneyInterchangeInfo,
+          fromPointRef
+        )
+      );
+    }
+
+    if (!stopPointIds.contains(toPointRef)) {
+      issues.add(
+        createValidationIssueOnMissingStopPoint(
+          serviceJourneyInterchangeInfo,
+          toPointRef
+        )
+      );
+    }
+
+    return issues;
+  }
+
+  static ValidationIssue createValidationIssueOnMissingServiceJourney(
     ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo,
     String journeyRef
   ) {
@@ -62,7 +116,7 @@ public class InterchangeServiceJourneyReferencesExistValidator
 
     if (!serviceJourneyIds.contains(fromServiceJourneyRef)) {
       issues.add(
-        createValidationIssue(
+        createValidationIssueOnMissingServiceJourney(
           serviceJourneyInterchangeInfo,
           fromServiceJourneyRef.id()
         )
@@ -71,7 +125,7 @@ public class InterchangeServiceJourneyReferencesExistValidator
 
     if (!serviceJourneyIds.contains(toServiceJourneyRef)) {
       issues.add(
-        createValidationIssue(
+        createValidationIssueOnMissingServiceJourney(
           serviceJourneyInterchangeInfo,
           toServiceJourneyRef.id()
         )
@@ -96,11 +150,25 @@ public class InterchangeServiceJourneyReferencesExistValidator
     );
 
     for (ServiceJourneyInterchangeInfo serviceJourneyInterchangeInfo : serviceJourneyInterchangeInfoList) {
-      List<ValidationIssue> validationIssues = validateServiceJourneyRefsExists(
-        serviceJourneyInterchangeInfo,
-        existingServiceJourneyIds
+      List<ValidationIssue> validationIssuesOnServiceJourneyRefs =
+        validateServiceJourneyRefsExists(
+          serviceJourneyInterchangeInfo,
+          existingServiceJourneyIds
+        );
+
+      validationIssuesOnServiceJourneyRefs.forEach(validationIssue ->
+        validationReport.addValidationReportEntry(
+          createValidationReportEntry(validationIssue)
+        )
       );
-      validationIssues.forEach(validationIssue ->
+
+      List<ValidationIssue> validationIssuesOnStopPointRefs =
+        validateStopPointRefsExists(
+          serviceJourneyInterchangeInfo,
+          netexDataRepository.scheduledStopPointIds(validationReportId)
+        );
+
+      validationIssuesOnStopPointRefs.forEach(validationIssue ->
         validationReport.addValidationReportEntry(
           createValidationReportEntry(validationIssue)
         )
