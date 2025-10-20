@@ -159,16 +159,6 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     SimpleStopPlace stopPlace
   ) {
     stopPlaceCache.put(id, stopPlace);
-    Set<String> quayIds = stopPlace.quayIds();
-    if (quayIds != null) {
-      for (String quayIdStr : quayIds) {
-        QuayId quayId = new QuayId(quayIdStr);
-        SimpleQuay quay = quayCache.get(quayId);
-        if (quay != null) {
-          createOrUpdateQuay(quayId, quay);
-        }
-      }
-    }
   }
 
   @Override
