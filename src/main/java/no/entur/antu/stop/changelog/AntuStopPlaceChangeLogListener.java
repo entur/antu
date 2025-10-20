@@ -2,6 +2,7 @@ package no.entur.antu.stop.changelog;
 
 import java.io.InputStream;
 import java.util.Set;
+import java.util.stream.Collectors;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.stop.changelog.support.ChangeLogUtils;
 import org.entur.netex.NetexParser;
@@ -12,8 +13,8 @@ import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
-import org.entur.netex.validation.validator.utils.StopPlaceUtils;
 import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelogListener;
+import org.rutebanken.netex.model.EntityStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,47 +51,43 @@ public class AntuStopPlaceChangeLogListener
 
   @Override
   public void onStopPlaceDeactivated(String id, InputStream stopPlaceStream) {
+    deactivateStopPlace(new StopPlaceId(id), stopPlaceStream);
     log.info("Stop place deactivated: {}", id);
-    onStopPlaceDeleted(id);
+  }
+
+  private void deactivateStopPlace(
+    StopPlaceId stopPlaceId,
+    InputStream stopPlaceStream
+  ) {
+    NetexParser parser = new NetexParser();
+    NetexEntitiesIndex netexEntitiesIndex = parser.parse(stopPlaceStream);
+    Set<String> quaysToDelete = getQuaysIdsFromIndex(netexEntitiesIndex);
+    deleteStopPlace(stopPlaceId);
+    for (String quayId : quaysToDelete) {
+      deleteQuay(quayId, stopPlaceId);
+    }
+  }
+
+  private Set<String> getQuaysIdsFromIndex(
+    NetexEntitiesIndex netexEntitiesIndex
+  ) {
+    return netexEntitiesIndex
+      .getQuayIndex()
+      .getLatestVersions()
+      .stream()
+      .map(EntityStructure::getId)
+      .collect(Collectors.toSet());
   }
 
   @Override
   public void onStopPlaceDeleted(String id) {
     StopPlaceId stopPlaceId = new StopPlaceId(id);
-    if (stopPlaceIsEligibleForDeletion(stopPlaceId)) {
-      log.info(
-        "Stop place with id {} is eligible for deletion. Proceeding with deletion",
-        id
-      );
-      Set<String> quaysToDelete =
-        stopPlaceRepositoryLoader.getQuaysForStopPlaceId(stopPlaceId);
-      deleteStopPlace(stopPlaceId);
-      for (String quayId : quaysToDelete) {
-        deleteQuay(quayId, stopPlaceId);
-      }
+    Set<String> quaysToDelete =
+      stopPlaceRepositoryLoader.getQuaysForStopPlaceId(stopPlaceId);
+    deleteStopPlace(stopPlaceId);
+    for (String quayId : quaysToDelete) {
+      deleteQuay(quayId, stopPlaceId);
     }
-  }
-
-  private boolean stopPlaceIsEligibleForDeletion(StopPlaceId stopPlaceId) {
-    log.info(
-      "Checking whether stop place with ID {} is eligible for deletion",
-      stopPlaceId.id()
-    );
-    if (!stopPlaceRepositoryLoader.hasStopPlaceId(stopPlaceId)) {
-      log.info(
-        "Stop place with ID {} is ineligible for deletion because it does not exist in the cache. Ignoring",
-        stopPlaceId.id()
-      );
-      return false;
-    }
-    if (stopPlaceRepositoryLoader.isParentStop(stopPlaceId)) {
-      log.warn(
-        "Deletion of parent stops is unsupported, and stop place with id {} is a parent stop. Ignoring",
-        stopPlaceId.id()
-      );
-      return false;
-    }
-    return true;
   }
 
   private void deleteStopPlace(StopPlaceId stopPlaceId) {
@@ -119,9 +116,7 @@ public class AntuStopPlaceChangeLogListener
         StopPlaceId stopPlaceId = new StopPlaceId(stopPlace.getId());
         SimpleStopPlace simpleStopPlace = new SimpleStopPlace(
           stopPlace.getName().getValue(),
-          TransportModeAndSubMode.of(stopPlace),
-          StopPlaceUtils.isParentStopPlace(stopPlace),
-          StopPlaceUtils.getQuayIdsForStopPlace(stopPlace)
+          TransportModeAndSubMode.of(stopPlace)
         );
         stopPlaceRepositoryLoader.createOrUpdateStopPlace(
           stopPlaceId,

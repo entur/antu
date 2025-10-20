@@ -59,48 +59,6 @@ class AntuStopPlaceChangeLogListenerTest {
                                             </Quay>
                                         </quays>
                                     </StopPlace>
-                                    <StopPlace created="2017-11-09T19:12:03.026" changed="2021-04-22T18:26:07.254" modification="new" version="13" id="NSR:StopPlace:58587">
-                                        <Name lang="nor">Sandefjord lufthavn parent stop</Name>
-                                        <Description lang="nor"></Description>
-                                        <Centroid>
-                                            <Location>
-                                                <Longitude>10.253136</Longitude>
-                                                <Latitude>59.179097</Latitude>
-                                            </Location>
-                                        </Centroid>
-                                        <TransportMode>air</TransportMode>
-                                        <StopPlaceType>airport</StopPlaceType>
-                                        <keyList>
-                                            <KeyValue>
-                                                <Key>IS_PARENT_STOP_PLACE</Key>
-                                                <Value>true</Value>
-                                            </KeyValue>
-                                        </keyList>
-                                    </StopPlace>
-                                    <StopPlace created="2017-11-09T19:12:03.026" changed="2021-04-22T18:26:07.254" modification="new" version="13" id="NSR:StopPlace:58588">
-                                        <Name lang="nor">Sandefjord lufthavn child stop</Name>
-                                        <Description lang="nor"></Description>
-                                        <Centroid>
-                                            <Location>
-                                                <Longitude>10.253136</Longitude>
-                                                <Latitude>59.179097</Latitude>
-                                            </Location>
-                                        </Centroid>
-                                        <TransportMode>air</TransportMode>
-                                        <StopPlaceType>airport</StopPlaceType>
-                                        <ParentSiteRef ref="NSR:StopPlace:58587" version="3"/>
-                                        <quays>
-                                            <Quay changed="2018-10-18T16:13:25.256" modification="new" version="13" id="NSR:Quay:100311">
-                                                <PrivateCode></PrivateCode>
-                                                <Centroid>
-                                                    <Location>
-                                                        <Longitude>10.253157</Longitude>
-                                                        <Latitude>59.179070</Latitude>
-                                                    </Location>
-                                                </Centroid>
-                                            </Quay>
-                                        </quays>
-                                    </StopPlace>
                                 </stopPlaces>
                             </SiteFrame>
                         </dataObjects>
@@ -151,11 +109,11 @@ class AntuStopPlaceChangeLogListenerTest {
       expectedPublicationTimestamp,
       timestampRepository.getTimestamp()
     );
-    assertEquals(3, stopPlaceCache.size());
+    assertEquals(1, stopPlaceCache.size());
     StopPlaceId stopPlaceId = new StopPlaceId("NSR:StopPlace:58586");
     assertTrue(stopPlaceCache.containsKey(stopPlaceId));
     assertEquals("Sandefjord lufthavn", stopPlaceCache.get(stopPlaceId).name());
-    assertEquals(2, quayCache.size());
+    assertEquals(1, quayCache.size());
     QuayId quayId = new QuayId("NSR:Quay:100310");
     assertTrue(quayCache.containsKey(quayId));
     assertEquals(
@@ -166,30 +124,12 @@ class AntuStopPlaceChangeLogListenerTest {
   }
 
   @Test
-  void deleteStopPlaceWontDeleteParentStops() {
-    listener.onStopPlaceCreated(
-      "id",
-      new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
-    );
-    listener.onStopPlaceDeleted("NSR:StopPlace:58587");
-    Instant expectedPublicationTimestamp = LocalDateTime
-      .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
-      .atZone(ZoneId.of("Europe/Oslo"))
-      .toInstant();
-    assertEquals(
-      expectedPublicationTimestamp,
-      timestampRepository.getTimestamp()
-    );
-    assertEquals(3, stopPlaceCache.size());
-  }
-
-  @Test
   void deleteStopPlaceDeletesOrdinaryStopsIncludingQuays() {
     listener.onStopPlaceCreated(
       "id",
       new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
     );
-    listener.onStopPlaceDeleted("NSR:StopPlace:58588");
+    listener.onStopPlaceDeleted("NSR:StopPlace:58586");
     Instant expectedPublicationTimestamp = LocalDateTime
       .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
       .atZone(ZoneId.of("Europe/Oslo"))
@@ -198,35 +138,19 @@ class AntuStopPlaceChangeLogListenerTest {
       expectedPublicationTimestamp,
       timestampRepository.getTimestamp()
     );
-    assertEquals(2, stopPlaceCache.size());
-    assertEquals(1, quayCache.size());
-  }
-
-  @Test
-  void deactivateStopPlaceWontDeleteParentStops() {
-    InputStream inputStream = new ByteArrayInputStream(
-      SITE_FRAME.getBytes(StandardCharsets.UTF_8)
-    );
-    listener.onStopPlaceCreated("id", inputStream);
-    listener.onStopPlaceDeactivated("NSR:StopPlace:58587", inputStream);
-    Instant expectedPublicationTimestamp = LocalDateTime
-      .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
-      .atZone(ZoneId.of("Europe/Oslo"))
-      .toInstant();
-    assertEquals(
-      expectedPublicationTimestamp,
-      timestampRepository.getTimestamp()
-    );
-    assertEquals(3, stopPlaceCache.size());
+    assertEquals(0, stopPlaceCache.size());
+    assertEquals(0, quayCache.size());
   }
 
   @Test
   void deactivateStopPlaceDeletesOrdinaryStopsIncludingQuays() {
-    InputStream inputStream = new ByteArrayInputStream(
-      SITE_FRAME.getBytes(StandardCharsets.UTF_8)
+    byte[] xmlBytes = SITE_FRAME.getBytes(StandardCharsets.UTF_8);
+    listener.onStopPlaceCreated("id", new ByteArrayInputStream(xmlBytes));
+    listener.onStopPlaceDeactivated(
+      "NSR:StopPlace:58586",
+      new ByteArrayInputStream(xmlBytes)
     );
-    listener.onStopPlaceCreated("id", inputStream);
-    listener.onStopPlaceDeactivated("NSR:StopPlace:58588", inputStream);
+
     Instant expectedPublicationTimestamp = LocalDateTime
       .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
       .atZone(ZoneId.of("Europe/Oslo"))
@@ -235,7 +159,7 @@ class AntuStopPlaceChangeLogListenerTest {
       expectedPublicationTimestamp,
       timestampRepository.getTimestamp()
     );
-    assertEquals(2, stopPlaceCache.size());
-    assertEquals(1, quayCache.size());
+    assertEquals(0, stopPlaceCache.size());
+    assertEquals(0, quayCache.size());
   }
 }

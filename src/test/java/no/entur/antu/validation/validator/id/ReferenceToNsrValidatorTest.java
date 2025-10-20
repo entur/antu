@@ -31,16 +31,6 @@ class ReferenceToNsrValidatorTest {
       }
 
       @Override
-      public boolean isParentStop(StopPlaceId stopPlaceId) {
-        return false;
-      }
-
-      @Override
-      public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
-        return Set.of();
-      }
-
-      @Override
       public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
         return null;
       }

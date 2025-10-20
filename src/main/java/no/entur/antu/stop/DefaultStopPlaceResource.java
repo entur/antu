@@ -5,7 +5,6 @@ import static no.entur.antu.stop.changelog.support.ChangeLogUtils.parsePublicati
 import jakarta.xml.bind.JAXBElement;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -15,7 +14,6 @@ import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
-import org.entur.netex.validation.validator.utils.StopPlaceUtils;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,20 +92,11 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
       .collect(
         Collectors.toUnmodifiableMap(
           stopPlace -> new StopPlaceId(stopPlace.getId()),
-          stopPlace -> {
-            Set<String> quayIds = StopPlaceUtils.getQuayIdsForStopPlace(
-              stopPlace
-            );
-            if (quayIds == null) {
-              quayIds = Set.of();
-            }
-            return new SimpleStopPlace(
+          stopPlace ->
+            new SimpleStopPlace(
               stopPlace.getName().getValue(),
-              TransportModeAndSubMode.of(stopPlace),
-              StopPlaceUtils.isParentStopPlace(stopPlace),
-              quayIds
-            );
-          }
+              TransportModeAndSubMode.of(stopPlace)
+            )
         )
       );
   }

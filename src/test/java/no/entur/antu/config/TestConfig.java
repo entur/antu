@@ -95,11 +95,6 @@ public class TestConfig {
     }
 
     @Override
-    public boolean isParentStop(StopPlaceId stopPlaceId) {
-      return false;
-    }
-
-    @Override
     public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
       return Set.of();
     }

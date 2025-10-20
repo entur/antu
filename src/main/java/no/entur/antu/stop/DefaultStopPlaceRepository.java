@@ -17,6 +17,7 @@ package no.entur.antu.stop;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -66,21 +67,13 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
   }
 
   @Override
-  public boolean isParentStop(StopPlaceId stopPlaceId) {
-    SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
-    if (stopPlace != null) {
-      return stopPlace.isParentStop();
-    }
-    return false;
-  }
-
-  @Override
   public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
-    SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
-    if (stopPlace != null) {
-      return stopPlace.quayIds();
-    }
-    return new HashSet<>();
+    return quayCache
+      .entrySet()
+      .stream()
+      .filter(entry -> entry.getValue().stopPlaceId().equals(stopPlaceId))
+      .map(entry -> entry.getKey().id())
+      .collect(Collectors.toSet());
   }
 
   @Override

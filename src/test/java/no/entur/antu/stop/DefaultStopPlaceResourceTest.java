@@ -136,19 +136,9 @@ class DefaultStopPlaceResourceTest {
     Assertions.assertEquals(
       Map.of(
         new StopPlaceId(NSR_STOP_PLACE_1),
-        new SimpleStopPlace(
-          NSR_STOP_PLACE_NAME_1,
-          transportModeAndSubMode1,
-          false,
-          Set.of()
-        ),
+        new SimpleStopPlace(NSR_STOP_PLACE_NAME_1, transportModeAndSubMode1),
         new StopPlaceId(NSR_STOP_PLACE_2),
-        new SimpleStopPlace(
-          NSR_STOP_PLACE_NAME_2,
-          transportModeAndSubMode2,
-          false,
-          Set.of()
-        )
+        new SimpleStopPlace(NSR_STOP_PLACE_NAME_2, transportModeAndSubMode2)
       ),
       defaultStopPlaceResource.getStopPlaces()
     );
