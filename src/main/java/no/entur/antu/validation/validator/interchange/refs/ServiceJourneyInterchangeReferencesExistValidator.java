@@ -16,7 +16,7 @@ public class ServiceJourneyInterchangeReferencesExistValidator
       "RULE_NON_EXISTING_SERVICE_JOURNEY_REF",
       "ServiceJourneyInterchange refers to non-existing service journey",
       "ServiceJourneyInterchange %s refers to non-existing service journey %s",
-      Severity.WARNING
+      Severity.ERROR
     );
 
   static final ValidationRule RULE_NON_EXISTING_STOP_POINT_REF =
