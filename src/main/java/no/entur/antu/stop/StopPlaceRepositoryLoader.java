@@ -34,4 +34,14 @@ public interface StopPlaceRepositoryLoader extends StopPlaceRepository {
    * This does not update the quays attached to this stop place.
    */
   void createOrUpdateStopPlace(StopPlaceId id, SimpleStopPlace stopPlace);
+
+  /**
+   * Delete a stop place by its ID.
+   */
+  void deleteStopPlace(StopPlaceId stopPlaceId);
+
+  /**
+   * Delete a quay by its ID.
+   */
+  void deleteQuay(QuayId quayId);
 }

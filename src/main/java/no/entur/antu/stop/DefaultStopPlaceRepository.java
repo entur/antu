@@ -16,9 +16,8 @@
 package no.entur.antu.stop;
 
 import java.time.Instant;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -67,7 +66,25 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     return getQuay(quayId).isPresent();
   }
 
-  @Override
+    @Override
+    public boolean isParentStop(StopPlaceId stopPlaceId) {
+        SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
+        if (stopPlace != null) {
+            return stopPlace.isParentStop();
+        }
+        return false;
+    }
+
+    @Override
+    public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
+        SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
+        if (stopPlace != null) {
+            return stopPlace.quayIds();
+        }
+        return new HashSet<>();
+    }
+
+    @Override
   public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
     return getQuay(quayId)
       .map(quay ->
@@ -145,7 +162,20 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     stopPlaceCache.put(id, stopPlace);
   }
 
-  private Optional<SimpleQuay> getQuay(QuayId quayId) {
+    @Override
+    public void deleteStopPlace(StopPlaceId stopPlaceId) {
+        SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
+        if (stopPlace != null) {
+            stopPlaceCache.remove(stopPlaceId);
+        }
+    }
+
+    @Override
+    public void deleteQuay(QuayId quayId) {
+        quayCache.remove(quayId);
+    }
+
+    private Optional<SimpleQuay> getQuay(QuayId quayId) {
     SimpleQuay quayFromCache = quayCache.get(quayId);
     if (quayFromCache != null) {
       return Optional.of(quayFromCache);

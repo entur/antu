@@ -115,4 +115,9 @@ class AntuStopPlaceChangeLogListenerTest {
     );
     assertEquals(stopPlaceId, quayCache.get(quayId).stopPlaceId());
   }
+
+  @Test
+    void deleteStopPlace() {
+
+  }
 }

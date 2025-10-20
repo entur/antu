@@ -14,6 +14,7 @@ import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
+import org.entur.netex.validation.validator.utils.StopPlaceUtils;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +96,10 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
           stopPlace ->
             new SimpleStopPlace(
               stopPlace.getName().getValue(),
-              TransportModeAndSubMode.of(stopPlace)
+              TransportModeAndSubMode.of(stopPlace),
+              StopPlaceUtils.isParentStopPlace(stopPlace),
+              stopPlace.getValidBetween().getFirst(),
+              netexEntitiesIndex.getQuayIdsByStopPlaceIdIndex().get(stopPlace.getId())
             )
         )
       );
