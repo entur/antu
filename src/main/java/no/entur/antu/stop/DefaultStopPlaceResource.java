@@ -5,6 +5,7 @@ import static no.entur.antu.stop.changelog.support.ChangeLogUtils.parsePublicati
 import jakarta.xml.bind.JAXBElement;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -93,14 +94,20 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
       .collect(
         Collectors.toUnmodifiableMap(
           stopPlace -> new StopPlaceId(stopPlace.getId()),
-          stopPlace ->
-            new SimpleStopPlace(
+          stopPlace -> {
+            Set<String> quayIds = netexEntitiesIndex
+              .getQuayIdsByStopPlaceIdIndex()
+              .get(stopPlace.getId());
+            if (quayIds == null) {
+              quayIds = Set.of();
+            }
+            return new SimpleStopPlace(
               stopPlace.getName().getValue(),
               TransportModeAndSubMode.of(stopPlace),
               StopPlaceUtils.isParentStopPlace(stopPlace),
-              stopPlace.getValidBetween().getFirst(),
-              netexEntitiesIndex.getQuayIdsByStopPlaceIdIndex().get(stopPlace.getId())
-            )
+              quayIds
+            );
+          }
         )
       );
   }

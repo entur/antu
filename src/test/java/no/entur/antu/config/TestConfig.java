@@ -1,6 +1,7 @@
 package no.entur.antu.config;
 
 import java.time.Instant;
+import java.util.Set;
 import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
@@ -94,6 +95,16 @@ public class TestConfig {
     }
 
     @Override
+    public boolean isParentStop(StopPlaceId stopPlaceId) {
+      return false;
+    }
+
+    @Override
+    public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
+      return Set.of();
+    }
+
+    @Override
     public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
       return null;
     }
@@ -126,6 +137,12 @@ public class TestConfig {
       StopPlaceId id,
       SimpleStopPlace stopPlace
     ) {}
+
+    @Override
+    public void deleteStopPlace(StopPlaceId stopPlaceId) {}
+
+    @Override
+    public void deleteQuay(QuayId quayId) {}
   }
 
   private static class TestOrganisationAliasRepository

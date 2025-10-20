@@ -19,6 +19,7 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class AntuStopPlaceChangeLogListenerTest {
@@ -58,22 +59,67 @@ class AntuStopPlaceChangeLogListenerTest {
                                             </Quay>
                                         </quays>
                                     </StopPlace>
+                                    <StopPlace created="2017-11-09T19:12:03.026" changed="2021-04-22T18:26:07.254" modification="new" version="13" id="NSR:StopPlace:58587">
+                                        <Name lang="nor">Sandefjord lufthavn parent stop</Name>
+                                        <Description lang="nor"></Description>
+                                        <Centroid>
+                                            <Location>
+                                                <Longitude>10.253136</Longitude>
+                                                <Latitude>59.179097</Latitude>
+                                            </Location>
+                                        </Centroid>
+                                        <TransportMode>air</TransportMode>
+                                        <StopPlaceType>airport</StopPlaceType>
+                                        <keyList>
+                                            <KeyValue>
+                                                <Key>IS_PARENT_STOP_PLACE</Key>
+                                                <Value>true</Value>
+                                            </KeyValue>
+                                        </keyList>
+                                    </StopPlace>
+                                    <StopPlace created="2017-11-09T19:12:03.026" changed="2021-04-22T18:26:07.254" modification="new" version="13" id="NSR:StopPlace:58588">
+                                        <Name lang="nor">Sandefjord lufthavn child stop</Name>
+                                        <Description lang="nor"></Description>
+                                        <Centroid>
+                                            <Location>
+                                                <Longitude>10.253136</Longitude>
+                                                <Latitude>59.179097</Latitude>
+                                            </Location>
+                                        </Centroid>
+                                        <TransportMode>air</TransportMode>
+                                        <StopPlaceType>airport</StopPlaceType>
+                                        <ParentSiteRef ref="NSR:StopPlace:58587" version="3"/>
+                                        <quays>
+                                            <Quay changed="2018-10-18T16:13:25.256" modification="new" version="13" id="NSR:Quay:100311">
+                                                <PrivateCode></PrivateCode>
+                                                <Centroid>
+                                                    <Location>
+                                                        <Longitude>10.253157</Longitude>
+                                                        <Latitude>59.179070</Latitude>
+                                                    </Location>
+                                                </Centroid>
+                                            </Quay>
+                                        </quays>
+                                    </StopPlace>
                                 </stopPlaces>
                             </SiteFrame>
                         </dataObjects>
                     </PublicationDelivery>
                     """;
 
-  @Test
-  void createStopPlace() {
-    Map<StopPlaceId, SimpleStopPlace> stopPlaceCache = new HashMap<>();
-    Map<QuayId, SimpleQuay> quayCache = new HashMap<>();
-    StopPlaceRepositoryLoader loader = new DefaultStopPlaceRepository(
-      null,
-      stopPlaceCache,
-      quayCache
-    );
-    ChangelogUpdateTimestampRepository timestampRepository =
+  private Map<StopPlaceId, SimpleStopPlace> stopPlaceCache;
+  private Map<QuayId, SimpleQuay> quayCache;
+  private StopPlaceRepositoryLoader loader;
+  private ChangelogUpdateTimestampRepository timestampRepository;
+  private AntuStopPlaceChangeLogListener listener;
+
+  @BeforeEach
+  void setUp() {
+    this.stopPlaceCache = new HashMap<>();
+    this.quayCache = new HashMap<>();
+    this.loader =
+      new DefaultStopPlaceRepository(null, stopPlaceCache, quayCache);
+    this.timestampRepository =
       new ChangelogUpdateTimestampRepository() {
         private Instant timestamp;
 
@@ -87,9 +133,12 @@ class AntuStopPlaceChangeLogListenerTest {
           return timestamp;
         }
       };
-    AntuStopPlaceChangeLogListener listener =
+    this.listener =
       new AntuStopPlaceChangeLogListener(loader, timestampRepository);
+  }
 
+  @Test
+  void createStopPlace() {
     listener.onStopPlaceCreated(
       "id",
       new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
@@ -102,11 +151,11 @@ class AntuStopPlaceChangeLogListenerTest {
       expectedPublicationTimestamp,
       timestampRepository.getTimestamp()
     );
-    assertEquals(1, stopPlaceCache.size());
+    assertEquals(3, stopPlaceCache.size());
     StopPlaceId stopPlaceId = new StopPlaceId("NSR:StopPlace:58586");
     assertTrue(stopPlaceCache.containsKey(stopPlaceId));
     assertEquals("Sandefjord lufthavn", stopPlaceCache.get(stopPlaceId).name());
-    assertEquals(1, quayCache.size());
+    assertEquals(2, quayCache.size());
     QuayId quayId = new QuayId("NSR:Quay:100310");
     assertTrue(quayCache.containsKey(quayId));
     assertEquals(
@@ -117,7 +166,39 @@ class AntuStopPlaceChangeLogListenerTest {
   }
 
   @Test
-    void deleteStopPlace() {
+  void deleteStopPlaceWontDeleteParentStops() {
+    listener.onStopPlaceCreated(
+      "id",
+      new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
+    );
+    listener.onStopPlaceDeleted("NSR:StopPlace:58587");
+    Instant expectedPublicationTimestamp = LocalDateTime
+      .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
+      .atZone(ZoneId.of("Europe/Oslo"))
+      .toInstant();
+    assertEquals(
+      expectedPublicationTimestamp,
+      timestampRepository.getTimestamp()
+    );
+    assertEquals(3, stopPlaceCache.size());
+  }
 
+  @Test
+  void deleteStopPlaceDeletesOrdinaryStopsIncludingQuays() {
+    listener.onStopPlaceCreated(
+      "id",
+      new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
+    );
+    listener.onStopPlaceDeleted("NSR:StopPlace:58588");
+    Instant expectedPublicationTimestamp = LocalDateTime
+      .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
+      .atZone(ZoneId.of("Europe/Oslo"))
+      .toInstant();
+    assertEquals(
+      expectedPublicationTimestamp,
+      timestampRepository.getTimestamp()
+    );
+    assertEquals(2, stopPlaceCache.size());
+    assertEquals(1, quayCache.size());
   }
 }

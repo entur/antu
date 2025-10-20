@@ -1,6 +1,7 @@
 package no.entur.antu.common.repository;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -9,6 +10,7 @@ import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
+import org.entur.netex.validation.validator.utils.StopPlaceUtils;
 import org.jetbrains.annotations.Nullable;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
@@ -147,6 +149,16 @@ public class TestStopPlaceRepository implements StopPlaceRepository {
   @Override
   public boolean hasQuayId(QuayId quayId) {
     return quays.containsKey(quayId);
+  }
+
+  @Override
+  public boolean isParentStop(StopPlaceId stopPlaceId) {
+    return StopPlaceUtils.isParentStopPlace(stopPlaces.get(stopPlaceId));
+  }
+
+  @Override
+  public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
+    return Set.of();
   }
 
   @Nullable

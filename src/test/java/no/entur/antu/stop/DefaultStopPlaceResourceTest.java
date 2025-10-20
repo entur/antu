@@ -4,6 +4,7 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.model.*;
@@ -135,9 +136,19 @@ class DefaultStopPlaceResourceTest {
     Assertions.assertEquals(
       Map.of(
         new StopPlaceId(NSR_STOP_PLACE_1),
-        new SimpleStopPlace(NSR_STOP_PLACE_NAME_1, transportModeAndSubMode1),
+        new SimpleStopPlace(
+          NSR_STOP_PLACE_NAME_1,
+          transportModeAndSubMode1,
+          false,
+          Set.of()
+        ),
         new StopPlaceId(NSR_STOP_PLACE_2),
-        new SimpleStopPlace(NSR_STOP_PLACE_NAME_2, transportModeAndSubMode2)
+        new SimpleStopPlace(
+          NSR_STOP_PLACE_NAME_2,
+          transportModeAndSubMode2,
+          false,
+          Set.of()
+        )
       ),
       defaultStopPlaceResource.getStopPlaces()
     );

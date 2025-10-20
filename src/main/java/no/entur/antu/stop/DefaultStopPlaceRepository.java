@@ -17,7 +17,6 @@ package no.entur.antu.stop;
 
 import java.time.Instant;
 import java.util.*;
-
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -66,25 +65,25 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     return getQuay(quayId).isPresent();
   }
 
-    @Override
-    public boolean isParentStop(StopPlaceId stopPlaceId) {
-        SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
-        if (stopPlace != null) {
-            return stopPlace.isParentStop();
-        }
-        return false;
+  @Override
+  public boolean isParentStop(StopPlaceId stopPlaceId) {
+    SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
+    if (stopPlace != null) {
+      return stopPlace.isParentStop();
     }
+    return false;
+  }
 
-    @Override
-    public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
-        SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
-        if (stopPlace != null) {
-            return stopPlace.quayIds();
-        }
-        return new HashSet<>();
+  @Override
+  public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
+    SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
+    if (stopPlace != null) {
+      return stopPlace.quayIds();
     }
+    return new HashSet<>();
+  }
 
-    @Override
+  @Override
   public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
     return getQuay(quayId)
       .map(quay ->
@@ -160,22 +159,29 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     SimpleStopPlace stopPlace
   ) {
     stopPlaceCache.put(id, stopPlace);
+    Set<String> quayIds = stopPlace.quayIds();
+    if (quayIds != null) {
+      for (String quayIdStr : quayIds) {
+        QuayId quayId = new QuayId(quayIdStr);
+        SimpleQuay quay = quayCache.get(quayId);
+        if (quay != null) {
+          createOrUpdateQuay(quayId, quay);
+        }
+      }
+    }
   }
 
-    @Override
-    public void deleteStopPlace(StopPlaceId stopPlaceId) {
-        SimpleStopPlace stopPlace = stopPlaceCache.get(stopPlaceId);
-        if (stopPlace != null) {
-            stopPlaceCache.remove(stopPlaceId);
-        }
-    }
+  @Override
+  public void deleteStopPlace(StopPlaceId stopPlaceId) {
+    stopPlaceCache.remove(stopPlaceId);
+  }
 
-    @Override
-    public void deleteQuay(QuayId quayId) {
-        quayCache.remove(quayId);
-    }
+  @Override
+  public void deleteQuay(QuayId quayId) {
+    quayCache.remove(quayId);
+  }
 
-    private Optional<SimpleQuay> getQuay(QuayId quayId) {
+  private Optional<SimpleQuay> getQuay(QuayId quayId) {
     SimpleQuay quayFromCache = quayCache.get(quayId);
     if (quayFromCache != null) {
       return Optional.of(quayFromCache);
