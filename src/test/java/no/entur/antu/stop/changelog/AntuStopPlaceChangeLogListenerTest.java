@@ -201,4 +201,41 @@ class AntuStopPlaceChangeLogListenerTest {
     assertEquals(2, stopPlaceCache.size());
     assertEquals(1, quayCache.size());
   }
+
+  @Test
+  void deactivateStopPlaceWontDeleteParentStops() {
+    InputStream inputStream = new ByteArrayInputStream(
+      SITE_FRAME.getBytes(StandardCharsets.UTF_8)
+    );
+    listener.onStopPlaceCreated("id", inputStream);
+    listener.onStopPlaceDeactivated("NSR:StopPlace:58587", inputStream);
+    Instant expectedPublicationTimestamp = LocalDateTime
+      .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
+      .atZone(ZoneId.of("Europe/Oslo"))
+      .toInstant();
+    assertEquals(
+      expectedPublicationTimestamp,
+      timestampRepository.getTimestamp()
+    );
+    assertEquals(3, stopPlaceCache.size());
+  }
+
+  @Test
+  void deactivateStopPlaceDeletesOrdinaryStopsIncludingQuays() {
+    InputStream inputStream = new ByteArrayInputStream(
+      SITE_FRAME.getBytes(StandardCharsets.UTF_8)
+    );
+    listener.onStopPlaceCreated("id", inputStream);
+    listener.onStopPlaceDeactivated("NSR:StopPlace:58588", inputStream);
+    Instant expectedPublicationTimestamp = LocalDateTime
+      .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
+      .atZone(ZoneId.of("Europe/Oslo"))
+      .toInstant();
+    assertEquals(
+      expectedPublicationTimestamp,
+      timestampRepository.getTimestamp()
+    );
+    assertEquals(2, stopPlaceCache.size());
+    assertEquals(1, quayCache.size());
+  }
 }
