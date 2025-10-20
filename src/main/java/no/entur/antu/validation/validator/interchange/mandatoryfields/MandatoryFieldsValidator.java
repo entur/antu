@@ -12,7 +12,7 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 
 /**
  * Validator for mandatory fields in interchange.
- * For validation of whether referred ServiceJourneys exist, see InterchangeServiceJourneyReferencesExistValidator.
+ * For validation of whether referred ServiceJourneys and ScheduledStopPoints exist, see ServiceJourneyInterchangeReferencesExistValidator.
  * Chouette reference (partially implemented here):
  *  3-Interchange-1,
  *  3-Interchange-2,
