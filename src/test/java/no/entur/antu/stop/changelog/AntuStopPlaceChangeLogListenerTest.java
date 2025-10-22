@@ -19,6 +19,7 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class AntuStopPlaceChangeLogListenerTest {
@@ -64,16 +65,19 @@ class AntuStopPlaceChangeLogListenerTest {
                     </PublicationDelivery>
                     """;
 
-  @Test
-  void createStopPlace() {
-    Map<StopPlaceId, SimpleStopPlace> stopPlaceCache = new HashMap<>();
-    Map<QuayId, SimpleQuay> quayCache = new HashMap<>();
-    StopPlaceRepositoryLoader loader = new DefaultStopPlaceRepository(
-      null,
-      stopPlaceCache,
-      quayCache
-    );
-    ChangelogUpdateTimestampRepository timestampRepository =
+  private Map<StopPlaceId, SimpleStopPlace> stopPlaceCache;
+  private Map<QuayId, SimpleQuay> quayCache;
+  private StopPlaceRepositoryLoader loader;
+  private ChangelogUpdateTimestampRepository timestampRepository;
+  private AntuStopPlaceChangeLogListener listener;
+
+  @BeforeEach
+  void setUp() {
+    this.stopPlaceCache = new HashMap<>();
+    this.quayCache = new HashMap<>();
+    this.loader =
+      new DefaultStopPlaceRepository(null, stopPlaceCache, quayCache);
+    this.timestampRepository =
       new ChangelogUpdateTimestampRepository() {
         private Instant timestamp;
 
@@ -87,9 +91,12 @@ class AntuStopPlaceChangeLogListenerTest {
           return timestamp;
         }
       };
-    AntuStopPlaceChangeLogListener listener =
+    this.listener =
       new AntuStopPlaceChangeLogListener(loader, timestampRepository);
+  }
 
+  @Test
+  void createStopPlace() {
     listener.onStopPlaceCreated(
       "id",
       new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
@@ -114,5 +121,45 @@ class AntuStopPlaceChangeLogListenerTest {
       quayCache.get(quayId).quayCoordinates()
     );
     assertEquals(stopPlaceId, quayCache.get(quayId).stopPlaceId());
+  }
+
+  @Test
+  void deleteStopPlaceDeletesOrdinaryStopsIncludingQuays() {
+    listener.onStopPlaceCreated(
+      "id",
+      new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
+    );
+    listener.onStopPlaceDeleted("NSR:StopPlace:58586");
+    Instant expectedPublicationTimestamp = LocalDateTime
+      .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
+      .atZone(ZoneId.of("Europe/Oslo"))
+      .toInstant();
+    assertEquals(
+      expectedPublicationTimestamp,
+      timestampRepository.getTimestamp()
+    );
+    assertEquals(0, stopPlaceCache.size());
+    assertEquals(0, quayCache.size());
+  }
+
+  @Test
+  void deactivateStopPlaceDeletesOrdinaryStopsIncludingQuays() {
+    byte[] xmlBytes = SITE_FRAME.getBytes(StandardCharsets.UTF_8);
+    listener.onStopPlaceCreated("id", new ByteArrayInputStream(xmlBytes));
+    listener.onStopPlaceDeactivated(
+      "NSR:StopPlace:58586",
+      new ByteArrayInputStream(xmlBytes)
+    );
+
+    Instant expectedPublicationTimestamp = LocalDateTime
+      .parse("2023-06-08T12:09:20.879", DateTimeFormatter.ISO_DATE_TIME)
+      .atZone(ZoneId.of("Europe/Oslo"))
+      .toInstant();
+    assertEquals(
+      expectedPublicationTimestamp,
+      timestampRepository.getTimestamp()
+    );
+    assertEquals(0, stopPlaceCache.size());
+    assertEquals(0, quayCache.size());
   }
 }
