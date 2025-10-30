@@ -104,7 +104,8 @@ public final class SortStopTimesUtil {
       .collect(
         Collectors.toMap(
           EntityStructure::getId,
-          point -> point.getOrder().intValueExact()
+          point -> point.getOrder().intValueExact(),
+          (previous, latest) -> latest
         )
       );
   }
