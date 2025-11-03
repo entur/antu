@@ -22,7 +22,7 @@ gcp:
 
 tiamatUrl: https://api.staging.entur.io/stop-places/v1
 
-agreementRegistryUrl: https://api.entur.io/agreements/v1
+agreementRegistryUrl: https://api.staging.entur.io/agreements/v1
 
 interchangeWaitingTimeValidationEnabled: true
 alightingAndBoardingValidationEnabled: true
