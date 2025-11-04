@@ -33,7 +33,7 @@ jobs:
             ${{ runner.os }}-
       - name: Run maven build
         run: mvn verify -PprettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@v5.0.0
         with:
           path: target/*-SNAPSHOT.jar
       - name: Sonar Scan
