@@ -37,7 +37,8 @@ public class NetexUtils {
       .collect(
         Collectors.toMap(
           StopPointInJourneyPattern::getId,
-          ScheduledStopPointId::of
+          ScheduledStopPointId::of,
+          (previous, latest) -> latest
         )
       );
   }
