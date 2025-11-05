@@ -1,6 +1,7 @@
 package no.entur.antu.stop;
 
 import java.time.Instant;
+import java.util.Set;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -34,4 +35,19 @@ public interface StopPlaceRepositoryLoader extends StopPlaceRepository {
    * This does not update the quays attached to this stop place.
    */
   void createOrUpdateStopPlace(StopPlaceId id, SimpleStopPlace stopPlace);
+
+  /**
+   * Delete a stop place by its ID.
+   */
+  void deleteStopPlace(StopPlaceId stopPlaceId);
+
+  /**
+   * Delete a quay by its ID.
+   */
+  void deleteQuay(QuayId quayId);
+
+  /**
+   * Return the set of quay IDs for a given stop place ID.
+   */
+  Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId);
 }

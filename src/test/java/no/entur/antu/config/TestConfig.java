@@ -107,6 +107,11 @@ public class TestConfig {
     }
 
     @Override
+    public Set<String> getQuaysForStopPlaceId(StopPlaceId stopPlaceId) {
+      return Set.of();
+    }
+
+    @Override
     public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
       return null;
     }
@@ -139,6 +144,12 @@ public class TestConfig {
       StopPlaceId id,
       SimpleStopPlace stopPlace
     ) {}
+
+    @Override
+    public void deleteStopPlace(StopPlaceId stopPlaceId) {}
+
+    @Override
+    public void deleteQuay(QuayId quayId) {}
   }
 
   private static class TestOrganisationAliasRepository
