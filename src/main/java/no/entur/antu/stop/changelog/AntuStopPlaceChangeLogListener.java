@@ -15,6 +15,7 @@ import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
 import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelogListener;
 import org.rutebanken.netex.model.EntityStructure;
+import org.rutebanken.netex.model.MultilingualString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,8 +115,9 @@ public class AntuStopPlaceChangeLogListener
       .getLatestVersions()
       .forEach(stopPlace -> {
         StopPlaceId stopPlaceId = new StopPlaceId(stopPlace.getId());
+        MultilingualString stopPlaceName = stopPlace.getName();
         SimpleStopPlace simpleStopPlace = new SimpleStopPlace(
-          stopPlace.getName().getValue(),
+          stopPlaceName == null ? "" : stopPlaceName.getValue(),
           TransportModeAndSubMode.of(stopPlace)
         );
         stopPlaceRepositoryLoader.createOrUpdateStopPlace(
