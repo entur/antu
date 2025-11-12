@@ -23,10 +23,10 @@ public record InvalidFlexibleAreaContext(
     InvalidFlexibleAreaContext.class
   );
 
-  public static InvalidFlexibleAreaContext of(
+  public static List<InvalidFlexibleAreaContext> of(
     FlexibleStopPlace flexibleStopPlace
   ) {
-    Optional<InvalidFlexibleAreaContext> context = flexibleStopPlace
+    return flexibleStopPlace
       .getAreas()
       .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
       .stream()
@@ -50,9 +50,11 @@ public record InvalidFlexibleAreaContext(
         }
       })
       .filter(Objects::nonNull)
-      .findFirst();
+      .toList();
+  }
 
-    return context.orElse(null);
+  public boolean hasValidCoordinates() {
+    return GeometryUtilities.isValidCoordinatesList(coordinates);
   }
 
   private static AbstractRingType getAbstractRingType(

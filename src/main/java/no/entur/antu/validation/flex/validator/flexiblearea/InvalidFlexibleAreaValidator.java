@@ -1,10 +1,12 @@
 package no.entur.antu.validation.flex.validator.flexiblearea;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import no.entur.antu.validation.utilities.GeometryUtilities;
+import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationRule;
@@ -53,6 +55,7 @@ public class InvalidFlexibleAreaValidator implements JAXBValidator {
         validateFlexibleArea(validationContext, invalidFlexibleAreaContext)
       )
       .filter(Objects::nonNull)
+      .flatMap(List::stream)
       .toList();
   }
 
@@ -61,49 +64,49 @@ public class InvalidFlexibleAreaValidator implements JAXBValidator {
     return Set.of(RULE);
   }
 
-  @Nullable
-  private ValidationIssue validateFlexibleArea(
-    JAXBValidationContext validationContext,
-    InvalidFlexibleAreaContext invalidFlexibleAreaContext
+  private ValidationIssue createValidationIssue(
+    DataLocation dataLocation,
+    String message
   ) {
-    if (
-      !GeometryUtilities.isValidCoordinatesList(
-        invalidFlexibleAreaContext.coordinates()
-      )
-    ) {
-      return new ValidationIssue(
-        RULE,
-        validationContext.dataLocation(
-          invalidFlexibleAreaContext.flexibleAreaId()
-        ),
-        "Incomplete coordinates"
-      );
-    }
+    return new ValidationIssue(RULE, dataLocation, message);
+  }
 
-    try {
-      LinearRing linearRing = GeometryUtilities.createLinerRing(
-        invalidFlexibleAreaContext.coordinates()
+  @Nullable
+  private List<ValidationIssue> validateFlexibleArea(
+    JAXBValidationContext validationContext,
+    List<InvalidFlexibleAreaContext> invalidFlexibleAreaContexts
+  ) {
+    List<ValidationIssue> issues = new ArrayList<>();
+    for (InvalidFlexibleAreaContext invalidFlexibleAreaContext : invalidFlexibleAreaContexts) {
+      DataLocation flexStopDataLocation = validationContext.dataLocation(
+        invalidFlexibleAreaContext.flexibleAreaId()
       );
-
-      IsValidOp isValidOp = new IsValidOp(linearRing);
-      if (!isValidOp.isValid()) {
-        return new ValidationIssue(
-          RULE,
-          validationContext.dataLocation(
-            invalidFlexibleAreaContext.flexibleAreaId()
-          ),
-          isValidOp.getValidationError().toString()
+      if (!invalidFlexibleAreaContext.hasValidCoordinates()) {
+        issues.add(
+          createValidationIssue(flexStopDataLocation, "Incomplete coordinates")
         );
+      } else {
+        try {
+          LinearRing linearRing = GeometryUtilities.createLinerRing(
+            invalidFlexibleAreaContext.coordinates()
+          );
+
+          IsValidOp isValidOp = new IsValidOp(linearRing);
+          if (!isValidOp.isValid()) {
+            issues.add(
+              createValidationIssue(
+                flexStopDataLocation,
+                isValidOp.getValidationError().toString()
+              )
+            );
+          }
+        } catch (Exception ex) {
+          issues.add(
+            createValidationIssue(flexStopDataLocation, ex.getMessage())
+          );
+        }
       }
-    } catch (Exception ex) {
-      return new ValidationIssue(
-        RULE,
-        validationContext.dataLocation(
-          invalidFlexibleAreaContext.flexibleAreaId()
-        ),
-        ex.getMessage()
-      );
     }
-    return null;
+    return issues;
   }
 }
