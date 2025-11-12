@@ -51,11 +51,8 @@ public record InvalidFlexibleAreaContext(
         }
       })
       .filter(Objects::nonNull)
-      .collect(Collectors.toList());
+    .toList();
 
-    if (flexibleAreaContexts.isEmpty()) {
-      return null;
-    }
     return flexibleAreaContexts;
   }
 

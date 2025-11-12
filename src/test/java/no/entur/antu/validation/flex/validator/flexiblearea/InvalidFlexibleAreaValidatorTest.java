@@ -252,8 +252,8 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
     ValidationReport validationReport = runValidation(netexEntitiesIndex);
     Assertions
-      .assertThat(validationReport.getValidationReportEntries().size())
-      .isEqualTo(2);
+      .assertThat(validationReport.getValidationReportEntries())
+      .hasSize(2);
   }
 
   private ValidationReport runTestWithGivenCoordinates(
