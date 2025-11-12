@@ -4,7 +4,6 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.AbstractRingType;
 import net.opengis.gml._3.LinearRingType;
@@ -27,7 +26,7 @@ public record InvalidFlexibleAreaContext(
   public static List<InvalidFlexibleAreaContext> of(
     FlexibleStopPlace flexibleStopPlace
   ) {
-    List<InvalidFlexibleAreaContext> flexibleAreaContexts = flexibleStopPlace
+    return flexibleStopPlace
       .getAreas()
       .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
       .stream()
@@ -52,8 +51,6 @@ public record InvalidFlexibleAreaContext(
       })
       .filter(Objects::nonNull)
       .toList();
-
-    return flexibleAreaContexts;
   }
 
   public boolean hasValidCoordinates() {
