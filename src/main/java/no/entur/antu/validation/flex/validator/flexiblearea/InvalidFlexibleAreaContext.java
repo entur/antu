@@ -51,7 +51,7 @@ public record InvalidFlexibleAreaContext(
         }
       })
       .filter(Objects::nonNull)
-    .toList();
+      .toList();
 
     return flexibleAreaContexts;
   }
