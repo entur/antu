@@ -90,7 +90,7 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         accumulatedNetexIdsKey
       );
       duplicatedIds.addAll(intersection);
-      accumulatedNetexIds.union(netexLocalIdsKey);
+      accumulatedNetexIds.addAll(localNetexIds);
       return intersection;
     } finally {
       if (lock.isHeldByCurrentThread()) {
