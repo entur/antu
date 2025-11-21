@@ -73,7 +73,7 @@ public class StopRouteBuilder extends BaseRouteBuilder {
         LoggingLevel.INFO,
         correlation() + "Stop place cache is empty, priming cache"
       )
-      .to("direct:refreshStopCache")
+      .bean("stopPlaceRepositoryUpdater", "createOrUpdate")
       .otherwise()
       .log(
         LoggingLevel.INFO,
