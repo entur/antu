@@ -21,8 +21,6 @@ import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.nimbusds.jose.JWSAlgorithm;
@@ -40,10 +38,10 @@ import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
+import org.rutebanken.helper.organisation.authorization.AuthorizationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -148,10 +146,12 @@ class RestValidationReportRouteBuilderIntegrationTest
         .audience(Set.of("test-audience"))
         .build();
     }
-  }
 
-  @MockBean
-  private AntuAuthorizationService antuAuthorizationService;
+    @Bean
+    public AuthorizationService<String> testAuthorizationService() {
+      return new TestRutebankenAuthorizationService();
+    }
+  }
 
   @Produce(
     "http:localhost:{{server.port}}/services/validation-report/" +
@@ -163,11 +163,6 @@ class RestValidationReportRouteBuilderIntegrationTest
 
   @Test
   void getValidationReport() throws Exception {
-    // Mock authorization
-    doNothing()
-      .when(antuAuthorizationService)
-      .verifyRouteDataEditorPrivileges(anyString());
-
     // Prepare test data - create a mock validation report JSON
     String testReportJson =
       "{\"validationReportId\":\"" +
