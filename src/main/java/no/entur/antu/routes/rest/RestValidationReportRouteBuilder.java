@@ -296,15 +296,17 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
     from("direct:authorizeEditorRequest")
       .validate(header(CODESPACE_PARAM).isNotNull())
       .doTry()
-      .bean(
-        antuAuthorizationService,
-        "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})"
+      .process(e ->
+        antuAuthorizationService.verifyRouteDataEditorPrivileges(
+          e.getIn().getHeader(CODESPACE_PARAM, String.class),
+          e
+        )
       )
       .routeId("admin-authorize-editor-request");
 
     from("direct:authorizeAdminRequest")
       .doTry()
-      .process(e -> antuAuthorizationService.verifyAdministratorPrivileges())
+      .process(antuAuthorizationService::verifyAdministratorPrivileges)
       .routeId("admin-authorize-admin-request");
   }
 }
