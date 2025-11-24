@@ -81,10 +81,9 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .transform(exceptionMessage());
 
     restConfiguration()
-      .component("servlet")
+      .component("platform-http")
       .contextPath("/services")
       .bindingMode(RestBindingMode.off)
-      .endpointProperty("matchOnUriPrefix", "true")
       .apiContextPath("/swagger.json")
       .apiProperty("api.title", "Antu NeTEx Validation API")
       .apiProperty("api.version", "1.0");
@@ -297,15 +296,17 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
     from("direct:authorizeEditorRequest")
       .validate(header(CODESPACE_PARAM).isNotNull())
       .doTry()
-      .bean(
-        antuAuthorizationService,
-        "verifyRouteDataEditorPrivileges(${header." + CODESPACE_PARAM + "})"
+      .process(e ->
+        antuAuthorizationService.verifyRouteDataEditorPrivileges(
+          e.getIn().getHeader(CODESPACE_PARAM, String.class),
+          e
+        )
       )
       .routeId("admin-authorize-editor-request");
 
     from("direct:authorizeAdminRequest")
       .doTry()
-      .process(e -> antuAuthorizationService.verifyAdministratorPrivileges())
+      .process(antuAuthorizationService::verifyAdministratorPrivileges)
       .routeId("admin-authorize-admin-request");
   }
 }
