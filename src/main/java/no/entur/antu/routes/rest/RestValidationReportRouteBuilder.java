@@ -81,10 +81,9 @@ public class RestValidationReportRouteBuilder extends BaseRouteBuilder {
       .transform(exceptionMessage());
 
     restConfiguration()
-      .component("servlet")
+      .component("platform-http")
       .contextPath("/services")
       .bindingMode(RestBindingMode.off)
-      .endpointProperty("matchOnUriPrefix", "true")
       .apiContextPath("/swagger.json")
       .apiProperty("api.title", "Antu NeTEx Validation API")
       .apiProperty("api.version", "1.0");
