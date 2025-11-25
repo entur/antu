@@ -36,7 +36,6 @@ public class CacheConfig {
     "serviceLinksAndFromToScheduledStopPointIdCache";
   public static final String SCHEDULED_STOP_POINT_REF_TO_FLEXIBLE_STOP_POINT_REF_CACHE =
     "scheduledStopPointRefToFlexibleStopPointRefCache";
-  public static final String LINE_INFO_CACHE = "linesInfoCache";
   public static final String SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE =
     "serviceJourneyInterchangeInfoCache";
   public static final String SERVICE_JOURNEY_STOPS_CACHE =
@@ -174,22 +173,6 @@ public class CacheConfig {
       redissonClient,
       VALIDATION_STATE_CACHE,
       DEFAULT_CODEC
-    );
-  }
-
-  /**
-   * The list of line id/line name present in the current dataset.
-   * The cache is report-scoped.
-   * The cache key is the current validation report.
-   */
-  @Bean(name = LINE_INFO_CACHE)
-  public Map<String, List<String>> lineNamesCache(
-    RedissonClient redissonClient
-  ) {
-    return getOrCreateReportScopedCache(
-      redissonClient,
-      LINE_INFO_CACHE,
-      new CompositeCodec(new StringCodec(), new JsonJacksonCodec())
     );
   }
 

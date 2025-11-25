@@ -21,10 +21,9 @@ public class NetexDataCollectorConfig {
 
   @Bean
   public LineInfoMemStoreRepository lineInfoMemStoreRepository(
-    RedissonClient redissonClient,
-    @Qualifier(LINE_INFO_CACHE) Map<String, List<String>> lineInfoCache
+    RedissonClient redissonClient
   ) {
-    return new RedisLineInfoMemStoreRepository(redissonClient, lineInfoCache);
+    return new RedisLineInfoMemStoreRepository(redissonClient);
   }
 
   @Bean
