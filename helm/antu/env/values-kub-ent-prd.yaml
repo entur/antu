@@ -37,12 +37,9 @@ kafka:
   changelogTopic: ror-stop-place-changelog-production
 
 auth0:
-  ror:
-    url: https://auth2.entur.org/
-    audience: https://ror.api.entur.io
-
   partner:
     url: https://partner.entur.org/
+    audience: https://api.entur.io,https://ror.api.entur.io
 
   client:
     tokenUri: https://partner.entur.org/oauth/token
