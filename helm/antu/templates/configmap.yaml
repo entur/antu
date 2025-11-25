@@ -62,16 +62,9 @@ data:
     spring.cloud.gcp.project-id=${antu.pubsub.project.id}
     camel.component.google-pubsub.synchronous-pull-retryable-codes=DEADLINE_EXCEEDED
 
-    #OAuth2 Resource Server
-    antu.oauth2.resourceserver.auth0.ror.claim.namespace=https://ror.entur.io/
-
     # OAuth2 Resource Server for Entur Partner tenant
     antu.oauth2.resourceserver.auth0.entur.partner.jwt.issuer-uri={{ .Values.auth0.partner.url }}
-    antu.oauth2.resourceserver.auth0.entur.partner.jwt.audience={{ .Values.auth0.ror.audience }}
-
-    # OAuth2 Resource Server for RoR tenant
-    antu.oauth2.resourceserver.auth0.ror.jwt.issuer-uri={{ .Values.auth0.ror.url }}
-    antu.oauth2.resourceserver.auth0.ror.jwt.audience={{ .Values.auth0.ror.audience }}
+    antu.oauth2.resourceserver.auth0.entur.partner.jwt.audience={{ .Values.auth0.partner.audience }}
 
     #Oauth2 Entur Partner Client
     spring.security.oauth2.client.provider.orgregister.token-uri={{ .Values.auth0.client.tokenUri }}
