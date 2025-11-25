@@ -50,6 +50,7 @@ auth0:
   internal:
     clientId: yBQ4Gct1iVdU6zqtF5gwuEoy2cRtBcN0
     tokenUri: https://internal.entur.org/oauth/token
+    audience: https://ror.api.entur.io
 
 roleAssignmentExtractor: baba
 

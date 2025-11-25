@@ -50,6 +50,7 @@ auth0:
   internal:
     clientId: LVDqz3RiLvDFNcGnq1hjdi2fg54b4TTu
     tokenUri: https://internal.staging.entur.org/oauth/token
+    audience: https://ror.api.staging.entur.io
 
 roleAssignmentExtractor: baba
 
