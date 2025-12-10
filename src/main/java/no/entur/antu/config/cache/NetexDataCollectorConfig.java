@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import no.entur.antu.memorystore.LineInfoMemStoreRepository;
+import no.entur.antu.memorystore.RedisLineInfoMemStoreRepository;
 import no.entur.antu.netexdata.collectors.*;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
@@ -18,11 +20,17 @@ import org.springframework.context.annotation.Configuration;
 public class NetexDataCollectorConfig {
 
   @Bean
-  public LineInfoCollector lineInfoScraper(
-    RedissonClient redissonClient,
-    @Qualifier(LINE_INFO_CACHE) Map<String, List<String>> lineInfoCache
+  public LineInfoMemStoreRepository lineInfoMemStoreRepository(
+    RedissonClient redissonClient
   ) {
-    return new LineInfoCollector(redissonClient, lineInfoCache);
+    return new RedisLineInfoMemStoreRepository(redissonClient);
+  }
+
+  @Bean
+  public LineInfoCollector lineInfoScraper(
+    LineInfoMemStoreRepository lineInfoMemStoreRepository
+  ) {
+    return new LineInfoCollector(lineInfoMemStoreRepository);
   }
 
   @Bean

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import no.entur.antu.exception.AntuException;
+import no.entur.antu.memorystore.LineInfoMemStoreRepository;
 import org.entur.netex.validation.validator.model.ActiveDates;
 import org.entur.netex.validation.validator.model.ActiveDatesId;
 import org.entur.netex.validation.validator.model.DayTypeId;
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
 
-  private final Map<String, List<String>> lineInfoCache;
+  private final LineInfoMemStoreRepository lineInfoMemStoreRepository;
   private final Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache;
   private final Map<String, List<String>> serviceJourneyInterchangeInfoCache;
   private final Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyIdCache;
@@ -34,7 +35,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
   );
 
   public DefaultNetexDataRepository(
-    Map<String, List<String>> lineInfoCache,
+    LineInfoMemStoreRepository lineInfoMemStoreRepository,
     Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache,
     Map<String, List<String>> serviceJourneyInterchangeInfoCache,
     Map<String, Map<ServiceJourneyId, List<LocalDateTime>>> activeDatesByServiceJourneyId,
@@ -42,7 +43,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
     Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache,
     Map<String, Set<String>> scheduledStopPointIdsCache
   ) {
-    this.lineInfoCache = lineInfoCache;
+    this.lineInfoMemStoreRepository = lineInfoMemStoreRepository;
     this.serviceJourneyStopsCache = serviceJourneyStopsCache;
     this.serviceJourneyInterchangeInfoCache =
       serviceJourneyInterchangeInfoCache;
@@ -54,7 +55,9 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
 
   @Override
   public List<SimpleLine> lineNames(String validationReportId) {
-    List<String> lineInfoForReportId = lineInfoCache.get(validationReportId);
+    List<String> lineInfoForReportId = lineInfoMemStoreRepository.getLineInfo(
+      validationReportId
+    );
     if (lineInfoForReportId == null) {
       throw new AntuException(
         "Line names not found for validation report with id: " +
@@ -137,7 +140,7 @@ public class DefaultNetexDataRepository implements NetexDataRepositoryLoader {
       validationReportId
     );
 
-    lineInfoCache.remove(validationReportId);
+    lineInfoMemStoreRepository.removeLineInfo(validationReportId);
     activeDatesByServiceJourneyIdCache.remove(validationReportId);
     dayTypeActiveDatesCache.remove(validationReportId);
     operatingDayActiveDateCache.remove(validationReportId);
