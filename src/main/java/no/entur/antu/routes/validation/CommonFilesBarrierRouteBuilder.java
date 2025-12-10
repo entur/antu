@@ -38,6 +38,8 @@ import org.apache.camel.ExchangePropertyKey;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.Message;
 import org.apache.camel.builder.PredicateBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,6 +48,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    CommonFilesBarrierRouteBuilder.class
+  );
 
   private static final String PROP_DATASET_NETEX_FILE_NAMES =
     "EnturDatasetNetexFileNames";
@@ -106,6 +112,11 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
 
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+      LOGGER.info(
+        "Received common file for aggregation for report ID {} and codespace {}",
+        newExchange.getIn().getHeader(VALIDATION_REPORT_ID_HEADER),
+        newExchange.getIn().getHeader(DATASET_CODESPACE)
+      );
       Exchange aggregatedExchange = super.aggregate(oldExchange, newExchange);
       copyValidationHeaders(newExchange, aggregatedExchange);
       aggregatedExchange.setProperty(
