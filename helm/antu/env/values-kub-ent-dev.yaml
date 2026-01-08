@@ -42,7 +42,7 @@ kafka:
 auth0:
   partner:
     url: https://partner.dev.entur.org/
-    audience: https://api.dev.entur.io,https://ror.api.dev.entur.io,https://portal.dev.entur.org
+    audience: https://api.dev.entur.io,https://portal.dev.entur.org
 
   client:
     tokenUri: https://partner.dev.entur.org/oauth/token
