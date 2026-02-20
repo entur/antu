@@ -1,7 +1,5 @@
 # Antu
 
-[![CircleCI](https://circleci.com/gh/entur/antu/tree/main.svg?style=svg)](https://circleci.com/gh/entur/antu/tree/main)
-
 Validate NeTEx datasets against
 the [Nordic NeTEx Profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/728891481/Nordic+NeTEx+Profile).
 
@@ -38,6 +36,10 @@ Antu is designed so that the validation workload can be split evenly among singl
 This results in smaller pods, both in terms of CPU and memory consumption, which makes the Kubernetes scheduling process
 more efficient.
 The number of pods is adjusted dynamically thanks to a Horizontal Pod Autoscaler.
+
+# Deployment
+
+EnTur deploys Antu using [Harness](https://app.harness.io/ng/account/8VwWgE0WRK67_PWDpkooNA/all/cd/orgs/entur/projects/ror/services/antu)
 
 # Parallel processing
 
