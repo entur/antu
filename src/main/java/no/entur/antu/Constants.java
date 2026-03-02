@@ -92,6 +92,11 @@ public final class Constants {
   public static final String VALIDATION_CORRELATION_ID_HEADER =
     "EnturValidationCorrelationId";
 
+  public static final String FILE_CREATED_TIMESTAMP_HEADER =
+    "FileCreatedTimestamp";
+  public static final String RUTEBANKEN_FILE_HANDLE_HEADER =
+    "RutebankenFileHandle";
+
   public static final String VALIDATION_CLIENT_MARDUK = "Marduk";
   public static final String VALIDATION_CLIENT_KAKKA = "Kakka";
 

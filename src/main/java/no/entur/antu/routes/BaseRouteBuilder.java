@@ -65,6 +65,8 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
     Constants.VALIDATION_PROFILE_HEADER,
     Constants.NETEX_COMMON_FILE_NAME,
     Constants.REPORT_CREATION_DATE,
+    Constants.FILE_CREATED_TIMESTAMP_HEADER,
+    Constants.RUTEBANKEN_FILE_HANDLE_HEADER,
   };
 
   @Value("${quartz.lenient.fire.time.ms:180000}")
