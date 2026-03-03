@@ -95,5 +95,17 @@ public abstract class AntuGroupedMessageAggregationStrategy
         VALIDATION_DATASET_FILE_HANDLE_HEADER,
         newExchange.getIn().getHeader(VALIDATION_DATASET_FILE_HANDLE_HEADER)
       );
+    aggregatedExchange
+      .getIn()
+      .setHeader(
+        FILE_CREATED_TIMESTAMP_HEADER,
+        newExchange.getIn().getHeader(FILE_CREATED_TIMESTAMP_HEADER)
+      );
+    aggregatedExchange
+      .getIn()
+      .setHeader(
+        RUTEBANKEN_FILE_HANDLE_HEADER,
+        newExchange.getIn().getHeader(RUTEBANKEN_FILE_HANDLE_HEADER)
+      );
   }
 }
