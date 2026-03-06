@@ -14,7 +14,7 @@ import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.CoachSubmodeEnumeration;
 import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
@@ -50,7 +50,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void transportModeOnLineMatchesWithStopPlace() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
@@ -71,7 +71,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void stopAssignmentsWithValidModeDefinedInLineFileShouldBeConsidered() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
@@ -98,7 +98,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void stopAssignmentsWithInvalidModeDefinedInLineFileShouldBeConsidered() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+      .withTransportMode(AllPublicTransportModesEnumeration.RAIL)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withRailSubmode(RailSubmodeEnumeration.LOCAL)
@@ -125,13 +125,13 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void transportModeOverriddenOnServiceJourneyMatchesWithStopPlace() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+      .withTransportMode(AllPublicTransportModesEnumeration.RAIL)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withRailSubmode(RailSubmodeEnumeration.LOCAL)
       );
     serviceJourney
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
@@ -153,7 +153,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void railReplacementBusStopsCanBeVisitedByRailReplacementBusService() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withBusSubmode(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS)
@@ -175,7 +175,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void railReplacementBusStopsCanOnlyBeVisitedByRailReplacementBusService() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
@@ -197,7 +197,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void transportModeBusOnServiceJourneyShouldMatchWithTransportModeCoachOnStopPlace() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
@@ -219,7 +219,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void transportModeCoachOnServiceJourneyShouldMatchWithTransportModeBusOnStopPlace() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.COACH)
+      .withTransportMode(AllPublicTransportModesEnumeration.COACH)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withCoachSubmode(CoachSubmodeEnumeration.NATIONAL_COACH)
@@ -241,7 +241,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void taxiCanStopOnBusStops() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.TAXI)
+      .withTransportMode(AllPublicTransportModesEnumeration.TAXI)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withTaxiSubmode(TaxiSubmodeEnumeration.CHARTER_TAXI)
@@ -263,7 +263,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void taxiCanStopOnCoachStops() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.TAXI)
+      .withTransportMode(AllPublicTransportModesEnumeration.TAXI)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withTaxiSubmode(TaxiSubmodeEnumeration.CHARTER_TAXI)
@@ -285,7 +285,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void taxiCannotStopOnStopOtherThanBusOrCoach() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.TAXI)
+      .withTransportMode(AllPublicTransportModesEnumeration.TAXI)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withTaxiSubmode(TaxiSubmodeEnumeration.CHARTER_TAXI)
@@ -320,7 +320,7 @@ class MismatchedTransportModeSubModeValidatorTest {
 
   @Test
   void validateOkWhenTransportSubModeNotFoundOnServiceJourneyNorLine() {
-    line.withTransportMode(AllVehicleModesOfTransportEnumeration.TAXI);
+    line.withTransportMode(AllPublicTransportModesEnumeration.TAXI);
     JAXBValidationContext validationContext = createValidationContext(
       netexEntitiesTestFactory.create(),
       TestCommonDataRepository.of(4),
@@ -336,7 +336,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void validateOkWhenTransportModeAndSubModeNotFoundOnQuay() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.TAXI)
+      .withTransportMode(AllPublicTransportModesEnumeration.TAXI)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withTaxiSubmode(TaxiSubmodeEnumeration.CHARTER_TAXI)
@@ -356,7 +356,7 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void transportModeMissMatchShouldGenerateValidationIssue() {
     line
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
@@ -381,7 +381,7 @@ class MismatchedTransportModeSubModeValidatorTest {
       createFlexNetexEntitiesIndex(createFlexibleLine ->
         createFlexibleLine
           .withFlexibleLineType(FlexibleLineTypeEnumeration.FIXED)
-          .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+          .withTransportMode(AllPublicTransportModesEnumeration.BUS)
           .withTransportSubmode(
             new TransportSubmodeStructure()
               .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
@@ -406,7 +406,7 @@ class MismatchedTransportModeSubModeValidatorTest {
     NetexEntitiesIndex flexNetexEntitiesIndex =
       createFlexNetexEntitiesIndex(createFlexibleLine ->
         createFlexibleLine
-          .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+          .withTransportMode(AllPublicTransportModesEnumeration.RAIL)
           .withTransportSubmode(
             new TransportSubmodeStructure()
               .withRailSubmode(RailSubmodeEnumeration.LOCAL)

@@ -2,7 +2,6 @@ package no.entur.antu.stop;
 
 import static no.entur.antu.stop.changelog.support.ChangeLogUtils.parsePublicationTime;
 
-import jakarta.xml.bind.JAXBElement;
 import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,6 +12,7 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
+import org.entur.netex.validation.validator.model.MultilingualStringValue;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
@@ -86,15 +86,13 @@ public class DefaultStopPlaceResource implements StopPlaceResource {
     return netexEntitiesIndex
       .getSiteFrames()
       .stream()
-      .flatMap(siteFrame -> siteFrame.getStopPlaces().getStopPlace_().stream())
-      .map(JAXBElement::getValue)
-      .map(StopPlace.class::cast)
+      .flatMap(siteFrame -> siteFrame.getStopPlaces().getStopPlace().stream())
       .collect(
         Collectors.toUnmodifiableMap(
           stopPlace -> new StopPlaceId(stopPlace.getId()),
           stopPlace ->
             new SimpleStopPlace(
-              stopPlace.getName().getValue(),
+              MultilingualStringValue.of(stopPlace.getName()),
               TransportModeAndSubMode.of(stopPlace)
             )
         )

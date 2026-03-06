@@ -1,7 +1,5 @@
 package no.entur.antu.stop;
 
-import jakarta.xml.bind.JAXBElement;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.entur.netex.index.api.NetexEntitiesIndex;
@@ -21,16 +19,14 @@ class DefaultStopPlaceResourceTest {
   private static final String NSR_STOP_PLACE_2 = "NSR:StopPlace:2";
   private static final String NSR_STOP_PLACE_NAME_1 = "Stop Place 123";
   private static final String NSR_STOP_PLACE_NAME_2 = "Stop Place 456";
-  private static final AllVehicleModesOfTransportEnumeration NSR_STOP_PLACE_MODE_1 =
-    AllVehicleModesOfTransportEnumeration.BUS;
+  private static final AllPublicTransportModesEnumeration NSR_STOP_PLACE_MODE_1 =
+    AllPublicTransportModesEnumeration.BUS;
   private static final BusSubmodeEnumeration NSR_STOP_PLACE_SUBMODE_1 =
     BusSubmodeEnumeration.LOCAL_BUS;
-  private static final AllVehicleModesOfTransportEnumeration NSR_STOP_PLACE_MODE_2 =
-    AllVehicleModesOfTransportEnumeration.RAIL;
+  private static final AllPublicTransportModesEnumeration NSR_STOP_PLACE_MODE_2 =
+    AllPublicTransportModesEnumeration.RAIL;
   private static final RailSubmodeEnumeration NSR_STOP_PLACE_SUBMODE_2 =
     RailSubmodeEnumeration.LOCAL;
-
-  private static final ObjectFactory netexFactory = new ObjectFactory();
 
   private NetexEntitiesIndex netexEntitiesIndex;
 
@@ -45,43 +41,38 @@ class DefaultStopPlaceResourceTest {
           new Quay()
             .withId(NSR_QUAY_1)
             .withVersion("1")
-            .withName(new MultilingualString().withValue("Quay 123")),
+            .withName(new MultilingualString().withContent("Quay 123")),
           new Quay()
             .withId(NSR_QUAY_2)
             .withVersion("1")
-            .withName(new MultilingualString().withValue("Quay 456")),
+            .withName(new MultilingualString().withContent("Quay 456")),
           new Quay()
             .withId(NSR_QUAY_3)
             .withVersion("1")
-            .withName(new MultilingualString().withValue("Quay 4567"))
+            .withName(new MultilingualString().withContent("Quay 4567"))
         )
       );
 
-    Collection<JAXBElement<? extends Site_VersionStructure>> stopPlaces =
-      List.of(
-        netexFactory.createStopPlace_(
-          new StopPlace()
-            .withId(NSR_STOP_PLACE_1)
-            .withVersion("1")
-            .withName(new MultilingualString().withValue(NSR_STOP_PLACE_NAME_1))
-            .withTransportMode(NSR_STOP_PLACE_MODE_1)
-            .withBusSubmode(NSR_STOP_PLACE_SUBMODE_1)
-        ),
-        netexFactory.createStopPlace_(
-          new StopPlace()
-            .withId(NSR_STOP_PLACE_2)
-            .withVersion("1")
-            .withName(new MultilingualString().withValue(NSR_STOP_PLACE_NAME_2))
-            .withTransportMode(NSR_STOP_PLACE_MODE_2)
-            .withRailSubmode(NSR_STOP_PLACE_SUBMODE_2)
-        )
-      );
+    List<StopPlace> stopPlaces = List.of(
+      new StopPlace()
+        .withId(NSR_STOP_PLACE_1)
+        .withVersion("1")
+        .withName(new MultilingualString().withContent(NSR_STOP_PLACE_NAME_1))
+        .withTransportMode(NSR_STOP_PLACE_MODE_1)
+        .withBusSubmode(NSR_STOP_PLACE_SUBMODE_1),
+      new StopPlace()
+        .withId(NSR_STOP_PLACE_2)
+        .withVersion("1")
+        .withName(new MultilingualString().withContent(NSR_STOP_PLACE_NAME_2))
+        .withTransportMode(NSR_STOP_PLACE_MODE_2)
+        .withRailSubmode(NSR_STOP_PLACE_SUBMODE_2)
+    );
     netexEntitiesIndex
       .getSiteFrames()
       .add(
         new SiteFrame()
           .withStopPlaces(
-            new StopPlacesInFrame_RelStructure().withStopPlace_(stopPlaces)
+            new StopPlacesInFrame_RelStructure().withStopPlace(stopPlaces)
           )
       );
 
