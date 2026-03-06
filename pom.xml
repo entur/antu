@@ -23,12 +23,12 @@
         <developerConnection>scm:git:ssh://git@github.com:entur/antu.git</developerConnection>
     </scm>
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <camel.version>4.10.9</camel.version>
         <entur.helpers.version>5.50.0</entur.helpers.version>
-        <netex-validator-java.version>12.0.0-SNAPSHOT</netex-validator-java.version>
-        <netex-parser-java.version>4.0.0-SNAPSHOT</netex-parser-java.version>
-        <netex-java-model.version>2.0.16-SNAPSHOT</netex-java-model.version>
+        <netex-validator-java.version>13.0.0-SNAPSHOT</netex-validator-java.version>
+        <netex-parser-java.version>5.0.0-SNAPSHOT</netex-parser-java.version>
+        <netex-java-model.version>3.0.0-SNAPSHOT</netex-java-model.version>
         <jts-core.version>1.20.0</jts-core.version>
         <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.17</zt-zip.version>
@@ -323,9 +323,24 @@
     </build>
     <repositories>
         <repository>
+            <id>confluent</id>
+            <name>Confluent Repository</name>
+            <url>https://packages.confluent.io/maven/</url>
+        </repository>
+        <repository>
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
             <url>https://repo.osgeo.org/repository/release/</url>
+        </repository>
+        <repository>
+            <id>maven-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 

@@ -3,8 +3,8 @@ package no.entur.antu.validation.validator.interchange.duplicate;
 import java.util.Objects;
 import java.util.Optional;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.rutebanken.netex.model.JourneyRefStructure;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
-import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 public record DuplicateInterchangesContext(
   String interchangeId,
@@ -31,11 +31,11 @@ public record DuplicateInterchangesContext(
         ),
         Optional
           .ofNullable(serviceJourneyInterchange.getFromJourneyRef())
-          .map(VehicleJourneyRefStructure::getRef)
+          .map(JourneyRefStructure::getRef)
           .orElse(null),
         Optional
           .ofNullable(serviceJourneyInterchange.getToJourneyRef())
-          .map(VehicleJourneyRefStructure::getRef)
+          .map(JourneyRefStructure::getRef)
           .orElse(null)
       )
     );

@@ -64,8 +64,8 @@ public class NetexTestDataSample {
   public static Line defaultLine() {
     return new Line()
       .withId(LINE_ID)
-      .withName(new MultilingualString().withValue("Line 1"))
-      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS);
+      .withName(new MultilingualString().withContent("Line 1"))
+      .withTransportMode(AllPublicTransportModesEnumeration.BUS);
   }
 
   static DayTypeRefs_RelStructure createEveryDayRefs() {
@@ -107,12 +107,12 @@ public class NetexTestDataSample {
     DestinationDisplay destinationBergen = new DestinationDisplay()
       .withId(DESTINATION_DISPLAY_ID_1)
       .withVias(via(DESTINATION_DISPLAY_ID_1))
-      .withFrontText(new MultilingualString().withValue("Bergen"));
+      .withFrontText(new MultilingualString().withContent("Bergen"));
 
     DestinationDisplay destinationStavanger = new DestinationDisplay()
       .withId(DESTINATION_DISPLAY_ID_2)
       .withVias(via(DESTINATION_DISPLAY_ID_1))
-      .withFrontText(new MultilingualString().withValue("Stavanger"));
+      .withFrontText(new MultilingualString().withContent("Stavanger"));
 
     List<TimetabledPassingTime> timetabledPassingTimes = NetexTestDataSample
       .defaultTimetabledPassingTimes()
