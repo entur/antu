@@ -706,7 +706,9 @@ public class NetexEntitiesTestFactory {
     public FlexibleStopPlace create() {
       return new FlexibleStopPlace()
         .withId(ref())
-        .withName(new MultilingualString().withContent("FlexibleStopPlace " + id))
+        .withName(
+          new MultilingualString().withContent("FlexibleStopPlace " + id)
+        )
         .withAreas(
           new FlexibleStopPlace_VersionStructure.Areas()
             .withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(
