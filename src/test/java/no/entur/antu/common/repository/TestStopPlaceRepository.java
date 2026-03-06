@@ -5,12 +5,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
+import org.entur.netex.validation.validator.model.MultilingualStringValue;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
 import org.jetbrains.annotations.Nullable;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.CoachSubmodeEnumeration;
 import org.rutebanken.netex.model.Quay;
@@ -62,7 +63,7 @@ public class TestStopPlaceRepository implements StopPlaceRepository {
       numStops,
       stopPlace ->
         stopPlace
-          .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+          .withTransportMode(AllPublicTransportModesEnumeration.BUS)
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
     );
   }
@@ -76,7 +77,7 @@ public class TestStopPlaceRepository implements StopPlaceRepository {
       numStops,
       stopPlace ->
         stopPlace
-          .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
+          .withTransportMode(AllPublicTransportModesEnumeration.BUS)
           .withBusSubmode(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS)
     );
   }
@@ -91,7 +92,7 @@ public class TestStopPlaceRepository implements StopPlaceRepository {
       numStops,
       stopPlace ->
         stopPlace
-          .withTransportMode(AllVehicleModesOfTransportEnumeration.COACH)
+          .withTransportMode(AllPublicTransportModesEnumeration.COACH)
           .withCoachSubmode(CoachSubmodeEnumeration.NATIONAL_COACH)
     );
   }
@@ -105,7 +106,7 @@ public class TestStopPlaceRepository implements StopPlaceRepository {
       numStops,
       stopPlace ->
         stopPlace
-          .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
+          .withTransportMode(AllPublicTransportModesEnumeration.RAIL)
           .withRailSubmode(RailSubmodeEnumeration.LOCAL)
     );
   }
@@ -164,6 +165,6 @@ public class TestStopPlaceRepository implements StopPlaceRepository {
   @Nullable
   @Override
   public String getStopPlaceNameForQuayId(QuayId quayId) {
-    return stopPlaceForQuay.get(quayId).getName().getValue();
+    return MultilingualStringValue.of(stopPlaceForQuay.get(quayId).getName());
   }
 }

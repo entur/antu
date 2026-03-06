@@ -1,6 +1,6 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 
 /**
  * Expected distance between two consecutive stop points in journey pattern for different modes of transport.
@@ -20,7 +20,7 @@ public record ExpectedDistance(double maxDistance, double minDistance) {
   }
 
   public static ExpectedDistance of(
-    AllVehicleModesOfTransportEnumeration transportMode
+    AllPublicTransportModesEnumeration transportMode
   ) {
     return switch (transportMode) {
       case COACH -> of(30000, 500);

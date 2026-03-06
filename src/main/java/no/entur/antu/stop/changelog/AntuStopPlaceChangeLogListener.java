@@ -7,6 +7,7 @@ import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.stop.changelog.support.ChangeLogUtils;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
+import org.entur.netex.validation.validator.model.MultilingualStringValue;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -117,7 +118,9 @@ public class AntuStopPlaceChangeLogListener
         StopPlaceId stopPlaceId = new StopPlaceId(stopPlace.getId());
         MultilingualString stopPlaceName = stopPlace.getName();
         SimpleStopPlace simpleStopPlace = new SimpleStopPlace(
-          stopPlaceName == null ? "" : stopPlaceName.getValue(),
+          stopPlaceName == null
+            ? ""
+            : MultilingualStringValue.of(stopPlaceName),
           TransportModeAndSubMode.of(stopPlace)
         );
         stopPlaceRepositoryLoader.createOrUpdateStopPlace(
