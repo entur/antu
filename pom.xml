@@ -333,11 +333,6 @@
             <url>https://repo.osgeo.org/repository/release/</url>
         </repository>
         <repository>
-            <id>confluent</id>
-            <name>Confluent Repository</name>
-            <url>https://packages.confluent.io/maven/</url>
-        </repository>
-        <repository>
             <id>maven-snapshots</id>
             <url>https://central.sonatype.com/repository/maven-snapshots</url>
             <releases>
