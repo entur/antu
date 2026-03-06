@@ -14,7 +14,7 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -181,12 +181,12 @@ public class MismatchedTransportModeSubModeValidator implements JAXBValidator {
   ) {
     return (
       serviceJourneyTransportModeAndSubMode.mode() ==
-      AllVehicleModesOfTransportEnumeration.TAXI &&
+      AllPublicTransportModesEnumeration.TAXI &&
       (
         quayTransportModeAndSubMode.mode() ==
-        AllVehicleModesOfTransportEnumeration.BUS ||
+        AllPublicTransportModesEnumeration.BUS ||
         quayTransportModeAndSubMode.mode() ==
-        AllVehicleModesOfTransportEnumeration.COACH
+        AllPublicTransportModesEnumeration.COACH
       )
     );
   }
@@ -197,9 +197,9 @@ public class MismatchedTransportModeSubModeValidator implements JAXBValidator {
   ) {
     return (
       quayTransportModeAndSubMode.mode() ==
-      AllVehicleModesOfTransportEnumeration.BUS &&
+      AllPublicTransportModesEnumeration.BUS &&
       serviceJourneyTransportModeAndSubMode.mode() ==
-      AllVehicleModesOfTransportEnumeration.COACH
+      AllPublicTransportModesEnumeration.COACH
     );
   }
 
@@ -209,9 +209,9 @@ public class MismatchedTransportModeSubModeValidator implements JAXBValidator {
   ) {
     return (
       quayTransportModeAndSubMode.mode() ==
-      AllVehicleModesOfTransportEnumeration.COACH &&
+      AllPublicTransportModesEnumeration.COACH &&
       serviceJourneyTransportModeAndSubMode.mode() ==
-      AllVehicleModesOfTransportEnumeration.BUS
+      AllPublicTransportModesEnumeration.BUS
     );
   }
 

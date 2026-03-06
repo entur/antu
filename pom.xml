@@ -25,9 +25,9 @@
     <properties>
         <entur.helpers.version>7.3.0</entur.helpers.version>
         <spring-cloud-gcp-dependencies.version>8.1.1</spring-cloud-gcp-dependencies.version>
-        <netex-validator-java.version>12.0.6</netex-validator-java.version>
-        <netex-parser-java.version>4.0.12</netex-parser-java.version>
-        <netex-java-model.version>2.0.16.1</netex-java-model.version>
+        <netex-validator-java.version>13.0.0-SNAPSHOT</netex-validator-java.version>
+        <netex-parser-java.version>5.0.0-SNAPSHOT</netex-parser-java.version>
+        <netex-java-model.version>3.0.0-SNAPSHOT</netex-java-model.version>
         <jts-core.version>1.20.0</jts-core.version>
         <zt-zip.version>1.18.2</zt-zip.version>
         <redisson.version>4.6.1</redisson.version>
@@ -278,6 +278,16 @@
             <id>confluent</id>
             <name>Confluent Repository</name>
             <url>https://packages.confluent.io/maven/</url>
+        </repository>
+        <repository>
+            <id>maven-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
