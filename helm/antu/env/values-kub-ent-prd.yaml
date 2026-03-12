@@ -20,7 +20,7 @@ gcp:
     bucketName: ror-antu-gcp2-production
     exchangeBucketName: ror-antu-exchange-gcp2-production
 
-tiamatUrl: https://api.entur.io/stop-places/v1
+tiamatUrl: http://tiamat.prd.entur.internal/services/stop_places
 
 agreementRegistryUrl: https://api.entur.io/agreements/v1
 
