@@ -129,8 +129,8 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
         }
         String codespace = exchange
           .getIn()
-          .getHeader(Constants.DATASET_CODESPACE, String.class);
-        if (codespace != null) {
+          .getHeader(Constants.DATASET_REFERENTIAL, String.class);
+        if (codespace != null && !codespace.isEmpty()) {
           MDC.put("codespace", codespace);
         }
       });
