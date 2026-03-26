@@ -119,7 +119,7 @@ public abstract class BaseRouteBuilder extends RouteBuilder {
       });
 
     // Copy correlation ID and codespace into SLF4J MDC for structured logging.
-    interceptFrom(".*google-pubsub:.*")
+    interceptFrom(".*")
       .process(exchange -> {
         String correlationId = exchange
           .getIn()
