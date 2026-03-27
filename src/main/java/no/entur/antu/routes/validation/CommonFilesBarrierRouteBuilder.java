@@ -68,6 +68,7 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
       .aggregationStrategy(new CommonFilesAggregationStrategy())
       .completionTimeout(1800000)
       .process(this::addSynchronizationForAggregatedExchange)
+      .process(this::updateMdcFromHeaders)
       .log(
         LoggingLevel.INFO,
         correlation() +

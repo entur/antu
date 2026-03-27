@@ -108,6 +108,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
       .aggregationStrategy(new CollectIndividualReportsAggregationStrategy())
       .completionTimeout(1800000)
       .process(this::addSynchronizationForAggregatedExchange)
+      .process(this::updateMdcFromHeaders)
       .log(
         LoggingLevel.INFO,
         correlation() +

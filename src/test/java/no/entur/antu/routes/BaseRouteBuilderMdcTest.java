@@ -3,6 +3,7 @@ package no.entur.antu.routes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import no.entur.antu.Constants;
 import org.apache.camel.RoutesBuilder;
@@ -30,13 +31,16 @@ class BaseRouteBuilderMdcTest extends CamelTestSupport {
         // Reuse the MDC interceptor logic from BaseRouteBuilder
         interceptFrom(".*")
           .process(exchange -> {
+            MDC.remove("correlationId");
+            MDC.remove("codespace");
+
             String correlationId = exchange
               .getIn()
               .getHeader(
                 Constants.VALIDATION_CORRELATION_ID_HEADER,
                 String.class
               );
-            if (correlationId != null) {
+            if (correlationId != null && !correlationId.isEmpty()) {
               MDC.put("correlationId", correlationId);
             }
             String codespace = exchange
@@ -68,7 +72,7 @@ class BaseRouteBuilderMdcTest extends CamelTestSupport {
     template.sendBodyAndHeaders(
       "direct:test",
       "",
-      java.util.Map.of(
+      Map.of(
         Constants.VALIDATION_CORRELATION_ID_HEADER,
         "corr-123",
         Constants.DATASET_REFERENTIAL,
@@ -93,7 +97,7 @@ class BaseRouteBuilderMdcTest extends CamelTestSupport {
     template.sendBodyAndHeaders(
       "direct:test",
       "",
-      java.util.Map.of(
+      Map.of(
         Constants.VALIDATION_CORRELATION_ID_HEADER,
         "corr-456",
         Constants.DATASET_REFERENTIAL,
@@ -105,5 +109,46 @@ class BaseRouteBuilderMdcTest extends CamelTestSupport {
     // MDC should be cleared after route completes
     assertNull(MDC.get("correlationId"));
     assertNull(MDC.get("codespace"));
+  }
+
+  @Test
+  void staleMdcClearedBySubsequentExchangeWithoutHeaders() throws Exception {
+    // First exchange sets MDC
+    template.sendBodyAndHeaders(
+      "direct:test",
+      "",
+      Map.of(
+        Constants.VALIDATION_CORRELATION_ID_HEADER,
+        "first-corr",
+        Constants.DATASET_REFERENTIAL,
+        "FIRST"
+      )
+    );
+
+    assertEquals("first-corr", capturedCorrelationId.get());
+    assertEquals("FIRST", capturedCodespace.get());
+
+    // Second exchange has no headers - must not inherit stale values
+    template.sendBody("direct:test", "");
+
+    assertNull(capturedCorrelationId.get());
+    assertNull(capturedCodespace.get());
+  }
+
+  @Test
+  void mdcIgnoresEmptyHeaders() throws Exception {
+    template.sendBodyAndHeaders(
+      "direct:test",
+      "",
+      Map.of(
+        Constants.VALIDATION_CORRELATION_ID_HEADER,
+        "",
+        Constants.DATASET_REFERENTIAL,
+        ""
+      )
+    );
+
+    assertNull(capturedCorrelationId.get());
+    assertNull(capturedCodespace.get());
   }
 }
