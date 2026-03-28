@@ -65,6 +65,47 @@ class AntuStopPlaceChangeLogListenerTest {
                     </PublicationDelivery>
                     """;
 
+  private static final String ALTERED_SITE_FRAME =
+    """
+                            <PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:ns2="http://www.opengis.net/gml/3.2" xmlns:ns3="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.12:NO-NeTEx-stops:1.4" xsi:schemaLocation="">
+                                <PublicationTimestamp>2023-06-09T12:09:20.879</PublicationTimestamp>
+                                <dataObjects>
+                                    <SiteFrame modification="new" version="1" id="NSR:SiteFrame:858500319">
+                                        <FrameDefaults>
+                                            <DefaultLocale>
+                                                <TimeZone>Europe/Oslo</TimeZone>
+                                            </DefaultLocale>
+                                        </FrameDefaults>
+                                        <stopPlaces>
+                                            <StopPlace created="2017-11-09T19:12:03.026" changed="2021-04-22T18:26:07.254" modification="new" version="13" id="NSR:StopPlace:58586">
+                                                <Name lang="nor">Sandefjord lufthavn</Name>
+                                                <Description lang="nor"></Description>
+                                                <Centroid>
+                                                    <Location>
+                                                        <Longitude>10.253136</Longitude>
+                                                        <Latitude>59.179097</Latitude>
+                                                    </Location>
+                                                </Centroid>
+                                                <TransportMode>bus</TransportMode>
+                                                <StopPlaceType>onstreetBus</StopPlaceType>
+                                                <quays>
+                                                    <Quay changed="2018-10-18T16:13:25.256" modification="new" version="13" id="NSR:Quay:100310">
+                                                        <PrivateCode></PrivateCode>
+                                                        <Centroid>
+                                                            <Location>
+                                                                <Longitude>10.253157</Longitude>
+                                                                <Latitude>59.179070</Latitude>
+                                                            </Location>
+                                                        </Centroid>
+                                                    </Quay>
+                                                </quays>
+                                            </StopPlace>
+                                        </stopPlaces>
+                                    </SiteFrame>
+                                </dataObjects>
+                            </PublicationDelivery>
+                            """;
+
   private Map<StopPlaceId, SimpleStopPlace> stopPlaceCache;
   private Map<QuayId, SimpleQuay> quayCache;
   private StopPlaceRepositoryLoader loader;
@@ -121,6 +162,26 @@ class AntuStopPlaceChangeLogListenerTest {
       quayCache.get(quayId).quayCoordinates()
     );
     assertEquals(stopPlaceId, quayCache.get(quayId).stopPlaceId());
+  }
+
+  @Test
+  void updateStopPlace() {
+    listener.onStopPlaceCreated(
+      "id",
+      new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
+    );
+    listener.onStopPlaceUpdated(
+      "id",
+      new ByteArrayInputStream(
+        ALTERED_SITE_FRAME.getBytes(StandardCharsets.UTF_8)
+      )
+    );
+    StopPlaceId stopPlaceId = new StopPlaceId("NSR:StopPlace:58586");
+    assertEquals("Sandefjord lufthavn", stopPlaceCache.get(stopPlaceId).name());
+    assertEquals(
+      "BUS",
+      stopPlaceCache.get(stopPlaceId).transportModeAndSubMode().mode().name()
+    );
   }
 
   @Test
