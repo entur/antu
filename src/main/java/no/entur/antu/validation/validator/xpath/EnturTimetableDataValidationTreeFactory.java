@@ -7,6 +7,8 @@ import no.entur.antu.validation.validator.organisation.OrganisationAliasReposito
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
+import org.entur.netex.validation.validator.Severity;
+import org.entur.netex.validation.validator.xpath.rules.ValidateNotExist;
 import org.entur.netex.validation.validator.xpath.tree.DefaultTimetableFrameValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.tree.PublicationDeliveryValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.tree.ValidationTreeBuilder;
@@ -52,6 +54,18 @@ public class EnturTimetableDataValidationTreeFactory
     timetableFrameValidationTreeBuilder()
       .removeRuleForLineFile(
         DefaultTimetableFrameValidationTreeFactory.CODE_DATED_SERVICE_JOURNEY_4
+      );
+
+    // Reject old DatedServiceJourneyRef format (pre NeTEx 1.16)
+    timetableFrameValidationTreeBuilder()
+      .withRuleForLineFile(
+        new ValidateNotExist(
+          "vehicleJourneys/DatedServiceJourney/DatedServiceJourneyRef",
+          "DEPRECATED_DATED_SERVICE_JOURNEY_REF",
+          "DatedServiceJourney uses deprecated DatedServiceJourneyRef",
+          "DatedServiceJourney uses deprecated DatedServiceJourneyRef element. Use replacedJourneys/DatedVehicleJourneyRef instead",
+          Severity.ERROR
+        )
       );
 
     // No boarding at last stop point in journey pattern
