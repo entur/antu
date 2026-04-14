@@ -3,6 +3,7 @@ package no.entur.antu.validation.validator.xpath.rules;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmNode;
@@ -30,16 +31,25 @@ public class ValidateAuthorityRef extends AbstractXPathValidationRule {
   );
 
   private final OrganisationAliasRepository organisationAliasRepository;
+  private final Set<String> additionalAllowedOrganisations;
 
   public ValidateAuthorityRef(
-    OrganisationAliasRepository organisationAliasRepository
+    OrganisationAliasRepository organisationAliasRepository,
+    Set<String> additionalAllowedOrganisations
   ) {
     this.organisationAliasRepository =
       Objects.requireNonNull(organisationAliasRepository);
+    this.additionalAllowedOrganisations =
+      additionalAllowedOrganisations != null
+        ? additionalAllowedOrganisations
+        : Set.of();
   }
 
   private Boolean organisationExists(String authorityRef) {
-    return organisationAliasRepository.hasOrganisationWithAlias(authorityRef);
+    return (
+      additionalAllowedOrganisations.contains(authorityRef) ||
+      organisationAliasRepository.hasOrganisationWithAlias(authorityRef)
+    );
   }
 
   @Override

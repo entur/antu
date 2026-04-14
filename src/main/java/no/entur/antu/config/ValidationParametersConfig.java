@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 public class ValidationParametersConfig {
 
   private Set<NetexCodespace> additionalAllowedCodespaces;
+  private Set<String> additionalAllowedOrganisations;
 
   public Set<NetexCodespace> getAdditionalAllowedCodespaces() {
     return additionalAllowedCodespaces;
@@ -19,5 +20,15 @@ public class ValidationParametersConfig {
     Set<NetexCodespace> additionalAllowedCodespaces
   ) {
     this.additionalAllowedCodespaces = additionalAllowedCodespaces;
+  }
+
+  public Set<String> getAdditionalAllowedOrganisations() {
+    return additionalAllowedOrganisations;
+  }
+
+  public void setAdditionalAllowedOrganisations(
+    Set<String> additionalAllowedOrganisations
+  ) {
+    this.additionalAllowedOrganisations = additionalAllowedOrganisations;
   }
 }

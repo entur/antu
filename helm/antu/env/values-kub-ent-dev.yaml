@@ -10,6 +10,7 @@ antu:
         xmlnsUrl: http://www.rutebanken.org/ns/pen
       - xmlns: NOG
         xmlnsUrl: http://www.rutebanken.org/ns/nog
+    additionalAllowedOrganisations: []
 
 gcp:
   blobstoreProjectId: en-antu-dev

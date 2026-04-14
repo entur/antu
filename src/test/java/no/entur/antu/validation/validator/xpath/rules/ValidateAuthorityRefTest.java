@@ -20,6 +20,8 @@ class ValidateAuthorityRefTest {
 
   private final String EXISTING_ORGANISATION_ALIAS = "OrganisationAlias:1";
   private final String NON_EXISTENT_ORGANISATION_ALIAS = "OrganisationAlias:2";
+  private final String ADDITIONAL_ALLOWED_ORGANISATION =
+    "AdditionalOrganisation:1";
 
   @BeforeEach
   public void setUp() {
@@ -27,7 +29,8 @@ class ValidateAuthorityRefTest {
       new SimpleOrganisationAliasRepository(
         Set.of(EXISTING_ORGANISATION_ALIAS)
       );
-    this.validator = new ValidateAuthorityRef(organisationAliasRepository);
+    this.validator =
+      new ValidateAuthorityRef(organisationAliasRepository, Set.of());
   }
 
   @Test
@@ -49,6 +52,24 @@ class ValidateAuthorityRefTest {
     );
     assertEquals(1, validationIssues.size());
     assertEquals(INVALID_AUTHORITY_REF_RULE, validationIssues.get(0).rule());
+  }
+
+  @Test
+  void testAdditionalAllowedOrganisation() {
+    OrganisationAliasRepository organisationAliasRepository =
+      new SimpleOrganisationAliasRepository(
+        Set.of(EXISTING_ORGANISATION_ALIAS)
+      );
+    ValidateAuthorityRef validatorWithAdditional = new ValidateAuthorityRef(
+      organisationAliasRepository,
+      Set.of(ADDITIONAL_ALLOWED_ORGANISATION)
+    );
+    XPathRuleValidationContext validationContext =
+      validationContextWithAuthorityRef(ADDITIONAL_ALLOWED_ORGANISATION);
+    List<ValidationIssue> validationIssues = validatorWithAdditional.validate(
+      validationContext
+    );
+    assertTrue(validationIssues.isEmpty());
   }
 
   private static final String NETEX_FRAGMENT =

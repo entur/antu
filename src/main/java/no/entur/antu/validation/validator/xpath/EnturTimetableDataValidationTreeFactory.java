@@ -32,7 +32,12 @@ public class EnturTimetableDataValidationTreeFactory
   public ValidationTreeBuilder builder() {
     // Validation against the Norwegian organisation register
     serviceFrameValidationTreeBuilder()
-      .withRule(new ValidateAuthorityRef(organisationAliasRepository));
+      .withRule(
+        new ValidateAuthorityRef(
+          organisationAliasRepository,
+          validationParametersConfig.getAdditionalAllowedOrganisations()
+        )
+      );
     // Validation against Norwegian codespaces
     compositeFrameValidationTreeBuilder().withRule(new ValidateNSRCodespace());
 
