@@ -549,6 +549,10 @@ public class NetexEntitiesTestFactory {
       .withRef("TST:ScheduledStopPoint:" + id);
   }
 
+  public static OperatorRefStructure createOperatorRef(int id) {
+    return new OperatorRefStructure().withRef("TST:Operator:" + id);
+  }
+
   /**
    * Creates the new QuayRefStructure with the given id
    *
@@ -921,6 +925,7 @@ public class NetexEntitiesTestFactory {
 
     protected AllVehicleModesOfTransportEnumeration transportMode;
     protected TransportSubmodeStructure transportSubmode;
+    protected OperatorRefStructure operatorRef;
 
     public CreateGenericLine(int id) {
       super(id);
@@ -939,6 +944,13 @@ public class NetexEntitiesTestFactory {
       this.transportSubmode = transportSubmode;
       return this;
     }
+
+    public CreateGenericLine<T> withOperatorRef(
+      OperatorRefStructure operatorRef
+    ) {
+      this.operatorRef = operatorRef;
+      return this;
+    }
   }
 
   public static class CreateLine extends CreateGenericLine<Line> {
@@ -952,7 +964,8 @@ public class NetexEntitiesTestFactory {
         .withId(ref())
         .withName(new MultilingualString().withValue("Line " + id))
         .withTransportMode(transportMode)
-        .withTransportSubmode(transportSubmode);
+        .withTransportSubmode(transportSubmode)
+        .withOperatorRef(operatorRef);
     }
   }
 
@@ -978,7 +991,8 @@ public class NetexEntitiesTestFactory {
         .withFlexibleLineType(flexibleLineType)
         .withName(new MultilingualString().withValue("FlexibleLine " + id))
         .withTransportMode(transportMode)
-        .withTransportSubmode(transportSubmode);
+        .withTransportSubmode(transportSubmode)
+        .withOperatorRef(operatorRef);
     }
   }
 

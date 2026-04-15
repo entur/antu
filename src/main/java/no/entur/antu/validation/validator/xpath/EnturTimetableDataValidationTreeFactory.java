@@ -3,6 +3,7 @@ package no.entur.antu.validation.validator.xpath;
 import no.entur.antu.config.ValidationParametersConfig;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoAlightingAtFirstStopPoint;
 import no.entur.antu.validation.validator.journeypattern.stoppoint.NoBoardingAtLastStopPoint;
+import no.entur.antu.validation.validator.line.MissingOperatorRefOnLine;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
@@ -60,6 +61,9 @@ public class EnturTimetableDataValidationTreeFactory
     // No alighting at first stop point in journey pattern
     serviceFrameValidationTreeBuilder()
       .withRuleForLineFile(new NoAlightingAtFirstStopPoint());
+    // OperatorRef is required on Line
+    serviceFrameValidationTreeBuilder()
+      .withRuleForLineFile(new MissingOperatorRefOnLine());
     return super.builder();
   }
 }
