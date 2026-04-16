@@ -8,6 +8,7 @@ antu:
         xmlnsUrl: http://www.rutebanken.org/ns/nsr
       - xmlns: PEN
         xmlnsUrl: http://www.rutebanken.org/ns/pen
+    additionalAllowedOrganisations: []
 
 gcp:
   blobstoreProjectId: entur-ror-prod

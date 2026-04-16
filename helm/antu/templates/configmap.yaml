@@ -127,6 +127,11 @@ data:
     antu.validation.additional-allowed-codespaces[{{ $index }}].xmlns={{ $allowedCodespace.xmlns }}
     antu.validation.additional-allowed-codespaces[{{ $index }}].xmlnsUrl={{ $allowedCodespace.xmlnsUrl }}
     {{- end }}
+
+    # Additional allowed organisations for Antu validation
+    {{- range $index, $org := .Values.antu.validation.additionalAllowedOrganisations }}
+    antu.validation.additional-allowed-organisations[{{ $index }}]={{ $org }}
+    {{- end }}
 kind: ConfigMap
 metadata:
   name: {{ template "antu.name" . }}-config

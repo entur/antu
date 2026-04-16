@@ -42,6 +42,7 @@ public class TestConfig {
     validationParametersConfig.setAdditionalAllowedCodespaces(
       Set.of(NetexCodespace.rutebanken("nsr"), NetexCodespace.rutebanken("pen"))
     );
+    validationParametersConfig.setAdditionalAllowedOrganisations(Set.of());
     return validationParametersConfig;
   }
 
