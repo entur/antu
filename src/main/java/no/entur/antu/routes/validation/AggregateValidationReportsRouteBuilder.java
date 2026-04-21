@@ -409,6 +409,14 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
         oldExchange == null ||
         oldExchange.getIn().getBody(ValidationReport.class) == null
       ) {
+        ValidationReport report = newExchange
+          .getIn()
+          .getBody(ValidationReport.class);
+        if (report != null && report.getCreationDate() != null) {
+          newExchange
+            .getIn()
+            .setHeader(REPORT_CREATION_DATE, report.getCreationDate());
+        }
         return newExchange;
       }
 

@@ -12,10 +12,16 @@ import java.util.List;
 import org.apache.camel.Handler;
 import org.apache.camel.Header;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AntuPrometheusMetricsService {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    AntuPrometheusMetricsService.class
+  );
 
   private static final String METRICS_PREFIX = "app.antu.";
   private static final String VALIDATION_ENTRIES_COUNTER_NAME =
@@ -57,6 +63,14 @@ public class AntuPrometheusMetricsService {
     ValidationReport validationReport,
     LocalDateTime reportCreationDate
   ) {
+    if (reportCreationDate == null) {
+      LOGGER.warn(
+        "Missing {} header for codespace {}, skipping validation time metric",
+        REPORT_CREATION_DATE,
+        validationReport.getCodespace()
+      );
+      return;
+    }
     long seconds = Duration
       .between(reportCreationDate, LocalDateTime.now())
       .toSeconds();
