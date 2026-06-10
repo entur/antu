@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import no.entur.antu.memorystore.LineInfoMemStoreRepository;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +27,41 @@ class DefaultNetexDataRepositoryTest {
   private Map<String, Map<String, LocalDateTime>> operatingDayActiveDateCache;
   private Map<String, Set<String>> scheduledStopPointIdsCache;
 
+  /**
+   * Simple in-memory implementation of LineInfoMemStoreRepository for testing.
+   */
+  private static class InMemoryLineInfoRepository
+    implements LineInfoMemStoreRepository {
+
+    private final Map<String, List<String>> cache = new HashMap<>();
+
+    @Override
+    public void addLineInfo(String validationReportId, String lineInfoString) {
+      cache
+        .computeIfAbsent(validationReportId, k -> new java.util.ArrayList<>())
+        .add(lineInfoString);
+    }
+
+    @Override
+    public List<String> getLineInfo(String validationReportId) {
+      return cache.get(validationReportId);
+    }
+
+    @Override
+    public void removeLineInfo(String validationReportId) {
+      cache.remove(validationReportId);
+    }
+
+    public Map<String, List<String>> getCache() {
+      return cache;
+    }
+  }
+
   @BeforeEach
   void setUp() {
-    lineInfoCache = new HashMap<>();
+    InMemoryLineInfoRepository lineInfoRepository =
+      new InMemoryLineInfoRepository();
+    lineInfoCache = lineInfoRepository.getCache();
     lineInfoCache.put(validationReportId, List.of("TST:Line:1", "TST:Line:2"));
 
     serviceJourneyStopsCache = new HashMap<>();
@@ -71,7 +104,7 @@ class DefaultNetexDataRepositoryTest {
 
     this.repository =
       new DefaultNetexDataRepository(
-        lineInfoCache,
+        lineInfoRepository,
         serviceJourneyStopsCache,
         serviceJourneyInterchangeInfoCache,
         activeDatesByServiceJourneyId,
