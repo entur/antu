@@ -90,7 +90,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     jaxbValidationContext
       .datedServiceJourneys()
       .forEach(dsj -> {
-        var serviceJourneyRef = dsj.getJourneyRef().get(0).getValue().getRef();
+        var serviceJourneyRef = dsj.getJourneyRef().getValue().getRef();
         var operatingDayRef = dsj.getOperatingDayRef().getRef();
         var serviceJourneyDates = serviceJourneyToDates.getOrDefault(
           ServiceJourneyId.ofValidId(serviceJourneyRef),
