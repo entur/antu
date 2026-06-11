@@ -58,7 +58,7 @@ public class AntuWebSecurityConfiguration {
   public SecurityFilterChain filterChain(
     HttpSecurity http,
     MultiIssuerAuthenticationManagerResolver multiIssuerAuthenticationManagerResolver
-  ) throws Exception {
+  ) {
     http
       .cors(withDefaults())
       .csrf(AbstractHttpConfigurer::disable)

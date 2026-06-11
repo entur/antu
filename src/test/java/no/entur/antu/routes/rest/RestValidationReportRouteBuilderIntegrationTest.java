@@ -98,7 +98,7 @@ class RestValidationReportRouteBuilderIntegrationTest
 
     @Bean
     @ConditionalOnWebApplication
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) {
       http
         .cors(withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
