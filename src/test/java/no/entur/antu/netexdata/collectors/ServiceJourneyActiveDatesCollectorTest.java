@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,14 @@ class ServiceJourneyActiveDatesCollectorTest {
   @Test
   void testSingleDayOperatingPeriodIncludesTheDay() {
     // 2025-01-15 is a Wednesday — covered by WEEKDAYS
-    LocalDateTime singleDay = LocalDateTime.of(2025, 1, 15, 0, 0, 0);
+    LocalDateTime singleDay = LocalDateTime.of(
+      2025,
+      Month.JANUARY,
+      15,
+      0,
+      0,
+      0
+    );
     OperatingPeriod period = new OperatingPeriod()
       .withFromDate(singleDay)
       .withToDate(singleDay);
