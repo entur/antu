@@ -299,7 +299,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     }
   }
 
-  private LocalDateTime getFromDateFromOperatingPeriod(
+  static LocalDateTime getFromDateFromOperatingPeriod(
     OperatingPeriod operatingPeriod,
     Map<String, LocalDateTime> operatingDayRefsToCalendarDate
   ) {
@@ -311,7 +311,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     );
   }
 
-  private LocalDateTime getToDateFromOperatingPeriod(
+  static LocalDateTime getToDateFromOperatingPeriod(
     OperatingPeriod operatingPeriod,
     Map<String, LocalDateTime> operatingDayRefsToCalendarDate
   ) {
@@ -323,7 +323,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     );
   }
 
-  private Set<LocalDateTime> computeDatesForPeriodAndWeekday(
+  static Set<LocalDateTime> computeDatesForPeriodAndWeekday(
     OperatingPeriod period,
     Set<DayOfWeekEnumeration> daysOfWeekEnumeration,
     Map<String, LocalDateTime> operatingDayRefsToCalendarDate
@@ -338,7 +338,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
       period,
       operatingDayRefsToCalendarDate
     );
-    for (LocalDateTime d = fromDate; d.isBefore(toDate); d = d.plusDays(1)) {
+    for (LocalDateTime d = fromDate; !d.isAfter(toDate); d = d.plusDays(1)) {
       if (daysOfWeek.contains(d.getDayOfWeek())) {
         dates.add(d);
       }
