@@ -21,6 +21,7 @@ import java.util.Locale;
 import no.entur.antu.security.AntuAuthorizationService;
 import no.entur.antu.security.DefaultAntuAuthorizationService;
 import org.entur.oauth2.AuthorizedWebClientBuilder;
+import org.entur.oauth2.JwtRoleAssignmentExtractor;
 import org.entur.ror.permission.RemoteBabaRoleAssignmentExtractor;
 import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
 import org.rutebanken.helper.organisation.authorization.AuthorizationService;
@@ -29,7 +30,7 @@ import org.rutebanken.helper.organisation.authorization.FullAccessAuthorizationS
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
@@ -40,6 +41,16 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Configuration
 public class AuthorizationConfig {
+
+  @ConditionalOnProperty(
+    value = "antu.security.role.assignment.extractor",
+    havingValue = "jwt",
+    matchIfMissing = true
+  )
+  @Bean
+  public RoleAssignmentExtractor jwtRoleAssignmentExtractor() {
+    return new JwtRoleAssignmentExtractor();
+  }
 
   @ConditionalOnProperty(
     value = "antu.security.role.assignment.extractor",

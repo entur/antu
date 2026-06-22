@@ -53,6 +53,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -98,21 +99,31 @@ class RestValidationReportRouteBuilderIntegrationTest
 
     @Bean
     @ConditionalOnWebApplication
-    public SecurityFilterChain filterChain(HttpSecurity http) {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
       http
         .cors(withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(authz ->
           authz
-            .requestMatchers("/services/openapi.json")
+            .requestMatchers(
+              AntPathRequestMatcher.antMatcher("/services/openapi.json")
+            )
             .permitAll()
-            .requestMatchers("/actuator/prometheus")
+            .requestMatchers(
+              AntPathRequestMatcher.antMatcher("/actuator/prometheus")
+            )
             .permitAll()
-            .requestMatchers("/actuator/health")
+            .requestMatchers(
+              AntPathRequestMatcher.antMatcher("/actuator/health")
+            )
             .permitAll()
-            .requestMatchers("/actuator/health/liveness")
+            .requestMatchers(
+              AntPathRequestMatcher.antMatcher("/actuator/health/liveness")
+            )
             .permitAll()
-            .requestMatchers("/actuator/health/readiness")
+            .requestMatchers(
+              AntPathRequestMatcher.antMatcher("/actuator/health/readiness")
+            )
             .permitAll()
             .anyRequest()
             .authenticated()

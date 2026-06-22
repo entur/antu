@@ -10,7 +10,7 @@ import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.data.redis.autoconfigure.DataRedisProperties;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -24,7 +24,7 @@ public class RedisClientConfig {
 
   @Bean
   public Config redissonConfig(
-    DataRedisProperties redisProperties,
+    RedisProperties redisProperties,
     @Value("${antu.redis.server.trust.store.file:}") String trustStoreFile,
     @Value(
       "${antu.redis.server.trust.store.password:}"
@@ -52,10 +52,12 @@ public class RedisClientConfig {
         redisProperties.getHost(),
         redisProperties.getPort()
       );
-      redissonConfig.useSingleServer().setAddress(address);
-      redissonConfig.setSslTruststore(new File(trustStoreFile).toURI().toURL());
-      redissonConfig.setSslTruststorePassword(trustStorePassword);
-      redissonConfig.setPassword(authenticationString);
+      redissonConfig
+        .useSingleServer()
+        .setAddress(address)
+        .setSslTruststore(new File(trustStoreFile).toURI().toURL())
+        .setSslTruststorePassword(trustStorePassword)
+        .setPassword(authenticationString);
       return redissonConfig;
     }
   }

@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -58,25 +59,37 @@ public class AntuWebSecurityConfiguration {
   public SecurityFilterChain filterChain(
     HttpSecurity http,
     MultiIssuerAuthenticationManagerResolver multiIssuerAuthenticationManagerResolver
-  ) {
+  ) throws Exception {
     http
       .cors(withDefaults())
       .csrf(AbstractHttpConfigurer::disable)
       .authorizeHttpRequests(authz ->
         authz
-          .requestMatchers("/services/validation-report/swagger.json")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher(
+              "/services/validation-report/swagger.json"
+            )
+          )
           .permitAll()
-          .requestMatchers("/services/swagger.json")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher("/services/swagger.json")
+          )
           .permitAll()
-          .requestMatchers("/actuator/prometheus")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher("/actuator/prometheus")
+          )
           .permitAll()
-          .requestMatchers("/actuator/health")
+          .requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/health"))
           .permitAll()
-          .requestMatchers("/actuator/health/liveness")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher("/actuator/health/liveness")
+          )
           .permitAll()
-          .requestMatchers("/actuator/health/readiness")
+          .requestMatchers(
+            AntPathRequestMatcher.antMatcher("/actuator/health/readiness")
+          )
           .permitAll()
-          .requestMatchers("/actuator/info")
+          .requestMatchers(AntPathRequestMatcher.antMatcher("/actuator/info"))
           .permitAll()
           .anyRequest()
           .authenticated()
