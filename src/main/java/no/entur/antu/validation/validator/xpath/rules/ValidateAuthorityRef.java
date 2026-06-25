@@ -23,12 +23,27 @@ import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
 public class ValidateAuthorityRef extends AbstractXPathValidationRule {
 
   public static final String CODE_AUTHORITY_REF = "AUTHORITY_REF";
+  public static final String CODE_AUTHORITY_REF_IN_ADDITIONAL_NETWORKS =
+    "AUTHORITY_REF_IN_ADDITIONAL_NETWORKS";
+
   static final ValidationRule INVALID_AUTHORITY_REF_RULE = new ValidationRule(
     CODE_AUTHORITY_REF,
     "Invalid Authority Ref",
     "Authority Ref %s does not exist in the organisation registry",
     Severity.ERROR
   );
+  static final ValidationRule INVALID_AUTHORITY_REF_IN_ADDITIONAL_NETWORKS_RULE =
+    new ValidationRule(
+      CODE_AUTHORITY_REF_IN_ADDITIONAL_NETWORKS,
+      "Invalid Authority Ref in Additional Networks",
+      "Authority Ref %s does not exist in the organisation registry",
+      Severity.WARNING
+    );
+
+  private static final String XPATH_NETWORK =
+    "//ServiceFrame/Network/AuthorityRef";
+  private static final String XPATH_ADDITIONAL_NETWORKS =
+    "//ServiceFrame/additionalNetworks/Network/AuthorityRef";
 
   private final OrganisationAliasRepository organisationAliasRepository;
   private final Set<String> additionalAllowedOrganisations;
@@ -45,7 +60,7 @@ public class ValidateAuthorityRef extends AbstractXPathValidationRule {
         : Set.of();
   }
 
-  private Boolean organisationExists(String authorityRef) {
+  private boolean organisationExists(String authorityRef) {
     return (
       additionalAllowedOrganisations.contains(authorityRef) ||
       organisationAliasRepository.hasOrganisationWithAlias(authorityRef)
@@ -56,39 +71,51 @@ public class ValidateAuthorityRef extends AbstractXPathValidationRule {
   public List<ValidationIssue> validate(
     XPathRuleValidationContext validationContext
   ) {
-    String xpath = "//ServiceFrame/Network/AuthorityRef";
-    XPathSelector selector = null;
     List<ValidationIssue> validationIssues = new ArrayList<>();
     try {
-      selector =
-        validationContext
-          .getNetexXMLParser()
-          .getXPathCompiler()
-          .compile(xpath)
-          .load();
-      selector.setContextItem(validationContext.getXmlNode());
-      XdmValue nodes = selector.evaluate();
-      for (XdmValue node : nodes) {
-        XdmNode xdmNode = (XdmNode) node;
-        String authorityRef = ((XdmNode) node).attribute("ref");
-        Boolean organisationExists = this.organisationExists(authorityRef);
-        DataLocation dataLocation = getXdmNodeLocation(
-          validationContext.getFileName(),
-          xdmNode
-        );
-        if (!organisationExists) {
-          validationIssues.add(
-            new ValidationIssue(
-              INVALID_AUTHORITY_REF_RULE,
-              dataLocation,
-              authorityRef
-            )
-          );
-        }
-      }
-      return validationIssues;
+      validateAuthorityRefs(
+        validationContext,
+        XPATH_NETWORK,
+        INVALID_AUTHORITY_REF_RULE,
+        validationIssues
+      );
+      validateAuthorityRefs(
+        validationContext,
+        XPATH_ADDITIONAL_NETWORKS,
+        INVALID_AUTHORITY_REF_IN_ADDITIONAL_NETWORKS_RULE,
+        validationIssues
+      );
     } catch (SaxonApiException e) {
       throw new RuntimeException(e);
+    }
+    return validationIssues;
+  }
+
+  private void validateAuthorityRefs(
+    XPathRuleValidationContext validationContext,
+    String xpath,
+    ValidationRule rule,
+    List<ValidationIssue> validationIssues
+  ) throws SaxonApiException {
+    XPathSelector selector = validationContext
+      .getNetexXMLParser()
+      .getXPathCompiler()
+      .compile(xpath)
+      .load();
+    selector.setContextItem(validationContext.getXmlNode());
+    XdmValue nodes = selector.evaluate();
+    for (XdmValue node : nodes) {
+      XdmNode xdmNode = (XdmNode) node;
+      String authorityRef = xdmNode.attribute("ref");
+      if (!organisationExists(authorityRef)) {
+        validationIssues.add(
+          new ValidationIssue(
+            rule,
+            getXdmNodeLocation(validationContext.getFileName(), xdmNode),
+            authorityRef
+          )
+        );
+      }
     }
   }
 
