@@ -9,7 +9,6 @@ import net.sf.saxon.s9api.XPathSelector;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
-import org.entur.netex.validation.validator.DataLocation;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationRule;
