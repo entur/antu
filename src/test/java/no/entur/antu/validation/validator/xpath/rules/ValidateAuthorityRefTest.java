@@ -1,5 +1,6 @@
 package no.entur.antu.validation.validator.xpath.rules;
 
+import static no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef.INVALID_AUTHORITY_REF_IN_ADDITIONAL_NETWORKS_RULE;
 import static no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef.INVALID_AUTHORITY_REF_RULE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,6 +73,34 @@ class ValidateAuthorityRefTest {
     assertTrue(validationIssues.isEmpty());
   }
 
+  @Test
+  void testInvalidAuthorityRefInAdditionalNetworks() {
+    XPathRuleValidationContext validationContext =
+      validationContextWithAdditionalNetworkAuthorityRef(
+        NON_EXISTENT_ORGANISATION_ALIAS
+      );
+    List<ValidationIssue> validationIssues = validator.validate(
+      validationContext
+    );
+    assertEquals(1, validationIssues.size());
+    assertEquals(
+      INVALID_AUTHORITY_REF_IN_ADDITIONAL_NETWORKS_RULE,
+      validationIssues.get(0).rule()
+    );
+  }
+
+  @Test
+  void testValidAuthorityRefInAdditionalNetworks() {
+    XPathRuleValidationContext validationContext =
+      validationContextWithAdditionalNetworkAuthorityRef(
+        EXISTING_ORGANISATION_ALIAS
+      );
+    List<ValidationIssue> validationIssues = validator.validate(
+      validationContext
+    );
+    assertTrue(validationIssues.isEmpty());
+  }
+
   private static final String NETEX_FRAGMENT =
     """
             <ServiceFrame xmlns="http://www.netex.org.uk/netex" version="1">
@@ -81,10 +110,35 @@ class ValidateAuthorityRefTest {
             </ServiceFrame>
         """;
 
+  private static final String NETEX_FRAGMENT_ADDITIONAL_NETWORKS =
+    """
+            <ServiceFrame xmlns="http://www.netex.org.uk/netex" version="1">
+              <Network>
+                <AuthorityRef ref="%s"></AuthorityRef>
+              </Network>
+              <additionalNetworks>
+                <Network>
+                  <AuthorityRef ref="%s"></AuthorityRef>
+                </Network>
+              </additionalNetworks>
+            </ServiceFrame>
+        """;
+
   private XPathRuleValidationContext validationContextWithAuthorityRef(
     String authorityRef
   ) {
     String netexFragment = String.format(NETEX_FRAGMENT, authorityRef);
+    return TestValidationContextBuilder.ofNetexFragment(netexFragment).build();
+  }
+
+  private XPathRuleValidationContext validationContextWithAdditionalNetworkAuthorityRef(
+    String additionalNetworkAuthorityRef
+  ) {
+    String netexFragment = String.format(
+      NETEX_FRAGMENT_ADDITIONAL_NETWORKS,
+      EXISTING_ORGANISATION_ALIAS,
+      additionalNetworkAuthorityRef
+    );
     return TestValidationContextBuilder.ofNetexFragment(netexFragment).build();
   }
 }
