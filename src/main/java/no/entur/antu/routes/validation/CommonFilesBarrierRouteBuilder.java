@@ -61,7 +61,7 @@ public class CommonFilesBarrierRouteBuilder extends BaseRouteBuilder {
     super.configure();
 
     from(
-      "master:lockOnAntuCommonFilesAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue"
+      "master:lockOnAntuCommonFilesAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuCommonFilesAggregationQueue?maxDeliveryAttempts=0"
     )
       .process(this::removeSynchronizationForAggregatedExchange)
       .aggregate(header(VALIDATION_REPORT_ID_HEADER))

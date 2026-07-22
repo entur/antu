@@ -101,7 +101,7 @@ public class AggregateValidationReportsRouteBuilder extends BaseRouteBuilder {
     super.configure();
 
     from(
-      "master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue?concurrentConsumers=10"
+      "master:lockOnAntuReportAggregationQueue:google-pubsub:{{antu.pubsub.project.id}}:AntuReportAggregationQueue?concurrentConsumers=10&maxDeliveryAttempts=0"
     )
       .process(this::removeSynchronizationForAggregatedExchange)
       .aggregate(header(VALIDATION_REPORT_ID_HEADER))
