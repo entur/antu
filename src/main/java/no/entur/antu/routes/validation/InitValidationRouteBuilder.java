@@ -51,7 +51,9 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
   public void configure() throws Exception {
     super.configure();
 
-    from("google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationQueue")
+    from(
+      "google-pubsub:{{antu.pubsub.project.id}}:AntuNetexValidationQueue?maxDeliveryAttempts=0"
+    )
       .to("direct:initDatasetValidation")
       .routeId("netex-validation-queue-pubsub");
 
@@ -89,7 +91,7 @@ public class InitValidationRouteBuilder extends BaseRouteBuilder {
       .routeId("init-dataset-validation");
 
     from(
-      "google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue?synchronousPull=true&concurrentConsumers={{antu.netex.job.consumers:1}}"
+      "google-pubsub:{{antu.pubsub.project.id}}:AntuJobQueue?synchronousPull=true&concurrentConsumers={{antu.netex.job.consumers:1}}&maxDeliveryAttempts=0"
     )
       .to("direct:processJob")
       .routeId("process-job-queue-pubsub");
