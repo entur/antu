@@ -55,6 +55,16 @@ public class CacheConfig {
 
   public static final String VALIDATION_STATE_CACHE = "validationProgressCache";
 
+  /**
+   * TTL for per-validation data in Redis, as a backstop for validations that
+   * never reach cleanUp. Must be applied AFTER the key is created: EXPIRE on a
+   * nonexistent key is a no-op. 24h outlives the job queue message retention
+   * (1h), so idempotency markers cannot expire before a redelivery. Entries
+   * inside the report-scoped RLocalCachedMaps cannot carry per-entry TTLs and
+   * are removed by cleanUp only.
+   */
+  public static final Duration VALIDATION_DATA_TTL = Duration.ofHours(24);
+
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
   /**

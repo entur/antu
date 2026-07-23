@@ -1,10 +1,11 @@
 package no.entur.antu.validation.validator.id;
 
+import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import no.entur.antu.Constants;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.api.RLocalCachedMap;
@@ -78,20 +79,19 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         return new HashSet<>(duplicatedIds);
       }
       localNetexIds.addAll(localIds);
-      // expire after the write: EXPIRE on a nonexistent key is a no-op
-      localNetexIds.expire(Constants.VALIDATION_DATA_TTL);
-
-      RSet<String> accumulatedNetexIds = redissonClient.getSet(
-        accumulatedNetexIdsKey
-      );
+      localNetexIds.expireIfNotSet(VALIDATION_DATA_TTL);
 
       Set<String> intersection = localNetexIds.readIntersection(
         accumulatedNetexIdsKey
       );
       duplicatedIds.addAll(intersection);
-      duplicatedIds.expire(Constants.VALIDATION_DATA_TTL);
+      duplicatedIds.expireIfNotSet(VALIDATION_DATA_TTL);
+
+      RSet<String> accumulatedNetexIds = redissonClient.getSet(
+        accumulatedNetexIdsKey
+      );
       accumulatedNetexIds.addAll(localNetexIds);
-      accumulatedNetexIds.expire(Constants.VALIDATION_DATA_TTL);
+      accumulatedNetexIds.expireIfNotSet(VALIDATION_DATA_TTL);
       return intersection;
     } finally {
       if (lock.isHeldByCurrentThread()) {

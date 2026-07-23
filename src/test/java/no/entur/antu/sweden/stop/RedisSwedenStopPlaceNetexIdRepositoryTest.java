@@ -1,5 +1,6 @@
 package no.entur.antu.sweden.stop;
 
+import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
@@ -82,6 +83,15 @@ class RedisSwedenStopPlaceNetexIdRepositoryTest {
 
   private static void assertKeyHasTtl(String key) {
     long ttl = redissonClient.getKeys().remainTimeToLive(key);
-    assertTrue(ttl > 0, "Key " + key + " should exist and have a TTL");
+    assertTrue(
+      ttl > 0 && ttl <= VALIDATION_DATA_TTL.toMillis(),
+      "Key " +
+      key +
+      " remainTimeToLive=" +
+      ttl +
+      ", expected in (0, " +
+      VALIDATION_DATA_TTL.toMillis() +
+      "]"
+    );
   }
 }

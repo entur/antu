@@ -1,11 +1,11 @@
 package no.entur.antu.netexdata.collectors;
 
 import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_STOPS_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import no.entur.antu.Constants;
 import no.entur.antu.validation.validator.support.NetexUtils;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
@@ -278,7 +278,7 @@ public class ServiceJourneyStopsCollector extends NetexDataCollector {
         redissonClient.getMap(cacheKey);
 
       serviceJourneyStopsMap.putAll(serviceJourneyStops);
-      serviceJourneyStopsMap.expire(Constants.VALIDATION_DATA_TTL);
+      serviceJourneyStopsMap.expireIfNotSet(VALIDATION_DATA_TTL);
       serviceJourneyStopsCache.put(cacheKey, serviceJourneyStopsMap);
     } finally {
       if (lock.isHeldByCurrentThread()) {

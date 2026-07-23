@@ -19,6 +19,7 @@ package no.entur.antu.routes.rest;
 import static no.entur.antu.Constants.BLOBSTORE_PATH_ANTU_REPORTS;
 import static no.entur.antu.Constants.VALIDATION_REPORT_PREFIX;
 import static no.entur.antu.Constants.VALIDATION_REPORT_SUFFIX;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -27,6 +28,10 @@ import com.nimbusds.jose.JWSAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
@@ -40,6 +45,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.helper.organisation.authorization.AuthorizationService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -174,6 +180,9 @@ class RestValidationReportRouteBuilderIntegrationTest
   )
   protected ProducerTemplate validationReportTemplate;
 
+  @Value("${server.port}")
+  private int serverPort;
+
   @Test
   void getValidationReport() throws Exception {
     // Prepare test data - create a mock validation report JSON
@@ -213,6 +222,34 @@ class RestValidationReportRouteBuilderIntegrationTest
     assertTrue(responseBytes.length > 0);
     String responseContent = new String(responseBytes, StandardCharsets.UTF_8);
     assertTrue(responseContent.contains(TEST_VALIDATION_REPORT_ID));
+  }
+
+  /**
+   * Pins camel.component.platform-http.serverRequestValidation=false:
+   * a plain POST without Content-Type must reach the route, not fail 415.
+   */
+  @Test
+  void postWithoutContentTypeIsAccepted() throws Exception {
+    context.start();
+
+    HttpResponse<Void> response = HttpClient
+      .newHttpClient()
+      .send(
+        HttpRequest
+          .newBuilder(
+            URI.create(
+              "http://localhost:" +
+              serverPort +
+              "/services/cache-admin/clear-cache"
+            )
+          )
+          .POST(HttpRequest.BodyPublishers.noBody())
+          .header("Authorization", "Bearer test-token")
+          .build(),
+        HttpResponse.BodyHandlers.discarding()
+      );
+
+    assertEquals(204, response.statusCode());
   }
 
   private static Map<String, Object> getTestHeaders(String method) {
