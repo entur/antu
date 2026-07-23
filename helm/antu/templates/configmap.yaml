@@ -18,6 +18,8 @@ data:
     camel.cluster.kubernetes.config-map-name=antu-leaders
     camel.main.stream-caching-enabled=false
     camel.main.stream-caching-spool-enabled=true
+    # restore pre-4.18 behaviour: do not reject requests on consumes/produces mismatch (415/406)
+    camel.component.platform-http.serverRequestValidation=false
     # the Camel shutdown timeout must be shorter than the Kubernetes terminationGracePeriod
     antu.shutdown.timeout=175
     antu.camel.redelivery.max=0
