@@ -18,6 +18,8 @@
 
 package no.entur.antu;
 
+import java.time.Duration;
+
 public final class Constants {
 
   /**
@@ -118,6 +120,12 @@ public final class Constants {
    */
   public static final String ET_CLIENT_NAME_HEADER = "Et-Client-Name";
   public static final String ET_CLIENT_NAME_HEADER_VALUE = "entur-antu";
+
+  /**
+   * TTL for per-validation data in Redis. Backstop for validations that never
+   * reach cleanUp; completed validations are cleaned up immediately.
+   */
+  public static final Duration VALIDATION_DATA_TTL = Duration.ofHours(24);
 
   private Constants() {}
 }

@@ -5,6 +5,7 @@ import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_INTERCHANGE
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+import no.entur.antu.Constants;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
@@ -74,6 +75,9 @@ public class ServiceJourneyInterchangeInfoCollector extends NetexDataCollector {
         serviceJourneyInterchangeInfos
           .map(ServiceJourneyInterchangeInfo::toString)
           .toList()
+      );
+      serviceJourneyInterchangeInfosListCache.expire(
+        Constants.VALIDATION_DATA_TTL
       );
       serviceJourneyInterchangeInfoCache.put(
         keyName,
