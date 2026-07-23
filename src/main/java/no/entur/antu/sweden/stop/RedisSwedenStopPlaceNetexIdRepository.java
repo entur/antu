@@ -1,8 +1,9 @@
 package no.entur.antu.sweden.stop;
 
+import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
+
 import java.time.Duration;
 import java.util.Set;
-import no.entur.antu.Constants;
 import no.entur.antu.exception.AntuException;
 import no.entur.antu.exception.RetryableAntuException;
 import org.redisson.api.RSemaphore;
@@ -35,8 +36,7 @@ public class RedisSwedenStopPlaceNetexIdRepository
     RSemaphore semaphore = redissonClient.getSemaphore(
       getStopPlaceIdCacheSemaphoreKey(reportId)
     );
-    semaphore.trySetPermits(1);
-    semaphore.expire(Constants.VALIDATION_DATA_TTL);
+    semaphore.trySetPermits(1, VALIDATION_DATA_TTL);
     boolean cacheEntryAvailable;
     try {
       cacheEntryAvailable = semaphore.tryAcquire(Duration.ofMinutes(1));
@@ -60,12 +60,12 @@ public class RedisSwedenStopPlaceNetexIdRepository
       getStopPlaceIdCacheKey(reportId)
     );
     stopPlaceIds.addAll(stopPlaceAndQuayIds);
-    stopPlaceIds.expire(Constants.VALIDATION_DATA_TTL);
+    stopPlaceIds.expireIfNotSet(VALIDATION_DATA_TTL);
     RSemaphore semaphore = redissonClient.getSemaphore(
-      STOP_PLACE_ID_SET_SEMAPHORE_PREFIX + reportId
+      getStopPlaceIdCacheSemaphoreKey(reportId)
     );
     semaphore.addPermits(1);
-    semaphore.expire(Constants.VALIDATION_DATA_TTL);
+    semaphore.expireIfNotSet(VALIDATION_DATA_TTL);
   }
 
   @Override
