@@ -173,4 +173,34 @@ class RedisNetexIdRepositoryTest {
       "Processing same file twice should return same results (idempotency)"
     );
   }
+
+  /**
+   * Per-report keys must carry a TTL so that validations that never reach
+   * cleanUp do not leak keys. Pins the expire-after-write ordering: EXPIRE
+   * on a nonexistent key is a no-op.
+   */
+  @Test
+  void testPerReportKeysHaveTtl() {
+    repository.getDuplicateNetexIds(
+      TEST_REPORT_ID,
+      "fileA.xml",
+      Set.of("TST:Line:ID1", "TST:Line:ID2")
+    );
+    // second file with a duplicate so the duplicated ids set is created
+    repository.getDuplicateNetexIds(
+      TEST_REPORT_ID,
+      "fileB.xml",
+      Set.of("TST:Line:ID1")
+    );
+
+    assertKeyHasTtl("NETEX_LOCAL_ID_SET_" + TEST_REPORT_ID + "_fileA.xml");
+    assertKeyHasTtl("NETEX_LOCAL_ID_SET_" + TEST_REPORT_ID + "_fileB.xml");
+    assertKeyHasTtl("DUPLICATED_ID_SET_" + TEST_REPORT_ID + "_fileB.xml");
+    assertKeyHasTtl("ACCUMULATED_NETEX_ID_SET_" + TEST_REPORT_ID);
+  }
+
+  private static void assertKeyHasTtl(String key) {
+    long ttl = redissonClient.getKeys().remainTimeToLive(key);
+    assertTrue(ttl > 0, "Key " + key + " should exist and have a TTL");
+  }
 }
