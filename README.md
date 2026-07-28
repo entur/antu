@@ -127,7 +127,7 @@ The Kubernetes configmap helm/antu/templates/configmap.yaml can also be used as 
 
 - Run `mvn package` to generate the Spring Boot jar.
 - The application can be started with the following command line:  
-  ```java -Xmx500m -Dspring.config.location=/path/to/application.properties -Dfile.encoding=UTF-8 -jar target/antu-0.0.1-SNAPSHOT.jar```
+  ```java -Xmx500m -Dspring.config.location=/path/to/application.properties -Dfile.encoding=UTF-8 -jar target/antu-*.jar```
 
 # Antu rule set
 

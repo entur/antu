@@ -1,7 +1,7 @@
 package no.entur.antu.validation.validator.interchange.waitingtime;
 
 import static no.entur.antu.validation.validator.interchange.waitingtime.InterchangeWaitingTimeValidator.sortedLocalDateTimesForServiceJourneyAtStop;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigInteger;
 import java.time.Duration;
@@ -22,7 +22,6 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.*;
@@ -256,10 +255,7 @@ class InterchangeWaitingTimeValidatorTest {
       CODESPACE,
       REFERENCE_TO_NON_EXISTENT_FROM_SERVICE_JOURNEY
     );
-    Assertions.assertEquals(
-      validationReport,
-      validator.validate(validationReport)
-    );
+    assertEquals(validationReport, validator.validate(validationReport));
   }
 
   private void setupTestCaseWithReferenceToNonExistentToServiceJourney() {
@@ -300,10 +296,7 @@ class InterchangeWaitingTimeValidatorTest {
       CODESPACE,
       REFERENCE_TO_NON_EXISTENT_TO_SERVICE_JOURNEY
     );
-    Assertions.assertEquals(
-      validationReport,
-      validator.validate(validationReport)
-    );
+    assertEquals(validationReport, validator.validate(validationReport));
   }
 
   @Test
@@ -393,7 +386,7 @@ class InterchangeWaitingTimeValidatorTest {
           .sorted()
           .toList()
       );
-    assertEquals(null, minimum);
+    assertNull(minimum);
   }
 
   @Test
@@ -442,7 +435,7 @@ class InterchangeWaitingTimeValidatorTest {
         fromStop,
         toStop
       );
-    assertTrue(validationIssue == null);
+    assertNull(validationIssue);
   }
 
   @Test
@@ -476,12 +469,12 @@ class InterchangeWaitingTimeValidatorTest {
         fromStop,
         toStop
       );
-    assertTrue(validationIssue != null);
+    assertNotNull(validationIssue);
     assertEquals(
-      validationIssue.rule().name(),
-      InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name()
+      InterchangeWaitingTimeValidator.RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING.name(),
+      validationIssue.rule().name()
     );
-    assertEquals(validationIssue.rule().severity(), Severity.WARNING);
+    assertEquals(Severity.WARNING, validationIssue.rule().severity());
   }
 
   @Test
@@ -515,12 +508,12 @@ class InterchangeWaitingTimeValidatorTest {
         fromStop,
         toStop
       );
-    assertTrue(validationIssue != null);
+    assertNotNull(validationIssue);
     assertEquals(
-      validationIssue.rule().name(),
-      InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name()
+      InterchangeWaitingTimeValidator.RULE_NO_INTERCHANGE_POSSIBLE.name(),
+      validationIssue.rule().name()
     );
-    assertEquals(validationIssue.rule().severity(), Severity.WARNING);
+    assertEquals(Severity.WARNING, validationIssue.rule().severity());
   }
 
   @Test

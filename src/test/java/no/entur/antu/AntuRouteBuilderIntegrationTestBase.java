@@ -50,8 +50,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PubSubEmulatorContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.gcloud.PubSubEmulatorContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @CamelSpringBootTest
@@ -59,7 +58,6 @@ import org.testcontainers.utility.DockerImageName;
 @ActiveProfiles(
   { "test", "default", "in-memory-blobstore", "google-pubsub-autocreate" }
 )
-@Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AntuRouteBuilderIntegrationTestBase {
 

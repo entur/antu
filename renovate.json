@@ -5,5 +5,21 @@
   "baseBranchPatterns": [
     "main"
   ],
-  "separateMinorPatch": true
+  "separateMinorPatch": true,
+  "packageRules": [
+    {
+      "description": "superpom carries the Spring Boot version, never automerge",
+      "matchPackageNames": [
+        "org.entur.ror:superpom"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "redisson-spring-data-40 is pinned by hand against the starter's transitive module, never automerge",
+      "matchPackageNames": [
+        "org.redisson:**"
+      ],
+      "automerge": false
+    }
+  ]
 }
