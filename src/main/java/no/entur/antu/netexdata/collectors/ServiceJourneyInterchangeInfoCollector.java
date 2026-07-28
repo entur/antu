@@ -1,6 +1,7 @@
 package no.entur.antu.netexdata.collectors;
 
 import static no.entur.antu.config.cache.CacheConfig.SERVICE_JOURNEY_INTERCHANGE_INFO_CACHE;
+import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
 
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,9 @@ public class ServiceJourneyInterchangeInfoCollector extends NetexDataCollector {
         serviceJourneyInterchangeInfos
           .map(ServiceJourneyInterchangeInfo::toString)
           .toList()
+      );
+      serviceJourneyInterchangeInfosListCache.expireIfNotSet(
+        VALIDATION_DATA_TTL
       );
       serviceJourneyInterchangeInfoCache.put(
         keyName,

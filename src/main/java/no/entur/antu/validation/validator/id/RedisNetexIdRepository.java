@@ -1,6 +1,7 @@
 package no.entur.antu.validation.validator.id;
 
-import java.time.Duration;
+import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -77,20 +78,20 @@ public class RedisNetexIdRepository implements NetexIdRepository {
         );
         return new HashSet<>(duplicatedIds);
       }
-      duplicatedIds.expire(Duration.ofHours(1));
-      localNetexIds.expire(Duration.ofHours(1));
       localNetexIds.addAll(localIds);
-
-      RSet<String> accumulatedNetexIds = redissonClient.getSet(
-        accumulatedNetexIdsKey
-      );
-      accumulatedNetexIds.expire(Duration.ofHours(1));
+      localNetexIds.expireIfNotSet(VALIDATION_DATA_TTL);
 
       Set<String> intersection = localNetexIds.readIntersection(
         accumulatedNetexIdsKey
       );
       duplicatedIds.addAll(intersection);
+      duplicatedIds.expireIfNotSet(VALIDATION_DATA_TTL);
+
+      RSet<String> accumulatedNetexIds = redissonClient.getSet(
+        accumulatedNetexIdsKey
+      );
       accumulatedNetexIds.addAll(localNetexIds);
+      accumulatedNetexIds.expireIfNotSet(VALIDATION_DATA_TTL);
       return intersection;
     } finally {
       if (lock.isHeldByCurrentThread()) {

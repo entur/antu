@@ -1,5 +1,6 @@
 package no.entur.antu.validation.validator.id;
 
+import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
@@ -171,6 +172,45 @@ class RedisNetexIdRepositoryTest {
       firstResult,
       secondResult,
       "Processing same file twice should return same results (idempotency)"
+    );
+  }
+
+  /**
+   * Per-report keys must carry a TTL so that validations that never reach
+   * cleanUp do not leak keys. Pins the expire-after-write ordering: EXPIRE
+   * on a nonexistent key is a no-op.
+   */
+  @Test
+  void testPerReportKeysHaveTtl() {
+    repository.getDuplicateNetexIds(
+      TEST_REPORT_ID,
+      "fileA.xml",
+      Set.of("TST:Line:ID1", "TST:Line:ID2")
+    );
+    // second file with a duplicate so the duplicated ids set is created
+    repository.getDuplicateNetexIds(
+      TEST_REPORT_ID,
+      "fileB.xml",
+      Set.of("TST:Line:ID1")
+    );
+
+    assertKeyHasTtl("NETEX_LOCAL_ID_SET_" + TEST_REPORT_ID + "_fileA.xml");
+    assertKeyHasTtl("NETEX_LOCAL_ID_SET_" + TEST_REPORT_ID + "_fileB.xml");
+    assertKeyHasTtl("DUPLICATED_ID_SET_" + TEST_REPORT_ID + "_fileB.xml");
+    assertKeyHasTtl("ACCUMULATED_NETEX_ID_SET_" + TEST_REPORT_ID);
+  }
+
+  private static void assertKeyHasTtl(String key) {
+    long ttl = redissonClient.getKeys().remainTimeToLive(key);
+    assertTrue(
+      ttl > 0 && ttl <= VALIDATION_DATA_TTL.toMillis(),
+      "Key " +
+      key +
+      " remainTimeToLive=" +
+      ttl +
+      ", expected in (0, " +
+      VALIDATION_DATA_TTL.toMillis() +
+      "]"
     );
   }
 }
