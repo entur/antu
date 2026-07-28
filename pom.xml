@@ -24,7 +24,11 @@
     </scm>
     <properties>
         <java.version>17</java.version>
-        <camel.version>4.18.3</camel.version>
+        <camel.version>4.19.0</camel.version>
+        <!-- Must match the fabric8 kubernetes-client version pulled transitively by camel-kubernetes
+             (see camel.version). Pins the JDK-based fabric8 HTTP transport that replaces the
+             Netty-incompatible Vert.x one below. -->
+        <fabric8-kubernetes-client.version>7.6.1</fabric8-kubernetes-client.version>
         <entur.helpers.version>7.1.0</entur.helpers.version>
         <netex-validator-java.version>11.0.31</netex-validator-java.version>
         <netex-parser-java.version>3.1.80</netex-parser-java.version>
@@ -186,6 +190,22 @@
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-kubernetes-cluster-service-starter</artifactId>
+            <exclusions>
+                <!-- fabric8's default Vert.x HTTP transport (Vert.x 4.5 is built for Netty 4.1) is
+                     binary-incompatible with the Netty 4.2 forced by Spring Boot 4, which breaks the
+                     K8s leader-election Lease write and stops master-gated routes from starting.
+                     Replaced with the Netty-free JDK HttpClient transport below. -->
+                <exclusion>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>kubernetes-httpclient-vertx</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Netty-free HTTP transport for the fabric8 kubernetes-client used by Camel K8s leader election. -->
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-httpclient-jdk</artifactId>
+            <version>${fabric8-kubernetes-client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
