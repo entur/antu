@@ -22,7 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.redisson.config.SingleServerConfig;
+import org.redisson.config.Config;
 import org.springframework.boot.data.redis.autoconfigure.DataRedisProperties;
 
 class RedisClientConfigTest {
@@ -35,27 +35,26 @@ class RedisClientConfigTest {
     redisProperties.setHost("redis.example.org");
     redisProperties.setPort(6379);
 
-    SingleServerConfig singleServerConfig = new RedisClientConfig()
+    Config redissonConfig = new RedisClientConfig()
       .redissonConfig(
         redisProperties,
         trustStore.toString(),
         "trustStorePassword",
         "authenticationString"
-      )
-      .useSingleServer();
+      );
 
     assertEquals(
       "rediss://redis.example.org:6379",
-      singleServerConfig.getAddress()
+      redissonConfig.useSingleServer().getAddress()
     );
     assertEquals(
       trustStore.toUri().toURL().toString(),
-      singleServerConfig.getSslTruststore().toString()
+      redissonConfig.getSslTruststore().toString()
     );
     assertEquals(
       "trustStorePassword",
-      singleServerConfig.getSslTruststorePassword()
+      redissonConfig.getSslTruststorePassword()
     );
-    assertEquals("authenticationString", singleServerConfig.getPassword());
+    assertEquals("authenticationString", redissonConfig.getPassword());
   }
 }

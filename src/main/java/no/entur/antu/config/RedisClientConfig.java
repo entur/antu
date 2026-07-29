@@ -52,12 +52,10 @@ public class RedisClientConfig {
         redisProperties.getHost(),
         redisProperties.getPort()
       );
-      redissonConfig
-        .useSingleServer()
-        .setAddress(address)
-        .setSslTruststore(new File(trustStoreFile).toURI().toURL())
-        .setSslTruststorePassword(trustStorePassword)
-        .setPassword(authenticationString);
+      redissonConfig.useSingleServer().setAddress(address);
+      redissonConfig.setSslTruststore(new File(trustStoreFile).toURI().toURL());
+      redissonConfig.setSslTruststorePassword(trustStorePassword);
+      redissonConfig.setPassword(authenticationString);
       return redissonConfig;
     }
   }
