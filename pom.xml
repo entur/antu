@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>4.10.0</version>
+        <version>6.5.0</version>
     </parent>
 
     <groupId>no.entur.antu</groupId>
@@ -23,15 +23,17 @@
         <developerConnection>scm:git:ssh://git@github.com:entur/antu.git</developerConnection>
     </scm>
     <properties>
-        <java.version>17</java.version>
-        <camel.version>4.18.3</camel.version>
-        <entur.helpers.version>5.50.0</entur.helpers.version>
+        <java.version>21</java.version>
+        <camel.version>4.21.0</camel.version>
+        <entur.helpers.version>7.2.0</entur.helpers.version>
+        <spring-cloud-gcp-dependencies.version>7.4.10</spring-cloud-gcp-dependencies.version>
+        <!-- unmanaged by any BOM, must track the kubernetes-client version that camel-kubernetes pulls in -->
+        <kubernetes-client.version>7.7.0</kubernetes-client.version>
         <netex-validator-java.version>11.0.31</netex-validator-java.version>
         <netex-parser-java.version>3.1.80</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
-        <commons-io.version>2.11.0</commons-io.version>
         <zt-zip.version>1.17</zt-zip.version>
-        <redisson.version>3.52.0</redisson.version>
+        <redisson.version>4.6.1</redisson.version>
         <kryo.version>5.6.2</kryo.version>
         <embedded-redis.version>0.9.1</embedded-redis.version>
         <prettier-java.version>2.1.0</prettier-java.version>
@@ -47,6 +49,28 @@
     <dependencyManagement>
         <dependencies>
 
+            <!--
+              Must precede spring-cloud-gcp-dependencies, which pins opentelemetry-api to an older
+              version than the rest of the opentelemetry modules resolve to. First declaration wins.
+            -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-bom</artifactId>
+                <version>${opentelemetry.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!--
+              entur-helpers still pins spring-cloud-gcp 5.11.3, which references Boot 3 classes that
+              no longer exist. Remove this once helpers ships a Boot 4 compatible version.
+            -->
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>spring-cloud-gcp-dependencies</artifactId>
+                <version>${spring-cloud-gcp-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.apache.camel.springboot</groupId>
                 <artifactId>camel-spring-boot-bom</artifactId>
@@ -80,20 +104,6 @@
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>storage-gcp-gcs</artifactId>
             <version>${entur.helpers.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-codec-http2</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.protobuf</groupId>
-                    <artifactId>protobuf-lite</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
@@ -111,12 +121,24 @@
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>stopplace-changelog-starter</artifactId>
             <version>${entur.helpers.version}</version>
+            <exclusions>
+                <!-- Duplicate of swagger-annotations-jakarta, which camel-openapi-java reads -->
+                <exclusion>
+                    <groupId>io.swagger.core.v3</groupId>
+                    <artifactId>swagger-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- WebClient auto-configuration is no longer part of the web starters in Boot 4 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-webclient</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -144,6 +166,18 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redisson.version}</version>
+            <exclusions>
+                <!-- The starter targets Spring Boot 4.1; swap in the Spring Data Redis 4.0 module -->
+                <exclusion>
+                    <groupId>org.redisson</groupId>
+                    <artifactId>redisson-spring-data-41</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-data-40</artifactId>
             <version>${redisson.version}</version>
         </dependency>
         <!-- Used by Redisson -->
@@ -173,6 +207,19 @@
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-kubernetes-cluster-service-starter</artifactId>
+            <exclusions>
+                <!-- fabric8's default Vert.x transport is built for Netty 4.1, Spring Boot 4 forces
+                     Netty 4.2. Use the Netty-free JDK transport so k8s leader election keeps working. -->
+                <exclusion>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>kubernetes-httpclient-vertx</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-httpclient-jdk</artifactId>
+            <version>${kubernetes-client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
@@ -238,12 +285,12 @@
         <!-- testing -->
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>gcloud</artifactId>
+            <artifactId>testcontainers-gcloud</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

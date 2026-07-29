@@ -9,7 +9,7 @@ Antu is a NeTEx dataset validation service built by Entur for validating public 
 ## Architecture
 
 ### Core Components
-- **Language**: Java 17
+- **Language**: Java 21
 - **Framework**: Spring Boot with Apache Camel
 - **Build Tool**: Maven
 - **Message Queue**: Google Cloud PubSub
@@ -28,11 +28,13 @@ Antu is a NeTEx dataset validation service built by Entur for validating public 
 8. Notifies Marduk via PubSub
 
 ### Key Dependencies
-- `netex-validator-java` (v11.0.3): Core validation library
-- `netex-parser-java` (v3.1.63): NeTEx XML parsing
-- `camel-spring-boot` (v4.10.7): Integration framework
-- `redisson` (v3.52.0): Distributed data structures
-- `entur-helpers` (v5.47.0): Entur-specific utilities
+- `netex-validator-java`: Core validation library
+- `netex-parser-java`: NeTEx XML parsing
+- `camel-spring-boot`: Integration framework
+- `redisson`: Distributed data structures
+- `entur-helpers`: Entur-specific utilities
+
+Versions live in pom.xml; do not trust versions written in this file.
 
 ## Project Structure
 
@@ -79,9 +81,9 @@ Requirements:
 - Application properties file configured
 
 ```bash
-docker run -p 6379:6379 --name redis-antu redis:6
+docker run -p 6379:6379 --name redis-antu redis:7-alpine
 gcloud beta emulators pubsub start
-java -Xmx500m -Dspring.config.location=/path/to/application.properties -jar target/antu-0.0.1-SNAPSHOT.jar
+java -Xmx500m -Dspring.config.location=/path/to/application.properties -jar target/antu-*.jar
 ```
 
 ### Code Formatting
