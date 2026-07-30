@@ -66,12 +66,12 @@ Antu supports multiple validation profiles with different rule sets:
 
 ### Building the Project
 ```bash
-mvn clean package
+./mvnw clean package
 ```
 
 ### Running Tests
 ```bash
-mvn test
+./mvnw test
 ```
 
 ### Running Locally
@@ -89,8 +89,8 @@ java -Xmx500m -Dspring.config.location=/path/to/application.properties -jar targ
 ### Code Formatting
 Uses Prettier for Java:
 ```bash
-mvn prettier:write  # Format code
-mvn prettier:check  # Check formatting
+./mvnw prettier:write  # Format code
+./mvnw prettier:check  # Check formatting
 ```
 
 ## Important Considerations
@@ -114,7 +114,7 @@ mvn prettier:check  # Check formatting
 ## Code Style
 
 - Follow existing patterns in the codebase
-- Prettier handles formatting automatically on `mvn validate`
+- Prettier handles formatting automatically on `./mvnw validate`
 - Use Spring dependency injection
 - Camel routes for async processing
 - Prefer functional programming style where appropriate

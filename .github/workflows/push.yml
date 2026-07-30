@@ -29,7 +29,7 @@ jobs:
             ${{ runner.os }}-maven-
             ${{ runner.os }}-
       - name: Run maven build
-        run: mvn verify -PprettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
+        run: ./mvnw verify -PprettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
       - uses: actions/upload-artifact@v7
         with:
           path: target/*-SNAPSHOT.jar
@@ -39,7 +39,7 @@ jobs:
           SONAR_PROJECT_NAME: ${{ github.event.repository.name }}
           SONAR_PROJECT_KEY: entur_${{ github.event.repository.name }}
         run: |
-          mvn     org.jacoco:jacoco-maven-plugin:prepare-agent verify \
+          ./mvnw org.jacoco:jacoco-maven-plugin:prepare-agent verify \
                   org.jacoco:jacoco-maven-plugin:report sonar:sonar \
                   -P prettierSkip \
                   -Dmaven.main.skip \
