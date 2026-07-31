@@ -10,7 +10,7 @@ variable "gcp_region" {
 
 variable "bucket_location" {
   description = "GCP bucket location"
-  default = "europe-west1"
+  default     = "europe-west1"
 }
 
 variable "bucket_instance_suffix" {
@@ -38,24 +38,24 @@ variable "gcp_resources_project" {
 
 variable "kube_namespace" {
   description = "The Kubernetes namespace"
-  default = "antu"
+  default     = "antu"
 }
 
 variable "labels" {
   description = "Labels used in all resources"
-  type = map(string)
+  type        = map(string)
   default = {
     manager = "terraform"
-    team = "ror"
-    slack = "talk-ror"
-    app = "antu"
+    team    = "ror"
+    slack   = "talk-ror"
+    app     = "antu"
   }
 }
 
 
 variable "redis_zone" {
   description = "The GCP zone for redis"
-  default = "europe-west1-d"
+  default     = "europe-west1-d"
 }
 
 
