@@ -6,6 +6,9 @@ data:
     spring.main.sources=no.entur.antu
     spring.profiles.active=gcs-blobstore,stop-place-changelog
     server.port={{ .Values.service.http.internalPort }}
+    # init the servlet before Camel starts, or platform-http's route mappings are unreachable
+    # and every /services/** request gets Spring's no-handler 404
+    spring.mvc.servlet.load-on-startup=1
 
     # Camel
     camel.main.name=antu
