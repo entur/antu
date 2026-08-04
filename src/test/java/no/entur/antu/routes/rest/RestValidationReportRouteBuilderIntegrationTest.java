@@ -169,8 +169,32 @@ class RestValidationReportRouteBuilderIntegrationTest
   )
   protected ProducerTemplate validationReportTemplate;
 
+  @Produce("http:localhost:{{server.port}}/services/health")
+  protected ProducerTemplate healthTemplate;
+
   @Value("${server.port}")
   private int serverPort;
+
+  /**
+   * The readiness probe targets this endpoint, so it has to be served by platform-http itself.
+   * The actuator health group reports UP even when the platform-http mappings are unreachable,
+   * which is the failure mode this endpoint exists to expose.
+   */
+  @Test
+  void getHealth() throws Exception {
+    context.start();
+
+    InputStream response = (InputStream) healthTemplate.requestBodyAndHeaders(
+      null,
+      getTestHeaders("GET")
+    );
+
+    assertNotNull(response);
+    assertEquals(
+      "OK",
+      new String(response.readAllBytes(), StandardCharsets.UTF_8)
+    );
+  }
 
   @Test
   void getValidationReport() throws Exception {

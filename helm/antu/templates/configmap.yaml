@@ -9,6 +9,9 @@ data:
     # init the servlet before Camel starts, or platform-http's route mappings are unreachable
     # and every /services/** request gets Spring's no-handler 404
     spring.mvc.servlet.load-on-startup=1
+    # platform-http runs every /services/** route on this pool; Boot's default core of 8 with an
+    # unbounded queue never grows, so report downloads can starve the probes off the pool
+    spring.task.execution.pool.core-size=32
 
     # Camel
     camel.main.name=antu

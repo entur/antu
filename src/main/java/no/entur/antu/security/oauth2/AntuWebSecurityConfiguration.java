@@ -7,10 +7,12 @@ import org.entur.oauth2.multiissuer.MultiIssuerAuthenticationManagerResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -62,8 +64,15 @@ public class AntuWebSecurityConfiguration {
     http
       .cors(withDefaults())
       .csrf(AbstractHttpConfigurer::disable)
+      // a JWT resource server has no use for sessions, and without this an unauthenticated 401
+      // mints one per request via the saved-request cache
+      .sessionManagement(session ->
+        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+      )
       .authorizeHttpRequests(authz ->
         authz
+          .requestMatchers(HttpMethod.GET, "/services/health")
+          .permitAll()
           .requestMatchers("/services/validation-report/swagger.json")
           .permitAll()
           .requestMatchers("/services/swagger.json")
