@@ -95,6 +95,7 @@ class AntuWebSecurityConfigurationTest {
   @ParameterizedTest
   @ValueSource(
     strings = {
+      "/services/health",
       "/services/validation-report/swagger.json",
       "/services/swagger.json",
       "/actuator/prometheus",

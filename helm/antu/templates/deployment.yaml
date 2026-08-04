@@ -65,25 +65,31 @@ spec:
               name: http
               protocol: TCP
           livenessProbe:
+            # also platform-http, so a pod whose Camel mappings never registered is recycled
+            # instead of silently leaving the Service; /actuator/health/liveness cannot see that
             httpGet:
-              path: /actuator/health/liveness
+              path: /services/health
               port: {{ .Values.service.http.internalPort }}
               scheme: HTTP
             initialDelaySeconds: 140
             periodSeconds: 10
             successThreshold: 1
-            failureThreshold: 3
-            timeoutSeconds: 30
+            failureThreshold: 12
+            # must stay below periodSeconds: kubelet does not serialise probes, and each in-flight
+            # probe holds one of platform-http's executor threads
+            timeoutSeconds: 5
           readinessProbe:
+            # served by platform-http, so a pod whose Camel HTTP routes are unreachable fails
+            # readiness instead of serving 404s; /actuator/health/readiness stays UP in that state
             httpGet:
-              path: /actuator/health/readiness
+              path: /services/health
               port: {{ .Values.service.http.internalPort }}
               scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
-            timeoutSeconds: 10
+            timeoutSeconds: 5
           resources:
             limits:
               memory: {{ .Values.resources.memLimit }}
