@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>6.5.0</version>
+        <version>7.0.0</version>
     </parent>
 
     <groupId>no.entur.antu</groupId>
@@ -23,12 +23,11 @@
         <developerConnection>scm:git:ssh://git@github.com:entur/antu.git</developerConnection>
     </scm>
     <properties>
-        <java.version>21</java.version>
         <camel.version>4.21.0</camel.version>
         <entur.helpers.version>7.2.0</entur.helpers.version>
-        <spring-cloud-gcp-dependencies.version>7.4.10</spring-cloud-gcp-dependencies.version>
+        <spring-cloud-gcp-dependencies.version>8.1.0</spring-cloud-gcp-dependencies.version>
         <!-- unmanaged by any BOM, must track the kubernetes-client version that camel-kubernetes pulls in -->
-        <kubernetes-client.version>7.8.0</kubernetes-client.version>
+        <kubernetes-client.version>7.7.0</kubernetes-client.version>
         <netex-validator-java.version>11.0.31</netex-validator-java.version>
         <netex-parser-java.version>3.1.82</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
@@ -50,8 +49,10 @@
         <dependencies>
 
             <!--
-              Must precede spring-cloud-gcp-dependencies, which pins opentelemetry-api to an older
-              version than the rest of the opentelemetry modules resolve to. First declaration wins.
+              Keeps the whole opentelemetry graph on one version when spring-cloud-gcp and Spring Boot
+              disagree on it. First declaration wins, so this pins every module to Boot's
+              opentelemetry.version. Currently a no-op (Boot 4.1.0 and spring-cloud-gcp 8.1.0 both land
+              on 1.62.0); it matters again the next time libraries-bom runs ahead of Boot.
             -->
             <dependency>
                 <groupId>io.opentelemetry</groupId>
@@ -99,6 +100,15 @@
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>entur-google-pubsub</artifactId>
             <version>${entur.helpers.version}</version>
+            <exclusions>
+                <!-- Build-time library leaked as a compile dependency. spring-boot-dependencies does
+                     not manage it, so it stays at the 4.0.4 that entur-helpers' own parent pins.
+                     Nothing loads it at runtime. -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-loader-tools</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
@@ -166,18 +176,6 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
-            <version>${redisson.version}</version>
-            <exclusions>
-                <!-- The starter targets Spring Boot 4.1; swap in the Spring Data Redis 4.0 module -->
-                <exclusion>
-                    <groupId>org.redisson</groupId>
-                    <artifactId>redisson-spring-data-41</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-data-40</artifactId>
             <version>${redisson.version}</version>
         </dependency>
         <!-- Used by Redisson -->
