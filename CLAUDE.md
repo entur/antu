@@ -9,7 +9,7 @@ Antu is a NeTEx dataset validation service built by Entur for validating public 
 ## Architecture
 
 ### Core Components
-- **Language**: Java 21
+- **Language**: Java 25
 - **Framework**: Spring Boot with Apache Camel
 - **Build Tool**: Maven
 - **Message Queue**: Google Cloud PubSub
