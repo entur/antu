@@ -23,16 +23,16 @@
         <developerConnection>scm:git:ssh://git@github.com:entur/antu.git</developerConnection>
     </scm>
     <properties>
-        <!-- Temporary, for a dev experiment: Boot back to 4.0.6 while JDK 25, spring-cloud-gcp 8.1.0
-             and kubernetes-client 7.7.0 stay put, to test whether Boot's shutdown lifecycle is what
-             loses the pubsub race. java.version is set because superpom 6.5.0 defaults it to 17.
-             redisson-spring-data follows the Boot version, so it moves back to -40 with it. -->
+        <!-- Temporary, for a dev experiment: every dependency is back at the 480a414e versions and
+             JDK 25 is the only thing left new, to test whether the runtime is what loses the pubsub
+             race. java.version is set because superpom 6.5.0 defaults it to 17; redisson-spring-data
+             follows Boot's spring-data-redis, so it stays on -40. -->
         <java.version>25</java.version>
         <camel.version>4.21.0</camel.version>
         <entur.helpers.version>7.2.0</entur.helpers.version>
-        <spring-cloud-gcp-dependencies.version>8.1.0</spring-cloud-gcp-dependencies.version>
+        <spring-cloud-gcp-dependencies.version>7.4.10</spring-cloud-gcp-dependencies.version>
         <!-- unmanaged by any BOM, must track the kubernetes-client version that camel-kubernetes pulls in -->
-        <kubernetes-client.version>7.7.0</kubernetes-client.version>
+        <kubernetes-client.version>7.8.0</kubernetes-client.version>
         <netex-validator-java.version>11.0.31</netex-validator-java.version>
         <netex-parser-java.version>3.1.82</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
@@ -105,15 +105,6 @@
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>entur-google-pubsub</artifactId>
             <version>${entur.helpers.version}</version>
-            <exclusions>
-                <!-- Build-time library leaked as a compile dependency. spring-boot-dependencies does
-                     not manage it, so it stays at the 4.0.4 that entur-helpers' own parent pins.
-                     Nothing loads it at runtime. -->
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-loader-tools</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.entur.ror.helpers</groupId>
