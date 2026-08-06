@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>7.0.0</version>
+        <version>6.5.0</version>
     </parent>
 
     <groupId>no.entur.antu</groupId>
@@ -23,6 +23,11 @@
         <developerConnection>scm:git:ssh://git@github.com:entur/antu.git</developerConnection>
     </scm>
     <properties>
+        <!-- Temporary, for a dev experiment: Boot back to 4.0.6 while JDK 25, spring-cloud-gcp 8.1.0
+             and kubernetes-client 7.7.0 stay put, to test whether Boot's shutdown lifecycle is what
+             loses the pubsub race. java.version is set because superpom 6.5.0 defaults it to 17.
+             redisson-spring-data follows the Boot version, so it moves back to -40 with it. -->
+        <java.version>25</java.version>
         <camel.version>4.21.0</camel.version>
         <entur.helpers.version>7.2.0</entur.helpers.version>
         <spring-cloud-gcp-dependencies.version>8.1.0</spring-cloud-gcp-dependencies.version>
@@ -176,6 +181,18 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redisson.version}</version>
+            <exclusions>
+                <!-- The starter targets Spring Boot 4.1; swap in the Spring Data Redis 4.0 module -->
+                <exclusion>
+                    <groupId>org.redisson</groupId>
+                    <artifactId>redisson-spring-data-41</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-data-40</artifactId>
             <version>${redisson.version}</version>
         </dependency>
         <!-- Used by Redisson -->
