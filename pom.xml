@@ -23,11 +23,11 @@
         <developerConnection>scm:git:ssh://git@github.com:entur/antu.git</developerConnection>
     </scm>
     <properties>
-        <!-- Temporary, for a dev experiment: every dependency is back at the 480a414e versions and
-             JDK 25 is the only thing left new, to test whether the runtime is what loses the pubsub
-             race. java.version is set because superpom 6.5.0 defaults it to 17; redisson-spring-data
+        <!-- Temporary, for a dev experiment: the control for the JDK 25 run. Dependency graph is identical to
+             480a414e and to the failing build; only the runtime differs, so a clean forced rescale
+             here confirms the runtime and a dirty one invalidates the procedure. java.version is set because superpom 6.5.0 defaults it to 17; redisson-spring-data
              follows Boot's spring-data-redis, so it stays on -40. -->
-        <java.version>25</java.version>
+        <java.version>21</java.version>
         <camel.version>4.21.0</camel.version>
         <entur.helpers.version>7.2.0</entur.helpers.version>
         <spring-cloud-gcp-dependencies.version>7.4.10</spring-cloud-gcp-dependencies.version>
