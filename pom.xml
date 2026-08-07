@@ -32,7 +32,7 @@
         <spring-cloud-gcp-dependencies.version>7.4.10</spring-cloud-gcp-dependencies.version>
         <!-- unmanaged by any BOM, must track the kubernetes-client version that camel-kubernetes pulls in -->
         <kubernetes-client.version>7.8.0</kubernetes-client.version>
-        <netex-validator-java.version>11.0.31</netex-validator-java.version>
+        <netex-validator-java.version>12.0.3</netex-validator-java.version>
         <netex-parser-java.version>3.1.82</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
         <zt-zip.version>1.18.2</zt-zip.version>
