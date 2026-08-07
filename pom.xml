@@ -25,9 +25,13 @@
     <properties>
         <camel.version>4.21.0</camel.version>
         <entur.helpers.version>7.2.0</entur.helpers.version>
-        <spring-cloud-gcp-dependencies.version>8.1.0</spring-cloud-gcp-dependencies.version>
+        <!-- Temporary, for a dev experiment: the pre-migration versions of the two libraries that do
+             leader election and pubsub. Nightly batches went from 31/31 completing to 0/31 and 15/31
+             when superpom 7.0.0 landed, with lease failures up roughly tenfold. Everything else stays
+             on the migrated versions, so a clean nightly here points at one of these two. -->
+        <spring-cloud-gcp-dependencies.version>7.4.10</spring-cloud-gcp-dependencies.version>
         <!-- unmanaged by any BOM, must track the kubernetes-client version that camel-kubernetes pulls in -->
-        <kubernetes-client.version>7.7.0</kubernetes-client.version>
+        <kubernetes-client.version>7.8.0</kubernetes-client.version>
         <netex-validator-java.version>11.0.31</netex-validator-java.version>
         <netex-parser-java.version>3.1.82</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
