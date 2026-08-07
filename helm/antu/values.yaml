@@ -13,21 +13,6 @@ resources:
   memRequest: 3000Mi
   xmx: 2500m
 
-# Static half of JDK_JAVA_OPTIONS; -Xmx comes from resources.xmx and the JMX options from
-# monitoringEnabled. Kept here rather than inline in the deployment so the CI smoke job can read the
-# real option string with yq. --sun-misc-unsafe-memory-access is load-bearing: Kryo's FieldSerializer
-# calls Unsafe.objectFieldOffset, so POJO writes to the Redis caches fail without it.
-# IgnoreUnrecognizedVMOptions keeps the JVM starting if this chart ever meets a pre-JDK-24 image.
-jvmFlags: >-
-  -Xms128m -Xss512k -XX:ActiveProcessorCount=2
-  --add-opens=java.base/java.nio=ALL-UNNAMED
-  --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
-  -XX:+IgnoreUnrecognizedVMOptions
-  --enable-native-access=ALL-UNNAMED
-  --sun-misc-unsafe-memory-access=allow
-  -Dspring.config.location=/etc/application-config/application.properties
-  -Dfile.encoding=UTF-8
-
 horizontalPodAutoscaler:
   maxReplicas: 10
   minReplicas: 2

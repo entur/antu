@@ -20,13 +20,6 @@
         "org.redisson:**"
       ],
       "automerge": false
-    },
-    {
-      "description": "kubernetes-client must track the version camel-kubernetes pins; a bump ahead of Camel splits the fabric8 stack and only fails at runtime",
-      "matchPackageNames": [
-        "io.fabric8:**"
-      ],
-      "automerge": false
     }
   ]
 }
