@@ -11,6 +11,8 @@ import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.cache.RedissonCacheAdmin;
 import no.entur.antu.cache.codec.QuayIdCodec;
 import no.entur.antu.cache.codec.StopPlaceIdCodec;
+import no.entur.antu.memorystore.RedisTemporaryFileRepository;
+import no.entur.antu.memorystore.TemporaryFileRepository;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.entur.netex.validation.validator.model.*;
@@ -282,6 +284,17 @@ public class CacheConfig {
   @Bean
   public CacheAdmin cacheAdmin(RedissonClient redissonClient) {
     return new RedissonCacheAdmin(redissonClient);
+  }
+
+  /**
+   * The single NeTEx files and the per file reports of an in-progress validation. Report-scoped, and
+   * removed by {@code cleanUp} when the validation completes.
+   */
+  @Bean
+  public TemporaryFileRepository temporaryFileRepository(
+    RedissonClient redissonClient
+  ) {
+    return new RedisTemporaryFileRepository(redissonClient);
   }
 
   private static <K, V> RLocalCachedMap<K, V> getOrCreateReportScopedCache(

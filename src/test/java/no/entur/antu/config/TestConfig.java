@@ -3,28 +3,40 @@ package no.entur.antu.config;
 import java.time.Instant;
 import java.util.Set;
 import no.entur.antu.common.repository.TestNetexDataRepository;
+import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.NetexCodespace;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.*;
 import org.entur.netex.validation.validator.model.*;
+import org.rutebanken.helper.organisation.authorization.AuthorizationService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+/**
+ * Stubs for the repositories that back the validators, so the tests do not need the real registries.
+ *
+ * <p>Import this explicitly: TestApp filters test configurations out of component scanning, so a test
+ * that forgets the import silently gets the real stop place and organisation repositories instead.
+ *
+ * <p>The bean methods declare the loader interfaces the validator configuration asks for. Declaring only
+ * the read-only supertype makes the match depend on bean instantiation order.
+ */
 @TestConfiguration
 public class TestConfig {
 
   @Bean
   @Primary
-  public CommonDataRepository commonDataRepository() {
+  public CommonDataRepositoryLoader commonDataRepository() {
     return new TestCommonDataRepository();
   }
 
   @Bean
   @Primary
-  public NetexDataRepository netexDataRepository() {
+  public NetexDataRepositoryLoader netexDataRepository() {
     return new TestNetexDataRepository();
   }
 
@@ -50,6 +62,61 @@ public class TestConfig {
   @Primary
   public StopPlaceRepositoryLoader stopPlaceRepository() {
     return new TestStopPlaceRepository();
+  }
+
+  /**
+   * Grants everything to an authenticated caller. In a deployed environment this bean comes from
+   * antu.security.authorization-service, which the tests do not set.
+   */
+  @Bean
+  public AuthorizationService<String> testAuthorizationService() {
+    return new TestRutebankenAuthorizationService();
+  }
+
+  private static class TestRutebankenAuthorizationService
+    implements AuthorizationService<String> {
+
+    @Override
+    public boolean isRouteDataAdmin() {
+      return authenticated();
+    }
+
+    @Override
+    public boolean isOrganisationAdmin() {
+      return authenticated();
+    }
+
+    @Override
+    public boolean canViewAllOrganisationData() {
+      return authenticated();
+    }
+
+    @Override
+    public boolean canViewRouteData(String providerId) {
+      return authenticated();
+    }
+
+    @Override
+    public boolean canEditRouteData(String providerId) {
+      return authenticated();
+    }
+
+    @Override
+    public boolean canViewBlockData(String providerId) {
+      return authenticated();
+    }
+
+    @Override
+    public boolean canViewRoleAssignments() {
+      return authenticated();
+    }
+
+    private static boolean authenticated() {
+      if (SecurityContextHolder.getContext().getAuthentication() == null) {
+        throw new IllegalStateException("No security context");
+      }
+      return true;
+    }
   }
 
   private static class TestCommonDataRepository

@@ -5,7 +5,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.camel.Handler;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,6 @@ public class AntuPrometheusMetricsService {
     this.meterRegistry = meterRegistry;
   }
 
-  @Handler
   public void validationReportMetrics(ValidationReport validationReport) {
     countValidationEntries(validationReport);
   }

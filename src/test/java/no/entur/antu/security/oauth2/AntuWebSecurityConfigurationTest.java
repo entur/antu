@@ -96,8 +96,6 @@ class AntuWebSecurityConfigurationTest {
   @ValueSource(
     strings = {
       "/services/health",
-      "/services/validation-report/swagger.json",
-      "/services/swagger.json",
       "/actuator/prometheus",
       "/actuator/health",
       "/actuator/health/liveness",

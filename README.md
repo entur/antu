@@ -28,7 +28,8 @@ Organisation Register.
 # API
 
 Validation reports can be downloaded thanks to a REST API. Reports are identified by their unique report ID.  
-The API is OAuth2-protected and access rights must be sufficient to access a given report.
+The API is OAuth2-protected and access rights must be sufficient to access a given report.  
+Responses are gzipped when the caller sends `Accept-Encoding: gzip`, through `server.compression`.
 
 # Kubernetes integration
 
@@ -53,6 +54,27 @@ the following exceptions:
 * **validating NeTEx ids uniqueness** across the dataset needs to be synchronized.
   Antu uses distributed locks and distributed collections stored in Redis to ensure proper synchronization between
   concurrent jobs.
+
+# Coordination
+
+`docs/camel-removal.md` records what the move off Apache Camel changed, which behaviours were kept
+identical on purpose, and what to watch when it deploys. Its *Distributed correctness* section is the one to
+read before changing how the pipeline coordinates: with no aggregator and no leader on the critical path,
+every step runs on an arbitrary pod against at-least-once delivery, and a check followed by an act is not a
+guard.
+
+Every step of a validation ends by putting the next job on `AntuJobQueue`, and any pod may pick it up. Two points in the
+pipeline have to wait for the whole dataset:
+
+* line files may not be validated until every common file is,
+* the individual reports may not be merged until every file has produced one.
+
+Both are counted in Redis: each file records its arrival in a set, and the caller that both completes the set and wins an
+atomic claim on it starts the next step. Recording the same file twice is harmless, which is what makes this safe under
+PubSub redelivery.
+
+The work that must not run on more than one pod at a time, the stop place changelog consumer, priming the stop place
+cache and deciding when the caches are refreshed, is guarded by a leader election, also a lease in Redis.
 
 # Local environment configuration
 
@@ -84,7 +106,6 @@ The emulator port must be set in the Spring Boot application.properties file as 
 
 ```
 spring.cloud.gcp.pubsub.emulatorHost=localhost:8085
-camel.component.google-pubsub.endpoint=localhost:8085
 ```
 
 ### Additional instructions for Mac OS when validating large datasets

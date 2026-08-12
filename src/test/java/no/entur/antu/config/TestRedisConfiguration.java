@@ -12,14 +12,29 @@ import redis.embedded.RedisServer;
 @Configuration
 public class TestRedisConfiguration {
 
+  /**
+   * One server for the whole JVM, on the fixed port from the test properties.
+   *
+   * <p>Spring caches contexts, so several of them are alive at once and each would otherwise try to
+   * bind the same port. The server outlives every context and is reclaimed when the JVM exits.
+   */
+  private static RedisServer sharedServer;
+
   @Bean(destroyMethod = "shutdown")
   @DependsOn("redissonServer")
   public RedissonClient redissonClient(Config redissonConfig) {
     return Redisson.create(redissonConfig);
   }
 
-  @Bean(initMethod = "start", destroyMethod = "stop")
-  public RedisServer redissonServer(DataRedisProperties redisProperties) {
-    return new RedisServer(redisProperties.getPort());
+  @Bean
+  public synchronized RedisServer redissonServer(
+    DataRedisProperties redisProperties
+  ) {
+    if (sharedServer == null) {
+      RedisServer server = new RedisServer(redisProperties.getPort());
+      server.start();
+      sharedServer = server;
+    }
+    return sharedServer;
   }
 }

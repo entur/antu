@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.entur.ror</groupId>
         <artifactId>superpom</artifactId>
-        <version>6.5.0</version>
+        <version>7.0.0</version>
     </parent>
 
     <groupId>no.entur.antu</groupId>
@@ -23,12 +23,8 @@
         <developerConnection>scm:git:ssh://git@github.com:entur/antu.git</developerConnection>
     </scm>
     <properties>
-        <java.version>21</java.version>
-        <camel.version>4.21.0</camel.version>
         <entur.helpers.version>7.2.0</entur.helpers.version>
-        <spring-cloud-gcp-dependencies.version>7.4.10</spring-cloud-gcp-dependencies.version>
-        <!-- unmanaged by any BOM, must track the kubernetes-client version that camel-kubernetes pulls in -->
-        <kubernetes-client.version>7.8.0</kubernetes-client.version>
+        <spring-cloud-gcp-dependencies.version>8.1.0</spring-cloud-gcp-dependencies.version>
         <netex-validator-java.version>11.0.31</netex-validator-java.version>
         <netex-parser-java.version>3.1.82</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
@@ -68,13 +64,6 @@
                 <groupId>com.google.cloud</groupId>
                 <artifactId>spring-cloud-gcp-dependencies</artifactId>
                 <version>${spring-cloud-gcp-dependencies.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.camel.springboot</groupId>
-                <artifactId>camel-spring-boot-bom</artifactId>
-                <version>${camel.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -121,13 +110,6 @@
             <groupId>org.entur.ror.helpers</groupId>
             <artifactId>stopplace-changelog-starter</artifactId>
             <version>${entur.helpers.version}</version>
-            <exclusions>
-                <!-- Duplicate of swagger-annotations-jakarta, which camel-openapi-java reads -->
-                <exclusion>
-                    <groupId>io.swagger.core.v3</groupId>
-                    <artifactId>swagger-annotations</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Spring Boot -->
@@ -160,24 +142,8 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jersey</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson-spring-boot-starter</artifactId>
-            <version>${redisson.version}</version>
-            <exclusions>
-                <!-- The starter targets Spring Boot 4.1; swap in the Spring Data Redis 4.0 module -->
-                <exclusion>
-                    <groupId>org.redisson</groupId>
-                    <artifactId>redisson-spring-data-41</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson-spring-data-40</artifactId>
             <version>${redisson.version}</version>
         </dependency>
         <!-- Used by Redisson -->
@@ -185,73 +151,6 @@
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
             <version>${kryo.version}</version>
-        </dependency>
-
-        <!-- Camel -->
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-google-pubsub-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-zipfile-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-master-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-kubernetes-cluster-service-starter</artifactId>
-            <exclusions>
-                <!-- fabric8's default Vert.x transport is built for Netty 4.1, Spring Boot 4 forces
-                     Netty 4.2. Use the Netty-free JDK transport so k8s leader election keeps working. -->
-                <exclusion>
-                    <groupId>io.fabric8</groupId>
-                    <artifactId>kubernetes-httpclient-vertx</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-httpclient-jdk</artifactId>
-            <version>${kubernetes-client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-file-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-file-cluster-service-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-jaxb-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-platform-http-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-http-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-openapi-java-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-quartz-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel.springboot</groupId>
-            <artifactId>camel-jackson-starter</artifactId>
         </dependency>
 
         <!-- Other -->
@@ -265,10 +164,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.ws.rs</groupId>
-            <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
@@ -303,12 +198,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-test-spring-junit5</artifactId>
-            <version>${camel.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

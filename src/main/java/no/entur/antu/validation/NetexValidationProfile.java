@@ -3,7 +3,7 @@ package no.entur.antu.validation;
 import java.util.Map;
 import no.entur.antu.config.cache.ValidationState;
 import no.entur.antu.exception.AntuException;
-import no.entur.antu.routes.validation.ValidationStateRepository;
+import no.entur.antu.validation.state.ValidationStateRepository;
 import org.entur.netex.validation.validator.NetexValidationProgressCallBack;
 import org.entur.netex.validation.validator.NetexValidatorsRunner;
 import org.entur.netex.validation.validator.ValidationReport;

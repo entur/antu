@@ -33,11 +33,9 @@ spec:
           image: {{ .Values.image.identifier }}
           env:
             - name: JDK_JAVA_OPTIONS
-              value: -Xmx{{ .Values.resources.xmx }} -Xms128m -Xss512k -XX:ActiveProcessorCount=2
-                --add-opens=java.base/java.nio=ALL-UNNAMED
-                --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
-                -Dspring.config.location=/etc/application-config/application.properties
-                -Dfile.encoding=UTF-8  {{- if .Values.monitoringEnabled}} -Dcom.sun.management.jmxremote.port=9999  -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
+              # In values.yaml so the docker-smoke CI job can start the image with the same flags.
+              value: -Xmx{{ .Values.resources.xmx }} {{ .Values.jvmFlags }}
+                {{- if .Values.monitoringEnabled}} -Dcom.sun.management.jmxremote.port=9999  -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
             {{- end}}
             - name: TZ
               value: Europe/Oslo
@@ -65,8 +63,8 @@ spec:
               name: http
               protocol: TCP
           livenessProbe:
-            # also platform-http, so a pod whose Camel mappings never registered is recycled
-            # instead of silently leaving the Service; /actuator/health/liveness cannot see that
+            # A plain Spring MVC endpoint. It answers from a constant, so it reports on the HTTP
+            # stack alone and never fails because Redis, GCS or PubSub are unavailable.
             httpGet:
               path: /services/health
               port: {{ .Values.service.http.internalPort }}
@@ -75,12 +73,10 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 12
-            # must stay below periodSeconds: kubelet does not serialise probes, and each in-flight
-            # probe holds one of platform-http's executor threads
+            # must stay below periodSeconds: kubelet does not serialise probes
             timeoutSeconds: 5
           readinessProbe:
-            # served by platform-http, so a pod whose Camel HTTP routes are unreachable fails
-            # readiness instead of serving 404s; /actuator/health/readiness stays UP in that state
+            # Same endpoint as the liveness probe, for the same reason.
             httpGet:
               path: /services/health
               port: {{ .Values.service.http.internalPort }}
@@ -144,6 +140,9 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
+      # The HPA scales antu down routinely, so pods are terminated mid-validation as normal operation. This
+      # has to stay above antu.shutdown.drain.timeout.seconds, or SIGKILL cuts the drain short and the
+      # in-flight files are redelivered and revalidated from scratch, which is slow for XSD validation.
       terminationGracePeriodSeconds: 180
       volumes:
         - name: application-config

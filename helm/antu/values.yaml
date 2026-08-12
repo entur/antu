@@ -18,9 +18,35 @@ horizontalPodAutoscaler:
   minReplicas: 2
   targetCPUUtilizationPercentage: 10
 
+# -Xmx is prepended by the deployment from resources.xmx.
+#
+# ExitOnOutOfMemoryError: otherwise an OOME kills only the validating thread and the pod stays Ready and
+# keeps leasing jobs it cannot finish.
+#
+# sun-misc-unsafe-memory-access: load-bearing on JDK 24 and later. Kryo's FieldSerializer calls
+# Unsafe.objectFieldOffset, and Kryo is the codec for every Redis structure the pipeline runs on: the
+# validation state, the barrier arrival sets, the temporary files. JDK 25 still defaults to warn, so
+# without this the pods work until a base image bump flips the default to deny, and then no pod can read
+# or write Redis at all. Verified on 25.0.4: records survive deny, plain POJOs do not.
+#
+# Read by the docker-smoke job in .github/workflows/push.yml, which is the only thing in CI that starts
+# the image. Keep them here rather than inline in the deployment, or that gate goes stale.
+jvmFlags: >-
+  -Xms128m -Xss512k -XX:ActiveProcessorCount=2
+  -XX:+ExitOnOutOfMemoryError
+  -XX:+IgnoreUnrecognizedVMOptions
+  --enable-native-access=ALL-UNNAMED
+  --sun-misc-unsafe-memory-access=allow
+  --add-opens=java.base/java.nio=ALL-UNNAMED
+  --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+  -Dspring.config.location=/etc/application-config/application.properties
+  -Dfile.encoding=UTF-8
+
+# Read only by the Camel-era keys kept in the ConfigMap for the removal release. Delete with them.
 kubernetes:
   namespace: antu
   maxPods: 10
+
 secrets:
   antu-auth-secret:
     - SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_ORGREGISTER_CLIENT_SECRET
@@ -28,4 +54,12 @@ secrets:
     - KAFKAPASSWORD
     - KAFKAUSERNAME
 
-stopPlaceCacheRefreshCron: ?cron=0+0+01,14+?+*+*
+# Spring cron: second minute hour day-of-month month day-of-week
+stopPlaceCacheRefreshCron: 0 0 1,14 * * *
+
+# The same schedule as a quartz trigger URI, for the version being replaced. Delete with the Camel-era
+# ConfigMap keys.
+stopPlaceCacheRefreshQuartzTrigger: ?cron=0+0+01,14+?+*+*
+
+# Validations one pod runs at a time. Bounds heap: each one holds a whole NeTEx file.
+jobConsumers: 1
