@@ -4,6 +4,11 @@ import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import org.entur.netex.validation.validator.id.IdVersion;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,8 +33,10 @@ class RedisNetexIdRepositoryTest {
 
   private static RedisServer redisServer;
   private static RedissonClient redissonClient;
+  private static RedissonClient redissonClient2;
 
   private RedisNetexIdRepository repository;
+  private RedisNetexIdRepository repository2;
 
   @BeforeAll
   static void startRedis() throws Exception {
@@ -41,12 +48,16 @@ class RedisNetexIdRepositoryTest {
     Config config = new Config();
     config.useSingleServer().setAddress("redis://127.0.0.1:" + REDIS_PORT);
     redissonClient = Redisson.create(config);
+    redissonClient2 = Redisson.create(config);
   }
 
   @AfterAll
   static void stopRedis() {
     if (redissonClient != null) {
       redissonClient.shutdown();
+    }
+    if (redissonClient2 != null) {
+      redissonClient2.shutdown();
     }
     if (redisServer != null) {
       redisServer.stop();
@@ -62,11 +73,18 @@ class RedisNetexIdRepositoryTest {
           .codec(CODEC)
       );
     repository = new RedisNetexIdRepository(redissonClient, commonIdsCache);
+
+    RLocalCachedMap<String, Set<String>> commonIdsCache2 =
+      redissonClient2.getLocalCachedMap(
+        LocalCachedMapOptions
+          .<String, Set<String>>name("testCommonIdsCache")
+          .codec(CODEC)
+      );
+    repository2 = new RedisNetexIdRepository(redissonClient2, commonIdsCache2);
   }
 
   @AfterEach
   void tearDown() {
-    // Clean up Redis after each test
     repository.cleanUp(TEST_REPORT_ID);
     redissonClient.getKeys().flushdb();
   }
@@ -198,6 +216,73 @@ class RedisNetexIdRepositoryTest {
     assertKeyHasTtl("NETEX_LOCAL_ID_SET_" + TEST_REPORT_ID + "_fileB.xml");
     assertKeyHasTtl("DUPLICATED_ID_SET_" + TEST_REPORT_ID + "_fileB.xml");
     assertKeyHasTtl("ACCUMULATED_NETEX_ID_SET_" + TEST_REPORT_ID);
+  }
+
+  @Test
+  void testAddSharedNetexIdsAccumulatesAcrossMultipleCalls() {
+    Set<IdVersion> file1Ids = Set.of(
+      new IdVersion("mor:DayType:1", null, "DayType", null, null, 0, 0),
+      new IdVersion("mor:DayType:2", null, "DayType", null, null, 0, 0)
+    );
+    Set<IdVersion> file2Ids = Set.of(
+      new IdVersion("mor:Operator:1", null, "Operator", null, null, 0, 0)
+    );
+    Set<IdVersion> file3Ids = Set.of(
+      new IdVersion("mor:DayType:3", null, "DayType", null, null, 0, 0)
+    );
+
+    repository.addSharedNetexIds(TEST_REPORT_ID, file1Ids);
+    repository.addSharedNetexIds(TEST_REPORT_ID, file2Ids);
+    repository.addSharedNetexIds(TEST_REPORT_ID, file3Ids);
+
+    Set<String> shared = repository.getSharedNetexIds(TEST_REPORT_ID);
+    assertEquals(4, shared.size());
+    assertTrue(shared.contains("mor:DayType:1"));
+    assertTrue(shared.contains("mor:DayType:2"));
+    assertTrue(shared.contains("mor:Operator:1"));
+    assertTrue(shared.contains("mor:DayType:3"));
+  }
+
+  /**
+   * Simulates two pods (separate RedissonClient instances with independent local caches)
+   * calling addSharedNetexIds concurrently. All IDs from both pods must be present in the
+   * final accumulated set — the race condition fixed in addSharedNetexIds would drop one
+   * pod's IDs if the local cache were read instead of Redis under the lock.
+   */
+  @Test
+  void testAddSharedNetexIdsAccumulatesCorrectlyAcrossSimulatedPods()
+    throws InterruptedException {
+    Set<IdVersion> pod1Ids = Set.of(
+      new IdVersion("mor:DayType:1", null, "DayType", null, null, 0, 0),
+      new IdVersion("mor:DayType:2", null, "DayType", null, null, 0, 0)
+    );
+    Set<IdVersion> pod2Ids = Set.of(
+      new IdVersion("mor:Operator:1", null, "Operator", null, null, 0, 0),
+      new IdVersion("mor:Operator:2", null, "Operator", null, null, 0, 0)
+    );
+
+    CountDownLatch latch = new CountDownLatch(2);
+    ExecutorService executor = Executors.newFixedThreadPool(2);
+    executor.submit(() -> {
+      repository.addSharedNetexIds(TEST_REPORT_ID, pod1Ids);
+      latch.countDown();
+    });
+    executor.submit(() -> {
+      repository2.addSharedNetexIds(TEST_REPORT_ID, pod2Ids);
+      latch.countDown();
+    });
+    assertTrue(
+      latch.await(10, TimeUnit.SECONDS),
+      "Timed out waiting for threads"
+    );
+    executor.shutdown();
+
+    Set<String> shared = repository.getSharedNetexIds(TEST_REPORT_ID);
+    assertEquals(4, shared.size(), "All IDs from both pods must be present");
+    assertTrue(shared.contains("mor:DayType:1"));
+    assertTrue(shared.contains("mor:DayType:2"));
+    assertTrue(shared.contains("mor:Operator:1"));
+    assertTrue(shared.contains("mor:Operator:2"));
   }
 
   private static void assertKeyHasTtl(String key) {
