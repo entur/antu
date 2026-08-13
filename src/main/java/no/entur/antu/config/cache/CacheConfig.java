@@ -55,7 +55,26 @@ public class CacheConfig {
   public static final String SCHEDULED_STOP_POINT_ID_CACHE =
     "scheduledStopPointIdCache";
 
-  public static final String VALIDATION_STATE_CACHE = "validationProgressCache";
+  /**
+   * The {@code .v2} is a serialization version, not a rename.
+   *
+   * <p>{@link ValidationState} is stored here through a bare {@code Kryo5Codec}, whose
+   * {@code FieldSerializer} writes fields positionally with no schema header. A payload written by a
+   * version with different fields cannot be read back: too few fields underflow the buffer and throw,
+   * too many are read as the wrong fields and do not. Because {@code allValidationStates()} scans the
+   * whole hash, one unreadable entry takes down the stalled-validation sweep entirely.
+   *
+   * <p>That happened when {@code ValidationState} grew from one field to three: the sweep threw every
+   * five minutes against entries left by the previous version, and the only thing that concludes a
+   * stalled validation was dead while looking healthy. Giving the new shape its own key means the two
+   * versions never read each other's entries, in either direction, so no flush and no rollout window is
+   * needed. The old key goes cold and can be deleted whenever.
+   *
+   * <p>Change the fields, change the suffix. {@code ValidationStateSerializationTest} fails if you do
+   * not.
+   */
+  public static final String VALIDATION_STATE_CACHE =
+    "validationProgressCache.v2";
 
   /**
    * TTL for per-validation data in Redis, as a backstop for validations that

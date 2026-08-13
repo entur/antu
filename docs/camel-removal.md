@@ -368,15 +368,31 @@ The cutover needs no validation in flight **and none arriving for the duration o
 rollout rather than checked once at the start. `maxSurge: 1` with `maxUnavailable: 1` means both versions
 consume `AntuJobQueue` for minutes, so a request marduk sends midway through is as exposed as one that was
 already running. Stop the validation clients, or accept that datasets crossing the rollout have to be
-re-triggered. The two versions share none of three pieces of state:
+re-triggered. The two versions share none of four pieces of state:
 
 - a validated common file is recorded by publishing to `AntuCommonFilesAggregationQueue` in the old version
   and in a Redis arrival set in the new one;
 - the merged report was keyed by the first reverse-sorted file name and is now keyed `aggregated`;
-- the `VALIDATE_DATASET` message carried that file name in its body and now carries none.
+- the `VALIDATE_DATASET` message carried that file name in its body and now carries none;
+- `ValidationState` grew from one field to three, and it is stored through a bare `Kryo5Codec`, which
+  writes fields positionally with no schema header.
 
 A dataset whose files are handled by both versions therefore satisfies neither version's barrier. The sweep
 reports it as `timeout` within 30 minutes, but it has to be re-triggered.
+
+> The fourth one was found the hard way, in dev, after this section had already been written claiming there
+> were three. Old entries are not merely ignored: too few fields underflow the buffer and throw, and
+> `allValidationStates()` scans the whole hash, so one entry left by the previous version killed every
+> stalled-validation sweep — every five minutes, for hours, logged only by Spring's scheduled-task error
+> handler and never reaching the `System error` line the alert watches. The safety net was down and looked
+> fine. In the other direction it is quieter and worse: a rolled-back pod reads a three-field payload as a
+> one-field class, takes garbage for `hasErrorInCommonFile` and throws nothing.
+>
+> Fixed by versioning the key: `validationProgressCache` → `validationProgressCache.v2`. The two shapes now
+> live under different names, so neither version can read the other's entries and no flush is needed. The
+> old key is orphaned — nothing expires it, because entries inside the report-scoped `RLocalCachedMap`s
+> carry no Redis TTL and are removed by `cleanUp` alone — so delete it by hand once the rollout is done.
+> `ValidationStateSerializationTest` now fails if the fields change without the name changing.
 
 **Deploy marduk first.** It logs and discards statuses it does not know, and this version publishes `timeout`,
 which no antu version had ever sent.
