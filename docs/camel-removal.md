@@ -242,18 +242,24 @@ nacked then and nacks now; the subscription's `retry_policy` provides the spacin
 > marduk already has it in. Keeping the id across the retry would need an idempotency key, and the only
 > candidate is the client-supplied correlation id, which antu invents when it is absent.
 
-**Common files are queued in reverse name order.** `_stops.xml` has to be validated before
-`_shared_data.xml` references it. The previous implementation left the order to `HashSet` iteration and got
-away with it only because several consumers ran the common files at once and the declaring file happened to be
-smaller. This is deterministic, but it is a naming convention standing in for a data dependency: a dataset
-that does not follow it will report spurious unresolved references.
+**Common files are queued in reverse name order**, which puts `_stops.xml` ahead of the `_shared_data.xml`
+that references it. The previous implementation left the order to `HashSet` iteration; this is at least
+deterministic.
 
-> It orders the **queue**, not the validation. One job consumer per pod serialises common files within a pod,
-> but three pods take three at once, so the declaring file still only *usually* wins. Measured on the
-> three-pod rig with `varmland.zip`: `_stops.xml` and `_shared_data.xml` started 32 ms apart on different pods
-> and overlapped for four seconds. No worse than the Camel version, which was concurrent too, and the queue
-> order does decide it on a single pod. But it is luck, not a guarantee. Only a barrier between the common
-> files, or the real data dependency, would make it one.
+> **It orders the queue and nothing else, and in production not even that.** An earlier version of this
+> section claimed one job consumer per pod at least serialises common files within a pod, so the declaring
+> file "usually" wins. Dev says otherwise. Job messages carry no ordering key, so PubSub delivery order is
+> not publish order, and every pod pulls concurrently. Measured on `mor`, 24 common files across ten pods:
+> `_MOR__ScheduledStopPointsLinksAndAssignments.xml` sorts first (`_` is above `B` and the digits) and was
+> published first, yet it *started* 19.5 s after another common file, ran for 45.8 s, and finished last of
+> the 24 — it was the file that closed the barrier. All 23 others were validated start to finish before the
+> declaring file was done.
+>
+> The dataset still validated clean. So for `mor` the intra-common-file dependency either does not exist or
+> is not checked at that stage, and the same held for two other multi-common-file datasets that day. Keep
+> the sort — it is free and it does decide the order on a single consumer — but do not reason from it. The
+> guarantee that actually exists is `COMMON_FILES_VALIDATED`, which protects line files from common files,
+> and that held: one barrier open, all 24 counted.
 
 **`antu.netex.job.consumers` needed a second setting to mean anything.** Under Camel it set
 `concurrentConsumers` on a `synchronousPull` endpoint with `maxMessagesPerPoll=1`, which really did bound
@@ -490,7 +496,11 @@ Ranked by consequence, none of them blocking:
    giving `StopPlaceRepositoryUpdater` a way to stop, which it does not have today.
 3. A pod demoted by a single heartbeat exception cannot retake its own still-live lease; it waits for the
    lease to expire and then re-acquires.
-4. Common file ordering is not enforced across pods, only within one. See *Behaviour changes*.
+4. Common file ordering is not enforced at all — not across pods and not within one, since delivery order
+   is not publish order. Now measured rather than assumed, and no impact observed on three
+   multi-common-file datasets including one with 24: see *Behaviour changes*. Ranks below everything else
+   in this list on present evidence, and is kept only so that a dataset reporting unresolved references
+   between its own common files has somewhere obvious to start.
 5. `ValidationState` is read-modify-write over an `RLocalCachedMap`, so `hasErrorInCommonFile` set on one pod
    can be lost by a concurrent progress write on another. The conditional write stops the entry being
    resurrected but does not merge fields. The consequence is a noisier report, not a wrong verdict: line files

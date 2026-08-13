@@ -71,10 +71,13 @@ public class DatasetSplitter {
       System.currentTimeMillis() - startedAt
     );
 
-    // Reverse name order, so that a common file declaring shared data is validated before one
-    // referencing it: _stops.xml has to be seen before _shared_data.xml, or the references to its stop
-    // places are reported as unresolved. The dependency is really between the data, not the names, so a
-    // dataset that does not follow the convention will report spurious unresolved references.
+    // Reverse name order, which puts a common file declaring shared data ahead of one referencing it:
+    // _stops.xml before _shared_data.xml. This orders the queue and nothing else. Jobs carry no ordering
+    // key, so delivery order is not publish order, and every pod pulls at once: measured on a 24 common
+    // file dataset across ten pods, the file queued first started 19 s after another one and finished
+    // last of the 24. Treat the order as a tie-breaker on a single consumer, not as sequencing.
+    //
+    // What does hold is the barrier below: no line file is validated until every common file is.
     List<String> commonFileNames = netexFileNames
       .stream()
       .filter(AntuJob::isCommonFile)

@@ -161,12 +161,13 @@ Uses Prettier for Java:
 2. **Memory constraints**: Tests run with `-Xms500m -Xmx500m -Xss512k`
 3. **Redis serialization**: Uses Kryo for distributed data structures
 4. **NeTEx file structure**: Single-line files in zip with optional common files
-5. **Common file ordering**: A common file that declares shared data has to be validated before one that references it.
-   `DatasetSplitter` queues them in reverse name order so `_stops.xml` precedes `_shared_data.xml`. The dependency is
-   really data-driven, not name-driven, so a dataset that breaks the convention will report spurious unresolved
-   references. Note that this orders the queue, not the validation: one job consumer per pod serialises common files
-   within a pod, but several pods take several at once and the two can overlap. Verified overlapping on the three-pod
-   rig. It is not a guarantee, and nothing currently enforces one.
+5. **Common file ordering is not a thing you can rely on**: `DatasetSplitter` queues common files in reverse name
+   order, which puts `_stops.xml` ahead of `_shared_data.xml`, but that orders the *queue* only. Jobs carry no
+   ordering key, so delivery order is not publish order, and every pod pulls at once. Measured on a 24 common file
+   dataset across ten pods: the file queued first started 19.5 s after another and finished last of the 24. It still
+   validated clean, as did two other multi-common-file datasets, so this is a documented non-guarantee rather than a
+   known bug. The real guarantee is the `COMMON_FILES_VALIDATED` barrier: no line file runs until every common file
+   has. Do not add logic that assumes one common file was validated before another.
 
 ## Getting Help
 
