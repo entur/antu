@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import no.entur.antu.TestApp;
 import no.entur.antu.config.TestConfig;
-import org.entur.pubsub.base.EnturGooglePubSubAdmin;
 import org.entur.pubsub.base.EnturGooglePubSubUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -67,9 +66,6 @@ class PubSubWiringTest {
 
   @Autowired
   private PubSubTemplate pubSubTemplate;
-
-  @Autowired
-  private EnturGooglePubSubAdmin enturGooglePubSubAdmin;
 
   @Autowired
   private InMemoryBlobStoreRepository antuExchangeInMemoryBlobStoreRepository;
@@ -129,9 +125,8 @@ class PubSubWiringTest {
 
     List<ConvertedBasicAcknowledgeablePubsubMessage<String>> statuses =
       new CopyOnWriteArrayList<>();
-    enturGooglePubSubAdmin.createSubscriptionIfMissing(
-      AntuQueues.NETEX_VALIDATION_STATUS_QUEUE
-    );
+    // Subscribing without creating anything: PubSubPublishTargets created the status topic and its
+    // subscription at startup, and nothing else does.
     // Closed at the end: an open Subscriber keeps non-daemon gax threads alive, which intermittently
     // delays the JVM's exit past surefire's patience and adds 30s to the build.
     statusSubscriber =

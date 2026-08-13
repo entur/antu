@@ -315,7 +315,7 @@ saved queries and the alert runbook depend on.
 | `spring.task.scheduling.pool.size` | 4 | One thread per `@Scheduled`: the heartbeat, the two refresh triggers and the sweep. Fewer lets the other three starve the heartbeat and drop the lease |
 | `spring.cloud.gcp.pubsub.publisher.executor-accept-tasks-after-context-close` | true | Load-bearing for the drain; see *Shutdown* |
 | `spring.cloud.gcp.pubsub.subscription.<name>.flow-control.max-outstanding-element-count` | 1 | Lease no more than can be worked on. The gax default is 1000 |
-| `entur.pubsub.subscriber.autocreate` | false in helm | Topics and subscriptions are terraformed |
+| `entur.pubsub.subscriber.autocreate` | false in helm | Topics and subscriptions are terraformed. Where it is true, each consumer creates the destination it subscribes to and `PubSubPublishTargets` creates the status queue, which no consumer covers |
 
 **JVM options live in `values.yaml` as `jvmFlags`**, not inline in the deployment, because the `docker-smoke`
 job in CI reads them with `yq` and starts the image with them. That job is the only thing anywhere that runs
