@@ -3,11 +3,8 @@ package no.entur.antu.validation.validator.id;
 import static no.entur.antu.config.cache.CacheConfig.VALIDATION_DATA_TTL;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -16,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RLocalCachedMap;
+import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.options.LocalCachedMapOptions;
 import org.redisson.codec.Kryo5Codec;
@@ -28,6 +26,7 @@ import redis.embedded.RedisServer;
 class RedisNetexIdRepositoryTest {
 
   private static final String TEST_REPORT_ID = "test-report-123";
+  private static final String CACHE_NAME = "testCommonIdsCache";
   private static final Kryo5Codec CODEC = new Kryo5Codec();
   private static final int REDIS_PORT = 6371;
 
@@ -68,17 +67,13 @@ class RedisNetexIdRepositoryTest {
   void setUp() {
     RLocalCachedMap<String, Set<String>> commonIdsCache =
       redissonClient.getLocalCachedMap(
-        LocalCachedMapOptions
-          .<String, Set<String>>name("testCommonIdsCache")
-          .codec(CODEC)
+        LocalCachedMapOptions.<String, Set<String>>name(CACHE_NAME).codec(CODEC)
       );
     repository = new RedisNetexIdRepository(redissonClient, commonIdsCache);
 
     RLocalCachedMap<String, Set<String>> commonIdsCache2 =
       redissonClient2.getLocalCachedMap(
-        LocalCachedMapOptions
-          .<String, Set<String>>name("testCommonIdsCache")
-          .codec(CODEC)
+        LocalCachedMapOptions.<String, Set<String>>name(CACHE_NAME).codec(CODEC)
       );
     repository2 = new RedisNetexIdRepository(redissonClient2, commonIdsCache2);
   }
@@ -244,45 +239,46 @@ class RedisNetexIdRepositoryTest {
   }
 
   /**
-   * Simulates two pods (separate RedissonClient instances with independent local caches)
-   * calling addSharedNetexIds concurrently. All IDs from both pods must be present in the
-   * final accumulated set — the race condition fixed in addSharedNetexIds would drop one
-   * pod's IDs if the local cache were read instead of Redis under the lock.
+   * The stale read this fixes needs a local cache that is populated <em>and</em> out of date. Racing two
+   * threads does not produce that: both local caches start empty, and a miss falls through to Redis, so
+   * whichever pod takes the lock second reads fresh even on the unfixed code.
+   *
+   * <p>A plain RMap write publishes no invalidation, which makes the staleness deterministic with no
+   * threads, no latch and no dependence on pub/sub timing. Against the unfixed addSharedNetexIds this
+   * fails: pod B reads its stale local entry and writes mor:DayType:2 back out of existence.
    */
   @Test
-  void testAddSharedNetexIdsAccumulatesCorrectlyAcrossSimulatedPods()
-    throws InterruptedException {
-    Set<IdVersion> pod1Ids = Set.of(
-      new IdVersion("mor:DayType:1", null, "DayType", null, null, 0, 0),
-      new IdVersion("mor:DayType:2", null, "DayType", null, null, 0, 0)
-    );
-    Set<IdVersion> pod2Ids = Set.of(
-      new IdVersion("mor:Operator:1", null, "Operator", null, null, 0, 0),
-      new IdVersion("mor:Operator:2", null, "Operator", null, null, 0, 0)
+  void testAddSharedNetexIdsReadsRedisRatherThanTheStaleLocalCache() {
+    // Mirrors RedisNetexIdRepository.getCommonNetexIdsKey, which is private.
+    String cacheKey = "COMMON_NETEX_ID_SET_" + TEST_REPORT_ID;
+    RMap<String, Set<String>> redisView = redissonClient.getMap(
+      CACHE_NAME,
+      CODEC
     );
 
-    CountDownLatch latch = new CountDownLatch(2);
-    ExecutorService executor = Executors.newFixedThreadPool(2);
-    executor.submit(() -> {
-      repository.addSharedNetexIds(TEST_REPORT_ID, pod1Ids);
-      latch.countDown();
-    });
-    executor.submit(() -> {
-      repository2.addSharedNetexIds(TEST_REPORT_ID, pod2Ids);
-      latch.countDown();
-    });
-    assertTrue(
-      latch.await(10, TimeUnit.SECONDS),
-      "Timed out waiting for threads"
-    );
-    executor.shutdown();
+    // Pod B validates a common file, so its local cache now holds what it wrote.
+    repository2.addSharedNetexIds(TEST_REPORT_ID, Set.of(id("mor:DayType:1")));
 
-    Set<String> shared = repository.getSharedNetexIds(TEST_REPORT_ID);
-    assertEquals(4, shared.size(), "All IDs from both pods must be present");
-    assertTrue(shared.contains("mor:DayType:1"));
-    assertTrue(shared.contains("mor:DayType:2"));
-    assertTrue(shared.contains("mor:Operator:1"));
-    assertTrue(shared.contains("mor:Operator:2"));
+    // Another pod adds an id straight to Redis. No invalidation is broadcast, so pod B's local cache
+    // is now definitively behind.
+    redisView.put(
+      cacheKey,
+      new HashSet<>(Set.of("mor:DayType:1", "mor:DayType:2"))
+    );
+
+    // Pod B validates a second common file.
+    repository2.addSharedNetexIds(TEST_REPORT_ID, Set.of(id("mor:Operator:1")));
+
+    assertEquals(
+      Set.of("mor:DayType:1", "mor:DayType:2", "mor:Operator:1"),
+      redisView.get(cacheKey),
+      "the id added while pod B's local cache was stale must survive pod B's next accumulate"
+    );
+  }
+
+  /** addSharedNetexIds reads only getId(), so the other components do not matter here. */
+  private static IdVersion id(String id) {
+    return new IdVersion(id, null, "DayType", null, null, 0, 0);
   }
 
   private static void assertKeyHasTtl(String key) {
