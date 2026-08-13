@@ -23,7 +23,7 @@ spec:
               resource.labels.subscription_id: AntuJobQueue
         target:
           type: AverageValue
-          averageValue: "0.1"
+          averageValue: "{{ .Values.horizontalPodAutoscaler.messagesPerPod | default 5 }}"
     - type: Resource
       resource:
         name: cpu
@@ -32,14 +32,20 @@ spec:
           averageUtilization: {{ .Values.horizontalPodAutoscaler.targetCPUUtilizationPercentage | default "80" }}
   behavior:
     scaleUp:
+      # Immediately, and as many as needed: the work is already queued and waiting, and a line file
+      # fan-out arrives all at once.
       policies:
         - type: Pods
           value: 10
           periodSeconds: 15
       stabilizationWindowSeconds: 0
     scaleDown:
+      # Slowly, and only once the backlog has stayed low. Scaling down costs more than scaling up: a pod
+      # stopped mid-validation holds shutdown open for the drain, and anything it does not finish is
+      # redelivered and revalidated. Validations run for minutes and the stages of one import are a
+      # minute or two apart, so a short window tears the fleet down between stages and rebuilds it.
       policies:
         - type: Pods
-          value: 10
-          periodSeconds: 15
-      stabilizationWindowSeconds : 60
+          value: 2
+          periodSeconds: 60
+      stabilizationWindowSeconds: 300

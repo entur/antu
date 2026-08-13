@@ -197,7 +197,17 @@ Three things have to line up for the replacement to work, and each of them defau
    the three-pod rig; the failure and its cost are in *Testing it*.
 
 `terminationGracePeriodSeconds` must stay above `antu.shutdown.drain.timeout.seconds`, or SIGKILL cuts the
-drain short and the files are revalidated anyway. Both are commented with that constraint.
+drain short and the files are revalidated anyway. That is necessary but **not sufficient**, which is what
+the original 175-against-180 got wrong: the drain does not start when SIGTERM arrives. The
+`ContextClosedEvent` listener runs first and calls `stopAsync().awaitTerminated(10, SECONDS)` once per
+Subscriber, and for the Subscriber holding the in-flight file that wait always expires, because gax does
+not terminate while a callback is running. The budget is therefore about 10 s per busy consumer, then the
+drain, then bean destruction — so at 175 the total overran 180 and SIGKILL cut off the very file the drain
+was holding the pod open for. The drain is 150.
+
+> Still unexercised. Across ten pod shutdowns in dev, including eight at once, `InFlightMessages` never
+> logged a drain: `inFlight` was zero every time, because the scale-downs happened to land in idle
+> windows. The arithmetic above is read off the jar, not off a run.
 
 ## Behaviour changes
 
@@ -293,7 +303,7 @@ saved queries and the alert runbook depend on.
 | `antu.leader.heartbeat.millis` | 10000 | Renewal interval, a third of the lease |
 | `antu.validation.stalled.after.millis` | 1800000 | Inactivity before a validation is given up on |
 | `antu.validation.sweep.millis` | 300000 | How often the leader looks for stalled validations |
-| `antu.shutdown.drain.timeout.seconds` | 175 | In-flight work is finished rather than redelivered. Keep below `terminationGracePeriodSeconds` |
+| `antu.shutdown.drain.timeout.seconds` | 150 | In-flight work is finished rather than redelivered. Keep below `terminationGracePeriodSeconds` *minus* the subscriber close; see *Shutdown* |
 | `antu.stop.refresh.cron` | `0 0 1,14 * * *` | Stop place cache refresh. `-` disables. Unquoted in the ConfigMap: it renders into a properties file, where quotes become part of the value |
 | `antu.organisation.refresh.millis` | 1800000 | Organisation alias cache refresh interval |
 | `spring.task.scheduling.pool.size` | 4 | One thread per `@Scheduled`: the heartbeat, the two refresh triggers and the sweep. Fewer lets the other three starve the heartbeat and drop the lease |
@@ -313,6 +323,16 @@ cluster. Two of the flags are load-bearing on JDK 25 and neither is obvious:
   a POJO. `renovate` bumps the base image unattended, which is what makes this worth a flag rather than a note.
 - `--enable-native-access=ALL-UNNAMED`, with `-XX:+IgnoreUnrecognizedVMOptions` so the same list still starts
   on an older JRE.
+
+**Autoscaling.** Two thresholds decide the fleet, and the HPA takes the higher of them, so both have to be
+sane or neither matters. `horizontalPodAutoscaler.messagesPerPod` is the target backlog per pod on
+`AntuJobQueue`; `targetCPUUtilizationPercentage` is the other. Both were originally set so low that any
+activity at all demanded `maxReplicas`: `0.1` means one queued message asks for the whole fleet, and `10`
+percent of a `1500m` request is less than a validating pod ever uses. Measured in dev before the change: 20
+JVM starts in 37 minutes, with eight pods stopped and eight started inside four minutes, for seven
+validations. Scale-up is deliberately immediate and unthrottled, because a line file fan-out arrives all at
+once and the work is already queued; scale-down is deliberately slow, because stopping a pod mid-validation
+costs the drain and, if the drain does not finish, a revalidated file.
 
 Redis keys: `ANTU_LEADER` (lease, plain string), `BARRIER_<STAGE>_<reportId>` and `..._passed` (barriers),
 `COMPLETING_<reportId>` (claimed by both completion and abandonment), `TEMPORARY_FILE_<reportId>_*` (split

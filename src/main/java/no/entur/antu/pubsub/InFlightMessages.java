@@ -37,7 +37,7 @@ public class InFlightMessages implements SmartLifecycle {
 
   public InFlightMessages(
     @Value(
-      "${antu.shutdown.drain.timeout.seconds:175}"
+      "${antu.shutdown.drain.timeout.seconds:150}"
     ) long drainTimeoutSeconds
   ) {
     this.drainTimeout = Duration.ofSeconds(drainTimeoutSeconds);

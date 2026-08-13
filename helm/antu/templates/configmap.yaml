@@ -52,8 +52,16 @@ data:
 
     # On shutdown, finish the files being validated right now instead of letting them be redelivered and
     # revalidated elsewhere. The HPA scales antu down routinely, so this is a normal path, and XSD
-    # validation is expensive enough that the retries add up. Must stay below terminationGracePeriodSeconds.
-    antu.shutdown.drain.timeout.seconds=175
+    # validation is expensive enough that the retries add up.
+    #
+    # Sized against terminationGracePeriodSeconds=180, but the drain does not get all of it. The
+    # ContextClosedEvent listener in AbstractEnturGooglePubSubConsumer runs first and calls
+    # stopAsync().awaitTerminated(10, SECONDS) per Subscriber, and for the Subscriber holding the
+    # in-flight file that wait always expires, because gax will not terminate while a callback is
+    # running. So the budget is roughly 10 s per busy subscriber, then this, then bean destruction.
+    # At 175 the total overran the grace period and SIGKILL cut off the very file the drain was holding
+    # the pod open for. 150 leaves headroom for both consumers plus shutdown.
+    antu.shutdown.drain.timeout.seconds=150
 
     # One thread per @Scheduled method: the leader heartbeat, the two cache refresh triggers, and the
     # stalled-validation sweep. The last three all do blocking Redis or PubSub work and can coincide, so

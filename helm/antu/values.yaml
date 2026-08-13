@@ -16,7 +16,19 @@ resources:
 horizontalPodAutoscaler:
   maxReplicas: 10
   minReplicas: 2
-  targetCPUUtilizationPercentage: 10
+  # Queued jobs per pod before another pod is added. Each pod runs jobConsumers validations at a time,
+  # so this is the queue depth one pod is expected to absorb.
+  #
+  # This was 0.1, which means a single queued message asks for maxReplicas. Measured in dev: the backlog
+  # is zero most of the time and spikes to 47-137 when a dataset fans out into line files, so the fleet
+  # oscillated between min and max all morning - 20 JVM starts in 37 minutes, including 8 pods stopped
+  # and 8 started within four minutes. At 5 the small spikes are absorbed by the pods already running and
+  # a real fan-out still reaches maxReplicas.
+  messagesPerPod: 5
+  # A validating pod uses more than a core against a 1500m request, so at 10 this metric on its own asked
+  # for maxReplicas whenever anything was running, whatever the queue looked like. The HPA scales on the
+  # highest of its metrics, so this has to be sane or messagesPerPod above has no effect.
+  targetCPUUtilizationPercentage: 70
 
 # -Xmx is prepended by the deployment from resources.xmx.
 #

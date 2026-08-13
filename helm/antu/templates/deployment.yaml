@@ -140,9 +140,11 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-      # The HPA scales antu down routinely, so pods are terminated mid-validation as normal operation. This
-      # has to stay above antu.shutdown.drain.timeout.seconds, or SIGKILL cuts the drain short and the
-      # in-flight files are redelivered and revalidated from scratch, which is slow for XSD validation.
+      # The HPA scales antu down routinely, so pods are terminated mid-validation as normal operation, and
+      # SIGKILL here means the in-flight files are redelivered and revalidated from scratch. Being above
+      # antu.shutdown.drain.timeout.seconds is necessary but not sufficient: the subscriber close runs
+      # before the drain and costs about 10 s per busy subscriber. Budget is 10 s x 2 consumers + the
+      # 150 s drain + bean destruction, against the 180 s below.
       terminationGracePeriodSeconds: 180
       volumes:
         - name: application-config
