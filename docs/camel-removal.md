@@ -3,6 +3,11 @@
 What changed, why, and what to watch when it deploys. Written for whoever has to operate or extend antu
 next.
 
+> Migrating a different service off Camel? Read [camel-migration-learnings.md](camel-migration-learnings.md)
+> as well. This document describes antu's design and is kept current; that one is the record of what the work
+> cost, including the claims this document originally got wrong and the six followup commits the main one
+> needed.
+
 The goal was narrow: take Camel out and keep every existing behaviour. Anything that changes behaviour is
 called out as such, with the reason. The *Distributed correctness* and *Shutdown* sections are the ones to
 read before changing anything in `pipeline/` or `leader/`: they are rules the work arrived at the hard way,
@@ -342,11 +347,15 @@ costs the drain and, if the drain does not finish, a revalidated file.
 
 Redis keys: `ANTU_LEADER` (lease, plain string), `BARRIER_<STAGE>_<reportId>` and `..._passed` (barriers),
 `COMPLETING_<reportId>` (claimed by both completion and abandonment), `TEMPORARY_FILE_<reportId>_*` (split
-files and per-file reports), plus the existing report-scoped caches. Everything in that list carries a TTL
-**except** the entries inside the report-scoped `RLocalCachedMap`s: `LocalCachedMapOptions.timeToLive` is the
-*local* cache TTL, and the Redis hash fields have none, so an entry belonging to a validation that never
-reaches `cleanUp` stays until something removes it. `CacheConfig` says so at the constant; this list used to
-claim otherwise.
+files and per-file reports), plus the existing report-scoped caches — one of which is versioned,
+`validationProgressCache.v2`. That suffix is a serialization version rather than a name: bump it whenever
+`ValidationState` changes shape, for the reason in *Deploying it*.
+
+Everything in the list above carries a TTL **except** the entries inside the report-scoped
+`RLocalCachedMap`s: `LocalCachedMapOptions.timeToLive` is the *local* cache TTL, and the Redis hash fields
+have none, so an entry belonging to a validation that never reaches `cleanUp` stays until something removes
+it. `CacheConfig` says so at the constant; this list used to claim otherwise. The orphaned pre-`.v2` key is
+one such leftover and can be deleted by hand.
 
 **Observability.** The existing log-based metric on `jsonPayload.message:"System error"` still fires: all
 four original sites kept their wording, and the new terminal-failure paths were worded to match, so a stalled
@@ -446,7 +455,8 @@ The old suite booted a PubSub emulator per scenario. Now:
   blob store, with the job queue drained synchronously by `RecordingJobQueue`. No emulator, no polling for a
   result, and a stack trace that points at the step that failed.
 - `PubSubWiringTest` is the only test that starts an emulator, and only checks the transport.
-- 362 tests, about 80 seconds including compilation. The old suite was 278 in 112 seconds.
+- 378 tests, about two minutes including compilation. The old suite was 278 in 112 seconds, so it has grown
+  past the original 362-in-80s on the strength of the followup regression tests rather than got slower.
 
 `TestApp` repeats the two filters `@SpringBootApplication` would contribute. Without `TypeExcludeFilter`
 every `@TestConfiguration` under `no.entur.antu` is picked up by every test that boots it, so one test's
@@ -464,10 +474,14 @@ all three release-on-failure cases when `RedisClaim` is stopped from releasing.
 Three invariants are **not** pinned, and were confirmed unpinned by reverting each one and watching the suite
 stay green: `isLeader()`'s lease-deadline check, `recordProgress`'s conditional `replace` (an earlier revision
 of this section claimed a progress-during-clean-up test that does not exist), and `ValidationMdc`'s clear on
-entry. Worse, the wire contract is asserted against itself: `attributeNamesAreTheOnesOnTheWire` reads its keys
-through the same constants it is meant to pin, so renaming `Constants.NETEX_FILE_NAME` or a `JobType` literal
-passes every test. That is the one thing *Deploying it* most depends on. A table-driven test against
-hard-coded strings would close it.
+entry.
+
+The wire contract was a fourth and is now closed. `attributeNamesAreTheOnesOnTheWire` read every key through
+the same constant it was meant to pin, so both sides moved together: renaming `Constants.NETEX_FILE_NAME`, a
+`JobType` literal, the `timeout` status, the `Marduk` client name or a queue name left the whole suite green.
+`WireContractTest` asserts the literals instead, and all five of those mutations now fail. On the Redis side
+`ValidationStateSerializationTest` does the equivalent job, coupling the serialized shape of `ValidationState`
+to the versioned cache name so that changing one without the other fails with instructions.
 
 **What the end-to-end runs did and did not cover.** A full docker-compose import was verified green through
 every stage, and `local-k8s/` was run with three replicas on two datasets: the split on one pod, the common
@@ -519,8 +533,10 @@ Ranked by consequence, none of them blocking:
    between its own common files has somewhere obvious to start.
 5. `ValidationState` is read-modify-write over an `RLocalCachedMap`, so `hasErrorInCommonFile` set on one pod
    can be lost by a concurrent progress write on another. The conditional write stops the entry being
-   resurrected but does not merge fields. The consequence is a noisier report, not a wrong verdict: line files
-   are validated that could have been skipped.
+   resurrected but does not merge fields, and a local cache can be stale regardless of any lock. The
+   consequence is a noisier report, not a wrong verdict: line files are validated that could have been
+   skipped. The same bug in `commonIdsCache` was real and is fixed in `2d26c86f`, by reading through a
+   non-cached `RMap` view of the same hash inside the lock; that remedy applies here unchanged.
 6. No alert on `oldest_unacked_message_age`, and no dead-letter topic on `AntuJobQueue`.
 7. Seven SonarCloud findings are open because prettier-java 2.1.0, the version in effect, cannot parse the
    syntax they ask for: unnamed variables (`java:S7467`, six of them, in switch labels and catch clauses) and

@@ -33,10 +33,15 @@ Responses are gzipped when the caller sends `Accept-Encoding: gzip`, through `se
 
 # Kubernetes integration
 
-Antu is designed so that the validation workload can be split evenly among single-core Kubernetes pods.  
-This results in smaller pods, both in terms of CPU and memory consumption, which makes the Kubernetes scheduling process
-more efficient.
-The number of pods is adjusted dynamically thanks to a Horizontal Pod Autoscaler.
+Antu is designed so that the validation workload splits evenly across many small pods rather than a few large
+ones, which makes Kubernetes scheduling more efficient. Each pod validates one file at a time
+(`jobConsumers`), so heap is bounded per pod and throughput comes from adding pods.
+
+A Horizontal Pod Autoscaler adjusts the pod count from the `AntuJobQueue` backlog and from CPU. It scales up
+immediately, because a dataset fans out into its line files all at once and the work is already queued, and
+down slowly, because stopping a pod mid-validation costs the shutdown drain and possibly a revalidated file.
+Both thresholds live in `helm/antu/values.yaml` under `horizontalPodAutoscaler`, and the HPA acts on whichever
+of them asks for more pods.
 
 # Deployment
 
@@ -76,10 +81,21 @@ PubSub redelivery.
 The work that must not run on more than one pod at a time, the stop place changelog consumer, priming the stop place
 cache and deciding when the caches are refreshed, is guarded by a leader election, also a lease in Redis.
 
+`docs/camel-migration-learnings.md` is the transferable version of the same material, written for whoever
+migrates another service off Camel.
+
 # Local environment configuration
 
+Antu builds and runs on **JDK 25**. The Maven enforcer rejects anything older, so `./mvnw` on an older JDK
+fails at `validate` with `Detected JDK ... is not in the allowed range [25,)` rather than anything more
+helpful.
+
 A minimal local setup requires a Redis memory store, a Google PubSub emulator and access to the stop place
-registry ([Baba](https://github.com/entur/tiamat)) and the organization registry.
+registry ([Tiamat](https://github.com/entur/tiamat)) and the organization registry.
+
+The whole pipeline can also be run locally with docker-compose or a local Kubernetes cluster from the
+[marduk-pipeline](https://github.com/entur/marduk-pipeline) repository, which is usually less work than wiring
+the dependencies up by hand.
 
 ## Redis memory store
 
@@ -88,7 +104,7 @@ the validation process.
 A Docker Redis memory store instance can be used for local testing:
 
 ```
-docker run -p 6379:6379 --name redis-antu redis:6
+docker run -p 6379:6379 --name redis-antu redis:7-alpine
 ```
 
 ## Google PubSub emulator
@@ -105,7 +121,7 @@ and will listen by default on port 8085.
 The emulator port must be set in the Spring Boot application.properties file as well:
 
 ```
-spring.cloud.gcp.pubsub.emulatorHost=localhost:8085
+spring.cloud.gcp.pubsub.emulator-host=localhost:8085
 ```
 
 ### Additional instructions for Mac OS when validating large datasets
@@ -146,84 +162,112 @@ The Kubernetes configmap helm/antu/templates/configmap.yaml can also be used as 
 
 ## Starting the application locally
 
-- Run `./mvnw package` to generate the Spring Boot jar.
+- Run `./mvnw package` to generate the Spring Boot jar. Requires JDK 25.
 - The application can be started with the following command line:  
   ```java -Xmx500m -Dspring.config.location=/path/to/application.properties -Dfile.encoding=UTF-8 -jar target/antu-*.jar```
 
 # Antu rule set
 
-Antu comes with the following rule sets, depending on the validation profile used for validation:
+Which rules run depends on the validation profile the request asks for. This list is maintained by hand; the
+authoritative source is the validator wiring in `config/TimetableDataValidatorConfig.java`,
+`config/StopPlaceDataValidatorConfig.java` and `config/flex/`. Add a validator, add its codes here.
 
-### For validation Profile `Timetable`
+## Profile `Timetable`
 
-| Sr. | Rule Code                                                   |                                                      Rule Description                                                       |
-|-----|-------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------:|
-| 1   | NETEX_ID_4                                                  |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 2   | NETEX_ID_4W                                                 |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 3   | NETEX_ID_2                                                  |                                               Invalid id structure on element                                               |
-| 4   | NETEX_ID_3                                                  |                                           Invalid structure on id %s. Expected %s                                           |
-| 5   | NETEX_ID_8                                                  |                                   Missing version attribute on elements with id attribute                                   |
-| 6   | NETEX_ID_9                                                  |                                  Missing version attribute on reference to local elements                                   |
-| 7   | NETEX_ID_6                                                  | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements if type XXXX |
-| 8   | NETEX_ID_7                                                  |                                               Invalid id structure on element                                               |
-| 9   | NETEX_ID_5                                                  |                                       Unresolved reference to external reference data                                       |
-| 10  | NETEX_ID_1                                                  |                                         Duplicate element identifiers across files                                          |
-| 11  | NETEX_ID_10                                                 |                                      Duplicate element identifiers across common files                                      |
-| 12  | INVALID_TRANSPORT_MODE                                      |                                                   Invalid transport mode                                                    |
-| 13  | TIMETABLED_PASSING_TIME_INCONSISTENT_TIME                   |                                    ServiceJourney has inconsistent TimetabledPassingTime                                    |
-| 14  | TIMETABLED_PASSING_TIME_INCOMPLETE_TIME                     |                                     ServiceJourney has incomplete TimetabledPassingTime                                     |
-| 15  | TIMETABLED_PASSING_TIME_NON_INCREASING_TIME                 |                                   ServiceJourney has non-increasing TimetabledPassingTime                                   |
-| 16  | HIGH_SPEED                                                  |                                              ServiceJourney has too high speed                                              |
-| 17  | LOW_SPEED                                                   |                                                ServiceJourney has low speed                                                 |
-| 18  | WARNING_SPEED                                               |                                                ServiceJourney has high speed                                                |
-| 19  | SAME_DEPARTURE_ARRIVAL_TIME                                 |                                      Same departure/arrival time for consecutive stops                                      |
-| 20  | CODESPACE                                                   |              Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s               |
-| 21  | VERSION_NON_NUMERIC                                         |                                                  Non-numeric NeTEx version                                                  |
-| 22  | JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP            |                                   Last StopPointInJourneyPattern must not allow boarding                                    |
-| 23  | JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP          |                                  First StopPointInJourneyPattern must not allow alighting                                   |
-| 23  | SAME_STOP_POINT_IN_JOURNEY_PATTERNS                         |                                            JourneyPatterns have same StopPoints                                             |
-| 24  | INVALID_NUMBER_OF_SERVICE_LINKS_IN_JOURNEY_PATTERN          |                                      Invalid number of ServiceLinks in JourneyPattern                                       |
-| 25  | SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN |                                Same quay refs in consecutive stop points in journey pattern                                 |
+| Rule code | Description |
+|---|---|
+| NETEX_ID_1 | Duplicate element identifiers across files |
+| NETEX_ID_2 | Invalid id structure on element |
+| NETEX_ID_3 | Invalid structure on id %s. Expected %s |
+| NETEX_ID_4 | Use of unapproved codespace. Approved codespaces are %s |
+| NETEX_ID_4W | Use of unapproved codespace. Approved codespaces are %s |
+| NETEX_ID_5 | Unresolved reference to external reference data |
+| NETEX_ID_6 | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements of type XXXX |
+| NETEX_ID_7 | Invalid id structure on element |
+| NETEX_ID_8 | Missing version attribute on elements with id attribute |
+| NETEX_ID_9 | Missing version attribute on reference to local elements |
+| NETEX_ID_10 | Duplicate element identifiers across common files |
+| CODESPACE | Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s |
+| VERSION_NON_NUMERIC | Non-numeric NeTEx version |
+| INVALID_TRANSPORT_MODE | Invalid transport mode |
+| TIMETABLED_PASSING_TIME_INCONSISTENT_TIME | ServiceJourney has inconsistent TimetabledPassingTime |
+| TIMETABLED_PASSING_TIME_INCOMPLETE_TIME | ServiceJourney has incomplete TimetabledPassingTime |
+| TIMETABLED_PASSING_TIME_NON_INCREASING_TIME | ServiceJourney has non-increasing TimetabledPassingTime |
+| HIGH_SPEED | ServiceJourney has too high speed |
+| WARNING_SPEED | ServiceJourney has high speed |
+| LOW_SPEED | ServiceJourney has low speed |
+| SAME_DEPARTURE_ARRIVAL_TIME | Same departure/arrival time for consecutive stops |
+| JOURNEY_PATTERN_NO_BOARDING_ALLOWED_AT_LAST_STOP | Last StopPointInJourneyPattern must not allow boarding |
+| JOURNEY_PATTERN_NO_ALIGHTING_ALLOWED_AT_FIRST_STOP | First StopPointInJourneyPattern must not allow alighting |
+| SAME_STOP_POINT_IN_JOURNEY_PATTERNS | JourneyPatterns have same StopPoints |
+| INVALID_NUMBER_OF_SERVICE_LINKS_IN_JOURNEY_PATTERN | Invalid number of ServiceLinks in JourneyPattern |
+| SAME_QUAY_REF_IN_CONSECUTIVE_STOP_POINTS_IN_JOURNEY_PATTERN | Same quay refs in consecutive stop points in journey pattern |
 
-### For validation Profiles `TimetableFlexibleTransport` and `ImportTimetableFlexibleTransport`
+### Interchange rules, also profile `Timetable`
 
-| Sr. | Rule Code             |                                                      Rule Description                                                       |
-|-----|-----------------------|:---------------------------------------------------------------------------------------------------------------------------:|
-| 1   | NETEX_FILE_NAME_1     |                                                      Invalid filename                                                       |
-| 2   | NETEX_ID_4W           |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 3   | NETEX_ID_2            |                                               Invalid id structure on element                                               |
-| 4   | NETEX_ID_3            |                                           Invalid structure on id %s. Expected %s                                           |
-| 5   | NETEX_ID_4            |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 6   | NETEX_ID_8            |                                   Missing version attribute on elements with id attribute                                   |
-| 7   | NETEX_ID_9            |                                  Missing version attribute on reference to local elements                                   |
-| 8   | NETEX_ID_6            | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements if type XXXX |
-| 9   | NETEX_ID_7            |                                               Invalid id structure on element                                               |
-| 10  | NETEX_ID_5            |                                       Unresolved reference to external reference data                                       |
-| 11  | NETEX_ID_1            |                                         Duplicate element identifiers across files                                          |
-| 12  | NETEX_ID_10           |                                      Duplicate element identifiers across common files                                      |
-| 13  | CODESPACE             |              Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s               |
-| 14  | VERSION_NON_NUMERIC   |                                                  Non-numeric NeTEx version                                                  |
-| 15  | INVALID_FLEXIBLE_AREA |                                                    Invalid flexible area                                                    |
+| Rule code | Description |
+|---|---|
+| DUPLICATE_INTERCHANGES | Duplicate interchanges found at %s |
+| MISSING_FROM_SERVICE_JOURNEY_IN_INTERCHANGE | Mandatory field FromJourneyRef is missing in ServiceJourneyInterchange |
+| MISSING_TO_SERVICE_JOURNEY_IN_INTERCHANGE | Mandatory field ToJourneyRef is missing in ServiceJourneyInterchange |
+| MISSING_FROM_STOP_POINT_IN_INTERCHANGE | Mandatory field FromPointRef is missing in ServiceJourneyInterchange |
+| MISSING_TO_STOP_POINT_IN_INTERCHANGE | Mandatory field ToPointRef is missing in ServiceJourneyInterchange |
+| FROM_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_FROM_JOURNEY_REF | FromPointRef in interchange is not a part of FromJourneyRef |
+| TO_POINT_REF_IN_INTERCHANGE_IS_NOT_PART_OF_TO_JOURNEY_REF | ToPointRef in interchange is not a part of ToJourneyRef |
+| DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_MAX_LIMIT | Distance between stop points in interchange is more than maximum limit |
+| DISTANCE_BETWEEN_STOP_POINTS_IN_INTERCHANGE_IS_MORE_THAN_WARNING_LIMIT | Distance between stop points in interchange is more than warning limit |
 
-### For validation Profile `TimetableFlexibleTransportMerging`
+Three interchange validators are behind feature flags and are **off unless the environment enables them**
+(see `helm/antu/templates/configmap.yaml`):
 
-| Sr. | Rule Code   |                 Rule Description                  |
-|-----|-------------|:-------------------------------------------------:|
-| 1   | NETEX_ID_10 | Duplicate element identifiers across common files |
-| 2   | NETEX_ID_1  |    Duplicate element identifiers across files     |
+| Rule code | Description | Flag |
+|---|---|---|
+| RULE_SERVICE_JOURNEYS_HAS_TOO_LONG_WAITING_TIME_WARNING | Interchange waiting time is longer than expected | `interchange-waiting-time-validation-enabled` |
+| RULE_NO_INTERCHANGE_POSSIBLE | Feeder and consumer vehicle journeys have no interchange possibilities | `interchange-waiting-time-validation-enabled` |
+| INTERCHANGE_ALIGHTING_NOT_ALLOWED_FOR_ALIGHTING_STOP | Alighting is not allowed at the interchange alighting stop | `interchange-alighting-and-boarding-validation-enabled` |
+| INTERCHANGE_BOARDING_NOT_ALLOWED_FOR_BOARDING_STOP | Boarding is not allowed at the interchange boarding stop | `interchange-alighting-and-boarding-validation-enabled` |
+| RULE_NON_EXISTING_SERVICE_JOURNEY_REF | ServiceJourneyInterchange %s refers to non-existing service journey %s | `interchange-service-journey-references-exist-validator-enabled` |
+| RULE_NON_EXISTING_STOP_POINT_REF | ServiceJourneyInterchange %s refers to non-existing scheduled stop point %s | `interchange-service-journey-references-exist-validator-enabled` |
 
-### For validation Profile `Stop`
+## Profiles `TimetableFlexibleTransport` and `ImportTimetableFlexibleTransport`
 
-| Sr. | Rule Code   |                                                      Rule Description                                                       |
-|-----|-------------|:---------------------------------------------------------------------------------------------------------------------------:|
-| 1   | NETEX_ID_4W |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 2   | NETEX_ID_2  |                                               Invalid id structure on element                                               |
-| 3   | NETEX_ID_3  |                                           Invalid structure on id %s. Expected %s                                           |
-| 4   | NETEX_ID_4  |                                   Use of unapproved codespace. Approved codespaces are %s                                   |
-| 5   | NETEX_ID_8  |                                   Missing version attribute on elements with id attribute                                   |
-| 6   | NETEX_ID_9  |                                  Missing version attribute on reference to local elements                                   |
-| 7   | NETEX_ID_6  | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements if type XXXX |
-| 8   | NETEX_ID_7  |                                               Invalid id structure on element                                               |
-| 9   | NETEX_ID_5  |                                       Unresolved reference to external reference data                                       |
-| 10  | NETEX_ID_1  |                                         Duplicate element identifiers across files                                          |
-| 11  | NETEX_ID_10 |                                      Duplicate element identifiers across common files                                      |
+| Rule code | Description |
+|---|---|
+| NETEX_FILE_NAME_1 | Invalid filename |
+| NETEX_ID_1 | Duplicate element identifiers across files |
+| NETEX_ID_2 | Invalid id structure on element |
+| NETEX_ID_3 | Invalid structure on id %s. Expected %s |
+| NETEX_ID_4 | Use of unapproved codespace. Approved codespaces are %s |
+| NETEX_ID_4W | Use of unapproved codespace. Approved codespaces are %s |
+| NETEX_ID_5 | Unresolved reference to external reference data |
+| NETEX_ID_6 | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements of type XXXX |
+| NETEX_ID_7 | Invalid id structure on element |
+| NETEX_ID_8 | Missing version attribute on elements with id attribute |
+| NETEX_ID_9 | Missing version attribute on reference to local elements |
+| NETEX_ID_10 | Duplicate element identifiers across common files |
+| CODESPACE | Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s |
+| VERSION_NON_NUMERIC | Non-numeric NeTEx version |
+| INVALID_FLEXIBLE_AREA | Invalid flexible area |
+
+## Profile `TimetableFlexibleTransportMerging`
+
+| Rule code | Description |
+|---|---|
+| NETEX_ID_1 | Duplicate element identifiers across files |
+| NETEX_ID_10 | Duplicate element identifiers across common files |
+
+## Profile `Stop`
+
+| Rule code | Description |
+|---|---|
+| NETEX_ID_1 | Duplicate element identifiers across files |
+| NETEX_ID_2 | Invalid id structure on element |
+| NETEX_ID_3 | Invalid structure on id %s. Expected %s |
+| NETEX_ID_4 | Use of unapproved codespace. Approved codespaces are %s |
+| NETEX_ID_4W | Use of unapproved codespace. Approved codespaces are %s |
+| NETEX_ID_5 | Unresolved reference to external reference data |
+| NETEX_ID_6 | Reference to %s is not allowed from element %s. Generally an element named XXXXRef may only reference elements of type XXXX |
+| NETEX_ID_7 | Invalid id structure on element |
+| NETEX_ID_8 | Missing version attribute on elements with id attribute |
+| NETEX_ID_9 | Missing version attribute on reference to local elements |
+| NETEX_ID_10 | Duplicate element identifiers across common files |

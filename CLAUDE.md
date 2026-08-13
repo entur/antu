@@ -44,11 +44,14 @@ antu/
 │   ├── pubsub/          # PubSub consumers, publisher, wire codec
 │   ├── pipeline/        # The validation steps and the barriers between them
 │   ├── leader/          # Redis lease leader election
-│   ├── validation/      # Custom validation rules
+│   ├── memorystore/     # Redis-backed store for split files and per-file reports
+│   ├── netexdata/       # Cross-file data collected while validating
+│   ├── validation/      # Custom validation rules, plus sweden/ and finland/ variants
 │   ├── rest/            # Spring MVC controllers
-│   ├── config/          # Spring configuration
+│   ├── config/          # Spring configuration, including config/cache
 │   ├── stop/            # Stop place registry and changelog
 │   └── services/        # Blob store access
+│   (also: actuator, cache, exception, metrics, organisation, security, stoptime)
 ├── src/test/
 ├── helm/                # Kubernetes deployment configs
 ├── terraform/           # Infrastructure as code
@@ -78,15 +81,20 @@ being processed. Nothing in the application touches it.
 
 Antu supports multiple validation profiles with different rule sets:
 
-1. **Timetable**: Standard timetable data validation (~25 rules)
-2. **TimetableFlexibleTransport**: Flexible transport services (~15 rules)
-3. **ImportTimetableFlexibleTransport**: Import variant of flexible transport
-4. **TimetableFlexibleTransportMerging**: Merging validation (~2 rules)
-5. **Stop**: Stop place data validation (~11 rules)
+1. **Timetable**: standard timetable data, including the interchange rules
+2. **TimetableFlexibleTransport**: flexible transport services
+3. **ImportTimetableFlexibleTransport**: import variant of flexible transport
+4. **TimetableFlexibleTransportMerging**: merging validation
+5. **Stop**: stop place data
+
+`README.md` lists the rule codes per profile. Which validators a profile runs is wired in
+`config/TimetableDataValidatorConfig.java`, `config/StopPlaceDataValidatorConfig.java` and `config/flex/`,
+and a few interchange validators are behind feature flags that default to off.
 
 ## Common Tasks
 
 ### Building the Project
+Requires JDK 25; the enforcer fails the build on anything older.
 ```bash
 ./mvnw clean package
 ```
@@ -95,6 +103,8 @@ Antu supports multiple validation profiles with different rule sets:
 ```bash
 ./mvnw test
 ```
+Use `clean` after changing a `static final` constant: those inline into call sites and an incremental build
+can pass against the old value.
 
 ### Running Locally
 Requirements:
@@ -146,6 +156,9 @@ Uses Prettier for Java:
 
 ## Key Files to Review
 
+- `docs/camel-migration-learnings.md`: the transferable lessons from removing Camel, for whoever migrates
+  another service off it. Also the record of what this repo's own design doc originally got wrong about
+  library behaviour, which is the most useful caution to carry into writing the next one
 - `docs/camel-removal.md`: what the move off Camel changed, and the behaviour differences it introduced. Read its
   *Distributed correctness* and *Shutdown* sections before changing anything under `pipeline/` or `leader/`: they
   are the rules that keep at-least-once delivery across arbitrary pods from producing duplicate or contradictory
@@ -157,11 +170,25 @@ Uses Prettier for Java:
 
 ## Common Pitfalls
 
-1. **Mac OS PubSub limits**: May need to increase ephemeral port range for large datasets
-2. **Memory constraints**: Tests run with `-Xms500m -Xmx500m -Xss512k`
-3. **Redis serialization**: Uses Kryo for distributed data structures
-4. **NeTEx file structure**: Single-line files in zip with optional common files
-5. **Common file ordering is not a thing you can rely on**: `DatasetSplitter` queues common files in reverse name
+1. **JDK 25 is required**: the Maven enforcer rejects anything older, and the failure at `validate` names the
+   JDK range rather than the cause. Set `JAVA_HOME` before `./mvnw`.
+2. **Mac OS PubSub limits**: May need to increase ephemeral port range for large datasets
+3. **Memory constraints**: Tests run with `-Xms500m -Xmx500m -Xss512k`
+4. **Redis values are a wire format**: two versions of antu read the same Redis during a rollout, and the
+   Kryo codec writes fields positionally with no schema header. Adding a field to a cached class makes every
+   entry written by the other version unreadable, and a read path that scans a whole hash then throws on the
+   first one. Change the shape, change the cache name: `validationProgressCache.v2` is versioned for exactly
+   this, and `ValidationStateSerializationTest` fails if you change one without the other.
+5. **`RLocalCachedMap.get()` is served from the JVM-local cache**, and holding a distributed lock does not
+   flush it. Invalidation is pub/sub only and `reconnectionStrategy` defaults to `NONE`, so a stale entry can
+   outlive a reconnect. Never read one for a read-modify-write; read a plain `RMap` view of the same hash
+   instead, as `RedisNetexIdRepository.addSharedNetexIds` does. Iteration does go to Redis, so two reads of
+   the same map can disagree.
+6. **`static final String` values are inlined into call sites**, so changing a constant and running `mvn test`
+   can pass against stale bytecode in the referencing classes. Verify constant changes with `mvn clean
+   verify`.
+7. **NeTEx file structure**: Single-line files in zip with optional common files
+8. **Common file ordering is not a thing you can rely on**: `DatasetSplitter` queues common files in reverse name
    order, which puts `_stops.xml` ahead of `_shared_data.xml`, but that orders the *queue* only. Jobs carry no
    ordering key, so delivery order is not publish order, and every pod pulls at once. Measured on a 24 common file
    dataset across ten pods: the file queued first started 19.5 s after another and finished last of the 24. It still
@@ -169,16 +196,14 @@ Uses Prettier for Java:
    known bug. The real guarantee is the `COMMON_FILES_VALIDATED` barrier: no line file runs until every common file
    has. Do not add logic that assumes one common file was validated before another.
 
-## Getting Help
-
-- Check existing tests for usage examples
-- Refer to netex-validator-java library documentation
-- Consult Nordic NeTEx Profile specification
-
 ## Making Changes
 
-1. Always run existing tests first to establish baseline
-2. Make minimal, surgical changes
-3. Ensure tests pass after changes
-4. Let Prettier handle formatting
-5. Update this file if architecture changes significantly
+- Run the tests first, so a failure afterwards is attributable.
+- Prettier runs in `validate` and gates the build; let `./mvnw prettier:write` do the formatting.
+- Changing anything under `pipeline/` or `leader/`: read *Distributed correctness* in
+  `docs/camel-removal.md` first. Every step runs on an arbitrary pod against at-least-once delivery, so a
+  check followed by an act is not a guard, and a terminal status must have exactly one exit.
+- A test for a concurrency fix has to be run against the unfixed code. Several here passed without their
+  fix until that was checked; see *Testing* in `docs/camel-migration-learnings.md` for the two shapes that
+  fail silently.
+- Update this file when the architecture moves, and `docs/camel-removal.md` when the behaviour does.
