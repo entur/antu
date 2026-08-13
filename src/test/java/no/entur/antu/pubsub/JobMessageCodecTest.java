@@ -90,11 +90,15 @@ class JobMessageCodecTest {
   }
 
   /**
-   * These attribute names are the contract with marduk and kakka, and with the antu version already
-   * deployed while a new one rolls out. Renaming one silently drops messages.
+   * That each field of the context ends up under the attribute it belongs to, rather than being dropped
+   * or swapped with its neighbour.
+   *
+   * <p>This does not pin the attribute names themselves: it reads each one through the same constant the
+   * encoder wrote it with, so both sides move together and it passes whatever the constant says.
+   * {@link WireContractTest} pins the names against literals.
    */
   @Test
-  void attributeNamesAreTheOnesOnTheWire() {
+  void attributesCarryTheContextFieldTheyBelongTo() {
     Map<String, String> attributes = JobMessageCodec
       .encode(new AntuJob.ValidateFile(CONTEXT, "line.xml", 12, 2, List.of()))
       .attributes();
