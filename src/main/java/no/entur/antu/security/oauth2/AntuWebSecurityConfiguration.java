@@ -20,7 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Authentication and authorization configuration for Antu.
- * All requests must be authenticated except for the Swagger and Actuator endpoints.
+ * All requests must be authenticated except for the health and Actuator endpoints.
  */
 @Profile("!test")
 @EnableWebSecurity
@@ -72,10 +72,6 @@ public class AntuWebSecurityConfiguration {
       .authorizeHttpRequests(authz ->
         authz
           .requestMatchers(HttpMethod.GET, "/services/health")
-          .permitAll()
-          .requestMatchers("/services/validation-report/swagger.json")
-          .permitAll()
-          .requestMatchers("/services/swagger.json")
           .permitAll()
           .requestMatchers("/actuator/prometheus")
           .permitAll()

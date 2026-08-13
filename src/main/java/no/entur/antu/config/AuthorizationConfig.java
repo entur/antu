@@ -16,7 +16,6 @@
 
 package no.entur.antu.config;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Locale;
 import no.entur.antu.security.AntuAuthorizationService;
 import no.entur.antu.security.DefaultAntuAuthorizationService;
@@ -33,7 +32,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
@@ -109,9 +107,8 @@ public class AuthorizationConfig {
 
   @Bean
   public AntuAuthorizationService antuAuthorizationService(
-    AuthorizationService<String> authorizationService,
-    AuthenticationManagerResolver<HttpServletRequest> resolver
+    AuthorizationService<String> authorizationService
   ) {
-    return new DefaultAntuAuthorizationService(authorizationService, resolver);
+    return new DefaultAntuAuthorizationService(authorizationService);
   }
 }

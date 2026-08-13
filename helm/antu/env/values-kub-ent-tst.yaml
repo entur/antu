@@ -65,4 +65,5 @@ ingress:
 horizontalPodAutoscaler:
   project: ent-antu-tst
 
-stopPlaceCacheRefreshCron: ?cron=0+0+03,14+?+*+*
+stopPlaceCacheRefreshCron: 0 0 3,14 * * *
+stopPlaceCacheRefreshQuartzTrigger: ?cron=0+0+03,14+?+*+*

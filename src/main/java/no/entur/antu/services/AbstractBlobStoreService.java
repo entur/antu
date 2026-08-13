@@ -19,8 +19,6 @@
 package no.entur.antu.services;
 
 import java.io.InputStream;
-import no.entur.antu.Constants;
-import org.apache.camel.Header;
 import org.rutebanken.helper.storage.repository.BlobStoreRepository;
 
 public abstract class AbstractBlobStoreService {
@@ -35,20 +33,15 @@ public abstract class AbstractBlobStoreService {
     this.repository.setContainerName(containerName);
   }
 
-  public boolean existBlob(@Header(value = Constants.FILE_HANDLE) String name) {
+  public boolean existBlob(String name) {
     return repository.exist(name);
   }
 
-  public InputStream getBlob(
-    @Header(value = Constants.FILE_HANDLE) String name
-  ) {
+  public InputStream getBlob(String name) {
     return repository.getBlob(name);
   }
 
-  public void uploadBlob(
-    @Header(value = Constants.FILE_HANDLE) String name,
-    InputStream inputStream
-  ) {
+  public void uploadBlob(String name, InputStream inputStream) {
     repository.uploadBlob(name, inputStream);
   }
 }

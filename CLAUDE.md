@@ -9,11 +9,11 @@ Antu is a NeTEx dataset validation service built by Entur for validating public 
 ## Architecture
 
 ### Core Components
-- **Language**: Java 21
-- **Framework**: Spring Boot with Apache Camel
-- **Build Tool**: Maven
+- **Language**: Java 25
+- **Framework**: Spring Boot (no integration framework; PubSub consumers come from `entur-google-pubsub`)
+- **Build Tool**: Maven, parent `org.entur.ror:superpom` (sets the Spring Boot version)
 - **Message Queue**: Google Cloud PubSub
-- **Cache/Coordination**: Redis (Redisson)
+- **Cache/Coordination**: Redis (Redisson) - report-scoped caches, pipeline barriers, leader election
 - **Storage**: Google Cloud Storage
 - **Deployment**: Kubernetes with HPA
 
@@ -30,9 +30,8 @@ Antu is a NeTEx dataset validation service built by Entur for validating public 
 ### Key Dependencies
 - `netex-validator-java`: Core validation library
 - `netex-parser-java`: NeTEx XML parsing
-- `camel-spring-boot`: Integration framework
 - `redisson`: Distributed data structures
-- `entur-helpers`: Entur-specific utilities
+- `entur-helpers`: Entur-specific utilities, including `AbstractEnturGooglePubSubConsumer`
 
 Versions live in pom.xml; do not trust versions written in this file.
 
@@ -41,16 +40,39 @@ Versions live in pom.xml; do not trust versions written in this file.
 ```
 antu/
 ├── src/main/java/no/entur/antu/
-│   ├── routes/          # Camel routes for message processing
+│   ├── job/             # Job model (sealed AntuJob), dispatch, MDC
+│   ├── pubsub/          # PubSub consumers, publisher, wire codec
+│   ├── pipeline/        # The validation steps and the barriers between them
+│   ├── leader/          # Redis lease leader election
 │   ├── validation/      # Custom validation rules
-│   ├── repository/      # Data access layer
-│   └── rest/            # REST API controllers
+│   ├── rest/            # Spring MVC controllers
+│   ├── config/          # Spring configuration
+│   ├── stop/            # Stop place registry and changelog
+│   └── services/        # Blob store access
 ├── src/test/
-├── api/                 # API specifications
 ├── helm/                # Kubernetes deployment configs
 ├── terraform/           # Infrastructure as code
 └── pom.xml              # Maven build configuration
 ```
+
+### How a validation runs
+
+`ValidationRequestConsumer` reads a request off `AntuNetexValidationQueue`, `ValidationInitializer` derives the report id
+and notifies STARTED, and from there every step ends by putting the next `AntuJob` on `AntuJobQueue`. `JobQueueConsumer`
+picks jobs up on any pod and `JobDispatcher` switches over the sealed job type:
+
+| Job | Step |
+| --- | --- |
+| `SplitDataset` | `DatasetSplitter` - explode the archive into the memory store, create the common file jobs |
+| `ValidateFile` | `NetexFileValidator` - validate one file, record its report, report to the barriers |
+| `CreateLineFileJobs` | `DatasetSplitter` - the common files barrier opened, create the line file jobs |
+| `AggregateReports` | `ReportAggregator` - merge the per file reports |
+| `ValidateDataset` | `DatasetValidator` - run the validators that need the whole dataset |
+| `CompleteValidation` | `ValidationCompleter` - publish the report, notify the client, clean up |
+| `Refresh*Cache` | `StopPlaceCacheRefresher` / `OrganisationAliasCacheRefresher` |
+
+The ack deadline is managed by the PubSub streaming pull client, which extends it for up to an hour while a message is
+being processed. Nothing in the application touches it.
 
 ## Validation Profiles
 
@@ -102,8 +124,12 @@ Uses Prettier for Java:
 - NeTEx ID uniqueness validation is synchronized across pods
 
 ### Testing
-- Unit tests use embedded Redis
-- Integration tests use Testcontainers with GCloud emulator
+- `AntuPipelineTestBase` runs a whole dataset validation in one JVM against embedded Redis and an in-memory blob store,
+  with the job queue drained synchronously by `RecordingJobQueue`. No emulator, no polling for a result.
+- `PubSubWiringTest` is the only test that starts a PubSub emulator, and it only checks the transport.
+- `TestApp` repeats the filters `@SpringBootApplication` would contribute. Dropping `TypeExcludeFilter` there makes every
+  `@TestConfiguration` under `no.entur.antu` apply to every test that boots it, so one test's doubles silently replace
+  another test's beans. Import the configurations you need instead.
 - Test resources in `src/test/resources/application.properties`
 
 ### External Dependencies
@@ -116,11 +142,14 @@ Uses Prettier for Java:
 - Follow existing patterns in the codebase
 - Prettier handles formatting automatically on `./mvnw validate`
 - Use Spring dependency injection
-- Camel routes for async processing
 - Prefer functional programming style where appropriate
 
 ## Key Files to Review
 
+- `docs/camel-removal.md`: what the move off Camel changed, and the behaviour differences it introduced. Read its
+  *Distributed correctness* and *Shutdown* sections before changing anything under `pipeline/` or `leader/`: they
+  are the rules that keep at-least-once delivery across arbitrary pods from producing duplicate or contradictory
+  terminal statuses, and several of them were arrived at by getting it wrong first
 - `pom.xml`: Dependencies and build configuration
 - `src/test/resources/application.properties`: Local config template
 - `helm/antu/templates/configmap.yaml`: Production config template
@@ -132,12 +161,17 @@ Uses Prettier for Java:
 2. **Memory constraints**: Tests run with `-Xms500m -Xmx500m -Xss512k`
 3. **Redis serialization**: Uses Kryo for distributed data structures
 4. **NeTEx file structure**: Single-line files in zip with optional common files
+5. **Common file ordering**: A common file that declares shared data has to be validated before one that references it.
+   `DatasetSplitter` queues them in reverse name order so `_stops.xml` precedes `_shared_data.xml`. The dependency is
+   really data-driven, not name-driven, so a dataset that breaks the convention will report spurious unresolved
+   references. Note that this orders the queue, not the validation: one job consumer per pod serialises common files
+   within a pod, but several pods take several at once and the two can overlap. Verified overlapping on the three-pod
+   rig. It is not a guarantee, and nothing currently enforces one.
 
 ## Getting Help
 
 - Check existing tests for usage examples
 - Refer to netex-validator-java library documentation
-- Review Camel documentation for routing patterns
 - Consult Nordic NeTEx Profile specification
 
 ## Making Changes

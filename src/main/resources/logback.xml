@@ -27,9 +27,10 @@
                             },
                             "correlationId": "%X{correlationId:-}",
                             "codespace": "%X{codespace:-}",
+                            "reportId": "%X{reportId:-}",
+                            "fileName": "%X{fileName:-}",
                             "message": "%message\n%ex{full}",
                             "severity": "%level",
-                            "breadcrumb": "%X{camel.breadcrumbId}",
                             "reportLocation": {
                                 "filePath": "%logger",
                                 "lineNumber": "%line",
@@ -44,9 +45,6 @@
         <logger name="com" level="INFO"/>
         <logger name="no" level="INFO"/>
         <logger name="org" level="INFO"/>
-
-        <!--- Reducing verbosity of Jackson startup logs-->
-        <logger name="org.apache.camel.component.jackson.JacksonDataFormat" level="WARN" />
 
         <root level="INFO">
             <appender-ref ref="console"/>

@@ -6,36 +6,69 @@ data:
     spring.main.sources=no.entur.antu
     spring.profiles.active=gcs-blobstore,stop-place-changelog
     server.port={{ .Values.service.http.internalPort }}
-    # init the servlet before Camel starts, or platform-http's route mappings are unreachable
-    # and every /services/** request gets Spring's no-handler 404
-    spring.mvc.servlet.load-on-startup=1
-    # platform-http runs every /services/** route on this pool; Boot's default core of 8 with an
-    # unbounded queue never grows, so report downloads can starve the probes off the pool
-    spring.task.execution.pool.core-size=32
 
-    # Camel
-    camel.main.name=antu
-    camel.dataformat.jackson.module-refs=jacksonJavaTimeModule
-    camel.dataformat.jackson.include=NON_NULL
-    camel.cluster.file.enabled=false
-    camel.cluster.kubernetes.enabled=true
-    camel.cluster.kubernetes.cluster-labels[app]=antu
-    camel.cluster.kubernetes.config-map-name=antu-leaders
-    camel.main.stream-caching-enabled=false
-    camel.main.stream-caching-spool-enabled=true
-    # restore pre-4.18 behaviour: do not reject requests on consumes/produces mismatch (415/406)
-    camel.component.platform-http.serverRequestValidation=false
-    # the Camel shutdown timeout must be shorter than the Kubernetes terminationGracePeriod
-    antu.shutdown.timeout=175
-    antu.camel.redelivery.max=0
+    # Compress responses when the caller asks for it. Validation reports are JSON in the hundreds of
+    # kilobytes and compress by roughly a factor of ten. The container sets Content-Encoding itself, so
+    # unlike the header this replaces it is always true. See ValidationReportController.
+    server.compression.enabled=true
+    server.compression.mime-types=application/json,text/plain
+    server.compression.min-response-size=2KB
+
+    # Job queue
+    # How many validations one pod runs at a time. Each holds a whole NeTEx file in heap, so this is
+    # what bounds memory; scale out on pods first.
+    #
+    # Two settings are needed, because the number of Subscribers and the number of threads that deliver
+    # to them are separate. The Subscriber count alone does not bound concurrency: callbacks run on a
+    # scheduler whose default is 4 threads, so leaving executor-threads unset lets one pod start four
+    # validations regardless of this value. They are set per subscription rather than globally so that a
+    # long validation cannot stop new validation requests from being accepted on the other subscription.
+    antu.netex.job.consumers={{ .Values.jobConsumers }}
+    spring.cloud.gcp.pubsub.subscription.AntuJobQueue.executor-threads={{ .Values.jobConsumers }}
+    # Lease no more messages than can be worked on. The gax default is 1000, and an idle lease still
+    # counts against the undelivered-message metric the HPA scales on.
+    spring.cloud.gcp.pubsub.subscription.AntuJobQueue.flow-control.max-outstanding-element-count={{ .Values.jobConsumers }}
+    spring.cloud.gcp.pubsub.subscription.AntuNetexValidationQueue.executor-threads=1
+    # Without this the gax default of 1000 applies, so one pod leases a whole nightly batch of requests and
+    # works through them one at a time while the other pods have nothing to do.
+    spring.cloud.gcp.pubsub.subscription.AntuNetexValidationQueue.flow-control.max-outstanding-element-count=1
+
+    # Load-bearing for antu.shutdown.drain.timeout.seconds. The publisher's thread pool stops accepting work
+    # on ContextClosedEvent by default, and that event fires before the drain runs, so a validation would
+    # finish draining and then fail to publish its next job or its terminal status: the nack and the
+    # revalidation the drain exists to avoid, plus a delayed shutdown to pay for it.
+    spring.cloud.gcp.pubsub.publisher.executor-accept-tasks-after-context-close=true
+    # Topics and subscriptions are terraformed, so the pods must not try to create them.
+    entur.pubsub.subscriber.autocreate=false
+    # Slept inline on the callback thread after a nack, so with one job thread per pod this is how long the
+    # pod stops validating. The subscription's own retry_policy.minimum_backoff already spaces redeliveries.
+    entur.pubsub.consumer.retry.delay=1000
+
+    # Give up on a validation that has made no progress for this long, notify the client with the timeout
+    # status and release its Redis state. Replaces the Camel aggregator's completionTimeout, which was the
+    # only thing guaranteeing that a STARTED is always followed by a terminal status.
+    antu.validation.stalled.after.millis=1800000
+    antu.validation.sweep.millis=300000
+
+    # On shutdown, finish the files being validated right now instead of letting them be redelivered and
+    # revalidated elsewhere. The HPA scales antu down routinely, so this is a normal path, and XSD
+    # validation is expensive enough that the retries add up. Must stay below terminationGracePeriodSeconds.
+    antu.shutdown.drain.timeout.seconds=175
+
+    # One thread per @Scheduled method: the leader heartbeat, the two cache refresh triggers, and the
+    # stalled-validation sweep. The last three all do blocking Redis or PubSub work and can coincide, so
+    # anything less than four lets them starve the heartbeat and drop the lease while this pod is healthy.
+    spring.task.scheduling.pool.size=4
 
     # Agreement registry
-    antu.organisation.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
+    antu.organisation.refresh.millis=1800000
     antu.agreement.registry.url={{ .Values.agreementRegistryUrl }}
 
     # Stop place dataset import
     # Refresh stop place cache at 01:00 and 14:00 every day
-    antu.stop.refresh.interval={{ .Values.stopPlaceCacheRefreshCron }}
+    # Unquoted on purpose: this renders into a properties file, where quotes would become part of
+    # the value and the cron parser would reject it at startup.
+    antu.stop.refresh.cron={{ .Values.stopPlaceCacheRefreshCron }}
 
     # Stop place changelog
     org.rutebanken.helper.stopplace.changelog.enabled=true
@@ -61,14 +94,9 @@ data:
     # Validators
     antu.netex.validation.schema.skip=false
 
-    # Kubernetes
-    antu.kubernetes.namespace={{ .Values.kubernetes.namespace }}
-    antu.kubernetes.maxpods={{ .Values.kubernetes.maxPods }}
-
     # PubSub
     antu.pubsub.project.id={{ .Values.gcp.pubsubProjectId }}
     spring.cloud.gcp.project-id=${antu.pubsub.project.id}
-    camel.component.google-pubsub.synchronous-pull-retryable-codes=DEADLINE_EXCEEDED
 
     # OAuth2 Resource Server for Entur Partner tenant
     antu.oauth2.resourceserver.auth0.entur.partner.jwt.issuer-uri={{ .Values.auth0.partner.url }}
@@ -121,7 +149,6 @@ data:
     logging.level.no.entur=INFO
     logging.level.no.entur.antu=INFO
     logging.level.org.apache=INFO
-    logging.level.org.apache.camel.component.http.HttpComponent=WARN
 
     # Feature flags
     interchange-waiting-time-validation-enabled={{ .Values.interchangeWaitingTimeValidationEnabled }}
@@ -138,6 +165,46 @@ data:
     {{- range $index, $org := .Values.antu.validation.additionalAllowedOrganisations }}
     antu.validation.additional-allowed-organisations[{{ $index }}]={{ $org }}
     {{- end }}
+
+    # ----------------------------------------------------------------------------------------------
+    # KEPT FOR THE CAMEL-REMOVAL RELEASE ONLY. Delete this whole block in the follow-up release,
+    # together with rbac.yaml, the kubernetes and stopPlaceCacheRefreshQuartzTrigger values, and the two
+    # aggregation topics in terraform.
+    #
+    # Nothing here is read by this version: no property below matches anything it binds, and Spring
+    # ignores the rest. They are here for the version being replaced.
+    #
+    # helm applies this ConfigMap before the first pod is replaced, and kubelet re-syncs the mounted
+    # volume into pods that are still running the old jar. Any old pod that restarts during the rollout,
+    # or any rollback that swaps the image without also rolling back this ConfigMap, boots the old code
+    # against whatever is in this file. Without camel.cluster.kubernetes.enabled there is no
+    # CamelClusterService, and MasterComponent throws "No cluster service found" on the first master:
+    # route, so the CamelContext fails to start and the pod CrashLoops. Four routes use master:.
+    #
+    # The rest are not fatal but are not free either: antu.stop.refresh.interval defaults to
+    # trigger.repeatCount=0, so dropping it does not fall back to a schedule, it stops the stop place
+    # cache refreshing at all.
+    spring.mvc.servlet.load-on-startup=1
+    spring.task.execution.pool.core-size=32
+    camel.main.name=antu
+    camel.dataformat.jackson.module-refs=jacksonJavaTimeModule
+    camel.dataformat.jackson.include=NON_NULL
+    camel.cluster.file.enabled=false
+    camel.cluster.kubernetes.enabled=true
+    camel.cluster.kubernetes.cluster-labels[app]=antu
+    camel.cluster.kubernetes.config-map-name=antu-leaders
+    camel.main.stream-caching-enabled=false
+    camel.main.stream-caching-spool-enabled=true
+    camel.component.platform-http.serverRequestValidation=false
+    camel.component.google-pubsub.synchronous-pull-retryable-codes=DEADLINE_EXCEEDED
+    logging.level.org.apache.camel.component.http.HttpComponent=WARN
+    antu.shutdown.timeout=175
+    antu.camel.redelivery.max=0
+    antu.organisation.refresh.interval=trigger.repeatInterval=1800000&trigger.repeatCount=-1&stateful=true
+    antu.stop.refresh.interval={{ .Values.stopPlaceCacheRefreshQuartzTrigger }}
+    antu.kubernetes.namespace={{ .Values.kubernetes.namespace }}
+    antu.kubernetes.maxpods={{ .Values.kubernetes.maxPods }}
+    # ----------------------------------------------------------------------------------------------
 kind: ConfigMap
 metadata:
   name: {{ template "antu.name" . }}-config

@@ -21,8 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import no.entur.antu.TestApp;
-import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.apache.camel.test.spring.junit5.UseAdviceWith;
 import org.entur.oauth2.JwtRoleAssignmentExtractor;
 import org.entur.ror.permission.RemoteBabaRoleAssignmentExtractor;
 import org.junit.jupiter.api.Test;
@@ -30,6 +28,7 @@ import org.rutebanken.helper.organisation.RoleAssignmentExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -38,9 +37,8 @@ import org.springframework.web.reactive.function.client.WebClient;
  * Verify the authorization wiring used in all deployed environments, where
  * antu.security.role.assignment.extractor is set to baba.
  */
-@CamelSpringBootTest
-@UseAdviceWith
 @ActiveProfiles({ "test", "default", "in-memory-blobstore" })
+@Import(TestConfig.class)
 @DirtiesContext
 @SpringBootTest(
   webEnvironment = SpringBootTest.WebEnvironment.NONE,

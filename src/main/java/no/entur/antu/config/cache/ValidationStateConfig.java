@@ -3,8 +3,8 @@ package no.entur.antu.config.cache;
 import static no.entur.antu.config.cache.CacheConfig.*;
 
 import java.util.Map;
-import no.entur.antu.routes.validation.DefaultValidationStateRepository;
-import no.entur.antu.routes.validation.ValidationStateRepository;
+import no.entur.antu.validation.state.DefaultValidationStateRepository;
+import no.entur.antu.validation.state.ValidationStateRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,3 +1,11 @@
+# Kept for the Camel-removal release only.
+#
+# The version being replaced elects its leader through a Kubernetes ConfigMap, and helm applies this chart
+# before the first pod is replaced: deleting the Role here takes leadership renewal away from the old pods
+# while they are still serving, and any old pod that restarts during the rollout cannot start its routes.
+# The new code calls no Kubernetes API at all, so these grants are inert to it.
+#
+# Delete this file in a follow-up release, together with the two unused PubSub topics in terraform.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -42,4 +50,3 @@ rules:
   - apiGroups: ["apps"]
     resources: [ "deployments" ]
     verbs: [ "get", "list", "watch", "update", "patch" ]
-

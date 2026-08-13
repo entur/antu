@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.apache.camel.Handler;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.slf4j.Logger;
@@ -34,7 +33,6 @@ public class ValidationReportTransformer {
    * @param validationReport the report to truncate.
    * @return ValidationReport with the truncated validationReportEntries.
    */
-  @Handler
   public ValidationReport truncate(ValidationReport validationReport) {
     Collection<ValidationReportEntry> validationReportEntries =
       validationReport.getValidationReportEntries();
