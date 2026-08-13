@@ -10,6 +10,7 @@ import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.redisson.api.RLocalCachedMap;
 import org.redisson.api.RLock;
+import org.redisson.api.RMap;
 import org.redisson.api.RSet;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -129,7 +130,15 @@ public class RedisNetexIdRepository implements NetexIdRepository {
     RLock lock = redissonClient.getLock(getCommonNetexIdsLockKey(reportId));
     try {
       lock.lock();
-      Set<String> existingCommonIds = commonIdsCache.get(cacheKey);
+      // Read directly from Redis, bypassing the local JVM cache.
+      // Local cache entries may lag behind pub/sub invalidations; a pod that
+      // acquires the lock immediately after another pod releases it can read a
+      // stale local entry and overwrite Redis with incomplete data.
+      RMap<String, Set<String>> remote = redissonClient.getMap(
+        commonIdsCache.getName(),
+        commonIdsCache.getCodec()
+      );
+      Set<String> existingCommonIds = remote.get(cacheKey);
       if (existingCommonIds == null) {
         existingCommonIds = new HashSet<>();
       }
