@@ -317,7 +317,7 @@ saved queries and the alert runbook depend on.
 | `antu.shutdown.drain.timeout.seconds` | 150 | In-flight work is finished rather than redelivered. Keep below `terminationGracePeriodSeconds` *minus* the subscriber close; see *Shutdown* |
 | `antu.stop.refresh.cron` | `0 0 1,14 * * *` | Stop place cache refresh. `-` disables. Unquoted in the ConfigMap: it renders into a properties file, where quotes become part of the value |
 | `antu.organisation.refresh.millis` | 1800000 | Organisation alias cache refresh interval |
-| `spring.task.scheduling.pool.size` | 4 | One thread per `@Scheduled`: the heartbeat, the two refresh triggers and the sweep. Fewer lets the other three starve the heartbeat and drop the lease |
+| `spring.task.scheduling.pool.size` | 4 | One thread per `@Scheduled`: the heartbeat, the two refresh triggers and the sweep. Fewer lets the other three starve the heartbeat and drop the lease. Only reaches the scheduler because `SchedulingConfig` supplies the `taskScheduler` bean Boot's auto-configuration backs off from |
 | `spring.cloud.gcp.pubsub.publisher.executor-accept-tasks-after-context-close` | true | Load-bearing for the drain; see *Shutdown* |
 | `spring.cloud.gcp.pubsub.subscription.<name>.flow-control.max-outstanding-element-count` | 1 | Lease no more than can be worked on. The gax default is 1000 |
 | `entur.pubsub.subscriber.autocreate` | false in helm | Topics and subscriptions are terraformed. Where it is true, each consumer creates the destination it subscribes to and `PubSubPublishTargets` creates the status queue, which no consumer covers |

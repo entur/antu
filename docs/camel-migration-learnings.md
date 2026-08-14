@@ -341,10 +341,44 @@ A sample of what was written down confidently and was wrong. All of these are no
 | a Sonar finding is blocked on the formatter being unable to parse it | a version that parses it exists; the real cost is a 134-file reformat |
 | the queue order serialises work within a pod | delivery order is not publish order |
 | three pieces of state cannot be shared across the rollout | four |
+| `spring.task.scheduling.pool.size=4` gave the four `@Scheduled` methods four threads | no bean was named `taskScheduler`, so `@Scheduled` built a single-threaded executor of its own and ignored the property |
 
 The same applies to production: the logs settle questions that reasoning cannot. Cross-check the deployed pod
 spec, the rendered config, the actual backlog metric and the actual pod churn. Several of the findings in this
 document came from reading a metric time series rather than code.
+
+## Auto-configuration backs off silently
+
+Removing the framework moves work onto Spring's own machinery, and Spring Boot's auto-configuration is
+mostly `@ConditionalOnMissingBean`. Where a library has already registered a bean of that type, Boot
+contributes nothing, and the properties documented for it quietly stop meaning anything.
+
+antu shipped a release like that. `spring.task.scheduling.pool.size=4` was set, with a ConfigMap comment
+explaining that fewer threads let the cache refreshes starve the leader heartbeat and drop the lease on a
+healthy pod. spring-cloud-gcp registers four `TaskScheduler` beans of its own -- the publisher pool, the
+global subscriber pool, and one per subscription -- so `TaskSchedulingAutoConfiguration` backed off,
+nothing was named `taskScheduler`, and `@Scheduled` ran all four methods on a single-threaded executor it
+built itself. The protection had never once been in effect.
+
+Nothing pointed at it. The tasks all ran, so a "are the scheduled tasks running" check passed. The one
+signal was a line from `TaskSchedulerRouter` naming every competing bean, logged **at INFO**, once per
+boot, which is why it survived review and a release.
+
+So, for the next service:
+
+- After the migration, boot it and read the startup log at INFO. Not the ERROR lines and not the WARN
+  lines: the ones that only say what Boot decided not to configure.
+- For any property you rely on, assert it reaches the object that consumes it.
+  `spring.task.scheduling.pool.size` is worth exactly one test that reads the pool size back off the
+  scheduler bean.
+- Watch that such a test is not vacuous. antu's first version compared the property to the pool size in a
+  test context where the property was unset, so both sides were the Boot default of 1 and the assertion
+  was `1 == 1`; replacing the whole bean with `new ThreadPoolTaskScheduler()` kept it green. Setting a
+  non-default value in the test properties is what made it fail.
+
+marduk, nabu, kilili and ashur are all latently in the same position. None is broken today, because the
+fallback is single-threaded and Boot's default pool size is also 1, so the behaviour is identical. It
+stops being identical the moment one of them wants a second scheduled task.
 
 ## Do not bundle the runtime upgrade
 
@@ -393,7 +427,7 @@ Before the release:
 
 After deploying:
 
-- [ ] scheduled tasks confirmed to be *running*, not merely not throwing
+- [ ] scheduled tasks confirmed to be *running*, **on the scheduler you configured**, not merely not throwing
 - [ ] pod churn and backlog metrics read, not assumed
 - [ ] drain exercised by deleting a busy pod on purpose
 
