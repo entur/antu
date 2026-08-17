@@ -12,4 +12,6 @@ COPY --from=builder /builder/extracted/dependencies/ ./
 COPY --from=builder /builder/extracted/spring-boot-loader/ ./
 COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
 COPY --from=builder /builder/extracted/application/ ./
-ENTRYPOINT [ "/sbin/tini", "--", "java", "-jar", "application.jar" ]
+# JAVA_OPTS rather than JDK_JAVA_OPTIONS: the JVM announces the latter on stderr at every start, and
+# Cloud Logging tags that ERROR. The HPA restarts pods all day, so it drowns antu's real errors.
+ENTRYPOINT [ "/sbin/tini", "--", "sh", "-c", "exec java $JAVA_OPTS -jar application.jar" ]

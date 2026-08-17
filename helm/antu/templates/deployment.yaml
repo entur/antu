@@ -32,8 +32,9 @@ spec:
         - name: antu
           image: {{ .Values.image.identifier }}
           env:
-            - name: JDK_JAVA_OPTIONS
+            - name: JAVA_OPTS
               # In values.yaml so the docker-smoke CI job can start the image with the same flags.
+              # Not JDK_JAVA_OPTIONS: see the entrypoint comment in the Dockerfile.
               value: -Xmx{{ .Values.resources.xmx }} {{ .Values.jvmFlags }}
                 {{- if .Values.monitoringEnabled}} -Dcom.sun.management.jmxremote.port=9999  -Dcom.sun.management.jmxremote.rmi.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1
             {{- end}}
@@ -118,8 +119,16 @@ spec:
                 secretKeyRef:
                   key: redis-server-trust-store-password
                   name: ror-antu-secret
-          command: [ "keytool" ]
-          args: [ "-importcert", "-v", "-noprompt", "-file", "/etc/antu-redis-config/redis-server-ca.pem", "-keystore", "/deployments/truststore/redis-server-ca.jks", "-storepass", "$(ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD)" ]
+          # keytool writes its progress to stderr, so Cloud Logging tags every pod start ERROR. The HPA
+          # starts pods all day, so keep the output for a real failure and drop it on success.
+          command: [ "sh", "-c" ]
+          args:
+            - >-
+              keytool -importcert -noprompt
+              -file /etc/antu-redis-config/redis-server-ca.pem
+              -keystore /deployments/truststore/redis-server-ca.jks
+              -storepass "$ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD"
+              >/tmp/keytool.log 2>&1 || { cat /tmp/keytool.log >&2; exit 1; }
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true

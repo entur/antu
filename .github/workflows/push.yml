@@ -72,7 +72,7 @@ jobs:
           # An empty or truncated lift would still let the app log "using Java", so fail loudly here
           # instead of silently degrading the gate to a flagless run.
           case "$opts" in *--sun-misc-unsafe-memory-access*) ;; *) echo "::error::could not read jvmFlags"; exit 1 ;; esac
-          timeout 180 docker run --rm -e JDK_JAVA_OPTIONS="$opts" antu:smoke 2>&1 | tee smoke.log || true
+          timeout 180 docker run --rm -e JAVA_OPTS="$opts" antu:smoke 2>&1 | tee smoke.log || true
           grep -q "using Java" smoke.log
 
   docker-build:
