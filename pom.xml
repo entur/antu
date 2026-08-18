@@ -23,7 +23,7 @@
         <developerConnection>scm:git:ssh://git@github.com:entur/antu.git</developerConnection>
     </scm>
     <properties>
-        <entur.helpers.version>7.2.0</entur.helpers.version>
+        <entur.helpers.version>7.3.0</entur.helpers.version>
         <spring-cloud-gcp-dependencies.version>8.1.0</spring-cloud-gcp-dependencies.version>
         <netex-validator-java.version>11.0.31</netex-validator-java.version>
         <netex-parser-java.version>3.1.84</netex-parser-java.version>
