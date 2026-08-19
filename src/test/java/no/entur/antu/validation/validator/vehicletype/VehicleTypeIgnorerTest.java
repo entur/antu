@@ -19,10 +19,11 @@ import org.mockito.Mockito;
 
 class VehicleTypeIgnorerIntegrationTest {
 
-    @Test
-    void testServiceJourneyWithNonExistentVehicleTypeRefIsAccepted()  {
-        // Create the test NeTEx XML with a ServiceJourney that has a non-existent VehicleTypeRef
-        String netexXml = """
+  @Test
+  void testServiceJourneyWithNonExistentVehicleTypeRefIsAccepted() {
+    // Create the test NeTEx XML with a ServiceJourney that has a non-existent VehicleTypeRef
+    String netexXml =
+      """
       <?xml version="1.0" encoding="UTF-8"?>
       <PublicationDelivery xmlns="http://www.netex.org.uk/netex">
         <dataObjects>
@@ -41,40 +42,52 @@ class VehicleTypeIgnorerIntegrationTest {
       </PublicationDelivery>
       """;
 
-        // Setup the validator components
-        NetexXMLParser parser = new NetexXMLParser(Set.of("SiteFrame"));
-        NetexIdRepository netexIdRepository = Mockito.mock(NetexIdRepository.class);
-        StopPlaceRepository stopPlaceRepository = Mockito.mock(StopPlaceRepository.class);
-        ReferenceToNsrValidator referenceToNsrValidator = new ReferenceToNsrValidator(stopPlaceRepository);
+    // Setup the validator components
+    NetexXMLParser parser = new NetexXMLParser(Set.of("SiteFrame"));
+    NetexIdRepository netexIdRepository = Mockito.mock(NetexIdRepository.class);
+    StopPlaceRepository stopPlaceRepository = Mockito.mock(
+      StopPlaceRepository.class
+    );
+    ReferenceToNsrValidator referenceToNsrValidator =
+      new ReferenceToNsrValidator(stopPlaceRepository);
 
-        ValidatorConfig config = new ValidatorConfig();
-        NetexReferenceValidator validator = config.netexReferenceValidator(
-                netexIdRepository,
-                referenceToNsrValidator
-        );
+    ValidatorConfig config = new ValidatorConfig();
+    NetexReferenceValidator validator = config.netexReferenceValidator(
+      netexIdRepository,
+      referenceToNsrValidator
+    );
 
-        // Parse the XML
-        var document = parser.parseByteArrayToXdmNode(netexXml.getBytes());
-        XPathValidationContext context = new XPathValidationContext(
-                document,
-                parser,
-                "TST",
-                null,
-                Set.of(),
-                List.of(new IdVersion("TST:VehicleType:999", null, "VehicleTypeRef", null, "Test.xml", 99, 34)),
-                "reportid-1"
-        );
+    // Parse the XML
+    var document = parser.parseByteArrayToXdmNode(netexXml.getBytes());
+    XPathValidationContext context = new XPathValidationContext(
+      document,
+      parser,
+      "TST",
+      null,
+      Set.of(),
+      List.of(
+        new IdVersion(
+          "TST:VehicleType:999",
+          null,
+          "VehicleTypeRef",
+          null,
+          "Test.xml",
+          99,
+          34
+        )
+      ),
+      "reportid-1"
+    );
 
-        // Run validation
-        List<ValidationIssue> issues = validator.validate(context);
+    // Run validation
+    List<ValidationIssue> issues = validator.validate(context);
 
-        // Assert that VehicleTypeRef does not produce a NETEX_ID_5 error
-        assertFalse(
-                issues.stream()
-                        .anyMatch(issue ->
-                                issue.rule().code().equals("NETEX_ID_5")
-                        ),
-                "VehicleTypeRef should be ignored and not produce NETEX_ID_5 errors"
-        );
-    }
+    // Assert that VehicleTypeRef does not produce a NETEX_ID_5 error
+    assertFalse(
+      issues
+        .stream()
+        .anyMatch(issue -> issue.rule().code().equals("NETEX_ID_5")),
+      "VehicleTypeRef should be ignored and not produce NETEX_ID_5 errors"
+    );
+  }
 }
