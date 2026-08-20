@@ -26,6 +26,7 @@ import no.entur.antu.validation.state.ValidationStateRepository;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.id.ReferenceToNsrValidator;
 import no.entur.antu.validation.validator.id.TrainElementRegistryIdValidator;
+import no.entur.antu.validation.validator.vehicletype.VehicleTypeReferenceIgnorer;
 import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
 import org.entur.netex.validation.configuration.ValidationConfigLoader;
 import org.entur.netex.validation.validator.DefaultValidationEntryFactory;
@@ -119,6 +120,7 @@ public class ValidatorConfig {
     externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
     externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
     externalReferenceValidators.add(new InterchangeRuleReferencesIgnorer());
+    externalReferenceValidators.add(new VehicleTypeReferenceIgnorer());
     externalReferenceValidators.add(new TrainElementRegistryIdValidator());
     externalReferenceValidators.add(referenceToNsrValidator);
     return new NetexReferenceValidator(
