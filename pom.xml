@@ -26,7 +26,7 @@
         <entur.helpers.version>7.2.0</entur.helpers.version>
         <spring-cloud-gcp-dependencies.version>8.1.0</spring-cloud-gcp-dependencies.version>
         <netex-validator-java.version>11.0.31</netex-validator-java.version>
-        <netex-parser-java.version>3.1.82</netex-parser-java.version>
+        <netex-parser-java.version>4.0.9</netex-parser-java.version>
         <jts-core.version>1.20.0</jts-core.version>
         <zt-zip.version>1.18.2</zt-zip.version>
         <redisson.version>4.6.1</redisson.version>
