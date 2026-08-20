@@ -1,8 +1,8 @@
 package no.entur.antu.validation.validator.vehicletype;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import no.entur.antu.config.ValidatorConfig;
@@ -15,7 +15,6 @@ import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class VehicleTypeIgnorerIntegrationTest {
 
@@ -33,6 +32,7 @@ class VehicleTypeIgnorerIntegrationTest {
                 <vehicleJourneys>
                   <ServiceJourney id="TST:ServiceJourney:1" version="1">
                     <VehicleTypeRef ref="TST:VehicleType:999"/>
+                    <VehicleRef ref="TST:Vehicle:123"/>
                   </ServiceJourney>
                 </vehicleJourneys>
               </ServiceFrame>
@@ -44,10 +44,8 @@ class VehicleTypeIgnorerIntegrationTest {
 
     // Setup the validator components
     NetexXMLParser parser = new NetexXMLParser(Set.of("SiteFrame"));
-    NetexIdRepository netexIdRepository = Mockito.mock(NetexIdRepository.class);
-    StopPlaceRepository stopPlaceRepository = Mockito.mock(
-      StopPlaceRepository.class
-    );
+    NetexIdRepository netexIdRepository = mock(NetexIdRepository.class);
+    StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);
     ReferenceToNsrValidator referenceToNsrValidator =
       new ReferenceToNsrValidator(stopPlaceRepository);
 
@@ -74,6 +72,15 @@ class VehicleTypeIgnorerIntegrationTest {
           "Test.xml",
           99,
           34
+        ),
+        new IdVersion(
+          "TST:Vehicle:123",
+          null,
+          "VehicleRef",
+          null,
+          "Test.xml",
+          100,
+          24
         )
       ),
       "reportid-1"

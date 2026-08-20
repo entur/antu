@@ -15,11 +15,11 @@ public class VehicleTypeReferenceIgnorer implements ExternalReferenceValidator {
     Objects.requireNonNull(externalIdsToValidate);
     return externalIdsToValidate
       .stream()
-      .filter(VehicleTypeReferenceIgnorer::isIgnorableReferenceFromInterchange)
+      .filter(VehicleTypeReferenceIgnorer::isIgnorableVehicleReference)
       .collect(Collectors.toUnmodifiableSet());
   }
 
-  private static boolean isIgnorableReferenceFromInterchange(IdVersion ref) {
+  private static boolean isIgnorableVehicleReference(IdVersion ref) {
     return (
       (
         "VehicleTypeRef".equals(ref.getElementName()) &&
