@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class NetexProfileVersionValidatorTest {
 
@@ -45,24 +47,6 @@ class NetexProfileVersionValidatorTest {
     );
   }
 
-  /**
-   * "1.5" was never a published NeTEx schema version (versions go ...1.04, 1.07, 1.08 ... 1.15).
-   * It isn't in the allowlist, so it's rejected — unlike under a numeric "greater than 1.16"
-   * ceiling, which would have accepted it because 1.5 sorts below 1.16 as a decimal.
-   */
-  @Test
-  void aNeverPublishedVersionIsRejectedEvenThoughItWouldSortBelowTheHighestKnownVersionNumerically() {
-    byte[] content = publicationDelivery("1.5:NO-NeTEx-networktimetable:1.0");
-
-    Optional<ValidationReportEntry> entry = validator.validate(
-      "netex.xml",
-      content
-    );
-
-    assertTrue(entry.isPresent());
-    assertEquals("UNSUPPORTED_NETEX_VERSION", entry.get().getName());
-  }
-
   @Test
   void aFileWithNoRecognizableVersionAttributeIsLeftToOtherValidators() {
     byte[] content = "<PublicationDelivery/>".getBytes();
@@ -71,32 +55,28 @@ class NetexProfileVersionValidatorTest {
   }
 
   /**
-   * A version attribute is present but doesn't match the
-   * netexSchemaVersion:profileName:profileVersion grammar, so there's no schema-version segment to
-   * look up — treated the same as an unsupported version, not left to other validators. A version
-   * that can't be read is not a version Antu can claim to support, even when the string happens to
-   * name a supported one. Only a file with no version attribute at all is accepted.
+   * The ways a declared version fails, which all end in the same rejection: a schema version that
+   * isn't in the allowlist, and a value the schema version can't be read out of at all. What the
+   * entry itself looks like is asserted once, in
+   * {@link #anUnknownMajorVersionIsRejected()}.
    */
-  @Test
-  void aVersionAttributeWithoutTheThreeColonSegmentsIsRejected() {
-    byte[] content = publicationDelivery("1.15");
-
-    Optional<ValidationReportEntry> entry = validator.validate(
-      "netex.xml",
-      content
-    );
-
-    assertTrue(entry.isPresent());
-    assertEquals("UNSUPPORTED_NETEX_VERSION", entry.get().getName());
-  }
-
-  /**
-   * The same rejection, for a value that names no NeTEx version at all rather than one in the wrong
-   * shape.
-   */
-  @Test
-  void aVersionAttributeThatNamesNoNetexVersionIsRejected() {
-    byte[] content = publicationDelivery("any");
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      // Never a published NeTEx schema version (they go ...1.04, 1.07, 1.08 ... 1.15). It sorts
+      // below the highest known version as a decimal, so a numeric ceiling would have let it
+      // through; the allowlist doesn't.
+      "1.5:NO-NeTEx-networktimetable:1.0",
+      // A supported schema version, but with no profile segments to make it the three-segment form,
+      // so there is no schema version segment to look up. A version that can't be read out is not
+      // one Antu can claim to support, even when the string happens to name one that is.
+      "1.15",
+      // Names no NeTEx version at all.
+      "any",
+    }
+  )
+  void anUnsupportedOrUnreadableVersionIsRejected(String versionAttribute) {
+    byte[] content = publicationDelivery(versionAttribute);
 
     Optional<ValidationReportEntry> entry = validator.validate(
       "netex.xml",
