@@ -63,10 +63,11 @@ data:
     # the pod open for. 150 leaves headroom for both consumers plus shutdown.
     antu.shutdown.drain.timeout.seconds=150
 
-    # One thread per @Scheduled method: the leader heartbeat, the two cache refresh triggers, and the
-    # stalled-validation sweep. The last three all do blocking Redis or PubSub work and can coincide, so
-    # anything less than four lets them starve the heartbeat and drop the lease while this pod is healthy.
-    spring.task.scheduling.pool.size=4
+    # One thread per @Scheduled method: the leader heartbeat, the two cache refresh triggers, the
+    # stalled-validation sweep, and the stop place source watch. All but the heartbeat do blocking Redis,
+    # PubSub or GCS work and can coincide, so anything less lets them starve the heartbeat and drop the
+    # lease while this pod is healthy.
+    spring.task.scheduling.pool.size=5
 
     # Agreement registry
     antu.organisation.refresh.millis=1800000
@@ -77,6 +78,13 @@ data:
     # Unquoted on purpose: this renders into a properties file, where quotes would become part of
     # the value and the cron parser would reject it at startup.
     antu.stop.refresh.cron={{ .Values.stopPlaceCacheRefreshCron }}
+    # A backstop for the cron above, which reads whichever export is in the bucket an hour before the
+    # next one lands, and for a changelog consumer that has stopped. Same reason for being unquoted.
+    antu.stop.watch.cron={{ .Values.stopPlaceWatchCron }}
+
+    # Read-only stop place API, asked for the single id when a reference is not in the cache. Without
+    # it, a stop place registered since the last export is reported as an unresolved reference.
+    antu.stop.registry.url={{ .Values.stopPlaceRegistryUrl }}
 
     # Stop place changelog
     org.rutebanken.helper.stopplace.changelog.enabled=true

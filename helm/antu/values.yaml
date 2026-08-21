@@ -69,6 +69,12 @@ secrets:
 # Spring cron: second minute hour day-of-month month day-of-week
 stopPlaceCacheRefreshCron: 0 0 1,14 * * *
 
+# How often the leader checks whether a new stop place dataset has landed in the bucket, and whether
+# the changelog consumer is still running. Tiamat exports at 02:00 and 12:00, an hour after and two
+# hours before the cron above, so the cron reads the previous export both times and this is what
+# decides how stale the cache gets.
+stopPlaceWatchCron: 0 */5 * * * *
+
 # The same schedule as a quartz trigger URI, for the version being replaced. Delete with the Camel-era
 # ConfigMap keys.
 stopPlaceCacheRefreshQuartzTrigger: ?cron=0+0+01,14+?+*+*

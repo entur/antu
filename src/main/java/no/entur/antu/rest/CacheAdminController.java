@@ -73,7 +73,7 @@ public class CacheAdminController {
   @PostMapping("/refresh-stop-cache")
   public void refreshStopCache() {
     antuAuthorizationService.verifyAdministratorPrivileges();
-    stopPlaceCacheRefresher.enqueueRefresh();
+    stopPlaceCacheRefresher.forceRefresh();
   }
 
   @PostMapping("/refresh-organisation-cache")
