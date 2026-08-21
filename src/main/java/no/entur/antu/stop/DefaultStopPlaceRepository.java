@@ -18,6 +18,9 @@ package no.entur.antu.stop;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import no.entur.antu.stop.registry.RegisteredStopPlace;
+import no.entur.antu.stop.registry.StopPlaceRegistry;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -42,27 +45,30 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
   private final StopPlaceResource stopPlaceResource;
   private final Map<StopPlaceId, SimpleStopPlace> stopPlaceCache;
   private final Map<QuayId, SimpleQuay> quayCache;
+  private final StopPlaceRegistry stopPlaceRegistry;
 
   public DefaultStopPlaceRepository(
     StopPlaceResource stopPlaceResource,
     Map<StopPlaceId, SimpleStopPlace> stopPlaceCache,
-    Map<QuayId, SimpleQuay> quayCache
+    Map<QuayId, SimpleQuay> quayCache,
+    StopPlaceRegistry stopPlaceRegistry
   ) {
     this.stopPlaceResource = stopPlaceResource;
     this.stopPlaceCache = Objects.requireNonNull(stopPlaceCache);
     this.quayCache = Objects.requireNonNull(quayCache);
+    this.stopPlaceRegistry = Objects.requireNonNull(stopPlaceRegistry);
   }
 
   @Override
   public boolean hasStopPlaceId(StopPlaceId stopPlaceId) {
-    return stopPlaceCache.containsKey(stopPlaceId);
+    if (stopPlaceCache.containsKey(stopPlaceId)) {
+      return true;
+    }
+    return cache(stopPlaceRegistry.findById(stopPlaceId));
   }
 
   @Override
   public boolean hasQuayId(QuayId quayId) {
-    if (quayCache.containsKey(quayId)) {
-      return true;
-    }
     return getQuay(quayId).isPresent();
   }
 
@@ -164,11 +170,33 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     quayCache.remove(quayId);
   }
 
+  /**
+   * The cache is rebuilt from a NeTEx export produced twice a day, so a stop place registered since the
+   * last one is unknown to it, and the changelog only closes that gap while its consumer is running. Ask
+   * the registry for the single id before answering that it does not exist.
+   */
   private Optional<SimpleQuay> getQuay(QuayId quayId) {
     SimpleQuay quayFromCache = quayCache.get(quayId);
     if (quayFromCache != null) {
       return Optional.of(quayFromCache);
     }
-    return Optional.empty();
+    RegisteredStopPlace registered = stopPlaceRegistry.findByQuayId(quayId);
+    if (!cache(registered)) {
+      return Optional.empty();
+    }
+    return Optional.ofNullable(registered.quays().get(quayId));
+  }
+
+  private boolean cache(@Nullable RegisteredStopPlace registered) {
+    if (registered == null) {
+      return false;
+    }
+    stopPlaceCache.put(registered.id(), registered.stopPlace());
+    quayCache.putAll(registered.quays());
+    LOGGER.info(
+      "Added {} from the stop place registry to the cache",
+      registered.id().id()
+    );
+    return true;
   }
 }

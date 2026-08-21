@@ -4,6 +4,7 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import no.entur.antu.stop.loader.StopPlacesDatasetLoader;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.model.*;
@@ -102,7 +103,7 @@ class DefaultStopPlaceResourceTest {
   @Test
   void getQuays() {
     DefaultStopPlaceResource defaultStopPlaceResource =
-      new DefaultStopPlaceResource(() -> netexEntitiesIndex);
+      new DefaultStopPlaceResource(datasetLoader());
     Assertions.assertEquals(3, defaultStopPlaceResource.getQuays().size());
     Assertions.assertEquals(
       Map.of(
@@ -120,7 +121,7 @@ class DefaultStopPlaceResourceTest {
   @Test
   void getStopPlaces() {
     DefaultStopPlaceResource defaultStopPlaceResource =
-      new DefaultStopPlaceResource(() -> netexEntitiesIndex);
+      new DefaultStopPlaceResource(datasetLoader());
     Assertions.assertEquals(2, defaultStopPlaceResource.getStopPlaces().size());
     TransportModeAndSubMode transportModeAndSubMode1 =
       new TransportModeAndSubMode(
@@ -141,5 +142,19 @@ class DefaultStopPlaceResourceTest {
       ),
       defaultStopPlaceResource.getStopPlaces()
     );
+  }
+
+  private StopPlacesDatasetLoader datasetLoader() {
+    return new StopPlacesDatasetLoader() {
+      @Override
+      public NetexEntitiesIndex loadNetexEntitiesIndex() {
+        return netexEntitiesIndex;
+      }
+
+      @Override
+      public String loadDatasetVersion() {
+        return "tiamat-export.xml";
+      }
+    };
   }
 }

@@ -13,6 +13,8 @@ import no.entur.antu.cache.codec.QuayIdCodec;
 import no.entur.antu.cache.codec.StopPlaceIdCodec;
 import no.entur.antu.memorystore.RedisTemporaryFileRepository;
 import no.entur.antu.memorystore.TemporaryFileRepository;
+import no.entur.antu.stop.registry.NotFoundIdCache;
+import no.entur.antu.stop.registry.RedisNotFoundIdCache;
 import no.entur.antu.validation.validator.id.RedisNetexIdRepository;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
 import org.entur.netex.validation.validator.model.*;
@@ -43,7 +45,12 @@ public class CacheConfig {
     "serviceJourneyInterchangeInfoCache";
   public static final String SERVICE_JOURNEY_STOPS_CACHE =
     "serviceJourneyStopsCache";
-  public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
+  /**
+   * A new key rather than the {@code quayIdNotFoundCache} this replaces: that one was written as a
+   * plain set, and reading a plain set as a set cache does not work.
+   */
+  public static final String STOP_REGISTRY_NOT_FOUND_CACHE =
+    "stopRegistryNotFoundCache";
   public static final String ORGANISATION_ALIAS_CACHE =
     "organisationAliasCache";
   public static final String ACTIVE_DATES_BY_DAY_TYPE_REF =
@@ -86,6 +93,13 @@ public class CacheConfig {
    */
   public static final Duration VALIDATION_DATA_TTL = Duration.ofHours(24);
 
+  /**
+   * How long an id the registry answered 404 for stays remembered. Short: a stop place that does not
+   * exist now is the normal state of one that is about to be created, and the point of asking the
+   * registry at all is to see such a stop place before the next dataset import does.
+   */
+  public static final Duration NOT_FOUND_TTL = Duration.ofMinutes(10);
+
   private static final Kryo5Codec DEFAULT_CODEC = new Kryo5Codec();
 
   /**
@@ -117,11 +131,18 @@ public class CacheConfig {
   }
 
   /**
-   * Keep track of quays not found when querying the stop place REST API.
+   * Keep track of the ids the stop place registry does not have, so that a missing id repeated across a
+   * dataset stops costing a call once the first answer is in. Shared, so one pod's answer spares the
+   * others.
    */
-  @Bean(name = QUAY_ID_NOT_FOUND_CACHE)
-  public Set<QuayId> quayIdNotFoundCache(RedissonClient redissonClient) {
-    return redissonClient.getSet(QUAY_ID_NOT_FOUND_CACHE);
+  @Bean(name = STOP_REGISTRY_NOT_FOUND_CACHE)
+  public NotFoundIdCache stopRegistryNotFoundCache(
+    RedissonClient redissonClient
+  ) {
+    return new RedisNotFoundIdCache(
+      redissonClient.getSetCache(STOP_REGISTRY_NOT_FOUND_CACHE),
+      NOT_FOUND_TTL
+    );
   }
 
   /**

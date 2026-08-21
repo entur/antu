@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -50,6 +51,28 @@ public class DefaultStopPlacesDatasetLoader implements StopPlacesDatasetLoader {
     } catch (IOException e) {
       throw new AntuException(
         "Error while parsing the NeTEx timetable dataset",
+        e
+      );
+    }
+  }
+
+  @Override
+  @Nullable
+  public String loadDatasetVersion() {
+    InputStream currentStopPlaceBlob = mardukBlobStoreService.getBlob(
+      currentStopPlacesFile
+    );
+    if (currentStopPlaceBlob == null) {
+      return null;
+    }
+    try (
+      ZipInputStream zipInputStream = new ZipInputStream(currentStopPlaceBlob)
+    ) {
+      ZipEntry zipEntry = zipInputStream.getNextEntry();
+      return zipEntry == null ? null : zipEntry.getName();
+    } catch (IOException e) {
+      throw new AntuException(
+        "Error while reading the NeTEx stop place dataset",
         e
       );
     }

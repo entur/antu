@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
+import no.entur.antu.stop.registry.StopPlaceRegistry;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -76,7 +77,12 @@ class AntuStopPlaceChangeLogListenerTest {
     this.stopPlaceCache = new HashMap<>();
     this.quayCache = new HashMap<>();
     this.loader =
-      new DefaultStopPlaceRepository(null, stopPlaceCache, quayCache);
+      new DefaultStopPlaceRepository(
+        null,
+        stopPlaceCache,
+        quayCache,
+        StopPlaceRegistry.disabled()
+      );
     this.timestampRepository =
       new ChangelogUpdateTimestampRepository() {
         private Instant timestamp;

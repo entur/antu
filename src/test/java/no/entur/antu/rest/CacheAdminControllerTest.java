@@ -99,7 +99,8 @@ class CacheAdminControllerTest {
 
   /**
    * The refresh endpoints only queue the work: the refresh is expensive and belongs on whichever pod
-   * takes the job, not on the one serving the request.
+   * takes the job, not on the one serving the request. The stop place one forces it, because an operator
+   * asking for a refresh has a reason the recorded dataset version does not know about.
    */
   @Test
   void refreshEndpointsQueueAJob() throws Exception {
@@ -110,7 +111,7 @@ class CacheAdminControllerTest {
       .perform(post("/services/cache-admin/refresh-organisation-cache"))
       .andExpect(status().isOk());
 
-    verify(stopPlaceCacheRefresher).enqueueRefresh();
+    verify(stopPlaceCacheRefresher).forceRefresh();
     verify(organisationAliasCacheRefresher).enqueueRefresh();
   }
 
