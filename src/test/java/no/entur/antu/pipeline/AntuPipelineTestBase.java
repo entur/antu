@@ -82,6 +82,18 @@ public abstract class AntuPipelineTestBase {
   protected String uploadTestDataset(String codespace, String fileName) {
     InputStream dataset = getClass().getResourceAsStream('/' + fileName);
     assertNotNull(dataset, "Test dataset file not found: " + fileName);
+    return uploadTestDataset(codespace, fileName, dataset);
+  }
+
+  /**
+   * Put a dataset the test assembled itself where a validation client would have left it. Only the
+   * blob name is derived from {@code fileName}; nothing in the pipeline reads it.
+   */
+  protected String uploadTestDataset(
+    String codespace,
+    String fileName,
+    InputStream dataset
+  ) {
     String datasetBlobName =
       BLOBSTORE_PATH_ANTU_EXCHANGE_INBOUND_RECEIVED +
       codespace +

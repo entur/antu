@@ -91,6 +91,54 @@ Antu supports multiple validation profiles with different rule sets:
 `config/TimetableDataValidatorConfig.java`, `config/StopPlaceDataValidatorConfig.java` and `config/flex/`,
 and a few interchange validators are behind feature flags that default to off.
 
+Every profile also rejects a file outright if its `PublicationDelivery` declares a NeTEx schema
+version Antu doesn't recognize (`NetexProfileVersionValidator`, wired into
+`validation/NetexValidationProfile.java`). This runs before schema, XPath or JAXB validation, so
+the file never reaches `netex-validator-java`'s `NetexValidatorsRunner`. The allowlist
+(`SUPPORTED_NETEX_SCHEMA_VERSIONS`) is seeded entirely from
+`org.rutebanken.netex.validation.NeTExValidator.NetexVersion` — netex-java-model's own enum of
+schema versions it can validate against — with no hand-added entries on top of it. The `version`
+attribute is read in the three-segment form the Nordic profile declares
+(`1.15:NO-NeTEx-networktimetable:1.5`), and only its first segment is looked up. The shape is part
+of the rule, not just the lookup: a value that doesn't split into three segments — a bare `1.15`,
+say — is rejected too, on the grounds that a version Antu can't read out is not one it can claim to
+support. A file with *no* `version` attribute is the single case that passes unrecognized: there is
+nothing to compare, and schema validation already falls back to its own latest known version. In
+particular
+`"1.16"` is rejected today: `netex-java-model` has no schema for it yet, so it isn't in
+`NetexVersion`, so it isn't in the allowlist either. It starts being accepted automatically, with
+no Antu code change, the day `netex-java-model` adds it. **Bumping `netex-java-model`,
+`netex-parser-java` or `netex-validator-java` in `pom.xml` can silently change which versions
+Antu accepts**, since the allowlist is derived from that enum at compile time — check
+`NetexVersion` for new or removed values when bumping those dependencies. The rule code is
+`UNSUPPORTED_NETEX_VERSION`; like `XML_SCHEMA_ERROR` and `SYSTEM_ERROR`, it's a structural
+pre-flight check, not a per-profile rule, so it isn't listed in the README's rule-code tables.
+
+The check is per file, and a dataset can mix supported and unsupported files: a rejected file
+contributes exactly one entry naming itself and every other file is validated as usual. Rejecting a
+*common* file is the exception — it rejects the shared data the line files resolve their references
+against, so it sets `hasErrorInCommonFile` and the line files skip the NeTEx validators. Without
+that, one bad `_shared_data.xml` buries its own entry under up to 50 spurious
+`NeTEx ID unresolved reference` entries **per line file**, since `ReportAggregator` concatenates
+per-file reports and the 50-per-rule truncation is per file, not global. The flag normally reaches
+the validation state through `AntuNetexValidationProgressCallback` when `NetexValidatorsRunner`
+completes a file; a rejection never runs the runner, so `NetexValidationProfile` sets it directly.
+
+A dataset with several common files needs nothing extra from the check, which is per report rather
+than per common file: any one rejected common file suppresses the NeTEx validators for the whole
+dataset, and a rejected common file still writes its report and arrives at both barriers, so the
+`COMMON_FILES_VALIDATED` count is never left short. Two consequences are worth knowing rather than
+fixing. The flag is read for *every* file that has not been validated yet, siblings included, so
+whichever common file is rejected first also suppresses the NeTEx validators for the other common
+files — and since delivery order is not publish order (pitfall 8), which sibling findings a
+multi-common-file report contains is timing-dependent. And the flag is written read-modify-write
+over an `RLocalCachedMap` (pitfall 5), so a concurrent progress write can lose it and the line
+files get validated after all; that is open item 5 in `docs/camel-removal.md`, which several common
+files make more likely rather than differently broken.
+The version check also sits *after* the `validationAlreadyComplete` guard, so a redelivered job for
+an already-published report reports nothing. `UnsupportedNetexVersionDatasetTest` pins both
+behaviours end to end.
+
 ## Common Tasks
 
 ### Building the Project
