@@ -44,8 +44,15 @@ public class ChangelogStopPlaceRepositoryUpdater
     this.handler = handler;
   }
 
+  /**
+   * Synchronized against {@link #createOrUpdate()}, which is only a same-pod guard: the two run on
+   * different threads of one pod when a refresh job lands on the pod that is taking over as leader, and
+   * starting the consumer while the refresh has its listener unregistered drops every change it reads.
+   * Refresh jobs run on an arbitrary pod, so the cross-pod case is not covered by this and needs a
+   * distributed lock or a leader-local refresh.
+   */
   @Override
-  public void init() {
+  public synchronized void init() {
     LOGGER.info("Initializing Changelog Stop Place Repository Updater");
     Instant timestamp = changelogUpdateTimestampRepository.getTimestamp();
     if (timestamp == null) {
@@ -60,14 +67,42 @@ public class ChangelogStopPlaceRepositoryUpdater
     );
   }
 
+  /**
+   * The consumer comes back whether or not the refresh worked: a refresh that throws would otherwise leave
+   * it stopped with its listener unregistered until the next refresh or the next leader.
+   *
+   * <p>A restart failure is not swallowed. Returning normally tells the refresher the cache was rebuilt,
+   * which keeps the recorded version and stops the checks from retrying, so a transient Kafka failure
+   * would leave the changelog dead until the next export. When the refresh failed too, that exception is
+   * the one that propagates and the restart failure rides along as suppressed.
+   */
   @Override
-  public void createOrUpdate() {
-    changelogConsumerController.stop();
-    stopPlaceChangelog.unregisterStopPlaceChangelogListener(handler);
-    Instant publicationTime = stopPlaceRepositoryLoader.refreshCache();
-    changelogUpdateTimestampRepository.setTimestamp(publicationTime);
-    antuPublicationTimeRecordFilterStrategy.setPublicationTime(publicationTime);
-    stopPlaceChangelog.registerStopPlaceChangelogListener(handler);
-    changelogConsumerController.start();
+  public synchronized void createOrUpdate() {
+    RuntimeException refreshFailure = null;
+    try {
+      changelogConsumerController.stop();
+      stopPlaceChangelog.unregisterStopPlaceChangelogListener(handler);
+      Instant publicationTime = stopPlaceRepositoryLoader.refreshCache();
+      changelogUpdateTimestampRepository.setTimestamp(publicationTime);
+      antuPublicationTimeRecordFilterStrategy.setPublicationTime(
+        publicationTime
+      );
+    } catch (RuntimeException e) {
+      refreshFailure = e;
+    }
+
+    try {
+      stopPlaceChangelog.registerStopPlaceChangelogListener(handler);
+      changelogConsumerController.start();
+    } catch (RuntimeException e) {
+      if (refreshFailure == null) {
+        throw e;
+      }
+      refreshFailure.addSuppressed(e);
+    }
+
+    if (refreshFailure != null) {
+      throw refreshFailure;
+    }
   }
 }
