@@ -4,6 +4,7 @@ import no.entur.antu.job.AntuJob;
 import no.entur.antu.job.JobQueue;
 import no.entur.antu.leader.LeaderElection;
 import no.entur.antu.leader.LeadershipGrantedEvent;
+import no.entur.antu.leader.LeadershipLostEvent;
 import no.entur.antu.stop.StopPlaceDatasetVersionRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.stop.changelog.StopPlaceRepositoryUpdater;
@@ -71,6 +72,23 @@ public class StopPlaceCacheRefresher {
       LOGGER.error(
         "System error: failed to prime the stop place cache on taking over as leader. Validations will " +
         "report unresolved stop place references until it is refreshed.",
+        e
+      );
+    }
+  }
+
+  /**
+   * The changelog consumer is the leader's, so it goes down with the leadership. Nothing else here needs
+   * standing down: the caches are shared, and the next leader picks them up as they are.
+   */
+  @EventListener
+  public void onLeadershipLost(LeadershipLostEvent event) {
+    try {
+      stopPlaceRepositoryUpdater.standDown();
+    } catch (Exception e) {
+      LOGGER.error(
+        "System error: failed to stop the stop place changelog consumer after losing leadership. It is " +
+        "consuming alongside the new leader's.",
         e
       );
     }

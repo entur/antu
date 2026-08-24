@@ -99,6 +99,32 @@ class RedisLeaseLeaderElectionTest extends EmbeddedRedisTestBase {
       .until(() -> events.size() == 1);
   }
 
+  /**
+   * Whatever the leader started has to be told to stop, or it keeps running alongside the new leader's.
+   */
+  @Test
+  void standingDownIsAnnouncedOnce() {
+    RedisLeaseLeaderElection pod = pod();
+    pod.heartbeat();
+    await().atMost(Duration.ofSeconds(5)).until(() -> events.size() == 1);
+
+    // Another pod takes the lease, so this one cannot simply reacquire it and become leader again.
+    redissonClient.getBucket("ANTU_LEADER").delete();
+    pod().heartbeat();
+    await().atMost(Duration.ofSeconds(5)).until(() -> events.size() == 2);
+
+    pod.heartbeat();
+    pod.heartbeat();
+
+    assertFalse(pod.isLeader());
+    await().atMost(Duration.ofSeconds(5)).until(() -> events.size() == 3);
+    assertTrue(events.get(2) instanceof LeadershipLostEvent);
+    await()
+      .during(Duration.ofMillis(300))
+      .atMost(Duration.ofSeconds(5))
+      .until(() -> events.size() == 3);
+  }
+
   @Test
   void aHeartbeatExtendsTheLease() {
     RedisLeaseLeaderElection pod = pod();
