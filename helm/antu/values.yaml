@@ -66,8 +66,14 @@ secrets:
     - KAFKAPASSWORD
     - KAFKAUSERNAME
 
-# Spring cron: second minute hour day-of-month month day-of-week
-stopPlaceCacheRefreshCron: 0 0 1,14 * * *
+# How often the leader checks the bucket for a new stop place export.
+# Spring cron: second minute hour day-of-month month day-of-week.
+#
+# Not the export schedule: Tiamat writes twice a day, and this used to be an hour off it in both
+# directions, which left the cache up to 26 hours behind. A check is one blob metadata read, so the
+# schedule no longer has to guess right. It is also how often a failed refresh is retried, which is
+# why it is not shorter.
+stopPlaceCacheRefreshCron: 0 */15 * * * *
 
 # The same schedule as a quartz trigger URI, for the version being replaced. Delete with the Camel-era
 # ConfigMap keys.

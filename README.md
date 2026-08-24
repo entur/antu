@@ -140,10 +140,13 @@ Mac will need to be restarted for changes to take effect.
 
 ## Access to the stop place registry
 
-Access to the stop place registry is configured in the Spring Boot application.properties file:
+The stop place cache is built from the NeTEx export Tiamat writes to the marduk bucket, and kept current
+by the stop place changelog. Both are configured in the Spring Boot application.properties file:
 
 ```
-antu.stop.registry.id.url=https://tiamat
+antu.netex.stop.current.filename=tiamat/CurrentAndFuture_latest.zip
+antu.stop.refresh.cron=0 */15 * * * *
+org.rutebanken.helper.stopplace.changelog.repository.url=http://tiamat.<env>.entur.internal/services/stop_places
 ```
 
 ## Access to the organization registry
