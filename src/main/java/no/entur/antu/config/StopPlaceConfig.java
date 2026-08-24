@@ -22,6 +22,7 @@ import static no.entur.antu.stop.DefaultStopPlaceRepository.STOP_PLACE_CACHE;
 import java.util.Map;
 import no.entur.antu.stop.DefaultStopPlaceRepository;
 import no.entur.antu.stop.DefaultStopPlaceResource;
+import no.entur.antu.stop.StopPlaceDatasetVersionRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.stop.changelog.DefaultStopPlaceRepositoryUpdater;
 import no.entur.antu.stop.changelog.StopPlaceRepositoryUpdater;
@@ -30,6 +31,7 @@ import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,6 +64,13 @@ public class StopPlaceConfig {
       stopPlaceCache,
       quayCache
     );
+  }
+
+  @Bean
+  StopPlaceDatasetVersionRepository stopPlaceDatasetVersionRepository(
+    RedissonClient redissonClient
+  ) {
+    return new StopPlaceDatasetVersionRepository(redissonClient);
   }
 
   @Profile("!stop-place-changelog")
