@@ -15,6 +15,7 @@ import no.entur.antu.job.AntuJob;
 import no.entur.antu.job.JobQueue;
 import no.entur.antu.leader.LeaderElection;
 import no.entur.antu.leader.LeadershipGrantedEvent;
+import no.entur.antu.leader.LeadershipLostEvent;
 import no.entur.antu.stop.StopPlaceDatasetVersionRepository;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.stop.changelog.StopPlaceRepositoryUpdater;
@@ -212,6 +213,27 @@ class StopPlaceCacheRefresherTest {
     );
 
     verify(datasetVersionRepository, never()).set(anyString());
+  }
+
+  /**
+   * The changelog consumer is the leader's, so losing the lease has to take it down.
+   */
+  @Test
+  void losingLeadershipStandsTheUpdaterDown() {
+    refresher.onLeadershipLost(new LeadershipLostEvent());
+
+    verify(stopPlaceRepositoryUpdater).standDown();
+  }
+
+  @Test
+  void aStandDownThatFailsIsContained() {
+    doThrow(new IllegalStateException("kafka is down"))
+      .when(stopPlaceRepositoryUpdater)
+      .standDown();
+
+    assertDoesNotThrow(() ->
+      refresher.onLeadershipLost(new LeadershipLostEvent())
+    );
   }
 
   private void leaderSees(String inBucket, String recorded) {

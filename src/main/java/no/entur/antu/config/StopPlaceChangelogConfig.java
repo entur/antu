@@ -16,6 +16,7 @@
 
 package no.entur.antu.config;
 
+import no.entur.antu.leader.LeaderElection;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.stop.changelog.AntuPublicationTimeRecordFilterStrategy;
 import no.entur.antu.stop.changelog.AntuStopPlaceChangeLogListener;
@@ -63,7 +64,8 @@ public class StopPlaceChangelogConfig {
     RedisChangelogUpdateTimestampRepository changelogUpdateTimestampRepository,
     ChangelogConsumerController changelogConsumerController,
     StopPlaceChangelog stopPlaceChangelog,
-    AntuStopPlaceChangeLogListener antuStopPlaceChangeLogListener
+    AntuStopPlaceChangeLogListener antuStopPlaceChangeLogListener,
+    LeaderElection leaderElection
   ) {
     return new ChangelogStopPlaceRepositoryUpdater(
       stopPlaceRepositoryLoader,
@@ -71,7 +73,8 @@ public class StopPlaceChangelogConfig {
       changelogUpdateTimestampRepository,
       changelogConsumerController,
       stopPlaceChangelog,
-      antuStopPlaceChangeLogListener
+      antuStopPlaceChangeLogListener,
+      leaderElection
     );
   }
 }

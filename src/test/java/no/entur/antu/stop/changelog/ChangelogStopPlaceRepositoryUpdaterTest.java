@@ -16,6 +16,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import no.entur.antu.leader.LeaderElection;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ class ChangelogStopPlaceRepositoryUpdaterTest {
   private ChangelogConsumerController changelogConsumerController;
   private StopPlaceChangelog stopPlaceChangelog;
   private AntuStopPlaceChangeLogListener handler;
+  private LeaderElection leaderElection;
   private ChangelogStopPlaceRepositoryUpdater updater;
 
   @BeforeEach
@@ -36,6 +38,8 @@ class ChangelogStopPlaceRepositoryUpdaterTest {
     changelogConsumerController = mock(ChangelogConsumerController.class);
     stopPlaceChangelog = mock(StopPlaceChangelog.class);
     handler = mock(AntuStopPlaceChangeLogListener.class);
+    leaderElection = mock(LeaderElection.class);
+    when(leaderElection.isLeader()).thenReturn(true);
     updater =
       new ChangelogStopPlaceRepositoryUpdater(
         stopPlaceRepositoryLoader,
@@ -43,7 +47,8 @@ class ChangelogStopPlaceRepositoryUpdaterTest {
         mock(RedisChangelogUpdateTimestampRepository.class),
         changelogConsumerController,
         stopPlaceChangelog,
-        handler
+        handler,
+        leaderElection
       );
   }
 
@@ -137,5 +142,79 @@ class ChangelogStopPlaceRepositoryUpdaterTest {
 
     assertEquals("bad export", thrown.getMessage());
     assertEquals("kafka is down", thrown.getSuppressed()[0].getMessage());
+  }
+
+  /**
+   * The consumer belongs to the leader, and refresh jobs run on an arbitrary pod. A pod without a
+   * consumer must not come out of a refresh with one: nothing would stop it again, and it would replay
+   * the whole retained topic on top of the leader's.
+   */
+  @Test
+  void aRefreshOffTheLeaderLeavesTheConsumerAlone() {
+    when(leaderElection.isLeader()).thenReturn(false);
+    when(stopPlaceRepositoryLoader.refreshCache()).thenReturn(Instant.now());
+
+    updater.createOrUpdate();
+
+    verify(stopPlaceRepositoryLoader).refreshCache();
+    verify(changelogConsumerController, never()).start();
+    verify(changelogConsumerController, never()).stop();
+    verify(stopPlaceChangelog, never())
+      .registerStopPlaceChangelogListener(handler);
+  }
+
+  /**
+   * A refresh takes long enough for the lease to move. Restarting on the strength of the check made
+   * before the parse would leave an ex-leader consuming alongside the new one.
+   */
+  @Test
+  void leadershipLostDuringARefreshLeavesTheConsumerStopped() {
+    when(leaderElection.isLeader()).thenReturn(true, false);
+    when(stopPlaceRepositoryLoader.refreshCache()).thenReturn(Instant.now());
+
+    updater.createOrUpdate();
+
+    verify(stopPlaceRepositoryLoader).refreshCache();
+    verify(changelogConsumerController).stop();
+    verify(changelogConsumerController, never()).start();
+  }
+
+  @Test
+  void standingDownStopsTheConsumer() {
+    updater.standDown();
+
+    verify(changelogConsumerController).stop();
+    verify(stopPlaceChangelog).unregisterStopPlaceChangelogListener(handler);
+    verify(changelogConsumerController, never()).start();
+  }
+
+  /**
+   * The listener is what puts records into the shared cache, so a Kafka shutdown that fails must not leave
+   * it registered while the new leader takes over.
+   */
+  @Test
+  void standingDownUnregistersEvenIfTheConsumerCannotBeStopped() {
+    doThrow(new IllegalStateException("kafka is down"))
+      .when(changelogConsumerController)
+      .stop();
+
+    assertThrows(IllegalStateException.class, () -> updater.standDown());
+
+    verify(stopPlaceChangelog).unregisterStopPlaceChangelogListener(handler);
+  }
+
+  /**
+   * Taking over and standing down arrive on separate threads, so init() cannot assume the lease still
+   * holds by the time it runs.
+   */
+  @Test
+  void initialisingAfterTheLeaseHasMovedDoesNotStartTheConsumer() {
+    when(leaderElection.isLeader()).thenReturn(false);
+
+    updater.init();
+
+    verify(changelogConsumerController, never()).start();
+    verify(stopPlaceChangelog, never())
+      .registerStopPlaceChangelogListener(handler);
   }
 }
