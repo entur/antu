@@ -27,37 +27,6 @@ Antu is a NeTEx dataset validation service built by Entur for validating public 
 7. Stores final report in GCS
 8. Notifies Marduk via PubSub
 
-### Key Dependencies
-- `netex-validator-java`: Core validation library
-- `netex-parser-java`: NeTEx XML parsing
-- `redisson`: Distributed data structures
-- `entur-helpers`: Entur-specific utilities, including `AbstractEnturGooglePubSubConsumer`
-
-Versions live in pom.xml; do not trust versions written in this file.
-
-## Project Structure
-
-```
-antu/
-├── src/main/java/no/entur/antu/
-│   ├── job/             # Job model (sealed AntuJob), dispatch, MDC
-│   ├── pubsub/          # PubSub consumers, publisher, wire codec
-│   ├── pipeline/        # The validation steps and the barriers between them
-│   ├── leader/          # Redis lease leader election
-│   ├── memorystore/     # Redis-backed store for split files and per-file reports
-│   ├── netexdata/       # Cross-file data collected while validating
-│   ├── validation/      # Custom validation rules, plus sweden/ and finland/ variants
-│   ├── rest/            # Spring MVC controllers
-│   ├── config/          # Spring configuration, including config/cache
-│   ├── stop/            # Stop place registry and changelog
-│   └── services/        # Blob store access
-│   (also: actuator, cache, exception, metrics, organisation, security, stoptime)
-├── src/test/
-├── helm/                # Kubernetes deployment configs
-├── terraform/           # Infrastructure as code
-└── pom.xml              # Maven build configuration
-```
-
 ### How a validation runs
 
 `ValidationRequestConsumer` reads a request off `AntuNetexValidationQueue`, `ValidationInitializer` derives the report id
@@ -146,13 +115,6 @@ Uses Prettier for Java:
 - **Tiamat**: National Stop Place Registry
 - **Organization Registry**: Authority/operator data
 - **Marduk**: Orchestration service
-
-## Code Style
-
-- Follow existing patterns in the codebase
-- Prettier handles formatting automatically on `./mvnw validate`
-- Use Spring dependency injection
-- Prefer functional programming style where appropriate
 
 ## Key Files to Review
 
