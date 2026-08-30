@@ -99,13 +99,13 @@ jobs:
           done
 
   terraform-lint:
-    uses: entur/gha-terraform/.github/workflows/lint.yml@v2.5.0
+    uses: entur/gha-terraform/.github/workflows/lint.yml@v3.0.0
 
   tf-plan-dev:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
     needs: [ terraform-lint, docker-push ]
     name: Terraform Plan DEV
-    uses: entur/gha-terraform/.github/workflows/plan.yml@v2.5.0
+    uses: entur/gha-terraform/.github/workflows/plan.yml@v3.0.0
     with:
       environment: dev
 
@@ -124,7 +124,7 @@ jobs:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && needs.tf-plan-dev.outputs.has_changes == 'true' }}
     needs: [ tf-plan-dev, tf-approval-dev ]
     name: Terraform Apply DEV
-    uses: entur/gha-terraform/.github/workflows/apply.yml@v2.5.0
+    uses: entur/gha-terraform/.github/workflows/apply.yml@v3.0.0
     with:
       environment: dev
       has_changes: ${{ needs.tf-plan-dev.outputs.has_changes }}
@@ -158,7 +158,7 @@ jobs:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
     needs: [ terraform-lint, approval-tst ]
     name: Terraform Plan TST
-    uses: entur/gha-terraform/.github/workflows/plan.yml@v2.5.0
+    uses: entur/gha-terraform/.github/workflows/plan.yml@v3.0.0
     with:
       environment: tst
 
@@ -177,7 +177,7 @@ jobs:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && needs.tf-plan-tst.outputs.has_changes == 'true' }}
     needs: [ tf-plan-tst, tf-approval-tst ]
     name: Terraform Apply TST
-    uses: entur/gha-terraform/.github/workflows/apply.yml@v2.5.0
+    uses: entur/gha-terraform/.github/workflows/apply.yml@v3.0.0
     with:
       environment: tst
       has_changes: ${{ needs.tf-plan-tst.outputs.has_changes }}
@@ -212,7 +212,7 @@ jobs:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
     needs: [ terraform-lint, approval-prd ]
     name: Terraform Plan PRD
-    uses: entur/gha-terraform/.github/workflows/plan.yml@v2.5.0
+    uses: entur/gha-terraform/.github/workflows/plan.yml@v3.0.0
     with:
       environment: prd
 
@@ -231,7 +231,7 @@ jobs:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && needs.tf-plan-prd.outputs.has_changes == 'true' }}
     needs: [ tf-plan-prd, tf-approval-prd ]
     name: Terraform Apply PRD
-    uses: entur/gha-terraform/.github/workflows/apply.yml@v2.5.0
+    uses: entur/gha-terraform/.github/workflows/apply.yml@v3.0.0
     with:
       environment: prd
       has_changes: ${{ needs.tf-plan-prd.outputs.has_changes }}
