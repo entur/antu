@@ -46,6 +46,7 @@ public class CacheConfig {
   public static final String QUAY_ID_NOT_FOUND_CACHE = "quayIdNotFoundCache";
   public static final String ORGANISATION_ALIAS_CACHE =
     "organisationAliasCache";
+  public static final String VEHICLE_REFERENCE_CACHE = "vehicleReferenceCache";
   public static final String ACTIVE_DATES_BY_DAY_TYPE_REF =
     "activeDatesByDayTypeRefCache";
   public static final String ACTIVE_DATES_BY_SERVICE_JOURNEY_ID =
@@ -206,6 +207,15 @@ public class CacheConfig {
       VALIDATION_STATE_CACHE,
       DEFAULT_CODEC
     );
+  }
+
+  /**
+   * Distributed cache of vehicle and vehicle type references as provided by vehicle registry.
+   * The cache is refreshed periodically.
+   */
+  @Bean(name = VEHICLE_REFERENCE_CACHE)
+  public Set<String> vehicleReferenceCache(RedissonClient redissonClient) {
+    return redissonClient.getSet(VEHICLE_REFERENCE_CACHE);
   }
 
   /**

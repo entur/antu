@@ -25,7 +25,9 @@ import no.entur.antu.validation.NetexValidationProfile;
 import no.entur.antu.validation.state.ValidationStateRepository;
 import no.entur.antu.validation.validator.id.NetexIdValidator;
 import no.entur.antu.validation.validator.id.ReferenceToNsrValidator;
+import no.entur.antu.validation.validator.id.ReferenceToVehicleRegistryValidator;
 import no.entur.antu.validation.validator.id.TrainElementRegistryIdValidator;
+import no.entur.antu.validation.validator.vehicletype.VehicleRefRepository;
 import no.entur.antu.validation.validator.vehicletype.VehicleTypeReferenceIgnorer;
 import org.entur.netex.validation.configuration.DefaultValidationConfigLoader;
 import org.entur.netex.validation.configuration.ValidationConfigLoader;
@@ -111,18 +113,33 @@ public class ValidatorConfig {
   }
 
   @Bean
+  public ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator(
+    VehicleRefRepository vehicleRefRepository
+  ) {
+    return new ReferenceToVehicleRegistryValidator(vehicleRefRepository);
+  }
+
+  @Bean
   public NetexReferenceValidator netexReferenceValidator(
     NetexIdRepository netexIdRepository,
-    ReferenceToNsrValidator referenceToNsrValidator
+    ReferenceToNsrValidator referenceToNsrValidator,
+    ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator,
+    @Value(
+      "${antu.netex.validation.vehicles.skip:false}"
+    ) boolean skipVehicleValidation
   ) {
     List<ExternalReferenceValidator> externalReferenceValidators =
       new ArrayList<>();
     externalReferenceValidators.add(new BlockJourneyReferencesIgnorer());
     externalReferenceValidators.add(new ServiceJourneyInterchangeIgnorer());
     externalReferenceValidators.add(new InterchangeRuleReferencesIgnorer());
-    externalReferenceValidators.add(new VehicleTypeReferenceIgnorer());
     externalReferenceValidators.add(new TrainElementRegistryIdValidator());
     externalReferenceValidators.add(referenceToNsrValidator);
+    if (!skipVehicleValidation) {
+      externalReferenceValidators.add(new VehicleTypeReferenceIgnorer());
+    } else {
+      externalReferenceValidators.add(referenceToVehicleRegistryValidator);
+    }
     return new NetexReferenceValidator(
       netexIdRepository,
       externalReferenceValidators
