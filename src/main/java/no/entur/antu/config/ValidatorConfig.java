@@ -135,7 +135,7 @@ public class ValidatorConfig {
     externalReferenceValidators.add(new InterchangeRuleReferencesIgnorer());
     externalReferenceValidators.add(new TrainElementRegistryIdValidator());
     externalReferenceValidators.add(referenceToNsrValidator);
-    if (!skipVehicleValidation) {
+    if (skipVehicleValidation) {
       externalReferenceValidators.add(new VehicleTypeReferenceIgnorer());
     } else {
       externalReferenceValidators.add(referenceToVehicleRegistryValidator);
