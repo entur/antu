@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.pipeline.OrganisationAliasCacheRefresher;
 import no.entur.antu.pipeline.StopPlaceCacheRefresher;
+import no.entur.antu.pipeline.VehicleReferenceCacheRefresher;
 import no.entur.antu.security.AntuAuthorizationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ class CacheAdminControllerTest {
   private CacheAdmin cacheAdmin;
   private StopPlaceCacheRefresher stopPlaceCacheRefresher;
   private OrganisationAliasCacheRefresher organisationAliasCacheRefresher;
+  private VehicleReferenceCacheRefresher vehicleReferenceCacheRefresher;
   private MockMvc mockMvc;
 
   @BeforeEach
@@ -33,6 +35,7 @@ class CacheAdminControllerTest {
     stopPlaceCacheRefresher = mock(StopPlaceCacheRefresher.class);
     organisationAliasCacheRefresher =
       mock(OrganisationAliasCacheRefresher.class);
+    vehicleReferenceCacheRefresher = mock(VehicleReferenceCacheRefresher.class);
     mockMvc =
       MockMvcBuilders
         .standaloneSetup(
@@ -40,7 +43,8 @@ class CacheAdminControllerTest {
             authorizationService,
             cacheAdmin,
             stopPlaceCacheRefresher,
-            organisationAliasCacheRefresher
+            organisationAliasCacheRefresher,
+            vehicleReferenceCacheRefresher
           )
         )
         .build();
@@ -109,9 +113,13 @@ class CacheAdminControllerTest {
     mockMvc
       .perform(post("/services/cache-admin/refresh-organisation-cache"))
       .andExpect(status().isOk());
+    mockMvc
+      .perform(post("/services/cache-admin/refresh-vehicle-cache"))
+      .andExpect(status().isOk());
 
     verify(stopPlaceCacheRefresher).enqueueRefresh();
     verify(organisationAliasCacheRefresher).enqueueRefresh();
+    verify(vehicleReferenceCacheRefresher).enqueueRefresh();
   }
 
   @Test
@@ -121,7 +129,8 @@ class CacheAdminControllerTest {
     mockMvc.perform(get("/services/cache-admin/dump-keys"));
     mockMvc.perform(post("/services/cache-admin/refresh-stop-cache"));
     mockMvc.perform(post("/services/cache-admin/refresh-organisation-cache"));
+    mockMvc.perform(post("/services/cache-admin/refresh-vehicle-cache"));
 
-    verify(authorizationService, times(5)).verifyAdministratorPrivileges();
+    verify(authorizationService, times(6)).verifyAdministratorPrivileges();
   }
 }
