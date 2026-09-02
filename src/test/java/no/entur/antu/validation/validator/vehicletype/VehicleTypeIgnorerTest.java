@@ -60,7 +60,7 @@ class VehicleTypeIgnorerTest {
       netexIdRepository,
       referenceToNsrValidator,
       vehicleRegistryValidator,
-      true
+      false
     );
 
     // Parse the XML

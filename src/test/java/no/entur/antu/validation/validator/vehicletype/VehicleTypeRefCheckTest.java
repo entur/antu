@@ -88,7 +88,7 @@ class VehicleTypeRefCheckTest {
       netexIdRepository,
       referenceToNsrValidator,
       vehicleRegistryValidator,
-      false
+      true
     );
 
     // Parse the XML
