@@ -21,7 +21,7 @@ public class VehicleReferenceResource {
   public VehicleReferenceResource(
     @Qualifier("vehicleRegistryWebClient") WebClient vehicleRegistryWebClient
   ) {
-    this.webClient = vehicleRegistryWebClient.mutate().build();
+    this.webClient = vehicleRegistryWebClient;
   }
 
   public Set<String> getVehicleAndVehicleTypesRef() {
