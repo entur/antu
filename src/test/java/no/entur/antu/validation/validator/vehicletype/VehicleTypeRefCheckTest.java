@@ -40,7 +40,7 @@ class VehicleTypeRefCheckTest {
       issues
         .stream()
         .anyMatch(issue -> issue.rule().code().equals("NETEX_ID_5")),
-      "VehicleTypeRef with existing references should be accepted and don't produce NETEX_ID_5 errors"
+      "VehicleTypeRef with existing references should be accepted and doesn't produce NETEX_ID_5 errors"
     );
   }
 
