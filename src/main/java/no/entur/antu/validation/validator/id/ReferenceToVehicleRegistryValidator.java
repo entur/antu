@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Validate that NeTEX references point to a valid stop or quay in the National Stop Place Registry.
+ * Validate that NeTEx references point to a valid vehicle or vehicle type in the Vehicle Registry.
  */
 public class ReferenceToVehicleRegistryValidator
   implements ExternalReferenceValidator {
