@@ -4,7 +4,6 @@ import no.entur.antu.job.AntuJob;
 import no.entur.antu.job.JobQueue;
 import no.entur.antu.leader.LeaderElection;
 import no.entur.antu.leader.LeadershipGrantedEvent;
-import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
 import no.entur.antu.validation.validator.vehicletype.VehicleRefRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
