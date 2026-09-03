@@ -35,7 +35,7 @@ public class VehicleReferenceResource {
       )
       .flatMapMany(Flux::fromIterable)
       .collect(Collectors.toSet())
-      .block();
+      .block(Duration.ofSeconds(120));
   }
 
   protected static final Predicate<Throwable> is5xx = throwable ->
