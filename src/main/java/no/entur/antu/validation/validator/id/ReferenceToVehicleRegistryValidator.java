@@ -6,18 +6,12 @@ import java.util.Set;
 import no.entur.antu.validation.validator.vehicletype.VehicleRefRepository;
 import org.entur.netex.validation.validator.id.ExternalReferenceValidator;
 import org.entur.netex.validation.validator.id.IdVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Validate that NeTEx references point to a valid vehicle or vehicle type in the Vehicle Registry.
  */
 public class ReferenceToVehicleRegistryValidator
   implements ExternalReferenceValidator {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(
-    ReferenceToVehicleRegistryValidator.class
-  );
 
   private final VehicleRefRepository vehicleRefRepository;
 

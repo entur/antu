@@ -3,11 +3,11 @@ package no.entur.antu.validation.validator.vehicletype;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class DefaultVehicleReferenceRepositoryTest {
 
@@ -53,8 +53,7 @@ class DefaultVehicleReferenceRepositoryTest {
     HashSet<String> refreshedVehicleRefs = new HashSet<>();
     refreshedVehicleRefs.add("NMR:VehicleType:2");
     refreshedVehicleRefs.add("NMR:VehicleType:3");
-    Mockito
-      .when(vehicleReferenceResource.getVehicleAndVehicleTypesRef())
+    when(vehicleReferenceResource.getVehicleAndVehicleTypesRef())
       .thenReturn(refreshedVehicleRefs);
 
     repository.refreshCache();

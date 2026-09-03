@@ -258,7 +258,9 @@ public class TestConfig {
     }
 
     @Override
-    public void refreshCache() {}
+    public void refreshCache() {
+      // No-op: no cache to refresh in this test implementation
+    }
 
     @Override
     public boolean isEmpty() {

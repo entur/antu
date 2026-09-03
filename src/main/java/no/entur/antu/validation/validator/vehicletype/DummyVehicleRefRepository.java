@@ -27,7 +27,9 @@ public class DummyVehicleRefRepository implements VehicleRefRepository {
   }
 
   @Override
-  public void refreshCache() {}
+  public void refreshCache() {
+    // No-op: no cache to refresh when vehicle validation is disabled
+  }
 
   @Override
   public boolean isEmpty() {
