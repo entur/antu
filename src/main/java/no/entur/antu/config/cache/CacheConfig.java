@@ -216,8 +216,8 @@ public class CacheConfig {
    */
   @Bean(name = VEHICLE_REFERENCE_CACHE)
   @ConditionalOnProperty(
-          name = "antu.netex.validation.vehicles.enabled",
-          havingValue = "true"
+    name = "antu.netex.validation.vehicles.enabled",
+    havingValue = "true"
   )
   public Set<String> vehicleReferenceCache(RedissonClient redissonClient) {
     return redissonClient.getSet(VEHICLE_REFERENCE_CACHE);

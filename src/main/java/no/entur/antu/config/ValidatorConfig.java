@@ -116,8 +116,8 @@ public class ValidatorConfig {
 
   @Bean
   @ConditionalOnProperty(
-          name = "antu.netex.validation.vehicles.enabled",
-          havingValue = "true"
+    name = "antu.netex.validation.vehicles.enabled",
+    havingValue = "true"
   )
   public ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator(
     VehicleRefRepository vehicleRefRepository
@@ -132,7 +132,9 @@ public class ValidatorConfig {
     @Value(
       "${antu.netex.validation.vehicles.enabled:false}"
     ) boolean enableVehicleValidation,
-    @Autowired(required = false) ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator
+    @Autowired(
+      required = false
+    ) ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator
   ) {
     List<ExternalReferenceValidator> externalReferenceValidators =
       new ArrayList<>();

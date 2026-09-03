@@ -18,8 +18,8 @@ public class VehicleRegistryWebClientConfiguration {
   @Bean("vehicleRegistryWebClient")
   @Profile("!test")
   @ConditionalOnProperty(
-          name = "antu.netex.validation.vehicles.enabled",
-          havingValue = "true"
+    name = "antu.netex.validation.vehicles.enabled",
+    havingValue = "true"
   )
   WebClient vehicleRegistryWebClient(
     @Value("${antu.vehicle.registry.url}") String vehicleRegistryUrl,

@@ -18,8 +18,8 @@ public class VehicleConfig {
   @Bean
   @Profile("!test")
   @ConditionalOnProperty(
-          name = "antu.netex.validation.vehicles.enabled",
-          havingValue = "true"
+    name = "antu.netex.validation.vehicles.enabled",
+    havingValue = "true"
   )
   VehicleReferenceResource vehicleReferenceResource(
     @Qualifier("vehicleRegistryWebClient") WebClient vehicleRegistryWebClient
@@ -30,8 +30,8 @@ public class VehicleConfig {
   @Bean
   @Profile("!test")
   @ConditionalOnProperty(
-          name = "antu.netex.validation.vehicles.enabled",
-          havingValue = "true"
+    name = "antu.netex.validation.vehicles.enabled",
+    havingValue = "true"
   )
   VehicleRefRepository vehicleRefRepository(
     VehicleReferenceResource vehicleReferenceResource,
@@ -43,15 +43,14 @@ public class VehicleConfig {
     );
   }
 
-    @Bean
-    @Profile("!test")
-    @ConditionalOnProperty(
-            name = "antu.netex.validation.vehicles.enabled",
-            havingValue = "false",
-            matchIfMissing = true
-    )
-    VehicleRefRepository dummyVehicleRefRepository(
-    ) {
-        return new DummyVehicleRefRepository();
-    }
+  @Bean
+  @Profile("!test")
+  @ConditionalOnProperty(
+    name = "antu.netex.validation.vehicles.enabled",
+    havingValue = "false",
+    matchIfMissing = true
+  )
+  VehicleRefRepository dummyVehicleRefRepository() {
+    return new DummyVehicleRefRepository();
+  }
 }

@@ -11,22 +11,23 @@ public class DummyVehicleRefRepository implements VehicleRefRepository {
   );
 
   public DummyVehicleRefRepository() {
-    LOGGER.info("Vehicle reference validation is disabled - using dummy repository");
+    LOGGER.info(
+      "Vehicle reference validation is disabled - using dummy repository"
+    );
   }
 
   @Override
   public boolean hasVehicleTypeRef(String reference) {
-      return false;
+    return false;
   }
 
   @Override
   public boolean hasVehicleRef(String reference) {
-      return false;
+    return false;
   }
 
   @Override
-  public void refreshCache() {
-  }
+  public void refreshCache() {}
 
   @Override
   public boolean isEmpty() {
