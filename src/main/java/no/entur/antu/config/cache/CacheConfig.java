@@ -25,6 +25,7 @@ import org.redisson.codec.CompositeCodec;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.codec.Kryo5Codec;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -214,6 +215,10 @@ public class CacheConfig {
    * The cache is refreshed periodically.
    */
   @Bean(name = VEHICLE_REFERENCE_CACHE)
+  @ConditionalOnProperty(
+          name = "antu.netex.validation.vehicles.enabled",
+          havingValue = "true"
+  )
   public Set<String> vehicleReferenceCache(RedissonClient redissonClient) {
     return redissonClient.getSet(VEHICLE_REFERENCE_CACHE);
   }

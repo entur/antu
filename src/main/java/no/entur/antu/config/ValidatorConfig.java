@@ -46,8 +46,10 @@ import org.entur.netex.validation.validator.id.VersionOnLocalNetexIdValidator;
 import org.entur.netex.validation.validator.id.VersionOnRefToLocalNetexIdValidator;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.entur.netex.validation.validator.schema.NetexSchemaValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -113,6 +115,10 @@ public class ValidatorConfig {
   }
 
   @Bean
+  @ConditionalOnProperty(
+          name = "antu.netex.validation.vehicles.enabled",
+          havingValue = "true"
+  )
   public ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator(
     VehicleRefRepository vehicleRefRepository
   ) {
@@ -123,10 +129,10 @@ public class ValidatorConfig {
   public NetexReferenceValidator netexReferenceValidator(
     NetexIdRepository netexIdRepository,
     ReferenceToNsrValidator referenceToNsrValidator,
-    ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator,
     @Value(
       "${antu.netex.validation.vehicles.enabled:false}"
-    ) boolean enableVehicleValidation
+    ) boolean enableVehicleValidation,
+    @Autowired(required = false) ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator
   ) {
     List<ExternalReferenceValidator> externalReferenceValidators =
       new ArrayList<>();
