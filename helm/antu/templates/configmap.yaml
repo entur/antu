@@ -67,7 +67,7 @@ data:
     # stalled-validation sweep. The last three all do blocking Redis, PubSub or GCS work and can coincide,
     # so anything less than four lets them starve the heartbeat and drop the lease while this pod is
     # healthy.
-    spring.task.scheduling.pool.size=4
+    spring.task.scheduling.pool.size=5
 
     # Agreement registry
     antu.organisation.refresh.millis=1800000
