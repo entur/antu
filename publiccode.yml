@@ -1,0 +1,55 @@
+publiccodeYmlVersion: "0.5.0"
+
+name: Antu
+url: https://github.com/entur/antu
+landingURL: https://github.com/entur/antu
+
+platforms:
+  - linux
+  - web
+
+categories:
+  - data-collection
+  - compliance-management
+  - geographic-information-systems
+
+developmentStatus: stable
+softwareType: standalone/backend
+
+organisation:
+  name: Entur AS
+  uri: https://entur.no
+
+usedBy:
+  - Norway (nationwide), Entur
+
+description:
+  en:
+    localisedName: Antu
+    shortDescription: Validates NeTEx datasets against the Nordic NeTEx Profile.
+    longDescription: >
+      Antu splits a NeTEx archive into line files and validates them in parallel across autoscaled workers, using
+      the netex-validator-java library plus Norwegian rules, and serves the combined report over a REST API.
+    documentation: https://github.com/entur/antu/blob/main/README.md
+    features:
+      - Validation against the Nordic NeTEx Profile
+      - Parallel validation across autoscaled workers
+      - Cross-file id uniqueness and reference checks
+      - Stop place references checked against the National Stop Place Register
+      - OAuth2-protected report download API
+
+legal:
+  license: EUPL-1.2
+  mainCopyrightOwner: Entur AS
+
+maintenance:
+  type: internal
+  contacts:
+    - name: Entur Open Data and Journey Planning
+      email: kollektivdata@entur.org
+      affiliation: Entur AS
+
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
