@@ -1,12 +1,12 @@
-publiccodeYmlVersion: "0.5.0"
+# publiccode.yml metadata, see https://yml.publiccode.tools/
+publiccodeYmlVersion: "0.7.0"
 
 name: Antu
 url: https://github.com/entur/antu
-landingURL: https://github.com/entur/antu
 
 platforms:
-  - linux
   - web
+  - linux
 
 categories:
   - data-collection
@@ -21,7 +21,13 @@ organisation:
   uri: https://entur.no
 
 usedBy:
-  - Norway (nationwide), Entur
+  - Norway (nationwide), Entur AS
+
+intendedAudience:
+  scope:
+    - transportation
+  countries:
+    - "NO"
 
 description:
   en:
@@ -45,11 +51,15 @@ legal:
 maintenance:
   type: internal
   contacts:
-    - name: Entur Open Data and Journey Planning
+    - name: Entur ROR (Open Data and Journey Planning)
       email: kollektivdata@entur.org
-      affiliation: Entur AS
 
 localisation:
   localisationReady: false
   availableLanguages:
     - en
+
+dependsOn:
+  open:
+    - name: netex-validator-java
+    - name: Redis
