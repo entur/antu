@@ -93,6 +93,7 @@ public final class JobMessageCodec {
         case AntuJob.CompleteValidation ignored -> "";
         case AntuJob.RefreshStopPlaceCache ignored -> "";
         case AntuJob.RefreshOrganisationAliasCache ignored -> "";
+        case AntuJob.RefreshVehicleReferenceCache ignored -> "";
       };
     return new JobMessage(attributes, body);
   }
@@ -131,6 +132,7 @@ public final class JobMessageCodec {
       );
       case REFRESH_STOP_PLACE_CACHE -> new AntuJob.RefreshStopPlaceCache();
       case REFRESH_ORGANISATION_ALIAS_CACHE -> new AntuJob.RefreshOrganisationAliasCache();
+      case REFRESH_VEHICLE_REFERENCE_CACHE -> new AntuJob.RefreshVehicleReferenceCache();
     };
   }
 

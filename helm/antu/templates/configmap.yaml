@@ -67,11 +67,14 @@ data:
     # stalled-validation sweep. The last three all do blocking Redis, PubSub or GCS work and can coincide,
     # so anything less than four lets them starve the heartbeat and drop the lease while this pod is
     # healthy.
-    spring.task.scheduling.pool.size=4
+    spring.task.scheduling.pool.size=5
 
     # Agreement registry
     antu.organisation.refresh.millis=1800000
     antu.agreement.registry.url={{ .Values.agreementRegistryUrl }}
+
+    # Vehicle registry
+    antu.vehicle.registry.url={{ .Values.vehicleRegistryUrl }}
 
     # Stop place dataset import
     # How often the leader checks the bucket for a new export.
@@ -123,6 +126,11 @@ data:
     spring.security.oauth2.client.provider.internal.token-uri={{ .Values.auth0.internal.tokenUri }}
     ror.oauth2.client.audience={{ .Values.auth0.internal.audience }}
 
+    # OAuth2 Sobek Client Registration
+    spring.security.oauth2.client.registration.sobek.authorization-grant-type=client_credentials
+    spring.security.oauth2.client.registration.sobek.client-id={{ .Values.auth0.internal.clientId }}
+    spring.security.oauth2.client.provider.sobek.token-uri={{ .Values.auth0.internal.tokenUri }}
+    ror.oauth2.client.audience.sobek={{ .Values.auth0.internal.audience }}
 
     # Authorization
     antu.security.authorization-service=token-based
@@ -163,6 +171,8 @@ data:
     interchange-waiting-time-validation-enabled={{ .Values.interchangeWaitingTimeValidationEnabled }}
     interchange-alighting-and-boarding-validation-enabled={{ .Values.alightingAndBoardingValidationEnabled }}
     interchange-service-journey-references-exist-validator-enabled={{ .Values.interchangeServiceJourneyReferencesExistValidatorEnabled }}
+    antu.netex.validation.vehicles.enabled={{ .Values.netexValidationVehiclesEnabled }}
+    
 
     # Additional allowed codespaces for Antu validation
     {{- range $index, $allowedCodespace := .Values.antu.validation.additionalAllowedCodespaces }}

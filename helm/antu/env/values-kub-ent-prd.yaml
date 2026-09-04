@@ -25,9 +25,12 @@ tiamatUrl: http://tiamat.prd.entur.internal/services/stop_places
 
 agreementRegistryUrl: https://api.entur.io/agreements/v1
 
+vehicleRegistryUrl: https://api.entur.io/vehicle-registry/v1
+
 interchangeWaitingTimeValidationEnabled: true
 alightingAndBoardingValidationEnabled: true
 interchangeServiceJourneyReferencesExistValidatorEnabled: true
+netexValidationVehiclesEnabled: false
 
 baba:
   service: http://baba.prd.entur.internal
