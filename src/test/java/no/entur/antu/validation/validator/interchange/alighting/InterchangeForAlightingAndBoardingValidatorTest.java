@@ -6,8 +6,8 @@ import static no.entur.antu.validation.validator.interchange.alighting.Interchan
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.common.repository.TestNetexDataRepository;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
+import no.entur.antu.netex.test.builder.NetexRefs;
+import no.entur.antu.netex.test.repository.TestNetexDataRepository;
 import org.entur.netex.validation.validator.SimpleValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
@@ -232,7 +232,7 @@ class InterchangeForAlightingAndBoardingValidatorTest {
     Boolean isForBoarding
   ) {
     ScheduledStopPointId stopId = ScheduledStopPointId.of(
-      createStopPointRef(stopPointId)
+      stopPointRef(stopPointId)
     );
 
     TimetabledPassingTime passingTime = new TimetabledPassingTime()
@@ -267,13 +267,9 @@ class InterchangeForAlightingAndBoardingValidatorTest {
     );
   }
 
-  private ScheduledStopPointRefStructure createStopPointRef(int stopPointId) {
+  private ScheduledStopPointRefStructure stopPointRef(int stopPointId) {
     return new ScheduledStopPointRefStructure()
-      .withRef(
-        NetexEntitiesTestFactory
-          .createScheduledStopPointRef(stopPointId)
-          .getRef()
-      );
+      .withRef(NetexRefs.scheduledStopPointRef(stopPointId).getRef());
   }
 
   private ServiceJourneyInterchangeInfo createServiceJourneyInterchangeInfo() {
@@ -287,8 +283,8 @@ class InterchangeForAlightingAndBoardingValidatorTest {
         .withToJourneyRef(
           new VehicleJourneyRefStructure().withRef(toServiceJourneyId.id())
         )
-        .withFromPointRef(createStopPointRef(fromStopPointId))
-        .withToPointRef(createStopPointRef(toStopPointId))
+        .withFromPointRef(stopPointRef(fromStopPointId))
+        .withToPointRef(stopPointRef(toStopPointId))
     );
   }
 }

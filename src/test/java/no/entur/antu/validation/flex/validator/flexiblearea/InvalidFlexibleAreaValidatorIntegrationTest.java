@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 class InvalidFlexibleAreaValidatorIntegrationTest {
 
-  private static final String _ATB_FLEXIBLE_SHARED_DATA =
+  private static final String ATB_FLEXIBLE_SHARED_DATA =
     "_ATB_flexible_shared_data.xml";
 
   private static final NetexParser NETEX_PARSER = new NetexParser();
@@ -22,7 +22,7 @@ class InvalidFlexibleAreaValidatorIntegrationTest {
   @Test
   void testSelfIntersectingRingShouldBeReported() throws IOException {
     List<ValidationIssue> validationIssues = getValidationIssues(
-      _ATB_FLEXIBLE_SHARED_DATA,
+      ATB_FLEXIBLE_SHARED_DATA,
       "ATB"
     );
     assertEquals(2, validationIssues.size());

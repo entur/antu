@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import net.opengis.gml._3.*;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
-import no.entur.antu.validation.ValidationTest;
+import no.entur.antu.netex.test.NetexTestData;
+import no.entur.antu.netex.test.ValidatorTestBase;
 import org.assertj.core.api.Assertions;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
@@ -17,24 +17,23 @@ import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
 
-class InvalidFlexibleAreaValidatorTest extends ValidationTest {
+class InvalidFlexibleAreaValidatorTest extends ValidatorTestBase {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnCommonFile(
       netexEntitiesIndex,
-      InvalidFlexibleAreaValidator.class
+      new InvalidFlexibleAreaValidator()
     );
   }
 
   @Test
   void testDataSetWithoutFlexibleStopPlacesShouldBeIgnoredGracefully() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
@@ -185,13 +184,12 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   @Test
   void testMissingFlexibleStopAreaShouldIgnoreValidationGracefully() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    netexEntitiesTestFactory.createFlexibleStopPlace();
+    netexEntitiesTestFactory.addFlexibleStopPlace();
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -199,16 +197,15 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 
   @Test
   void testMissingPolygonShouldIgnoreValidationGracefully2() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
     netexEntitiesTestFactory
-      .createFlexibleStopPlace()
-      .flexibleArea(1)
+      .addFlexibleStopPlace()
+      .addFlexibleArea(1)
       .withNullPolygon(true);
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -259,13 +256,12 @@ class InvalidFlexibleAreaValidatorTest extends ValidationTest {
   private ValidationReport runTestWithGivenCoordinates(
     List<Double> coordinates
   ) {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
     netexEntitiesTestFactory
-      .createFlexibleStopPlace()
-      .flexibleArea(1)
+      .addFlexibleStopPlace()
+      .addFlexibleArea(1)
       .withCoordinates(coordinates);
 
-    return runValidation(netexEntitiesTestFactory.create());
+    return runValidation(netexEntitiesTestFactory.build());
   }
 }

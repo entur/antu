@@ -3,8 +3,8 @@ package no.entur.antu.validation.validator.interchange.refs;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import no.entur.antu.common.netex.NetexTestDataSample;
-import no.entur.antu.common.repository.TestNetexDataRepository;
+import no.entur.antu.netex.test.builder.ServiceJourneyInterchangeBuilder;
+import no.entur.antu.netex.test.repository.TestNetexDataRepository;
 import org.entur.netex.validation.validator.SimpleValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -12,6 +12,8 @@ import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
+import org.rutebanken.netex.model.VehicleJourneyRefStructure;
 
 class ServiceJourneyInterchangeReferencesExistValidatorTest {
 
@@ -209,12 +211,20 @@ class ServiceJourneyInterchangeReferencesExistValidatorTest {
   private ServiceJourneyInterchangeInfo createServiceJourneyInterchangeInfo() {
     return ServiceJourneyInterchangeInfo.of(
       "",
-      NetexTestDataSample.serviceJourneyInterchangeWithServiceJourneyRefs(
-        fromJourneyRef.id(),
-        toJourneyRef.id(),
-        fromStopPointRef,
-        toStopPointRef
-      )
+      new ServiceJourneyInterchangeBuilder(1)
+        .withFromJourneyRef(
+          new VehicleJourneyRefStructure().withRef(fromJourneyRef.id())
+        )
+        .withToJourneyRef(
+          new VehicleJourneyRefStructure().withRef(toJourneyRef.id())
+        )
+        .withFromPointRef(
+          new ScheduledStopPointRefStructure().withRef(fromStopPointRef)
+        )
+        .withToPointRef(
+          new ScheduledStopPointRefStructure().withRef(toStopPointRef)
+        )
+        .build()
     );
   }
 }
