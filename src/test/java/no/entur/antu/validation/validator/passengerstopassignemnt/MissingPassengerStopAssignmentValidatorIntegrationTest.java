@@ -20,7 +20,6 @@ import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class MissingPassengerStopAssignmentValidatorIntegrationTest {
 

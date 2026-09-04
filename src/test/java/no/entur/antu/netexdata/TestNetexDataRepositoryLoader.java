@@ -15,5 +15,7 @@ public class TestNetexDataRepositoryLoader
   implements NetexDataRepositoryLoader {
 
   @Override
-  public void cleanUp(String validationReportId) {}
+  public void cleanUp(String validationReportId) {
+    //NOOP
+  }
 }

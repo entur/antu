@@ -27,7 +27,9 @@ public class TestCommonDataRepository implements CommonDataRepository {
 
   private boolean hasSharedScheduledStopPoints = true;
 
-  public TestCommonDataRepository() {}
+  public TestCommonDataRepository() {
+    //NOOP
+  }
 
   /**
    * Return a repository that maps ScheduledStopPoint #i to Quay #i, for i in 1..numScheduledStopPoints.

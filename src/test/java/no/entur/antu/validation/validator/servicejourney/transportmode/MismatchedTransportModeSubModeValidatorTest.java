@@ -416,23 +416,23 @@ class MismatchedTransportModeSubModeValidatorTest extends ValidatorTestBase {
   private NetexEntitiesIndex createFlexNetexEntitiesIndex(
     Consumer<FlexibleLineBuilder> configureFlexibleLine
   ) {
-    NetexTestData netexEntitiesTestFactory = new NetexTestData();
+    NetexTestData factory = new NetexTestData();
 
-    FlexibleLineBuilder createFlexibleLine = netexEntitiesTestFactory
+    FlexibleLineBuilder builder = factory
       .addFlexibleLine()
       .withFlexibleLineType(FlexibleLineTypeEnumeration.MIXED_FLEXIBLE);
 
-    configureFlexibleLine.accept(createFlexibleLine);
+    configureFlexibleLine.accept(builder);
 
-    RouteBuilder route = netexEntitiesTestFactory.addRoute();
+    RouteBuilder route = factory.addRoute();
 
-    JourneyPatternBuilder journeyPattern = netexEntitiesTestFactory
+    JourneyPatternBuilder journeyPattern = factory
       .addJourneyPattern()
       .withRoute(route);
     journeyPattern.addStopPoints(4);
 
-    netexEntitiesTestFactory.addServiceJourney(journeyPattern);
+    factory.addServiceJourney(journeyPattern);
 
-    return netexEntitiesTestFactory.build();
+    return factory.build();
   }
 }
