@@ -29,10 +29,10 @@ class SameQuayRefValidatorTest extends ValidatorTestBase {
   void testNoStopPointsInJourneyPattern() {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
-    createJourneyPattern.addStopPoints(0);
+    journeyPatternBuilder.addStopPoints(0);
 
     ValidationReport validationReport = runValidation(
       netexEntitiesTestFactory.build()
@@ -45,7 +45,7 @@ class SameQuayRefValidatorTest extends ValidatorTestBase {
   void testNoSameQuayRefOnStopPoints() {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
     ScheduledStopPointRefStructure scheduledStopPointRef1 =
@@ -53,11 +53,11 @@ class SameQuayRefValidatorTest extends ValidatorTestBase {
     ScheduledStopPointRefStructure scheduledStopPointRef2 =
       NetexRefs.scheduledStopPointRef(2);
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addStopPoint(1)
       .withScheduledStopPointRef(scheduledStopPointRef1);
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addStopPoint(2)
       .withScheduledStopPointRef(scheduledStopPointRef2);
 
@@ -82,7 +82,7 @@ class SameQuayRefValidatorTest extends ValidatorTestBase {
   void testSameQuayRefOnStopPoints() {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
     ScheduledStopPointRefStructure scheduledStopPointRef1 =
@@ -90,11 +90,11 @@ class SameQuayRefValidatorTest extends ValidatorTestBase {
     ScheduledStopPointRefStructure scheduledStopPointRef2 =
       NetexRefs.scheduledStopPointRef(2);
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addStopPoint(1)
       .withScheduledStopPointRef(scheduledStopPointRef1);
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addStopPoint(2)
       .withScheduledStopPointRef(scheduledStopPointRef2);
 

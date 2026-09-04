@@ -32,11 +32,11 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidatorTestBase {
 
     int numberOfStopPointsInJourneyPattern = 4;
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
-    createJourneyPattern.addStopPoints(numberOfStopPointsInJourneyPattern);
+    journeyPatternBuilder.addStopPoints(numberOfStopPointsInJourneyPattern);
 
-    netexEntitiesTestFactory.addServiceJourney(createJourneyPattern);
+    netexEntitiesTestFactory.addServiceJourney(journeyPatternBuilder);
 
     IntStream
       .range(0, numberOfStopPointsInJourneyPattern)
@@ -60,12 +60,12 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidatorTestBase {
 
     int numberOfStopPointsInJourneyPattern = 4;
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
-    createJourneyPattern.addStopPoints(numberOfStopPointsInJourneyPattern);
+    journeyPatternBuilder.addStopPoints(numberOfStopPointsInJourneyPattern);
 
-    netexEntitiesTestFactory.addServiceJourney(createJourneyPattern);
+    netexEntitiesTestFactory.addServiceJourney(journeyPatternBuilder);
 
     IntStream
       .range(0, numberOfStopPointsInJourneyPattern - 1)
@@ -93,9 +93,9 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidatorTestBase {
     IntStream
       .rangeClosed(1, 4)
       .mapToObj(netexEntitiesTestFactory::addJourneyPattern)
-      .forEach(createJourneyPattern -> {
-        createJourneyPattern.addStopPoints(4);
-        netexEntitiesTestFactory.addServiceJourney(createJourneyPattern);
+      .forEach(journeyPatternBuilder -> {
+        journeyPatternBuilder.addStopPoints(4);
+        netexEntitiesTestFactory.addServiceJourney(journeyPatternBuilder);
       });
 
     ValidationReport validationReport = runValidation(
@@ -111,9 +111,9 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidatorTestBase {
    */
   void testMissingStopPlaceAssignmentsAndNoServiceJourneyExists() {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
-    createJourneyPattern.addStopPoints(4);
+    journeyPatternBuilder.addStopPoints(4);
 
     ValidationReport validationReport = runValidation(
       netexEntitiesTestFactory.build()
@@ -147,12 +147,12 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidatorTestBase {
   void testMissingStopPlaceAssignmentsAndBothDeadRunAndServiceJourneyExists() {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
-    createJourneyPattern.addStopPoints(4);
+    journeyPatternBuilder.addStopPoints(4);
 
-    netexEntitiesTestFactory.addDeadRun(createJourneyPattern).build();
-    netexEntitiesTestFactory.addServiceJourney(createJourneyPattern).build();
+    netexEntitiesTestFactory.addDeadRun(journeyPatternBuilder).build();
+    netexEntitiesTestFactory.addServiceJourney(journeyPatternBuilder).build();
 
     ValidationReport validationReport = runValidation(
       netexEntitiesTestFactory.build()
@@ -167,12 +167,12 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidatorTestBase {
 
     int numberOfStopPointsInJourneyPattern = 4;
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
-    createJourneyPattern.addStopPoints(numberOfStopPointsInJourneyPattern);
+    journeyPatternBuilder.addStopPoints(numberOfStopPointsInJourneyPattern);
 
-    netexEntitiesTestFactory.addServiceJourney(createJourneyPattern);
+    netexEntitiesTestFactory.addServiceJourney(journeyPatternBuilder);
 
     IntStream
       .range(0, numberOfStopPointsInJourneyPattern - 2)
@@ -196,11 +196,11 @@ class MissingPassengerStopAssignmentValidatorTest extends ValidatorTestBase {
 
     int numberOfStopPointsInJourneyPattern = 4;
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
-    createJourneyPattern.addStopPoints(numberOfStopPointsInJourneyPattern);
+    journeyPatternBuilder.addStopPoints(numberOfStopPointsInJourneyPattern);
 
-    netexEntitiesTestFactory.addServiceJourney(createJourneyPattern);
+    netexEntitiesTestFactory.addServiceJourney(journeyPatternBuilder);
 
     IntStream
       .range(0, numberOfStopPointsInJourneyPattern)

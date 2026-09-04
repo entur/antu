@@ -181,17 +181,17 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest
       .withTransportMode(transportMode)
       .withTransportSubmode(submode);
 
-    JourneyPatternBuilder createJourneyPattern = netexEntitiesTestFactory
+    JourneyPatternBuilder journeyPatternBuilder = netexEntitiesTestFactory
       .addJourneyPattern(123)
       .withRoute(netexEntitiesTestFactory.addRoute());
 
     if (coordinates.isEmpty()) {
-      createJourneyPattern.addStopPoints(0);
+      journeyPatternBuilder.addStopPoints(0);
     } else {
       IntStream
         .rangeClosed(1, coordinates.size())
         .forEach(i ->
-          createJourneyPattern
+          journeyPatternBuilder
             .addStopPoint(i)
             .withScheduledStopPointRef(NetexRefs.scheduledStopPointRef(i))
         );

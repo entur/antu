@@ -155,11 +155,11 @@ class UnexpectedSpeedValidatorTest extends ValidatorTestBase {
 
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
     netexEntitiesTestFactory
-      .addServiceJourney(createJourneyPattern)
+      .addServiceJourney(journeyPatternBuilder)
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
@@ -192,13 +192,13 @@ class UnexpectedSpeedValidatorTest extends ValidatorTestBase {
   void testNoPassengerStopAssignmentsFoundShouldIgnoreValidationGracefully() {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
-    ServiceJourneyBuilder createServiceJourney =
-      netexEntitiesTestFactory.addServiceJourney(createJourneyPattern);
+    ServiceJourneyBuilder serviceJourneyBuilder =
+      netexEntitiesTestFactory.addServiceJourney(journeyPatternBuilder);
 
-    createServiceJourney
+    serviceJourneyBuilder
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
@@ -218,13 +218,13 @@ class UnexpectedSpeedValidatorTest extends ValidatorTestBase {
   ) {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
     List<StopPointInJourneyPatternBuilder> stopPointInJourneyPatterns =
-      createJourneyPattern.addStopPoints(4);
+      journeyPatternBuilder.addStopPoints(4);
 
-    ServiceJourneyBuilder createServiceJourney = netexEntitiesTestFactory
-      .addServiceJourney(createJourneyPattern)
+    ServiceJourneyBuilder serviceJourneyBuilder = netexEntitiesTestFactory
+      .addServiceJourney(journeyPatternBuilder)
       .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
       .withTransportSubmode(
         new TransportSubmodeStructure()
@@ -234,7 +234,7 @@ class UnexpectedSpeedValidatorTest extends ValidatorTestBase {
     IntStream
       .rangeClosed(1, stopPointInJourneyPatterns.size())
       .forEach(index ->
-        createServiceJourney
+        serviceJourneyBuilder
           .addTimetabledPassingTime(
             index,
             stopPointInJourneyPatterns.get(index - 1)

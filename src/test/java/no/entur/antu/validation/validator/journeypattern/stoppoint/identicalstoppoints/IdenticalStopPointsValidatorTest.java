@@ -175,19 +175,19 @@ class IdenticalStopPointsValidatorTest extends ValidatorTestBase {
   ) {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    List<JourneyPatternBuilder> createJourneyPatterns = IntStream
+    List<JourneyPatternBuilder> journeyPatternBuilders = IntStream
       .rangeClosed(1, numberOfJourneyPatterns)
       .mapToObj(netexEntitiesTestFactory::addJourneyPattern)
       .toList();
 
     if (numberOfStopPoints > 0) {
-      createJourneyPatterns.forEach(createJourneyPattern -> {
+      journeyPatternBuilders.forEach(journeyPatternBuilder -> {
         List<StopPointInJourneyPatternBuilder> stopPointsInJourneyPatterns =
-          createJourneyPattern.addStopPoints(numberOfStopPoints);
+          journeyPatternBuilder.addStopPoints(numberOfStopPoints);
 
         stopPointsInJourneyPatterns.forEach(createStopPointInJourneyPattern ->
           customizeStopPoint.accept(
-            createJourneyPattern,
+            journeyPatternBuilder,
             createStopPointInJourneyPattern
           )
         );

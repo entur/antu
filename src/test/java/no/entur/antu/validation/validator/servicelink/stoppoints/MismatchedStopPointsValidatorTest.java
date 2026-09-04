@@ -107,18 +107,18 @@ class MismatchedStopPointsValidatorTest extends ValidatorTestBase {
   void testFromStopPointInServiceLinkDoesNotMatchesJourneyPattern() {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addStopPoint(1)
       .withScheduledStopPointRef(NetexRefs.scheduledStopPointRef(1));
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addStopPoint(2)
       .withScheduledStopPointRef(NetexRefs.scheduledStopPointRef(2));
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addLink(1)
       .withServiceLinkRef(NetexRefs.serviceLinkRef(1));
 
@@ -150,18 +150,18 @@ class MismatchedStopPointsValidatorTest extends ValidatorTestBase {
   void testToStopPointInServiceLinkDoesNotMatchesJourneyPattern() {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    JourneyPatternBuilder createJourneyPattern =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern();
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addStopPoint(1)
       .withScheduledStopPointRef(NetexRefs.scheduledStopPointRef(1));
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addStopPoint(2)
       .withScheduledStopPointRef(NetexRefs.scheduledStopPointRef(2));
 
-    createJourneyPattern
+    journeyPatternBuilder
       .addLink(1)
       .withServiceLinkRef(NetexRefs.serviceLinkRef(1));
 
@@ -226,7 +226,7 @@ class MismatchedStopPointsValidatorTest extends ValidatorTestBase {
     IntStream
       .rangeClosed(1, numberOfJourneyPatterns)
       .forEach(journeyPatternId -> {
-        JourneyPatternBuilder createJourneyPattern =
+        JourneyPatternBuilder journeyPatternBuilder =
           netexEntitiesTestFactory.addJourneyPattern(journeyPatternId);
 
         IntStream
@@ -235,7 +235,7 @@ class MismatchedStopPointsValidatorTest extends ValidatorTestBase {
             Integer.parseInt(journeyPatternId + "" + stopPointId)
           )
           .forEach(stopPointInJourneyPatternId ->
-            createJourneyPattern
+            journeyPatternBuilder
               .addStopPoint(stopPointInJourneyPatternId)
               .withScheduledStopPointRef(
                 NetexRefs.scheduledStopPointRef(stopPointInJourneyPatternId)
@@ -249,7 +249,7 @@ class MismatchedStopPointsValidatorTest extends ValidatorTestBase {
             Integer.parseInt(journeyPatternId + "" + serviceLinkId)
           )
           .forEach(serviceLinkInJourneyPatternId ->
-            createJourneyPattern
+            journeyPatternBuilder
               .addLink(1)
               .withServiceLinkRef(
                 NetexRefs.serviceLinkRef(serviceLinkInJourneyPatternId)

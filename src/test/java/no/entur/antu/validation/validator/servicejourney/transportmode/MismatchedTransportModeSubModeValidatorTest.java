@@ -353,8 +353,8 @@ class MismatchedTransportModeSubModeValidatorTest extends ValidatorTestBase {
   @Test
   void correctTransportModeOnFlexibleLineShouldBeValidated() {
     NetexEntitiesIndex flexNetexEntitiesIndex =
-      createFlexNetexEntitiesIndex(createFlexibleLine ->
-        createFlexibleLine
+      createFlexNetexEntitiesIndex(flexibleLineBuilder ->
+        flexibleLineBuilder
           .withFlexibleLineType(FlexibleLineTypeEnumeration.FIXED)
           .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
           .withTransportSubmode(
@@ -377,8 +377,8 @@ class MismatchedTransportModeSubModeValidatorTest extends ValidatorTestBase {
   @Test
   void incorrectTransportModeOnFlexibleLineShouldBeReported() {
     NetexEntitiesIndex flexNetexEntitiesIndex =
-      createFlexNetexEntitiesIndex(createFlexibleLine ->
-        createFlexibleLine
+      createFlexNetexEntitiesIndex(flexibleLineBuilder ->
+        flexibleLineBuilder
           .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
           .withTransportSubmode(
             new TransportSubmodeStructure()

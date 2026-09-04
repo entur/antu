@@ -47,14 +47,14 @@ class StopPointsCountValidatorTest extends ValidatorTestBase {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
     int stopPointInJourneyPatternIdOffset = 123;
 
-    JourneyPatternBuilder createJourneyPattern123 = netexEntitiesTestFactory
+    JourneyPatternBuilder journeyPatternBuilder = netexEntitiesTestFactory
       .addJourneyPattern(123)
       .withNoServiceLinksInJourneyPattern();
 
     IntStream
       .rangeClosed(1, 10)
       .forEach(i ->
-        createJourneyPattern123.addStopPoint(
+        journeyPatternBuilder.addStopPoint(
           stopPointInJourneyPatternIdOffset + 1
         )
       );
@@ -71,13 +71,13 @@ class StopPointsCountValidatorTest extends ValidatorTestBase {
     int stopPointInJourneyPatternIdOffset = 123;
     int linksInJourneyPatternIdOffset = 234;
 
-    JourneyPatternBuilder createJourneyPattern123 =
+    JourneyPatternBuilder journeyPatternBuilder =
       testFragment.addJourneyPattern(123);
 
     IntStream
       .rangeClosed(1, 10)
       .forEach(i ->
-        createJourneyPattern123.addStopPoint(
+        journeyPatternBuilder.addStopPoint(
           stopPointInJourneyPatternIdOffset + 1
         )
       );
@@ -85,7 +85,7 @@ class StopPointsCountValidatorTest extends ValidatorTestBase {
     IntStream
       .rangeClosed(1, numberOfServiceLinks)
       .forEach(i ->
-        createJourneyPattern123.addLink(linksInJourneyPatternIdOffset + 1)
+        journeyPatternBuilder.addLink(linksInJourneyPatternIdOffset + 1)
       );
 
     return runValidation(testFragment.build());

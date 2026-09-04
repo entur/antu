@@ -92,22 +92,22 @@ class SameStopPointsValidatorTest extends ValidatorTestBase {
     NetexTestData netexEntitiesTestFactory = new NetexTestData();
     int stopPointInJourneyPatternId = 987;
 
-    JourneyPatternBuilder createJourneyPattern123 =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern(123);
 
     IntStream
       .rangeClosed(1, 10)
       .forEach(i ->
-        createJourneyPattern123.addStopPoint(stopPointInJourneyPatternId + 1)
+        journeyPatternBuilder.addStopPoint(stopPointInJourneyPatternId + 1)
       );
 
-    JourneyPatternBuilder createJourneyPattern345 =
+    JourneyPatternBuilder journeyPatternBuilder2 =
       netexEntitiesTestFactory.addJourneyPattern(345);
 
     IntStream
       .rangeClosed(1, 10)
       .forEach(i ->
-        createJourneyPattern345.addStopPoint(stopPointInJourneyPatternId + 1)
+        journeyPatternBuilder2.addStopPoint(stopPointInJourneyPatternId + 1)
       );
 
     ValidationReport validationReport = runValidation(
@@ -151,24 +151,24 @@ class SameStopPointsValidatorTest extends ValidatorTestBase {
 
     List<Integer> stopPointsOrder1 = List.of(8, 3, 5, 2, 4, 10, 9, 1, 7, 6);
 
-    JourneyPatternBuilder createJourneyPattern123 =
+    JourneyPatternBuilder journeyPatternBuilder =
       netexEntitiesTestFactory.addJourneyPattern(123);
 
     IntStream
       .rangeClosed(1, 10)
       .forEach(i ->
-        createJourneyPattern123
+        journeyPatternBuilder
           .addStopPoint(stopPointInJourneyPatternId + 1)
           .withOrder(stopPointsOrder1.get(i - 1))
       );
 
-    JourneyPatternBuilder createJourneyPattern345 =
+    JourneyPatternBuilder journeyPatternBuilder2 =
       netexEntitiesTestFactory.addJourneyPattern(345);
 
     IntStream
       .rangeClosed(1, 10)
       .forEach(i ->
-        createJourneyPattern345
+        journeyPatternBuilder2
           .addStopPoint(stopPointInJourneyPatternId + 1)
           .withOrder(i)
       );
