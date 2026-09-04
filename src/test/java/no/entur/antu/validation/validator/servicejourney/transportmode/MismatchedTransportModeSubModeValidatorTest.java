@@ -1,16 +1,18 @@
 package no.entur.antu.validation.validator.servicejourney.transportmode;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
-import no.entur.antu.common.repository.TestCommonDataRepository;
-import no.entur.antu.common.repository.TestStopPlaceRepository;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
+import no.entur.antu.netex.test.NetexTestData;
+import no.entur.antu.netex.test.ValidatorTestBase;
+import no.entur.antu.netex.test.builder.FlexibleLineBuilder;
+import no.entur.antu.netex.test.builder.GenericLineBuilder;
+import no.entur.antu.netex.test.builder.JourneyPatternBuilder;
+import no.entur.antu.netex.test.builder.RouteBuilder;
+import no.entur.antu.netex.test.builder.ServiceJourneyBuilder;
+import no.entur.antu.netex.test.repository.TestCommonDataRepository;
+import no.entur.antu.netex.test.repository.TestStopPlaceRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationIssue;
-import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
-import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,28 +25,25 @@ import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.TaxiSubmodeEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 
-class MismatchedTransportModeSubModeValidatorTest {
+class MismatchedTransportModeSubModeValidatorTest extends ValidatorTestBase {
 
-  private static final String TEST_REPORT_ID = "report id";
-  private static final String TEST_CODESPACE = "ENT";
-  private static final String TEST_FILENAME = "netex.xml";
   private MismatchedTransportModeSubModeValidator validator;
-  private NetexEntitiesTestFactory netexEntitiesTestFactory;
-  private NetexEntitiesTestFactory.CreateGenericLine<? extends Line_VersionStructure> line;
-  private NetexEntitiesTestFactory.CreateServiceJourney serviceJourney;
+  private NetexTestData netexEntitiesTestFactory;
+  private GenericLineBuilder<? extends Line_VersionStructure> line;
+  private ServiceJourneyBuilder serviceJourney;
 
   @BeforeEach
   void setUp() {
     validator = new MismatchedTransportModeSubModeValidator();
-    netexEntitiesTestFactory = new NetexEntitiesTestFactory();
-    line = netexEntitiesTestFactory.createLine(1);
-    NetexEntitiesTestFactory.CreateRoute route =
-      netexEntitiesTestFactory.createRoute(1);
-    NetexEntitiesTestFactory.CreateJourneyPattern journeyPattern =
-      netexEntitiesTestFactory.createJourneyPattern(1).withRoute(route);
-    journeyPattern.createStopPointsInJourneyPattern(4);
+    netexEntitiesTestFactory = new NetexTestData();
+    line = netexEntitiesTestFactory.addLine(1);
+    RouteBuilder route = netexEntitiesTestFactory.addRoute(1);
+    JourneyPatternBuilder journeyPattern = netexEntitiesTestFactory
+      .addJourneyPattern(1)
+      .withRoute(route);
+    journeyPattern.addStopPoints(4);
     serviceJourney =
-      netexEntitiesTestFactory.createServiceJourney(1, journeyPattern);
+      netexEntitiesTestFactory.addServiceJourney(1, journeyPattern);
   }
 
   @Test
@@ -56,14 +55,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
     Assertions.assertTrue(validationIssues.isEmpty());
   }
@@ -77,20 +74,18 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
       );
 
-    NetexEntitiesIndex netexEntitiesIndex = netexEntitiesTestFactory.create();
+    NetexEntitiesIndex netexEntitiesIndex = netexEntitiesTestFactory.build();
 
     netexEntitiesIndex
       .getQuayIdByStopPointRefIndex()
       .put("TST:ScheduledStopPoint:1", "TST:Quay:1");
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesIndex,
-      TestCommonDataRepository.of(0),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(0));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesIndex,
+      validator
     );
     Assertions.assertTrue(validationIssues.isEmpty());
   }
@@ -104,20 +99,18 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withRailSubmode(RailSubmodeEnumeration.LOCAL)
       );
 
-    NetexEntitiesIndex netexEntitiesIndex = netexEntitiesTestFactory.create();
+    NetexEntitiesIndex netexEntitiesIndex = netexEntitiesTestFactory.build();
 
     netexEntitiesIndex
       .getQuayIdByStopPointRefIndex()
       .put("TST:ScheduledStopPoint:1", "TST:Quay:1");
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesIndex,
-      TestCommonDataRepository.of(0),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(0));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesIndex,
+      validator
     );
     Assertions.assertFalse(validationIssues.isEmpty());
   }
@@ -137,14 +130,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertTrue(validationIssues.isEmpty());
@@ -159,14 +150,14 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withBusSubmode(BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(
       TestStopPlaceRepository.ofRailReplacementBusStops(4)
     );
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertTrue(validationIssues.isEmpty());
@@ -181,14 +172,14 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(
       TestStopPlaceRepository.ofRailReplacementBusStops(4)
     );
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertFalse(validationIssues.isEmpty());
@@ -203,14 +194,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofNationalCoachStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofNationalCoachStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertTrue(validationIssues.isEmpty());
@@ -225,14 +214,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withCoachSubmode(CoachSubmodeEnumeration.NATIONAL_COACH)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertTrue(validationIssues.isEmpty());
@@ -247,14 +234,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withTaxiSubmode(TaxiSubmodeEnumeration.CHARTER_TAXI)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertTrue(validationIssues.isEmpty());
@@ -269,14 +254,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withTaxiSubmode(TaxiSubmodeEnumeration.CHARTER_TAXI)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofNationalCoachStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofNationalCoachStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertTrue(validationIssues.isEmpty());
@@ -291,14 +274,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withTaxiSubmode(TaxiSubmodeEnumeration.CHARTER_TAXI)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalTrainStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalTrainStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertFalse(validationIssues.isEmpty());
@@ -306,14 +287,12 @@ class MismatchedTransportModeSubModeValidatorTest {
 
   @Test
   void validateOkWhenTransportModeNotFoundOnServiceJourneyNorLine() {
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
     Assertions.assertTrue(validationIssues.isEmpty());
   }
@@ -321,14 +300,12 @@ class MismatchedTransportModeSubModeValidatorTest {
   @Test
   void validateOkWhenTransportSubModeNotFoundOnServiceJourneyNorLine() {
     line.withTransportMode(AllVehicleModesOfTransportEnumeration.TAXI);
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
     Assertions.assertTrue(validationIssues.isEmpty());
   }
@@ -341,14 +318,14 @@ class MismatchedTransportModeSubModeValidatorTest {
         new TransportSubmodeStructure()
           .withTaxiSubmode(TaxiSubmodeEnumeration.CHARTER_TAXI)
       );
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(
       TestStopPlaceRepository.ofMissingTransportModeAndSubMode(4)
     );
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
     Assertions.assertTrue(validationIssues.isEmpty());
   }
@@ -362,14 +339,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS)
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      netexEntitiesTestFactory.create(),
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalTrainStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalTrainStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      netexEntitiesTestFactory.build(),
+      validator
     );
 
     Assertions.assertFalse(validationIssues.isEmpty());
@@ -388,14 +363,12 @@ class MismatchedTransportModeSubModeValidatorTest {
           )
       );
 
-    JAXBValidationContext validationContext = createValidationContext(
-      flexNetexEntitiesIndex,
-      TestCommonDataRepository.of(4),
-      TestStopPlaceRepository.ofLocalBusStops(4)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(4));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(4));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      flexNetexEntitiesIndex,
+      validator
     );
 
     Assertions.assertTrue(validationIssues.isEmpty());
@@ -415,14 +388,12 @@ class MismatchedTransportModeSubModeValidatorTest {
 
     // create common data and stop place repositories where only the first two stops are mapped to fixed quays
     // (the two following quays can be mapped to flexible areas)
-    JAXBValidationContext validationContext = createValidationContext(
-      flexNetexEntitiesIndex,
-      TestCommonDataRepository.of(2),
-      TestStopPlaceRepository.ofLocalBusStops(2)
-    );
+    withCommonDataRepository(TestCommonDataRepository.of(2));
+    withStopPlaceRepository(TestStopPlaceRepository.ofLocalBusStops(2));
 
-    List<ValidationIssue> validationIssues = validator.validate(
-      validationContext
+    List<ValidationIssue> validationIssues = validateLineFile(
+      flexNetexEntitiesIndex,
+      validator
     );
 
     Assertions.assertEquals(2, validationIssues.size());
@@ -443,43 +414,25 @@ class MismatchedTransportModeSubModeValidatorTest {
    * Create a NetexEntitiesIndex containing a flexible line.
    */
   private NetexEntitiesIndex createFlexNetexEntitiesIndex(
-    Consumer<NetexEntitiesTestFactory.CreateFlexibleLine> configureFlexibleLine
+    Consumer<FlexibleLineBuilder> configureFlexibleLine
   ) {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    NetexEntitiesTestFactory.CreateFlexibleLine createFlexibleLine =
-      netexEntitiesTestFactory
-        .createFlexibleLine()
-        .withFlexibleLineType(FlexibleLineTypeEnumeration.MIXED_FLEXIBLE);
+    FlexibleLineBuilder createFlexibleLine = netexEntitiesTestFactory
+      .addFlexibleLine()
+      .withFlexibleLineType(FlexibleLineTypeEnumeration.MIXED_FLEXIBLE);
 
     configureFlexibleLine.accept(createFlexibleLine);
 
-    NetexEntitiesTestFactory.CreateRoute route =
-      netexEntitiesTestFactory.createRoute();
+    RouteBuilder route = netexEntitiesTestFactory.addRoute();
 
-    NetexEntitiesTestFactory.CreateJourneyPattern journeyPattern =
-      netexEntitiesTestFactory.createJourneyPattern().withRoute(route);
-    journeyPattern.createStopPointsInJourneyPattern(4);
+    JourneyPatternBuilder journeyPattern = netexEntitiesTestFactory
+      .addJourneyPattern()
+      .withRoute(route);
+    journeyPattern.addStopPoints(4);
 
-    netexEntitiesTestFactory.createServiceJourney(journeyPattern);
+    netexEntitiesTestFactory.addServiceJourney(journeyPattern);
 
-    return netexEntitiesTestFactory.create();
-  }
-
-  private static JAXBValidationContext createValidationContext(
-    NetexEntitiesIndex netexEntitiesIndex,
-    CommonDataRepository commonDataRepository,
-    StopPlaceRepository stopPlaceRepository
-  ) {
-    return new JAXBValidationContext(
-      TEST_REPORT_ID,
-      netexEntitiesIndex,
-      commonDataRepository,
-      n -> stopPlaceRepository,
-      TEST_CODESPACE,
-      TEST_FILENAME,
-      Map.of()
-    );
+    return netexEntitiesTestFactory.build();
   }
 }

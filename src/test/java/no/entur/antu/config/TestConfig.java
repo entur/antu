@@ -2,8 +2,8 @@ package no.entur.antu.config;
 
 import java.time.Instant;
 import java.util.Set;
-import no.entur.antu.common.repository.TestNetexDataRepository;
 import no.entur.antu.netexdata.NetexDataRepositoryLoader;
+import no.entur.antu.netexdata.TestNetexDataRepositoryLoader;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.NetexCodespace;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
@@ -37,7 +37,7 @@ public class TestConfig {
   @Bean
   @Primary
   public NetexDataRepositoryLoader netexDataRepository() {
-    return new TestNetexDataRepository();
+    return new TestNetexDataRepositoryLoader();
   }
 
   @Bean

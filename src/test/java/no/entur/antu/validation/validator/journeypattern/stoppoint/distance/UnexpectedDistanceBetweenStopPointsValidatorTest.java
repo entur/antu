@@ -8,8 +8,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
-import no.entur.antu.validation.ValidationTest;
+import no.entur.antu.netex.test.NetexTestData;
+import no.entur.antu.netex.test.ValidatorTestBase;
+import no.entur.antu.netex.test.builder.JourneyPatternBuilder;
+import no.entur.antu.netex.test.builder.NetexRefs;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
@@ -21,14 +23,15 @@ import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 
-class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
+class UnexpectedDistanceBetweenStopPointsValidatorTest
+  extends ValidatorTestBase {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnLineFile(
       netexEntitiesIndex,
-      UnexpectedDistanceBetweenStopPointsValidator.class
+      new UnexpectedDistanceBetweenStopPointsValidator()
     );
   }
 
@@ -171,34 +174,30 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
     TransportSubmodeStructure submode,
     List<QuayCoordinates> coordinates
   ) {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
     netexEntitiesTestFactory
-      .createLine()
+      .addLine()
       .withTransportMode(transportMode)
       .withTransportSubmode(submode);
 
-    NetexEntitiesTestFactory.CreateJourneyPattern createJourneyPattern =
-      netexEntitiesTestFactory
-        .createJourneyPattern(123)
-        .withRoute(netexEntitiesTestFactory.createRoute());
+    JourneyPatternBuilder createJourneyPattern = netexEntitiesTestFactory
+      .addJourneyPattern(123)
+      .withRoute(netexEntitiesTestFactory.addRoute());
 
     if (coordinates.isEmpty()) {
-      createJourneyPattern.createStopPointsInJourneyPattern(0);
+      createJourneyPattern.addStopPoints(0);
     } else {
       IntStream
         .rangeClosed(1, coordinates.size())
         .forEach(i ->
           createJourneyPattern
-            .createStopPointInJourneyPattern(i)
-            .withScheduledStopPointRef(
-              NetexEntitiesTestFactory.createScheduledStopPointRef(i)
-            )
+            .addStopPoint(i)
+            .withScheduledStopPointRef(NetexRefs.scheduledStopPointRef(i))
         );
     }
 
-    NetexEntitiesIndex netexEntitiesIndex = netexEntitiesTestFactory.create();
+    NetexEntitiesIndex netexEntitiesIndex = netexEntitiesTestFactory.build();
 
     return runTestWith(coordinates, netexEntitiesIndex);
   }
@@ -208,7 +207,7 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     for (int i = 0; i < quayCoordinates.size(); i++) {
-      mockGetCoordinates(
+      withCoordinates(
         new ScheduledStopPointId("TST:ScheduledStopPoint:" + (i + 1)),
         new QuayId("TST:Quay:" + (i + 1)),
         quayCoordinates.get(i)
