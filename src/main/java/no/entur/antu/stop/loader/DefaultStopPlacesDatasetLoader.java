@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -53,6 +54,12 @@ public class DefaultStopPlacesDatasetLoader implements StopPlacesDatasetLoader {
         e
       );
     }
+  }
+
+  @Override
+  @Nullable
+  public String loadDatasetVersion() {
+    return mardukBlobStoreService.blobVersion(currentStopPlacesFile);
   }
 
   /**

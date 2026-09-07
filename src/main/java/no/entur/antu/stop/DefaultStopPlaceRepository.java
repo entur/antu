@@ -18,6 +18,7 @@ package no.entur.antu.stop;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import no.entur.antu.exception.AntuException;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.SimpleQuay;
@@ -104,31 +105,43 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
 
   @Override
   public Instant refreshCache() {
+    try {
+      return loadCache();
+    } finally {
+      // The resource holds the parsed dataset, tens of megabytes of it, until this is called. On the way
+      // out of a refusal too, or the pod carries it until the next refresh.
+      stopPlaceResource.clear();
+    }
+  }
+
+  private Instant loadCache() {
     stopPlaceResource.clear();
     Map<StopPlaceId, SimpleStopPlace> newStopPlaceCache =
       stopPlaceResource.getStopPlaces();
+    Map<QuayId, SimpleQuay> newQuayCache = stopPlaceResource.getQuays();
 
-    // TODO: Keep warning logs for testing, remove them later
-    if (newStopPlaceCache.isEmpty()) {
-      LOGGER.warn("Unable to refresh cache, no stop place found");
-    } else {
-      stopPlaceCache.keySet().retainAll(newStopPlaceCache.keySet());
-      stopPlaceCache.putAll(newStopPlaceCache);
+    // The national registry is never empty, so this is a truncated or unparsed export. Refuse it rather
+    // than log and carry on, which leaves the caller believing the cache was refreshed. Checked before
+    // either cache is touched, so the caches keep the export they had rather than pairing new stop
+    // places with the previous quays.
+    if (newStopPlaceCache.isEmpty() || newQuayCache.isEmpty()) {
+      throw new AntuException(
+        "Refusing to refresh the stop place cache from a dataset with %d stop places and %d quays".formatted(
+            newStopPlaceCache.size(),
+            newQuayCache.size()
+          )
+      );
     }
+
+    stopPlaceCache.keySet().retainAll(newStopPlaceCache.keySet());
+    stopPlaceCache.putAll(newStopPlaceCache);
     LOGGER.info("Updated Stop place cache");
 
-    Map<QuayId, SimpleQuay> newQuayCache = stopPlaceResource.getQuays();
-    if (newQuayCache.isEmpty()) {
-      LOGGER.warn("Unable to refresh cache, no quay found");
-    } else {
-      quayCache.keySet().retainAll(newQuayCache.keySet());
-      quayCache.putAll(newQuayCache);
-    }
+    quayCache.keySet().retainAll(newQuayCache.keySet());
+    quayCache.putAll(newQuayCache);
     LOGGER.info("Updated Quay cache");
 
     Instant publicationTime = stopPlaceResource.getPublicationTime();
-
-    stopPlaceResource.clear();
 
     LOGGER.info(
       "Updated cache with " +

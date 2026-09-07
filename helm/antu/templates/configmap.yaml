@@ -64,8 +64,9 @@ data:
     antu.shutdown.drain.timeout.seconds=150
 
     # One thread per @Scheduled method: the leader heartbeat, the two cache refresh triggers, and the
-    # stalled-validation sweep. The last three all do blocking Redis or PubSub work and can coincide, so
-    # anything less than four lets them starve the heartbeat and drop the lease while this pod is healthy.
+    # stalled-validation sweep. The last three all do blocking Redis, PubSub or GCS work and can coincide,
+    # so anything less than four lets them starve the heartbeat and drop the lease while this pod is
+    # healthy.
     spring.task.scheduling.pool.size=4
 
     # Agreement registry
@@ -73,7 +74,7 @@ data:
     antu.agreement.registry.url={{ .Values.agreementRegistryUrl }}
 
     # Stop place dataset import
-    # Refresh stop place cache at 01:00 and 14:00 every day
+    # How often the leader checks the bucket for a new export.
     # Unquoted on purpose: this renders into a properties file, where quotes would become part of
     # the value and the cron parser would reject it at startup.
     antu.stop.refresh.cron={{ .Values.stopPlaceCacheRefreshCron }}

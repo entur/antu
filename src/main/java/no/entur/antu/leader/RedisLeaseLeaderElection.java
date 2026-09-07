@@ -69,6 +69,21 @@ public class RedisLeaseLeaderElection implements LeaderElection {
       return thread;
     });
 
+  /**
+   * Standing down has its own thread. Queued behind a takeover it would wait for a prime that parses the
+   * national dataset, and by then the pod that took the lease is already consuming: the two consumers this
+   * is meant to prevent, for as long as the prime lasts.
+   *
+   * <p>Two threads means the two can also run out of order, so what starts the consumer checks leadership
+   * for itself rather than trusting the order it was told in.
+   */
+  private final ExecutorService leadershipRevocations =
+    Executors.newSingleThreadExecutor(runnable -> {
+      Thread thread = new Thread(runnable, "antu-leadership-revocation");
+      thread.setDaemon(true);
+      return thread;
+    });
+
   private volatile boolean leader;
 
   /**
@@ -96,6 +111,7 @@ public class RedisLeaseLeaderElection implements LeaderElection {
   @PreDestroy
   void stopLeadershipCallbacks() {
     leadershipCallbacks.shutdownNow();
+    leadershipRevocations.shutdownNow();
   }
 
   /**
@@ -125,7 +141,7 @@ public class RedisLeaseLeaderElection implements LeaderElection {
     } catch (Exception e) {
       // A lost Redis connection must not leave a stale leader believing it still owns the lease.
       LOGGER.warn("Leader election heartbeat failed: {}", e.getMessage());
-      leader = false;
+      stepDown();
     }
   }
 
@@ -165,7 +181,25 @@ public class RedisLeaseLeaderElection implements LeaderElection {
     }
     // The lease is gone or belongs to someone else now. Stepping aside is what keeps the single-leader
     // guarantee.
-    leader = false;
     LOGGER.warn("Leadership lost by {}", podId);
+    stepDown();
+  }
+
+  /**
+   * Announced only on the transition, and off the heartbeat thread: listeners stop things that block, and
+   * a heartbeat that waits on them is a heartbeat that misses the next renewal.
+   */
+  private void stepDown() {
+    if (!leader) {
+      return;
+    }
+    leader = false;
+    leadershipRevocations.execute(() -> {
+      try {
+        eventPublisher.publishEvent(new LeadershipLostEvent());
+      } catch (Exception e) {
+        LOGGER.error("Standing down as leader failed", e);
+      }
+    });
   }
 }
