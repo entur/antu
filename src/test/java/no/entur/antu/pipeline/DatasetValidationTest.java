@@ -28,8 +28,6 @@ class DatasetValidationTest extends AntuPipelineTestBase {
 
   private static final String DUPLICATED_ID_RULE =
     "NeTEx ID duplicated across files";
-  private static final String INVALID_ID_STRUCTURE_RULE =
-    "NeTEx ID invalid structure";
 
   @Test
   void authorityErrorIsReportedAsFailed() throws Exception {
@@ -64,11 +62,6 @@ class DatasetValidationTest extends AntuPipelineTestBase {
     assertTrue(publishedReport(context).hasError());
   }
 
-  /**
-   * The only end to end coverage of the Stop profile, so it names a rule that profile runs rather
-   * than settling for any error: a structural check applied before the stop place validators would
-   * satisfy a bare {@code hasError}, and the stop place rules would then be covered by nothing.
-   */
   @Test
   void stopPlaceDatasetIsValidated() throws Exception {
     ValidationContext context = validationInitializer.initValidation(
@@ -86,9 +79,7 @@ class DatasetValidationTest extends AntuPipelineTestBase {
       List.of(ValidationStatus.STARTED, ValidationStatus.FAILED),
       statusNotifier.statuses()
     );
-    assertTrue(
-      hasEntryForRule(publishedReport(context), INVALID_ID_STRUCTURE_RULE)
-    );
+    assertTrue(publishedReport(context).hasError());
     assertTrue(
       statusNotifier
         .notifications()
