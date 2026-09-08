@@ -16,12 +16,8 @@ import org.rutebanken.netex.validation.NeTExValidator;
 
 /**
  * Validate that the NeTEx schema version the PublicationDelivery declares is one there is a schema
- * for.
- *
- * <p>A file declaring a version no schema exists for is still validated: {@code
- * NetexSchemaValidator} falls back to {@link NeTExValidator#LATEST}. That fallback is what makes the
- * declaration worth reporting - the findings then describe the file as read by a schema it does not
- * claim to follow, so a NeTEx 1.16 file is measured against the newest schema there is instead.
+ * for. A file declaring a version no schema exists for is still validated: {@code
+ * NetexSchemaValidator} falls back to {@link NeTExValidator#LATEST}.
  */
 public class ValidateSupportedNetexVersion extends AbstractXPathValidationRule {
 
@@ -78,10 +74,8 @@ public class ValidateSupportedNetexVersion extends AbstractXPathValidationRule {
    * "1.15:NO-NeTEx-networktimetable:1.5", and only the first segment is the NeTEx schema version.
    *
    * @return the declared NeTEx schema version, or null if the attribute is absent or is not in that
-   * three-segment form. Both are cases the schema fallback has always covered - the checked-in stop
-   * place dataset declares {@code version="205"} - so this rule leaves them alone rather than
-   * calling a version it cannot read unsupported. This is the same split
-   * {@code NetexSchemaRepository.getSchemaVersion} applies when it picks the schema.
+   * three-segment form. This is the same split {@code NetexSchemaRepository.getSchemaVersion}
+   * applies when it picks the schema.
    */
   private static String declaredSchemaVersion(String versionAttribute) {
     if (versionAttribute == null) {
