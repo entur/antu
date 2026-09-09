@@ -44,7 +44,7 @@ public class VehicleReferenceCacheRefresher {
       prime();
     } catch (Exception e) {
       LOGGER.error(
-        "Failed to prime the vehicle reference cache on taking over as leader",
+        "System error: Failed to prime the vehicle reference cache on taking over as leader",
         e
       );
     }
