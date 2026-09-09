@@ -2,6 +2,7 @@ package no.entur.antu.validation.validator.organisation;
 
 import java.util.Collection;
 import java.util.Set;
+import no.entur.antu.exception.AntuException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +33,21 @@ public class DefaultOrganisationAliasRepository
   public void refreshCache() {
     Collection<String> organisationAliases =
       agreementResource.getOrganisationAliases();
+
+    // The agreement registry should not be empty, so this is a failed or truncated response. Checked
+    // before the cache is touched, so it keeps the aliases it had.
+    if (organisationAliases.isEmpty()) {
+      throw new AntuException(
+        "Refusing to refresh the organisation alias cache from an empty agreement registry response"
+      );
+    }
+
+    int previousSize = organisationAliasCache.size();
     organisationAliasCache.retainAll(organisationAliases);
     organisationAliasCache.addAll(organisationAliases);
     LOGGER.info(
-      "Organisation Alias cache was refreshed with {} elements",
+      "Organisation Alias cache was refreshed from {} to {} elements",
+      previousSize,
       organisationAliasCache.size()
     );
   }

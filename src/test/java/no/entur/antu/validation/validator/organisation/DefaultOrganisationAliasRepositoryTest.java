@@ -1,10 +1,13 @@
 package no.entur.antu.validation.validator.organisation;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import java.util.HashSet;
+import java.util.Set;
+import no.entur.antu.exception.AntuException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -64,5 +67,47 @@ class DefaultOrganisationAliasRepositoryTest {
     assertFalse(repository.hasOrganisationWithAlias("TestOrg1"));
     assertTrue(repository.hasOrganisationWithAlias("TestOrg2"));
     assertTrue(repository.hasOrganisationWithAlias("TestOrg3"));
+  }
+
+  /**
+   * The agreement registry is never legitimately empty, so an empty response is a failed or truncated
+   * one. Refusing it rather than applying it keeps the caller from believing the cache was refreshed.
+   */
+  @Test
+  void testRefreshCacheRefusesAnEmptyResponse() {
+    DefaultOrganisationAliasRepository repository =
+      new DefaultOrganisationAliasRepository(
+        this.agreementResource,
+        new HashSet<>(Set.of("TestOrg1"))
+      );
+    Mockito
+      .when(agreementResource.getOrganisationAliases())
+      .thenReturn(Set.of());
+
+    assertThrows(AntuException.class, repository::refreshCache);
+  }
+
+  /**
+   * Applying an empty response would clear the cache, and every AuthorityRef in every dataset would
+   * then be reported as invalid until the next refresh.
+   */
+  @Test
+  void testRefreshCacheKeepsThePreviousAliasesWhenTheResponseIsEmpty() {
+    HashSet<String> organisationIds = new HashSet<>(
+      Set.of("TestOrg1", "TestOrg2")
+    );
+    DefaultOrganisationAliasRepository repository =
+      new DefaultOrganisationAliasRepository(
+        this.agreementResource,
+        organisationIds
+      );
+    Mockito
+      .when(agreementResource.getOrganisationAliases())
+      .thenReturn(Set.of());
+
+    assertThrows(AntuException.class, repository::refreshCache);
+
+    assertTrue(repository.hasOrganisationWithAlias("TestOrg1"));
+    assertTrue(repository.hasOrganisationWithAlias("TestOrg2"));
   }
 }
