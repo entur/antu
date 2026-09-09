@@ -27,7 +27,7 @@ gcp:
 tiamatUrl: http://tiamat.dev.entur.internal/services/stop_places
 
 
-vehicleRegistryUrl: https://api.dev.entur.io/vehicle-registry/v1
+vehicleRegistryUrl: https://api.dev.entur.io/vehicles/v1
 
 interchangeWaitingTimeValidationEnabled: true
 alightingAndBoardingValidationEnabled: true
