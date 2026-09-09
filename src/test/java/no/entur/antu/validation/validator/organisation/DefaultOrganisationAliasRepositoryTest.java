@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
 import no.entur.antu.exception.AntuException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class DefaultOrganisationAliasRepositoryTest {
 
@@ -59,8 +59,7 @@ class DefaultOrganisationAliasRepositoryTest {
     HashSet<String> refreshedOrganisationIds = new HashSet<>();
     refreshedOrganisationIds.add("TestOrg2");
     refreshedOrganisationIds.add("TestOrg3");
-    Mockito
-      .when(agreementResource.getOrganisationAliases())
+    when(agreementResource.getOrganisationAliases())
       .thenReturn(refreshedOrganisationIds);
 
     repository.refreshCache();
@@ -80,9 +79,7 @@ class DefaultOrganisationAliasRepositoryTest {
         this.agreementResource,
         new HashSet<>(Set.of("TestOrg1"))
       );
-    Mockito
-      .when(agreementResource.getOrganisationAliases())
-      .thenReturn(Set.of());
+    when(agreementResource.getOrganisationAliases()).thenReturn(Set.of());
 
     assertThrows(AntuException.class, repository::refreshCache);
   }
@@ -101,9 +98,7 @@ class DefaultOrganisationAliasRepositoryTest {
         this.agreementResource,
         organisationIds
       );
-    Mockito
-      .when(agreementResource.getOrganisationAliases())
-      .thenReturn(Set.of());
+    when(agreementResource.getOrganisationAliases()).thenReturn(Set.of());
 
     assertThrows(AntuException.class, repository::refreshCache);
 
