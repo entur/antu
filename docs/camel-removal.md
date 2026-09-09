@@ -16,7 +16,7 @@ several of them after a review found the code breaking them.
 ## Why
 
 Camel was doing three jobs in antu: PubSub transport, an in-memory aggregator that waited for a dataset's
-files, and a REST layer. Only the first is hard, and the entur-google-pubsub helper already does it, using
+files, and a REST layer. Only the first is hard, and the entur-google-pubsub helper already does it, using 
 the same base class nabu uses.
 
 The aggregator was the real cost. It held pending aggregations in the heap of whichever pod had won a

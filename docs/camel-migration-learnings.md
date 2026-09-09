@@ -23,7 +23,7 @@ Swapping the transport is the easy part and took the least time. Three things co
 
 None of these are about Camel. They are about what Camel was hiding.
 
-## Before you write any code
+## Before you write any code 
 
 ### Write down the wire contract, then pin it with tests that assert literals
 
