@@ -10,10 +10,16 @@ import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2Clien
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.util.unit.DataSize;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class VehicleRegistryWebClientConfiguration {
+
+  @Value("${antu.vehicle.registry.max-in-memory-size:500KB}")
+  DataSize maxInMemorySize;
+
 
   @Bean("vehicleRegistryWebClient")
   @Profile("!test")
@@ -31,7 +37,12 @@ public class VehicleRegistryWebClientConfiguration {
       webClientBuilder
         .baseUrl(vehicleRegistryUrl)
         .defaultHeader(ET_CLIENT_NAME_HEADER, ET_CLIENT_NAME_HEADER_VALUE)
-    )
+        .exchangeStrategies(ExchangeStrategies
+          .builder()
+          .codecs(codecs -> codecs
+            .defaultCodecs()
+            .maxInMemorySize((int)maxInMemorySize.toBytes()))
+        .build()))
       .withOAuth2ClientProperties(properties)
       .withAudience(audience)
       .withClientRegistrationId("sobek")
