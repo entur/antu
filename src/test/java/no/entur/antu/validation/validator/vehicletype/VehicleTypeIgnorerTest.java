@@ -52,9 +52,6 @@ class VehicleTypeIgnorerTest {
     VehicleRefRepository vehicleRefRepository = mock(
       VehicleRefRepository.class
     );
-    ReferenceToVehicleRegistryValidator vehicleRegistryValidator =
-      new ReferenceToVehicleRegistryValidator(vehicleRefRepository);
-
     ValidatorConfig config = new ValidatorConfig();
     NetexReferenceValidator validator = config.netexReferenceValidator(
       netexIdRepository,
