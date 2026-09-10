@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import no.entur.antu.config.ValidatorConfig;
 import no.entur.antu.validation.validator.id.ReferenceToNsrValidator;
-import no.entur.antu.validation.validator.id.ReferenceToVehicleRegistryValidator;
 import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.id.IdVersion;
 import org.entur.netex.validation.validator.id.NetexIdRepository;
