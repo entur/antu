@@ -20,7 +20,6 @@ public class VehicleRegistryWebClientConfiguration {
   @Value("${antu.vehicle.registry.max-in-memory-size:500KB}")
   DataSize maxInMemorySize;
 
-
   @Bean("vehicleRegistryWebClient")
   @Profile("!test")
   @ConditionalOnProperty(
@@ -37,12 +36,17 @@ public class VehicleRegistryWebClientConfiguration {
       webClientBuilder
         .baseUrl(vehicleRegistryUrl)
         .defaultHeader(ET_CLIENT_NAME_HEADER, ET_CLIENT_NAME_HEADER_VALUE)
-        .exchangeStrategies(ExchangeStrategies
-          .builder()
-          .codecs(codecs -> codecs
-            .defaultCodecs()
-            .maxInMemorySize((int)maxInMemorySize.toBytes()))
-        .build()))
+        .exchangeStrategies(
+          ExchangeStrategies
+            .builder()
+            .codecs(codecs ->
+              codecs
+                .defaultCodecs()
+                .maxInMemorySize((int) maxInMemorySize.toBytes())
+            )
+            .build()
+        )
+    )
       .withOAuth2ClientProperties(properties)
       .withAudience(audience)
       .withClientRegistrationId("sobek")
