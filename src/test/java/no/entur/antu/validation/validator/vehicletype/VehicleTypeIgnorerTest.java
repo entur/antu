@@ -48,9 +48,6 @@ class VehicleTypeIgnorerTest {
     StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);
     ReferenceToNsrValidator referenceToNsrValidator =
       new ReferenceToNsrValidator(stopPlaceRepository);
-    VehicleRefRepository vehicleRefRepository = mock(
-      VehicleRefRepository.class
-    );
     ValidatorConfig config = new ValidatorConfig();
     NetexReferenceValidator validator = config.netexReferenceValidator(
       netexIdRepository,
