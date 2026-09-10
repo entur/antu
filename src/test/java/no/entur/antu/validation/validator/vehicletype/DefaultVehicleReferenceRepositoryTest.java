@@ -47,18 +47,18 @@ class DefaultVehicleReferenceRepositoryTest {
       this.vehicleReferenceResource,
       vehicleReferences
     );
-    
+
     // Test when reference is not in cache - should return false
     assertFalse(repository.hasVehicleRef("NMR:Vehicle:1"));
-    
+
     // Add a valid vehicle reference to cache
     vehicleReferences.add("NMR:Vehicle:1");
     assertTrue(repository.hasVehicleRef("NMR:Vehicle:1"));
-    
+
     // Test that VehicleType references are rejected even if in cache
     vehicleReferences.add("NMR:VehicleType:2");
     assertFalse(repository.hasVehicleRef("NMR:VehicleType:2"));
-    
+
     // Test that reference must contain ":Vehicle:" substring
     vehicleReferences.add("NMR:SomethingElse:3");
     assertFalse(repository.hasVehicleRef("NMR:SomethingElse:3"));
