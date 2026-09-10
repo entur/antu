@@ -129,9 +129,6 @@ public class ValidatorConfig {
   public NetexReferenceValidator netexReferenceValidator(
     NetexIdRepository netexIdRepository,
     ReferenceToNsrValidator referenceToNsrValidator,
-    @Value(
-      "${antu.netex.validation.vehicles.enabled:false}"
-    ) boolean enableVehicleValidation,
     @Autowired(
       required = false
     ) ReferenceToVehicleRegistryValidator referenceToVehicleRegistryValidator
@@ -143,7 +140,7 @@ public class ValidatorConfig {
     externalReferenceValidators.add(new InterchangeRuleReferencesIgnorer());
     externalReferenceValidators.add(new TrainElementRegistryIdValidator());
     externalReferenceValidators.add(referenceToNsrValidator);
-    if (enableVehicleValidation) {
+    if (referenceToVehicleRegistryValidator != null) {
       externalReferenceValidators.add(referenceToVehicleRegistryValidator);
     } else {
       externalReferenceValidators.add(new VehicleTypeReferenceIgnorer());

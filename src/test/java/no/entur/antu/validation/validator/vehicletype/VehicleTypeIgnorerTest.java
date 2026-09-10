@@ -59,8 +59,7 @@ class VehicleTypeIgnorerTest {
     NetexReferenceValidator validator = config.netexReferenceValidator(
       netexIdRepository,
       referenceToNsrValidator,
-      false,
-      vehicleRegistryValidator
+      null
     );
 
     // Parse the XML
