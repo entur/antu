@@ -17,6 +17,8 @@ public class AgreementResource {
 
   private static final long MAX_RETRY_ATTEMPTS = 3;
 
+  private static final Duration CALL_TIMEOUT = Duration.ofSeconds(120);
+
   private final WebClient webClient;
 
   public AgreementResource(
@@ -44,7 +46,7 @@ public class AgreementResource {
         return aliases;
       })
       .collect(Collectors.toSet())
-      .block();
+      .block(CALL_TIMEOUT);
   }
 
   protected static final Predicate<Throwable> is5xx = throwable ->

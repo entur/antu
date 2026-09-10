@@ -78,9 +78,21 @@ public class OrganisationAliasCacheRefresher {
     jobQueue.submit(new AntuJob.RefreshOrganisationAliasCache());
   }
 
+  /**
+   * Contained rather than thrown: letting it out nacks the job and redelivers against the pod's one
+   * job consumer. The retry is the next scheduled refresh.
+   */
   public void refresh() {
     LOGGER.info("Refreshing organisation alias cache");
-    organisationAliasRepository.refreshCache();
-    LOGGER.info("Refreshed organisation alias cache");
+    try {
+      organisationAliasRepository.refreshCache();
+      LOGGER.info("Refreshed organisation alias cache");
+    } catch (Exception e) {
+      LOGGER.error(
+        "Could not refresh the organisation alias cache. Validations will report authority " +
+        "references registered since the last successful refresh as invalid until it succeeds.",
+        e
+      );
+    }
   }
 }
