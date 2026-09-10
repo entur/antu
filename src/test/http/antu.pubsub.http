@@ -133,3 +133,26 @@ Content-Type: application/json
     }
   ]
 }
+
+###
+
+## validating a timetable file with vehicle references
+POST http://localhost:8085/v1/projects/test/topics/AntuNetexValidationQueue:publish
+Content-Type: application/json
+
+{
+"messages": [
+{
+"attributes": {
+"EnturValidationClient": "Marduk",
+"EnturValidationCorrelationId": "ac99265b-f6fa-4202-8118-54c5297f8e7b",
+"EnturValidationDatasetFileHandle": "KMB-Export_ac99265b-f6fa-4202-8118-54c5297f8e7b-2026-08-14T14_36_01.148Z.zip",
+"EnturValidationImportType": "ImportType_netex_flex",
+"EnturValidationProfile": "Timetable",
+"EnturValidationStage": "EnturValidationStagePrevalidation",
+"EnturDatasetReferential": "kmb"
+},
+"data": ""
+}
+]
+}

@@ -26,11 +26,15 @@ gcp:
 
 tiamatUrl: http://tiamat.dev.entur.internal/services/stop_places
 
+
 agreementRegistryUrl: https://api.entur.io/agreements/v1
+
+vehicleRegistryUrl: https://api.dev.entur.io/vehicles/v1
 
 interchangeWaitingTimeValidationEnabled: true
 alightingAndBoardingValidationEnabled: true
 interchangeServiceJourneyReferencesExistValidatorEnabled: true
+netexValidationVehiclesEnabled: true
 
 baba:
   service: http://baba.dev.entur.internal

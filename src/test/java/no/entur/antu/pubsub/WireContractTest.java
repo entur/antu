@@ -126,6 +126,10 @@ class WireContractTest {
       JobType.REFRESH_ORGANISATION_ALIAS_CACHE,
       "REFRESH_ORGANISATION_ALIAS_CACHE"
     );
+    expected.put(
+      JobType.REFRESH_VEHICLE_REFERENCE_CACHE,
+      "REFRESH_VEHICLE_REFERENCE_CACHE"
+    );
 
     assertEquals(
       EnumSet.allOf(JobType.class),

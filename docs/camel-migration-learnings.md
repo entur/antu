@@ -331,17 +331,17 @@ defaults*. Read the jar. `javap -c` on the class, or unzip the sources jar, take
 A sample of what was written down confidently and was wrong. All of these are now corrected in
 `camel-removal.md`; the point of keeping the list is the pattern, not the individual entries:
 
-| Claim | Actually |
-| --- | --- |
-| the sweeper's re-read narrows the race to one round trip | it reads the local cache, the staler of the two sources |
-| all per-validation Redis keys carry a TTL | entries inside the local-cached maps carry none |
-| both versions contend for the same lease during rollout | the old version used a different mechanism entirely; there are two leaders |
-| Camel retried three times in-process | production had it configured to zero |
-| the consumer setting only ever set the subscriber count | under Camel it genuinely bounded concurrency; that changed with the client |
-| a Sonar finding is blocked on the formatter being unable to parse it | a version that parses it exists; the real cost is a 134-file reformat |
-| the queue order serialises work within a pod | delivery order is not publish order |
-| three pieces of state cannot be shared across the rollout | four |
-| `spring.task.scheduling.pool.size=4` gave the four `@Scheduled` methods four threads | no bean was named `taskScheduler`, so `@Scheduled` built a single-threaded executor of its own and ignored the property |
+| Claim                                                                                   | Actually |
+|-----------------------------------------------------------------------------------------| --- |
+| the sweeper's re-read narrows the race to one round trip                                | it reads the local cache, the staler of the two sources |
+| all per-validation Redis keys carry a TTL                                               | entries inside the local-cached maps carry none |
+| both versions contend for the same lease during rollout                                 | the old version used a different mechanism entirely; there are two leaders |
+| Camel retried three times in-process                                                    | production had it configured to zero |
+| the consumer setting only ever set the subscriber count                                 | under Camel it genuinely bounded concurrency; that changed with the client |
+| a Sonar finding is blocked on the formatter being unable to parse it                    | a version that parses it exists; the real cost is a 134-file reformat |
+| the queue order serialises work within a pod                                            | delivery order is not publish order |
+| three pieces of state cannot be shared across the rollout                               | four |
+| `spring.task.scheduling.pool.size=5` gave the five `@Scheduled` methods five threads | no bean was named `taskScheduler`, so `@Scheduled` built a single-threaded executor of its own and ignored the property |
 
 The same applies to production: the logs settle questions that reasoning cannot. Cross-check the deployed pod
 spec, the rendered config, the actual backlog metric and the actual pod churn. Several of the findings in this
@@ -353,7 +353,7 @@ Removing the framework moves work onto Spring's own machinery, and Spring Boot's
 mostly `@ConditionalOnMissingBean`. Where a library has already registered a bean of that type, Boot
 contributes nothing, and the properties documented for it quietly stop meaning anything.
 
-antu shipped a release like that. `spring.task.scheduling.pool.size=4` was set, with a ConfigMap comment
+antu shipped a release like that. `spring.task.scheduling.pool.size=5` was set, with a ConfigMap comment
 explaining that fewer threads let the cache refreshes starve the leader heartbeat and drop the lease on a
 healthy pod. spring-cloud-gcp registers four `TaskScheduler` beans of its own -- the publisher pool, the
 global subscriber pool, and one per subscription -- so `TaskSchedulingAutoConfiguration` backed off,

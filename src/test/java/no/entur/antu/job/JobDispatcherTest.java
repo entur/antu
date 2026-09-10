@@ -7,13 +7,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import no.entur.antu.pipeline.DatasetSplitter;
-import no.entur.antu.pipeline.DatasetValidator;
-import no.entur.antu.pipeline.NetexFileValidator;
-import no.entur.antu.pipeline.OrganisationAliasCacheRefresher;
-import no.entur.antu.pipeline.ReportAggregator;
-import no.entur.antu.pipeline.StopPlaceCacheRefresher;
-import no.entur.antu.pipeline.ValidationCompleter;
+import no.entur.antu.pipeline.*;
 import no.entur.antu.validation.state.ValidationStateRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +40,7 @@ class JobDispatcherTest {
   private ValidationCompleter validationCompleter;
   private StopPlaceCacheRefresher stopPlaceCacheRefresher;
   private OrganisationAliasCacheRefresher organisationAliasCacheRefresher;
+  private VehicleReferenceCacheRefresher vehicleReferenceCacheRefresher;
   private JobDispatcher dispatcher;
 
   @BeforeEach
@@ -68,6 +63,7 @@ class JobDispatcherTest {
     stopPlaceCacheRefresher = mock(StopPlaceCacheRefresher.class);
     organisationAliasCacheRefresher =
       mock(OrganisationAliasCacheRefresher.class);
+    vehicleReferenceCacheRefresher = mock(VehicleReferenceCacheRefresher.class);
 
     dispatcher =
       new JobDispatcher(
@@ -78,7 +74,8 @@ class JobDispatcherTest {
         datasetValidator,
         validationCompleter,
         stopPlaceCacheRefresher,
-        organisationAliasCacheRefresher
+        organisationAliasCacheRefresher,
+        vehicleReferenceCacheRefresher
       );
   }
 
@@ -113,9 +110,11 @@ class JobDispatcherTest {
   void cacheRefreshJobsAreAlwaysExecuted() {
     dispatcher.dispatch(new AntuJob.RefreshStopPlaceCache());
     dispatcher.dispatch(new AntuJob.RefreshOrganisationAliasCache());
+    dispatcher.dispatch(new AntuJob.RefreshVehicleReferenceCache());
 
     verify(stopPlaceCacheRefresher).refresh();
     verify(organisationAliasCacheRefresher).refresh();
+    verify(vehicleReferenceCacheRefresher).refresh();
   }
 
   @Test

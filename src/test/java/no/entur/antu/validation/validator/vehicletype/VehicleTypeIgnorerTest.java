@@ -16,7 +16,7 @@ import org.entur.netex.validation.validator.xpath.XPathValidationContext;
 import org.entur.netex.validation.xml.NetexXMLParser;
 import org.junit.jupiter.api.Test;
 
-class VehicleTypeIgnorerIntegrationTest {
+class VehicleTypeIgnorerTest {
 
   @Test
   void testServiceJourneyWithNonExistentVehicleTypeRefIsAccepted() {
@@ -48,11 +48,11 @@ class VehicleTypeIgnorerIntegrationTest {
     StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);
     ReferenceToNsrValidator referenceToNsrValidator =
       new ReferenceToNsrValidator(stopPlaceRepository);
-
     ValidatorConfig config = new ValidatorConfig();
     NetexReferenceValidator validator = config.netexReferenceValidator(
       netexIdRepository,
-      referenceToNsrValidator
+      referenceToNsrValidator,
+      null
     );
 
     // Parse the XML

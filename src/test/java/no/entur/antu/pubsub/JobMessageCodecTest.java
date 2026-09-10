@@ -87,6 +87,7 @@ class JobMessageCodecTest {
   void cacheRefreshJobsRoundTrip() {
     assertRoundTrips(new AntuJob.RefreshStopPlaceCache());
     assertRoundTrips(new AntuJob.RefreshOrganisationAliasCache());
+    assertRoundTrips(new AntuJob.RefreshVehicleReferenceCache());
   }
 
   /**

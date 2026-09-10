@@ -307,20 +307,20 @@ saved queries and the alert runbook depend on.
 
 ## Operating it
 
-| Property | Default | What it does |
-| --- | --- | --- |
-| `antu.netex.job.consumers` | 1 | Validations per pod. Bounds heap; scale out on pods first |
-| `antu.leader.lease.seconds` | 30 | Redis lease duration |
-| `antu.leader.heartbeat.millis` | 10000 | Renewal interval, a third of the lease |
-| `antu.validation.stalled.after.millis` | 1800000 | Inactivity before a validation is given up on |
-| `antu.validation.sweep.millis` | 300000 | How often the leader looks for stalled validations |
-| `antu.shutdown.drain.timeout.seconds` | 150 | In-flight work is finished rather than redelivered. Keep below `terminationGracePeriodSeconds` *minus* the subscriber close; see *Shutdown* |
+| Property | Default          | What it does |
+| --- |------------------| --- |
+| `antu.netex.job.consumers` | 1                | Validations per pod. Bounds heap; scale out on pods first |
+| `antu.leader.lease.seconds` | 30               | Redis lease duration |
+| `antu.leader.heartbeat.millis` | 10000            | Renewal interval, a third of the lease |
+| `antu.validation.stalled.after.millis` | 1800000          | Inactivity before a validation is given up on |
+| `antu.validation.sweep.millis` | 300000           | How often the leader looks for stalled validations |
+| `antu.shutdown.drain.timeout.seconds` | 150              | In-flight work is finished rather than redelivered. Keep below `terminationGracePeriodSeconds` *minus* the subscriber close; see *Shutdown* |
 | `antu.stop.refresh.cron` | `0 0 1,14 * * *` | Stop place cache refresh. `-` disables. Unquoted in the ConfigMap: it renders into a properties file, where quotes become part of the value |
-| `antu.organisation.refresh.millis` | 1800000 | Organisation alias cache refresh interval |
-| `spring.task.scheduling.pool.size` | 4 | One thread per `@Scheduled`: the heartbeat, the two refresh triggers and the sweep. Fewer lets the other three starve the heartbeat and drop the lease. Only reaches the scheduler because `SchedulingConfig` supplies the `taskScheduler` bean Boot's auto-configuration backs off from |
-| `spring.cloud.gcp.pubsub.publisher.executor-accept-tasks-after-context-close` | true | Load-bearing for the drain; see *Shutdown* |
-| `spring.cloud.gcp.pubsub.subscription.<name>.flow-control.max-outstanding-element-count` | 1 | Lease no more than can be worked on. The gax default is 1000 |
-| `entur.pubsub.subscriber.autocreate` | false in helm | Topics and subscriptions are terraformed. Where it is true, each consumer creates the destination it subscribes to and `PubSubPublishTargets` creates the status queue, which no consumer covers |
+| `antu.organisation.refresh.millis` | 1800000          | Organisation alias cache refresh interval |
+| `spring.task.scheduling.pool.size` | 5                | One thread per `@Scheduled`: the heartbeat, the two refresh triggers and the sweep. Fewer lets the other three starve the heartbeat and drop the lease. Only reaches the scheduler because `SchedulingConfig` supplies the `taskScheduler` bean Boot's auto-configuration backs off from |
+| `spring.cloud.gcp.pubsub.publisher.executor-accept-tasks-after-context-close` | true             | Load-bearing for the drain; see *Shutdown* |
+| `spring.cloud.gcp.pubsub.subscription.<name>.flow-control.max-outstanding-element-count` | 1                | Lease no more than can be worked on. The gax default is 1000 |
+| `entur.pubsub.subscriber.autocreate` | false in helm    | Topics and subscriptions are terraformed. Where it is true, each consumer creates the destination it subscribes to and `PubSubPublishTargets` creates the status queue, which no consumer covers |
 
 **JVM options live in `values.yaml` as `jvmFlags`**, not inline in the deployment, because the `docker-smoke`
 job in CI reads them with `yq` and starts the image with them. That job is the only thing anywhere that runs

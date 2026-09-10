@@ -7,6 +7,7 @@ import no.entur.antu.netexdata.NetexDataRepositoryLoader;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.validation.NetexCodespace;
 import no.entur.antu.validation.validator.organisation.OrganisationAliasRepository;
+import no.entur.antu.validation.validator.vehicletype.VehicleRefRepository;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.jaxb.*;
 import org.entur.netex.validation.validator.model.*;
@@ -44,6 +45,12 @@ public class TestConfig {
   @Primary
   public OrganisationAliasRepository organisationAliasRepository() {
     return new TestOrganisationAliasRepository();
+  }
+
+  @Bean
+  @Primary
+  public VehicleRefRepository vehicleReferenceRepository() {
+    return new TestVehicleRefRepository();
   }
 
   @Bean
@@ -230,6 +237,30 @@ public class TestConfig {
 
     @Override
     public void refreshCache() {}
+
+    @Override
+    public boolean isEmpty() {
+      return false;
+    }
+  }
+
+  private static class TestVehicleRefRepository
+    implements VehicleRefRepository {
+
+    @Override
+    public boolean hasVehicleTypeRef(String vehicleTypeRef) {
+      return true;
+    }
+
+    @Override
+    public boolean hasVehicleRef(String vehicleRef) {
+      return true;
+    }
+
+    @Override
+    public void refreshCache() {
+      // No-op: no cache to refresh in this test implementation
+    }
 
     @Override
     public boolean isEmpty() {

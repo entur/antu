@@ -138,4 +138,11 @@ public sealed interface AntuJob {
       return JobType.REFRESH_ORGANISATION_ALIAS_CACHE;
     }
   }
+
+  record RefreshVehicleReferenceCache() implements AntuJob {
+    @Override
+    public JobType type() {
+      return JobType.REFRESH_VEHICLE_REFERENCE_CACHE;
+    }
+  }
 }

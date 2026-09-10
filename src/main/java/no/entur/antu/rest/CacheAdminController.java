@@ -3,6 +3,7 @@ package no.entur.antu.rest;
 import no.entur.antu.cache.CacheAdmin;
 import no.entur.antu.pipeline.OrganisationAliasCacheRefresher;
 import no.entur.antu.pipeline.StopPlaceCacheRefresher;
+import no.entur.antu.pipeline.VehicleReferenceCacheRefresher;
 import no.entur.antu.security.AntuAuthorizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,17 +31,20 @@ public class CacheAdminController {
   private final CacheAdmin cacheAdmin;
   private final StopPlaceCacheRefresher stopPlaceCacheRefresher;
   private final OrganisationAliasCacheRefresher organisationAliasCacheRefresher;
+  private final VehicleReferenceCacheRefresher vehicleReferenceCacheRefresher;
 
   public CacheAdminController(
     AntuAuthorizationService antuAuthorizationService,
     CacheAdmin cacheAdmin,
     StopPlaceCacheRefresher stopPlaceCacheRefresher,
-    OrganisationAliasCacheRefresher organisationAliasCacheRefresher
+    OrganisationAliasCacheRefresher organisationAliasCacheRefresher,
+    VehicleReferenceCacheRefresher vehicleReferenceCacheRefresher
   ) {
     this.antuAuthorizationService = antuAuthorizationService;
     this.cacheAdmin = cacheAdmin;
     this.stopPlaceCacheRefresher = stopPlaceCacheRefresher;
     this.organisationAliasCacheRefresher = organisationAliasCacheRefresher;
+    this.vehicleReferenceCacheRefresher = vehicleReferenceCacheRefresher;
   }
 
   @PostMapping("/clear-cache")
@@ -80,5 +84,11 @@ public class CacheAdminController {
   public void refreshOrganisationCache() {
     antuAuthorizationService.verifyAdministratorPrivileges();
     organisationAliasCacheRefresher.enqueueRefresh();
+  }
+
+  @PostMapping("/refresh-vehicle-cache")
+  public void refreshVehicleCache() {
+    antuAuthorizationService.verifyAdministratorPrivileges();
+    vehicleReferenceCacheRefresher.enqueueRefresh();
   }
 }

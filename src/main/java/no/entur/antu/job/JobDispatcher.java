@@ -1,12 +1,6 @@
 package no.entur.antu.job;
 
-import no.entur.antu.pipeline.DatasetSplitter;
-import no.entur.antu.pipeline.DatasetValidator;
-import no.entur.antu.pipeline.NetexFileValidator;
-import no.entur.antu.pipeline.OrganisationAliasCacheRefresher;
-import no.entur.antu.pipeline.ReportAggregator;
-import no.entur.antu.pipeline.StopPlaceCacheRefresher;
-import no.entur.antu.pipeline.ValidationCompleter;
+import no.entur.antu.pipeline.*;
 import no.entur.antu.validation.state.ValidationStateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +27,7 @@ public class JobDispatcher {
   private final ValidationCompleter validationCompleter;
   private final StopPlaceCacheRefresher stopPlaceCacheRefresher;
   private final OrganisationAliasCacheRefresher organisationAliasCacheRefresher;
+  private final VehicleReferenceCacheRefresher vehicleReferenceCacheRefresher;
 
   public JobDispatcher(
     ValidationStateRepository validationStateRepository,
@@ -42,7 +37,8 @@ public class JobDispatcher {
     DatasetValidator datasetValidator,
     ValidationCompleter validationCompleter,
     StopPlaceCacheRefresher stopPlaceCacheRefresher,
-    OrganisationAliasCacheRefresher organisationAliasCacheRefresher
+    OrganisationAliasCacheRefresher organisationAliasCacheRefresher,
+    VehicleReferenceCacheRefresher vehicleReferenceCacheRefresher
   ) {
     this.validationStateRepository = validationStateRepository;
     this.datasetSplitter = datasetSplitter;
@@ -52,6 +48,7 @@ public class JobDispatcher {
     this.validationCompleter = validationCompleter;
     this.stopPlaceCacheRefresher = stopPlaceCacheRefresher;
     this.organisationAliasCacheRefresher = organisationAliasCacheRefresher;
+    this.vehicleReferenceCacheRefresher = vehicleReferenceCacheRefresher;
   }
 
   /**
@@ -95,6 +92,7 @@ public class JobDispatcher {
       );
       case AntuJob.RefreshStopPlaceCache ignored -> stopPlaceCacheRefresher.refresh();
       case AntuJob.RefreshOrganisationAliasCache ignored -> organisationAliasCacheRefresher.refresh();
+      case AntuJob.RefreshVehicleReferenceCache ignored -> vehicleReferenceCacheRefresher.refresh();
     }
   }
 
