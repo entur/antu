@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import no.entur.antu.memorystore.LineInfoMemStoreRepository;
 import no.entur.antu.netexdata.RedisNetexDataRepository;
 import org.entur.netex.validation.validator.jaxb.NetexDataRepository;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
@@ -23,7 +24,7 @@ public class NetexDataConfig {
   @Profile("!test")
   NetexDataRepository netexDataRepository(
     RedissonClient redissonClient,
-    @Qualifier(LINE_INFO_CACHE) Map<String, List<String>> lineInfoCache,
+    LineInfoMemStoreRepository lineInfoMemStoreRepository,
     @Qualifier(
       SERVICE_JOURNEY_STOPS_CACHE
     ) Map<String, Map<String, List<ServiceJourneyStop>>> serviceJourneyStopsCache,
@@ -45,7 +46,7 @@ public class NetexDataConfig {
   ) {
     return new RedisNetexDataRepository(
       redissonClient,
-      lineInfoCache,
+      lineInfoMemStoreRepository,
       serviceJourneyStopsCache,
       serviceJourneyInterchangeInfoCache,
       activeDatesByServiceJourneyRefCache,
