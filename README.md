@@ -193,6 +193,7 @@ authoritative source is the validator wiring in `config/TimetableDataValidatorCo
 | CODESPACE | Codespace %s is not in the list of valid codespaces for this data space. Valid codespaces are %s |
 | VERSION_NON_NUMERIC | Non-numeric NeTEx version |
 | UNSUPPORTED_NETEX_VERSION | NeTEx version %s is not supported. The most recent supported NeTEx version is %s |
+| DEPRECATED_DATED_SERVICE_JOURNEY_REF | DatedServiceJourney uses deprecated DatedServiceJourneyRef element. Use replacedJourneys/DatedVehicleJourneyRef instead |
 | INVALID_TRANSPORT_MODE | Invalid transport mode |
 | TIMETABLED_PASSING_TIME_INCONSISTENT_TIME | ServiceJourney has inconsistent TimetabledPassingTime |
 | TIMETABLED_PASSING_TIME_INCOMPLETE_TIME | ServiceJourney has incomplete TimetabledPassingTime |

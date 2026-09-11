@@ -8,8 +8,10 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.io.IOUtils;
 import org.entur.netex.NetexParser;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationIssue;
@@ -21,25 +23,44 @@ class InvalidServiceAlterationValidatorIntegrationTest {
 
   private static final String TEST_CODESPACE = "NSB";
   private static final String TEST_LINE_XML_FILE = "line.xml";
-  private static final String TEST_FILE_INVALID =
-    "servicealteration/NSB_L1.xml";
-  private static final String TEST_FILE_VALID = "servicealteration/VYG_41.xml";
+  private static final String TEST_FILE = "servicealteration/NSB_L1.xml";
   private static final NetexParser NETEX_PARSER = new NetexParser();
 
   @Test
   void testMissingServiceAlterationOnReplacedDSJs() throws IOException {
-    List<ValidationIssue> issues = getValidationIssues(TEST_FILE_INVALID);
-    assertEquals(2, issues.size());
+    List<ValidationIssue> issues = getValidationIssues(
+      TEST_FILE,
+      "${SERVICE_ALTERATION}",
+      ""
+    );
+    assertEquals(1, issues.size());
+  }
+
+  @Test
+  void testMismatchedServiceAlterationOnReplacedDSJs() throws IOException {
+    List<ValidationIssue> issues = getValidationIssues(
+      TEST_FILE,
+      "${SERVICE_ALTERATION}",
+      "<ServiceAlteration>cancellation</ServiceAlteration>"
+    );
+    assertEquals(1, issues.size());
   }
 
   @Test
   void testCorrectServiceAlterationOnReplacedDSJs() throws IOException {
-    List<ValidationIssue> issues = getValidationIssues(TEST_FILE_VALID);
+    List<ValidationIssue> issues = getValidationIssues(
+      TEST_FILE,
+      "${SERVICE_ALTERATION}",
+      "<ServiceAlteration>replaced</ServiceAlteration>"
+    );
     assertTrue(issues.isEmpty());
   }
 
-  private List<ValidationIssue> getValidationIssues(String testFile)
-    throws IOException {
+  private List<ValidationIssue> getValidationIssues(
+    String testFile,
+    String placeholder,
+    String replacement
+  ) throws IOException {
     String validationReportId = "Test1122";
 
     try (
@@ -47,8 +68,15 @@ class InvalidServiceAlterationValidatorIntegrationTest {
         .getResourceAsStream('/' + testFile)
     ) {
       assert testDatasetAsStream != null;
+
+      String netex = new String(
+        testDatasetAsStream.readAllBytes(),
+        StandardCharsets.UTF_8
+      )
+        .replace(placeholder, replacement);
+
       NetexEntitiesIndex netexEntitiesIndex = NETEX_PARSER.parse(
-        testDatasetAsStream
+        IOUtils.toInputStream(netex)
       );
 
       CommonDataRepository commonDataRepository = mock(
