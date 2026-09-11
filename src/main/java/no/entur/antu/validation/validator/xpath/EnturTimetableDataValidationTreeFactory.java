@@ -8,6 +8,7 @@ import no.entur.antu.validation.validator.organisation.OrganisationAliasReposito
 import no.entur.antu.validation.validator.xpath.rules.ValidateAllowedCodespaces;
 import no.entur.antu.validation.validator.xpath.rules.ValidateAuthorityRef;
 import no.entur.antu.validation.validator.xpath.rules.ValidateNSRCodespace;
+import no.entur.antu.validation.validator.xpath.rules.ValidateSupportedNetexVersion;
 import org.entur.netex.validation.validator.xpath.tree.DefaultTimetableFrameValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.tree.PublicationDeliveryValidationTreeFactory;
 import org.entur.netex.validation.validator.xpath.tree.ValidationTreeBuilder;
@@ -47,6 +48,9 @@ public class EnturTimetableDataValidationTreeFactory
         validationParametersConfig.getAdditionalAllowedCodespaces()
       );
     rootValidationTreeBuilder().withRule(validateAllowedCodespaces);
+
+    // The declared NeTEx schema version has to be one there is a schema for
+    rootValidationTreeBuilder().withRule(new ValidateSupportedNetexVersion());
 
     // Disabling check of duplicate ServiceJourney with different versions (slow test)
     timetableFrameValidationTreeBuilder()
