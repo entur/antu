@@ -7,8 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Optional;
 import net.opengis.gml._3.DirectPositionType;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
-import no.entur.antu.validation.ValidationTest;
+import no.entur.antu.netex.test.NetexTestData;
+import no.entur.antu.netex.test.ValidatorTestBase;
+import no.entur.antu.netex.test.builder.NetexRefs;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
@@ -18,14 +19,14 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 
-class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
+class UnexpectedDistanceInServiceLinkValidatorTest extends ValidatorTestBase {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnCommonFile(
       netexEntitiesIndex,
-      UnexpectedDistanceInServiceLinkValidator.class
+      new UnexpectedDistanceInServiceLinkValidator()
     );
   }
 
@@ -363,11 +364,10 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
 
   @Test
   void datasetWithoutServiceLinksShouldBeIgnored() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertTrue(validationReport.getValidationReportEntries().isEmpty());
@@ -379,30 +379,29 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
     QuayCoordinates toQuayCoordinates
   ) {
     ScheduledStopPointRefStructure fromStopPointId =
-      NetexEntitiesTestFactory.createScheduledStopPointRef(1);
+      NetexRefs.scheduledStopPointRef(1);
     ScheduledStopPointRefStructure toStopPointId =
-      NetexEntitiesTestFactory.createScheduledStopPointRef(2);
+      NetexRefs.scheduledStopPointRef(2);
 
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
     netexEntitiesTestFactory
-      .createServiceLink(1, fromStopPointId, toStopPointId)
+      .addServiceLink(1, fromStopPointId, toStopPointId)
       .withLineStringPositions(lineStringCoordinates)
-      .create();
+      .build();
 
-    mockGetCoordinates(
+    withCoordinates(
       ScheduledStopPointId.of(fromStopPointId),
       new QuayId("TST:Quay:1"),
       fromQuayCoordinates
     );
-    mockGetCoordinates(
+    withCoordinates(
       ScheduledStopPointId.of(toStopPointId),
       new QuayId("TST:Quay:2"),
       toQuayCoordinates
     );
 
-    return runValidation(netexEntitiesTestFactory.create());
+    return runValidation(netexEntitiesTestFactory.build());
   }
 
   private ValidationReport runTestWith(
@@ -411,29 +410,28 @@ class UnexpectedDistanceInServiceLinkValidatorTest extends ValidationTest {
     QuayCoordinates toQuayCoordinates
   ) {
     ScheduledStopPointRefStructure fromStopPointId =
-      NetexEntitiesTestFactory.createScheduledStopPointRef(1);
+      NetexRefs.scheduledStopPointRef(1);
     ScheduledStopPointRefStructure toStopPointId =
-      NetexEntitiesTestFactory.createScheduledStopPointRef(2);
+      NetexRefs.scheduledStopPointRef(2);
 
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
     netexEntitiesTestFactory
-      .createServiceLink(1, fromStopPointId, toStopPointId)
+      .addServiceLink(1, fromStopPointId, toStopPointId)
       .withLineStringList(lineStringCoordinates)
-      .create();
+      .build();
 
-    mockGetCoordinates(
+    withCoordinates(
       ScheduledStopPointId.of(fromStopPointId),
       new QuayId("TST:Quay:1"),
       fromQuayCoordinates
     );
-    mockGetCoordinates(
+    withCoordinates(
       ScheduledStopPointId.of(toStopPointId),
       new QuayId("TST:Quay:2"),
       toQuayCoordinates
     );
 
-    return runValidation(netexEntitiesTestFactory.create());
+    return runValidation(netexEntitiesTestFactory.build());
   }
 }
