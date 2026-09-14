@@ -1,10 +1,7 @@
 package no.entur.antu.stop.changelog;
 
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -99,7 +96,7 @@ class ChangelogStopPlaceRepositoryUpdaterTest {
     await()
       .atMost(Duration.ofSeconds(5))
       .until(() -> takeOverAsLeader.getState() == Thread.State.BLOCKED);
-    assertFalse(initReturned.getCount() == 0);
+    assertNotEquals(0, initReturned.getCount());
     verify(changelogConsumerController, never()).start();
 
     letRefreshFinish.countDown();

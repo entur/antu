@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -19,7 +20,6 @@ import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class MissingPassengerStopAssignmentValidatorIntegrationTest {
 
@@ -40,14 +40,14 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndNoDeadRunShouldFail()
     throws IOException {
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
 
     // Mocking that the quay ids are not present in the common data repository.
     // Validator will try to fetch quay ids from the line file instead.
-    Mockito
-      .when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
+
+    when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
       .thenReturn(false);
 
     List<ValidationIssue> validationIssues = getValidationIssues(
@@ -65,14 +65,13 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
   @Test
   void testNoPassengerStopAssignmentsInDatasetAndWithAllDeadRun()
     throws IOException {
-    CommonDataRepository commonDataRepository = Mockito.mock(
+    CommonDataRepository commonDataRepository = mock(
       CommonDataRepository.class
     );
 
     // Mocking that the quay ids are not present in the common data repository.
     // Validator will try to fetch quay ids from the line file instead.
-    Mockito
-      .when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
+    when(commonDataRepository.hasSharedScheduledStopPoints(anyString()))
       .thenReturn(false);
 
     List<ValidationIssue> validationIssues = getValidationIssues(
@@ -98,9 +97,7 @@ class MissingPassengerStopAssignmentValidatorIntegrationTest {
         testDatasetAsStream
       );
 
-      StopPlaceRepository stopPlaceRepository = Mockito.mock(
-        StopPlaceRepository.class
-      );
+      StopPlaceRepository stopPlaceRepository = mock(StopPlaceRepository.class);
       when(stopPlaceRepository.getStopPlaceNameForQuayId(any()))
         .thenReturn("TestName");
 

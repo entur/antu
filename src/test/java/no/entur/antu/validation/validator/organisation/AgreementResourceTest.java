@@ -67,7 +67,7 @@ class AgreementResourceTest {
     AgreementResource agreementResource = new AgreementResource(webClient);
     assertThrows(
       WebClientResponseException.class,
-      () -> agreementResource.getOrganisationAliases()
+      agreementResource::getOrganisationAliases
     );
   }
 }

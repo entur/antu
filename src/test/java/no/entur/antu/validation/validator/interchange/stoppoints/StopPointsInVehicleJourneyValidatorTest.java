@@ -3,8 +3,9 @@ package no.entur.antu.validation.validator.interchange.stoppoints;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
-import no.entur.antu.validation.ValidationTest;
+import no.entur.antu.netex.test.NetexTestData;
+import no.entur.antu.netex.test.ValidatorTestBase;
+import no.entur.antu.netex.test.builder.NetexRefs;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
@@ -15,13 +16,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
-class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
+class StopPointsInVehicleJourneyValidatorTest extends ValidatorTestBase {
 
   @Test
   void interchangeStopPointArePartOfVehicleJourneys() {
     // Mocking both the fromPointRef and toPointRef,
     // to test that both fromPointRef and toPointRef are part of the vehicle journey.
-    mockGetServiceJourneyStops(
+    withServiceJourneyStops(
       Map.of(
         ServiceJourneyId.ofValidId("TST:ServiceJourney:1"),
         List.of(
@@ -61,7 +62,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
   @Test
   void interchangeWithNoExistingFromServiceJourneyGiveNoErrors() {
     // Mocking only the toPointRef, to test that the fromPointRef is not part of the vehicle journey
-    mockGetServiceJourneyStops(
+    withServiceJourneyStops(
       Map.of(
         ServiceJourneyId.ofValidId("TST:ServiceJourney:2"),
         List.of(
@@ -88,7 +89,10 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
   @Test
   void noInterchangeNoEffect() {
     ValidationReport validationReport = runDatasetValidation(
-      StopPointsInVehicleJourneyValidator.class
+      new StopPointsInVehicleJourneyValidator(
+        validationReportEntryFactory(),
+        netexDataRepository
+      )
     );
 
     Assertions.assertEquals(
@@ -99,19 +103,22 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
   @Test
   void interchangeWithMissingAttributes() {
-    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
+    NetexTestData fragment = new NetexTestData();
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
-      .createServiceJourneyInterchange()
-      .create();
+      .addServiceJourneyInterchange()
+      .build();
 
-    mockGetServiceJourneyInterchangeInfo(
+    withServiceJourneyInterchangeInfos(
       List.of(
         ServiceJourneyInterchangeInfo.of("test.xml", serviceJourneyInterchange)
       )
     );
 
     ValidationReport validationReport = runDatasetValidation(
-      StopPointsInVehicleJourneyValidator.class
+      new StopPointsInVehicleJourneyValidator(
+        validationReportEntryFactory(),
+        netexDataRepository
+      )
     );
 
     Assertions.assertEquals(
@@ -123,7 +130,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
   @Test
   void interchangeWithNoExistingToServiceJourneyGiveNoErrors() {
     // Mocking only the fromPointRef, to test that the toPointRef is not part of the vehicle journey
-    mockGetServiceJourneyStops(
+    withServiceJourneyStops(
       Map.of(
         ServiceJourneyId.ofValidId("TST:ServiceJourney:1"),
         List.of(
@@ -149,7 +156,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
   @Test
   void interchangeWithNoMatchingFromStopsGivesValidationError() {
-    mockGetServiceJourneyStops(
+    withServiceJourneyStops(
       Map.of(
         ServiceJourneyId.ofValidId("TST:ServiceJourney:1"),
         List.of(
@@ -183,7 +190,7 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
 
   @Test
   void interchangeWithNoMatchingToStopsGivesValidationError() {
-    mockGetServiceJourneyStops(
+    withServiceJourneyStops(
       Map.of(
         ServiceJourneyId.ofValidId("TST:ServiceJourney:1"),
         List.of(
@@ -228,22 +235,27 @@ class StopPointsInVehicleJourneyValidatorTest extends ValidationTest {
   }
 
   private ValidationReport runTestFor() {
-    NetexEntitiesTestFactory fragment = new NetexEntitiesTestFactory();
+    NetexTestData fragment = new NetexTestData();
 
     ServiceJourneyInterchange serviceJourneyInterchange = fragment
-      .createServiceJourneyInterchange()
-      .withFromPointRef(NetexEntitiesTestFactory.createScheduledStopPointRef(1))
-      .withToPointRef(NetexEntitiesTestFactory.createScheduledStopPointRef(2))
-      .withFromJourneyRef(NetexEntitiesTestFactory.createServiceJourneyRef(1))
-      .withToJourneyRef(NetexEntitiesTestFactory.createServiceJourneyRef(2))
-      .create();
+      .addServiceJourneyInterchange()
+      .withFromPointRef(NetexRefs.scheduledStopPointRef(1))
+      .withToPointRef(NetexRefs.scheduledStopPointRef(2))
+      .withFromJourneyRef(NetexRefs.serviceJourneyRef(1))
+      .withToJourneyRef(NetexRefs.serviceJourneyRef(2))
+      .build();
 
-    mockGetServiceJourneyInterchangeInfo(
+    withServiceJourneyInterchangeInfos(
       List.of(
         ServiceJourneyInterchangeInfo.of("test.xml", serviceJourneyInterchange)
       )
     );
 
-    return runDatasetValidation(StopPointsInVehicleJourneyValidator.class);
+    return runDatasetValidation(
+      new StopPointsInVehicleJourneyValidator(
+        validationReportEntryFactory(),
+        netexDataRepository
+      )
+    );
   }
 }

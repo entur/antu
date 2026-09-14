@@ -5,47 +5,51 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.stream.IntStream;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
-import no.entur.antu.validation.ValidationTest;
+import no.entur.antu.netex.test.NetexTestData;
+import no.entur.antu.netex.test.ValidatorTestBase;
+import no.entur.antu.netex.test.builder.DatedServiceJourneyBuilder;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.junit.jupiter.api.Test;
 import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
-class InvalidServiceAlterationValidatorTest extends ValidationTest {
+class InvalidServiceAlterationValidatorTest extends ValidatorTestBase {
 
   private ValidationReport runValidation(
     NetexEntitiesIndex netexEntitiesIndex
   ) {
     return runValidationOnLineFile(
       netexEntitiesIndex,
-      InvalidServiceAlterationValidator.class
+      new InvalidServiceAlterationValidator()
     );
   }
 
-  private NetexEntitiesTestFactory.CreateDatedServiceJourney datedServiceJourneyDraft(
+  private DatedServiceJourneyBuilder datedServiceJourneyDraft(
     int id,
-    NetexEntitiesTestFactory netexEntitiesTestFactory
+    NetexTestData netexEntitiesTestFactory
   ) {
-    return netexEntitiesTestFactory.createDatedServiceJourney(
+    return netexEntitiesTestFactory.addDatedServiceJourney(
       id,
-      netexEntitiesTestFactory.createServiceJourney(
+      netexEntitiesTestFactory.addServiceJourney(
         id,
-        netexEntitiesTestFactory.createJourneyPattern(id)
+        netexEntitiesTestFactory.addJourneyPattern(id)
       ),
-      netexEntitiesTestFactory.createOperatingDay(id, LocalDate.of(2024, 12, 1))
+      netexEntitiesTestFactory.operatingDay(
+        id,
+        LocalDate.of(2024, Month.DECEMBER, 1)
+      )
     );
   }
 
   @Test
   void testCorrectServiceAlterationExists() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    NetexEntitiesTestFactory.CreateDatedServiceJourney replacedDatedServiceJourney =
+    DatedServiceJourneyBuilder replacedDatedServiceJourney =
       datedServiceJourneyDraft(1, netexEntitiesTestFactory)
         .withServiceAlteration(ServiceAlterationEnumeration.REPLACED);
 
@@ -53,7 +57,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
       .withDatedServiceJourneyRef(replacedDatedServiceJourney); // Reference to replaced;
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -61,17 +65,15 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testCorrectServiceAlterationExistsForMultipleDSJs() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    List<NetexEntitiesTestFactory.CreateDatedServiceJourney> replacedDatedServiceJourneys =
-      IntStream
-        .of(1, 2, 3)
-        .mapToObj(i ->
-          datedServiceJourneyDraft(i, netexEntitiesTestFactory)
-            .withServiceAlteration(ServiceAlterationEnumeration.REPLACED)
-        )
-        .toList();
+    List<DatedServiceJourneyBuilder> replacedDatedServiceJourneys = IntStream
+      .of(1, 2, 3)
+      .mapToObj(i ->
+        datedServiceJourneyDraft(i, netexEntitiesTestFactory)
+          .withServiceAlteration(ServiceAlterationEnumeration.REPLACED)
+      )
+      .toList();
 
     IntStream
       .of(1, 2, 3)
@@ -81,7 +83,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
       );
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(0));
@@ -89,17 +91,16 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testServiceAlterationMissing() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    NetexEntitiesTestFactory.CreateDatedServiceJourney datedServiceJourneyReplaced =
+    DatedServiceJourneyBuilder datedServiceJourneyReplaced =
       datedServiceJourneyDraft(1, netexEntitiesTestFactory);
 
     datedServiceJourneyDraft(2, netexEntitiesTestFactory)
       .withDatedServiceJourneyRef(datedServiceJourneyReplaced); // Reference to replaced
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));
@@ -114,10 +115,9 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testServiceAlterationMissingForMultipleDSJs() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    List<NetexEntitiesTestFactory.CreateDatedServiceJourney> datedServiceJourneysWithNoServiceAlteration =
+    List<DatedServiceJourneyBuilder> datedServiceJourneysWithNoServiceAlteration =
       IntStream
         .of(1, 2, 3)
         .mapToObj(i -> datedServiceJourneyDraft(i, netexEntitiesTestFactory))
@@ -133,7 +133,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
       );
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(3));
@@ -148,10 +148,9 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
 
   @Test
   void testUnexpectedServiceAlteration() {
-    NetexEntitiesTestFactory netexEntitiesTestFactory =
-      new NetexEntitiesTestFactory();
+    NetexTestData netexEntitiesTestFactory = new NetexTestData();
 
-    NetexEntitiesTestFactory.CreateDatedServiceJourney cancelledDatedServiceJourney =
+    DatedServiceJourneyBuilder cancelledDatedServiceJourney =
       datedServiceJourneyDraft(1, netexEntitiesTestFactory)
         .withServiceAlteration(ServiceAlterationEnumeration.CANCELLATION);
 
@@ -159,7 +158,7 @@ class InvalidServiceAlterationValidatorTest extends ValidationTest {
       .withDatedServiceJourneyRef(cancelledDatedServiceJourney); // Reference to cancelled
 
     ValidationReport validationReport = runValidation(
-      netexEntitiesTestFactory.create()
+      netexEntitiesTestFactory.build()
     );
 
     assertThat(validationReport.getValidationReportEntries().size(), is(1));

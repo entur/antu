@@ -7,13 +7,14 @@ import java.math.BigInteger;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import no.entur.antu.common.repository.TestNetexDataRepository;
-import no.entur.antu.netextestdata.NetexEntitiesTestFactory;
+import no.entur.antu.netex.test.builder.NetexRefs;
+import no.entur.antu.netex.test.repository.TestNetexDataRepository;
 import org.entur.netex.validation.validator.Severity;
 import org.entur.netex.validation.validator.SimpleValidationEntryFactory;
 import org.entur.netex.validation.validator.ValidationReport;
@@ -56,13 +57,9 @@ class InterchangeWaitingTimeValidatorTest {
     this.netexDataRepository = new TestNetexDataRepository();
   }
 
-  private ScheduledStopPointRefStructure createStopPointRef(int stopPointId) {
+  private ScheduledStopPointRefStructure stopPointRef(int stopPointId) {
     return new ScheduledStopPointRefStructure()
-      .withRef(
-        NetexEntitiesTestFactory
-          .createScheduledStopPointRef(stopPointId)
-          .getRef()
-      );
+      .withRef(NetexRefs.scheduledStopPointRef(stopPointId).getRef());
   }
 
   private ServiceJourneyStop createArrivalStop(
@@ -73,7 +70,7 @@ class InterchangeWaitingTimeValidatorTest {
     Optional<Integer> dayOffset
   ) {
     ScheduledStopPointId stopId = ScheduledStopPointId.of(
-      NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
+      NetexRefs.scheduledStopPointRef(stopPointId)
     );
 
     TimetabledPassingTime passingTime = new TimetabledPassingTime()
@@ -94,7 +91,7 @@ class InterchangeWaitingTimeValidatorTest {
     Optional<Integer> dayOffset
   ) {
     ScheduledStopPointId stopId = ScheduledStopPointId.of(
-      NetexEntitiesTestFactory.createScheduledStopPointRef(stopPointId)
+      NetexRefs.scheduledStopPointRef(stopPointId)
     );
 
     TimetabledPassingTime passingTime = new TimetabledPassingTime()
@@ -119,8 +116,8 @@ class InterchangeWaitingTimeValidatorTest {
         new VehicleJourneyRefStructure()
           .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
       )
-      .withFromPointRef(createStopPointRef(fromStopPoint))
-      .withToPointRef(createStopPointRef(toStopPoint));
+      .withFromPointRef(stopPointRef(fromStopPoint))
+      .withToPointRef(stopPointRef(toStopPoint));
   }
 
   private void setupTestData(
@@ -169,9 +166,9 @@ class InterchangeWaitingTimeValidatorTest {
 
     Map<String, List<LocalDateTime>> activeDates = Map.of(
       fromJourneyId,
-      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      List.of(LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0)),
       toJourneyId,
-      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+      List.of(LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0))
     );
 
     Map<String, ServiceJourneyStop> stops = Map.of(
@@ -189,9 +186,9 @@ class InterchangeWaitingTimeValidatorTest {
       createInterchangeWithMaximumWaitTime();
     Map<String, List<LocalDateTime>> activeDates = Map.of(
       fromJourneyId,
-      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0)),
+      List.of(LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0)),
       toJourneyId,
-      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+      List.of(LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0))
     );
 
     Map<String, ServiceJourneyStop> stops = Map.of(
@@ -213,9 +210,9 @@ class InterchangeWaitingTimeValidatorTest {
       createInterchangeWithMaximumWaitTime();
     Map<String, List<LocalDateTime>> activeDates = Map.of(
       fromJourneyId,
-      List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0)),
+      List.of(LocalDateTime.of(2025, Month.JANUARY, 2, 0, 0, 0)),
       toJourneyId,
-      List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+      List.of(LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0))
     );
 
     Map<String, ServiceJourneyStop> stops = Map.of(
@@ -268,7 +265,7 @@ class InterchangeWaitingTimeValidatorTest {
 
     Map<String, List<LocalDateTime>> activeDates = Map.of(
       fromJourneyId,
-      List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
+      List.of(LocalDateTime.of(2025, Month.JANUARY, 2, 0, 0, 0))
     );
 
     Map<String, ServiceJourneyStop> stops = Map.of(
@@ -369,19 +366,19 @@ class InterchangeWaitingTimeValidatorTest {
       InterchangeWaitingTimeValidator.getShortestActualWaitingTimeForInterchange(
         Stream
           .of(
-            LocalDateTime.of(2025, 1, 5, 12, 0, 0),
-            LocalDateTime.of(2025, 1, 6, 12, 0, 0),
-            LocalDateTime.of(2025, 1, 7, 12, 0, 0),
-            LocalDateTime.of(2025, 1, 8, 12, 0, 0)
+            LocalDateTime.of(2025, Month.JANUARY, 5, 12, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 6, 12, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 7, 12, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 8, 12, 0, 0)
           )
           .sorted()
           .toList(),
         Stream
           .of(
-            LocalDateTime.of(2025, 1, 1, 11, 5, 0),
-            LocalDateTime.of(2025, 1, 2, 11, 15, 0),
-            LocalDateTime.of(2025, 1, 3, 11, 20, 0),
-            LocalDateTime.of(2025, 1, 4, 11, 25, 0)
+            LocalDateTime.of(2025, Month.JANUARY, 1, 11, 5, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 2, 11, 15, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 3, 11, 20, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 4, 11, 25, 0)
           )
           .sorted()
           .toList()
@@ -395,20 +392,20 @@ class InterchangeWaitingTimeValidatorTest {
       InterchangeWaitingTimeValidator.getShortestActualWaitingTimeForInterchange(
         Stream
           .of(
-            LocalDateTime.of(2025, 1, 1, 11, 0, 0),
-            LocalDateTime.of(2025, 1, 2, 11, 0, 0),
-            LocalDateTime.of(2025, 1, 3, 11, 0, 0),
-            LocalDateTime.of(2025, 1, 4, 11, 0, 0)
+            LocalDateTime.of(2025, Month.JANUARY, 1, 11, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 2, 11, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 3, 11, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 4, 11, 0, 0)
           )
           .sorted()
           .toList(),
         Stream
           .of(
-            LocalDateTime.of(2025, 1, 2, 11, 0, 0),
-            LocalDateTime.of(2025, 1, 3, 11, 0, 0),
-            LocalDateTime.of(2025, 1, 4, 11, 0, 0),
-            LocalDateTime.of(2025, 1, 5, 11, 0, 0),
-            LocalDateTime.of(2025, 1, 6, 11, 0, 0)
+            LocalDateTime.of(2025, Month.JANUARY, 2, 11, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 3, 11, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 4, 11, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 5, 11, 0, 0),
+            LocalDateTime.of(2025, Month.JANUARY, 6, 11, 0, 0)
           )
           .sorted()
           .toList()
@@ -422,8 +419,12 @@ class InterchangeWaitingTimeValidatorTest {
       "",
       new ServiceJourneyInterchange()
     );
-    var fromActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
-    var toActiveDates = List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
+    var fromActiveDates = List.of(
+      LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0)
+    );
+    var toActiveDates = List.of(
+      LocalDateTime.of(2025, Month.JANUARY, 2, 0, 0, 0)
+    );
     var fromStop = createArrivalStop(1, 23, 45, 0, Optional.empty());
     var toStop = createDepartureStop(2, 0, 15, 0, Optional.empty());
 
@@ -452,12 +453,16 @@ class InterchangeWaitingTimeValidatorTest {
           new VehicleJourneyRefStructure()
             .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
         )
-        .withFromPointRef(createStopPointRef(fromStopPoint))
-        .withToPointRef(createStopPointRef(toStopPoint))
+        .withFromPointRef(stopPointRef(fromStopPoint))
+        .withToPointRef(stopPointRef(toStopPoint))
     );
 
-    var fromActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
-    var toActiveDates = List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
+    var fromActiveDates = List.of(
+      LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0)
+    );
+    var toActiveDates = List.of(
+      LocalDateTime.of(2025, Month.JANUARY, 2, 0, 0, 0)
+    );
     var fromStop = createArrivalStop(1, 23, 45, 0, Optional.empty());
     var toStop = createDepartureStop(2, 1, 46, 0, Optional.empty());
 
@@ -491,12 +496,16 @@ class InterchangeWaitingTimeValidatorTest {
           new VehicleJourneyRefStructure()
             .withRef(ServiceJourneyId.ofValidId(toJourneyId).id())
         )
-        .withFromPointRef(createStopPointRef(fromStopPoint))
-        .withToPointRef(createStopPointRef(toStopPoint))
+        .withFromPointRef(stopPointRef(fromStopPoint))
+        .withToPointRef(stopPointRef(toStopPoint))
     );
 
-    var fromActiveDates = List.of(LocalDateTime.of(2025, 1, 2, 0, 0, 0));
-    var toActiveDates = List.of(LocalDateTime.of(2025, 1, 1, 0, 0, 0));
+    var fromActiveDates = List.of(
+      LocalDateTime.of(2025, Month.JANUARY, 2, 0, 0, 0)
+    );
+    var toActiveDates = List.of(
+      LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0)
+    );
     var fromStop = createArrivalStop(1, 23, 45, 0, Optional.empty());
     var toStop = createDepartureStop(2, 4, 15, 0, Optional.empty());
 
@@ -520,43 +529,49 @@ class InterchangeWaitingTimeValidatorTest {
   void testCreateLocalDateTimeFromDayOffsetAndPassingTime() {
     var localDateTime =
       InterchangeWaitingTimeValidator.createLocalDateTimeFromDayOffsetAndPassingTime(
-        LocalDateTime.of(2025, 1, 1, 0, 0, 0),
+        LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0),
         0,
         LocalTime.of(23, 45, 0)
       );
 
-    assertEquals(LocalDateTime.of(2025, 1, 1, 23, 45, 0), localDateTime);
+    assertEquals(
+      LocalDateTime.of(2025, Month.JANUARY, 1, 23, 45, 0),
+      localDateTime
+    );
   }
 
   @Test
   void testCreateLocalDateTimeFromDayOffsetAndPassingTimeWithDayOffset() {
     var localDateTime =
       InterchangeWaitingTimeValidator.createLocalDateTimeFromDayOffsetAndPassingTime(
-        LocalDateTime.of(2025, 1, 1, 0, 0, 0),
+        LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0),
         1,
         LocalTime.of(23, 45, 0)
       );
 
-    assertEquals(LocalDateTime.of(2025, 1, 2, 23, 45, 0), localDateTime);
+    assertEquals(
+      LocalDateTime.of(2025, Month.JANUARY, 2, 23, 45, 0),
+      localDateTime
+    );
   }
 
   @Test
   void testSortedLocalDateTimesForServiceJourneyAtStop() {
     List sortedLocalDateTimes = sortedLocalDateTimesForServiceJourneyAtStop(
       List.of(
-        LocalDateTime.of(2025, 1, 1, 0, 0, 0),
-        LocalDateTime.of(2024, 12, 31, 0, 0, 0)
+        LocalDateTime.of(2025, Month.JANUARY, 1, 0, 0, 0),
+        LocalDateTime.of(2024, Month.DECEMBER, 31, 0, 0, 0)
       ),
       0,
       LocalTime.of(12, 0)
     );
-    assertTrue(
-      sortedLocalDateTimes
-        .get(0)
-        .equals(LocalDateTime.of(2024, 12, 31, 12, 0, 0))
+    assertEquals(
+      sortedLocalDateTimes.get(0),
+      LocalDateTime.of(2024, Month.DECEMBER, 31, 12, 0, 0)
     );
-    assertTrue(
-      sortedLocalDateTimes.get(1).equals(LocalDateTime.of(2025, 1, 1, 12, 0, 0))
+    assertEquals(
+      sortedLocalDateTimes.get(1),
+      LocalDateTime.of(2025, Month.JANUARY, 1, 12, 0, 0)
     );
   }
 }
