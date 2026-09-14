@@ -7,11 +7,16 @@ service:
     externalPort: 8080
     internalPort: 8080
 
+# -Xmx has to leave room for everything the JVM allocates outside the heap: metaspace, code cache,
+# thread stacks, GC structures and the direct buffers gRPC and Netty use for PubSub and GCS. At
+# 2500m against a 3000Mi limit that was about 500Mi, so the container was OOM-killed by the kernel
+# before the heap ever reached its ceiling - which is why ExitOnOutOfMemoryError never fired and the
+# restarts left no log line at all. Keep the gap at roughly a quarter of the limit.
 resources:
-  memLimit: 3000Mi
+  memLimit: 4096Mi
   cpuRequest: 1500m
-  memRequest: 3000Mi
-  xmx: 2500m
+  memRequest: 4096Mi
+  xmx: 3000m
 
 horizontalPodAutoscaler:
   maxReplicas: 10
