@@ -25,6 +25,7 @@ import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
+import org.redisson.api.RMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,8 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
   private static final Logger LOGGER = LoggerFactory.getLogger(
     DefaultStopPlaceRepository.class
   );
+
+  private static final int MERGE_BATCH_SIZE = 5000;
 
   public static final String QUAY_CACHE = "quayCache";
   public static final String STOP_PLACE_CACHE = "stopPlaceCache";
@@ -108,8 +111,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     try {
       return loadCache();
     } finally {
-      // The resource holds the parsed dataset, tens of megabytes of it, until this is called. On the way
-      // out of a refusal too, or the pod carries it until the next refresh.
+      // loadCache clears it on the way through; this covers the paths that do not get there.
       stopPlaceResource.clear();
     }
   }
@@ -119,6 +121,8 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
     Map<StopPlaceId, SimpleStopPlace> newStopPlaceCache =
       stopPlaceResource.getStopPlaces();
     Map<QuayId, SimpleQuay> newQuayCache = stopPlaceResource.getQuays();
+    // Before the clear below: this getter re-parses the export once the resource is cleared.
+    Instant publicationTime = stopPlaceResource.getPublicationTime();
 
     // The national registry is never empty, so this is a truncated or unparsed export. Refuse it rather
     // than log and carry on, which leaves the caller believing the cache was refreshed. Checked before
@@ -133,15 +137,14 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
       );
     }
 
-    stopPlaceCache.keySet().retainAll(newStopPlaceCache.keySet());
-    stopPlaceCache.putAll(newStopPlaceCache);
+    // Held once rather than twice for the length of the merge.
+    stopPlaceResource.clear();
+
+    replaceContents(stopPlaceCache, newStopPlaceCache);
     LOGGER.info("Updated Stop place cache");
 
-    quayCache.keySet().retainAll(newQuayCache.keySet());
-    quayCache.putAll(newQuayCache);
+    replaceContents(quayCache, newQuayCache);
     LOGGER.info("Updated Quay cache");
-
-    Instant publicationTime = stopPlaceResource.getPublicationTime();
 
     LOGGER.info(
       "Updated cache with " +
@@ -152,6 +155,23 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
       publicationTime
     );
     return publicationTime;
+  }
+
+  /**
+   * An unbatched putAll serialises the whole national register into direct buffers in one call, which
+   * is native memory that -Xmx does not bound and ExitOnOutOfMemoryError cannot catch. Test doubles
+   * inject plain maps, which have no batched form.
+   */
+  private static <K, V> void replaceContents(
+    Map<K, V> cache,
+    Map<K, V> updated
+  ) {
+    cache.keySet().retainAll(updated.keySet());
+    if (cache instanceof RMap<K, V> redissonMap) {
+      redissonMap.putAll(updated, MERGE_BATCH_SIZE);
+    } else {
+      cache.putAll(updated);
+    }
   }
 
   @Override
