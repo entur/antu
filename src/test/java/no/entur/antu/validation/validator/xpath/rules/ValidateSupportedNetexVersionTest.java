@@ -27,14 +27,11 @@ class ValidateSupportedNetexVersionTest {
    * Versions netex-java-model ships a schema for, in the three-segment form the Nordic profile
    * declares them in. Two are worth naming: {@code 1.04} is what a file declares for the schema the
    * enum calls {@code 1.04beta}, which is why only the numeric part of the enum name is compared,
-   * and {@code 1.16.1} is a schema that exists even though {@code NetexSchemaRepository} has no case
-   * selecting it - a file declaring it falls back to the latest schema, which is that same one, so
-   * there is nothing to report. Patch versions have never been advertised as schema versions a
-   * dataset may declare, so neither is expected in the wild; the point is that the rule reports on
-   * the schemas that exist, not on a list maintained here.
+   * and {@code 2.0} is the latest schema. The point is that the rule reports on the schemas that
+   * exist, not on a list maintained here.
    */
   @ParameterizedTest
-  @ValueSource(strings = { "1.04", "1.08", "1.13", "1.15", "1.16", "1.16.1" })
+  @ValueSource(strings = { "1.04", "1.08", "1.13", "1.15", "1.16", "2.0" })
   void aVersionThereIsASchemaForIsAccepted(String schemaVersion) {
     assertEquals(
       List.of(),
@@ -48,7 +45,7 @@ class ValidateSupportedNetexVersionTest {
    * never published at all.
    */
   @ParameterizedTest
-  @ValueSource(strings = { "1.17", "2", "1.5" })
+  @ValueSource(strings = { "1.17", "3", "1.5" })
   void aVersionThereIsNoSchemaForIsReported(String schemaVersion) {
     List<ValidationIssue> issues = validate(
       schemaVersion + ":NO-NeTEx-networktimetable:1.5"

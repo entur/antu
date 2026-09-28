@@ -17,7 +17,7 @@ import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 
@@ -159,7 +159,7 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
     List<QuayCoordinates> coordinates
   ) {
     return runWithQuayCoordinates(
-      AllVehicleModesOfTransportEnumeration.BUS,
+      AllPublicTransportModesEnumeration.BUS,
       new TransportSubmodeStructure()
         .withBusSubmode(BusSubmodeEnumeration.LOCAL_BUS),
       coordinates
@@ -167,7 +167,7 @@ class UnexpectedDistanceBetweenStopPointsValidatorTest extends ValidationTest {
   }
 
   private ValidationReport runWithQuayCoordinates(
-    AllVehicleModesOfTransportEnumeration transportMode,
+    AllPublicTransportModesEnumeration transportMode,
     TransportSubmodeStructure submode,
     List<QuayCoordinates> coordinates
   ) {
