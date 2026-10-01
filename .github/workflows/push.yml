@@ -68,10 +68,10 @@ jobs:
       # exists in the cluster, which is fine. Anything earlier (wrong class file version, a flag the
       # JRE rejects) never gets that far.
       - run: |
-          opts=$(yq '.jvmFlags' helm/antu/values.yaml | sed 's#-Dspring.config.location=[^ ]*##')
+          opts=$(yq '.common.configmap.data.JAVA_OPTS' helm/antu/values.yaml | sed 's#-Dspring.config.location=[^ ]*##')
           # An empty or truncated lift would still let the app log "using Java", so fail loudly here
           # instead of silently degrading the gate to a flagless run.
-          case "$opts" in *--sun-misc-unsafe-memory-access*) ;; *) echo "::error::could not read jvmFlags"; exit 1 ;; esac
+          case "$opts" in *--sun-misc-unsafe-memory-access*) ;; *) echo "::error::could not read JAVA_OPTS"; exit 1 ;; esac
           timeout 180 docker run --rm -e JAVA_OPTS="$opts" antu:smoke 2>&1 | tee smoke.log || true
           grep -q "using Java" smoke.log
 
@@ -87,16 +87,13 @@ jobs:
     uses: entur/gha-docker/.github/workflows/push.yml@v1.11.0
 
   helm-lint:
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Helm lint against every env values file
-        run: |
-          for env in dev tst prd; do
-            helm lint helm/antu -f helm/antu/env/values-kub-ent-${env}.yaml
-          done
+    strategy:
+      matrix:
+        environment: [ dev, tst, prd ]
+    uses: entur/gha-helm/.github/workflows/lint.yml@v2.0.0
+    with:
+      environment: ${{ matrix.environment }}
+      chart: helm/antu
 
   terraform-lint:
     uses: entur/gha-terraform/.github/workflows/lint.yml@v3.0.0
@@ -137,7 +134,6 @@ jobs:
       environment: dev
       image: ${{ needs.docker-push.outputs.image_name }}:${{ needs.docker-push.outputs.image_tag}}
       chart: helm/antu
-      image_set_path: "image.identifier"
       namespace: antu
       release_name: antu
     secrets: inherit
@@ -191,7 +187,6 @@ jobs:
       environment: tst
       image: ${{ needs.docker-push.outputs.image_name }}:${{ needs.docker-push.outputs.image_tag}}
       chart: helm/antu
-      image_set_path: "image.identifier"
       namespace: antu
       release_name: antu
     secrets: inherit
@@ -245,7 +240,6 @@ jobs:
       environment: prd
       image: ${{ needs.docker-push.outputs.image_name }}:${{ needs.docker-push.outputs.image_tag}}
       chart: helm/antu
-      image_set_path: "image.identifier"
       namespace: antu
       release_name: antu
     secrets: inherit

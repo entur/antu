@@ -11,4 +11,7 @@ sources:
 maintainers:
   - name: 'team-ror'
     email: team.rutedata@entur.org
-engine: gotpl
+dependencies:
+  - name: common
+    version: "2.1.0"
+    repository: https://entur.github.io/helm-charts

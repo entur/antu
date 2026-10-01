@@ -5,7 +5,7 @@ data:
     # Spring
     spring.main.sources=no.entur.antu
     spring.profiles.active=gcs-blobstore,stop-place-changelog
-    server.port={{ .Values.service.http.internalPort }}
+    server.port={{ .Values.common.service.internalPort }}
 
     # Compress responses when the caller asks for it. Validation reports are JSON in the hundreds of
     # kilobytes and compress by roughly a factor of ten. The container sets Content-Encoding itself, so
@@ -226,9 +226,7 @@ data:
     # ----------------------------------------------------------------------------------------------
 kind: ConfigMap
 metadata:
-  name: {{ template "antu.name" . }}-config
+  name: antu-config
   namespace: {{ .Release.Namespace }}
   labels:
-  {{- include "common.labels" . | indent 4 }}
-  annotations:
-  {{- include "common.annotations" . | indent 4 }}
+    {{- include "antu.labels" . | nindent 4 }}

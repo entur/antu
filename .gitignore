@@ -2,3 +2,4 @@
 /.idea/
 /*.iml
 /terraform/.terraform/
+/helm/antu/charts/

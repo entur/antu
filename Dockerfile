@@ -14,4 +14,5 @@ COPY --from=builder /builder/extracted/snapshot-dependencies/ ./
 COPY --from=builder /builder/extracted/application/ ./
 # JAVA_OPTS rather than JDK_JAVA_OPTIONS: the JVM announces the latter on stderr at every start, and
 # Cloud Logging tags that ERROR. The HPA restarts pods all day, so it drowns antu's real errors.
-ENTRYPOINT [ "/sbin/tini", "--", "sh", "-c", "exec java $JAVA_OPTS -jar application.jar" ]
+# JAVA_OPTS_EXTRA: per-environment additions from helm/antu/env/, empty by default.
+ENTRYPOINT [ "/sbin/tini", "--", "sh", "-c", "exec java $JAVA_OPTS $JAVA_OPTS_EXTRA -jar application.jar" ]
