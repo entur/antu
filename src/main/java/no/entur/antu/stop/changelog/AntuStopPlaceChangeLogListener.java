@@ -124,6 +124,13 @@ public class AntuStopPlaceChangeLogListener
           stopPlaceId,
           simpleStopPlace
         );
+        log.info(
+          "Created or updated stop place with ID {} (Name={} TransportMode={} SubMode={})",
+          stopPlace.getId(),
+          simpleStopPlace.name(),
+          simpleStopPlace.transportModeAndSubMode().mode().name(),
+          simpleStopPlace.transportModeAndSubMode().subMode().name()
+        );
       });
 
     netexEntitiesIndex
