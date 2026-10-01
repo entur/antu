@@ -1,5 +1,28 @@
-env: prod
-replicas: 2
+common:
+  env: prd
+  ingress:
+    host: timetable-validation-v1-validation-gcp2.entur.io
+  # Thresholds explained in values.yaml under common.hpa. project_id must match gcp.pubsubProjectId.
+  hpa:
+    spec:
+      metrics:
+        - type: External
+          external:
+            metric:
+              name: pubsub.googleapis.com|subscription|num_undelivered_messages
+              selector:
+                matchLabels:
+                  resource.labels.project_id: ent-antu-prd
+                  resource.labels.subscription_id: AntuJobQueue
+            target:
+              type: AverageValue
+              averageValue: "5"
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 70
 
 antu:
   validation:
@@ -57,13 +80,3 @@ auth0:
     audience: https://api.entur.io
 
 roleAssignmentExtractor: baba
-
-
-monitoringEnabled: false
-
-ingress:
-  domainName: .entur.io
-
-horizontalPodAutoscaler:
-  project: ent-antu-prd
-

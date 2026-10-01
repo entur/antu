@@ -322,9 +322,10 @@ saved queries and the alert runbook depend on.
 | `spring.cloud.gcp.pubsub.subscription.<name>.flow-control.max-outstanding-element-count` | 1                | Lease no more than can be worked on. The gax default is 1000 |
 | `entur.pubsub.subscriber.autocreate` | false in helm    | Topics and subscriptions are terraformed. Where it is true, each consumer creates the destination it subscribes to and `PubSubPublishTargets` creates the status queue, which no consumer covers |
 
-**JVM options live in `values.yaml` as `jvmFlags`**, not inline in the deployment, because the `docker-smoke`
-job in CI reads them with `yq` and starts the image with them. That job is the only thing anywhere that runs
-the built image; without it a flag the JRE rejects, or a class file version mismatch, is first observed in the
+**JVM options live in `values.yaml` as `common.configmap.data.JAVA_OPTS`**, not in the Dockerfile, because the
+`docker-smoke` job in CI reads them with `yq` and starts the image with them. That job is the only thing
+anywhere that runs the built image; without it a flag the JRE rejects, or a class file version mismatch, is
+first observed in the
 cluster. Two of the flags are load-bearing on JDK 25 and neither is obvious:
 
 - `--sun-misc-unsafe-memory-access=allow`. Kryo's `FieldSerializer` calls `Unsafe.objectFieldOffset`, and Kryo
@@ -336,9 +337,10 @@ cluster. Two of the flags are load-bearing on JDK 25 and neither is obvious:
   on an older JRE.
 
 **Autoscaling.** Two thresholds decide the fleet, and the HPA takes the higher of them, so both have to be
-sane or neither matters. `horizontalPodAutoscaler.messagesPerPod` is the target backlog per pod on
-`AntuJobQueue`; `targetCPUUtilizationPercentage` is the other. Both were originally set so low that any
-activity at all demanded `maxReplicas`: `0.1` means one queued message asks for the whole fleet, and `10`
+sane or neither matters. In `common.hpa.spec.metrics` (per environment, in `env/`), the `AntuJobQueue`
+`averageValue` is the target backlog per pod; the CPU `averageUtilization` is the other. Both were originally
+set so low that any activity at all demanded `maxReplicas`: `0.1` means one queued message asks for the whole
+fleet, and `10`
 percent of a `1500m` request is less than a validating pod ever uses. Measured in dev before the change: 20
 JVM starts in 37 minutes, with eight pods stopped and eight started inside four minutes, for seven
 validations. Scale-up is deliberately immediate and unthrottled, because a line file fan-out arrives all at
@@ -435,8 +437,8 @@ not:
 | Method | Works | Why |
 | --- | --- | --- |
 | `git revert` + full redeploy | yes | ConfigMap, values, Dockerfile and rbac revert together; terraform is a no-op in both directions |
-| `helm rollback` | yes | Restores the ConfigMap and the image from one stored manifest, so the pair stays consistent. Check the stored manifest holds a concrete image reference and not an unresolved `<+artifacts.primary.image>` |
-| `kubectl rollout undo`, or rolling the image back in Harness | **no** | Restores the pod template only. The ConfigMap is a separate unversioned object referenced by name, so the old jar boots against the new properties. With the block above kept this is survivable; without it, every pod CrashLoops |
+| `helm rollback` | yes | Restores the ConfigMap and the image from one stored manifest, so the pair stays consistent |
+| `kubectl rollout undo`, or redeploying an older image alone | **no** | Restores the pod template only. The ConfigMap is a separate unversioned object referenced by name, so the old jar boots against the new properties. With the block above kept this is survivable; without it, every pod CrashLoops |
 
 `ANTU_LEADER` changes encoding, from the client's Kryo codec to a plain string, so that the atomic renewal
 script can compare the value. This does **not** put the two versions in contention: the old version elects

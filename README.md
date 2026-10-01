@@ -40,12 +40,13 @@ ones, which makes Kubernetes scheduling more efficient. Each pod validates one f
 A Horizontal Pod Autoscaler adjusts the pod count from the `AntuJobQueue` backlog and from CPU. It scales up
 immediately, because a dataset fans out into its line files all at once and the work is already queued, and
 down slowly, because stopping a pod mid-validation costs the shutdown drain and possibly a revalidated file.
-Both thresholds live in `helm/antu/values.yaml` under `horizontalPodAutoscaler`, and the HPA acts on whichever
-of them asks for more pods.
+Both thresholds live in `helm/antu/env/values-kub-ent-*.yaml` under `common.hpa.spec.metrics`, the scaling
+behaviour in `helm/antu/values.yaml`, and the HPA acts on whichever of them asks for more pods.
 
 # Deployment
 
-EnTur deploys Antu using [Harness](https://app.harness.io/ng/account/8VwWgE0WRK67_PWDpkooNA/all/cd/orgs/entur/projects/ror/services/antu)
+Deployed by `.github/workflows/push.yml` through `entur/gha-helm`, dev then tst then prd, with the Entur
+`common` Helm chart (`helm/antu`). `helm-lint` renders every env values file first.
 
 # Parallel processing
 

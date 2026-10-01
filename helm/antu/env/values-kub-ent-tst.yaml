@@ -1,5 +1,39 @@
-env: test
-replicas: 2
+common:
+  env: tst
+  ingress:
+    host: timetable-validation-v1-validation-gcp2.staging.entur.io
+  configmap:
+    data:
+      # JMX for port-forward debugging, never in prd. jmxremote.host binds the registry and the connector
+      # to loopback; without it they listen on the pod IP, unauthenticated.
+      JAVA_OPTS_EXTRA: >-
+        -Dcom.sun.management.jmxremote.host=127.0.0.1
+        -Dcom.sun.management.jmxremote.port=9999
+        -Dcom.sun.management.jmxremote.rmi.port=9998
+        -Dcom.sun.management.jmxremote.authenticate=false
+        -Dcom.sun.management.jmxremote.ssl=false
+        -Djava.rmi.server.hostname=127.0.0.1
+  # Thresholds explained in values.yaml under common.hpa. project_id must match gcp.pubsubProjectId.
+  hpa:
+    spec:
+      metrics:
+        - type: External
+          external:
+            metric:
+              name: pubsub.googleapis.com|subscription|num_undelivered_messages
+              selector:
+                matchLabels:
+                  resource.labels.project_id: ent-antu-tst
+                  resource.labels.subscription_id: AntuJobQueue
+            target:
+              type: AverageValue
+              averageValue: "5"
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 70
 
 antu:
   validation:
@@ -58,14 +92,5 @@ auth0:
     audience: https://api.staging.entur.io
 
 roleAssignmentExtractor: baba
-
-monitoringEnabled: true
-
-
-ingress:
-  domainName: .staging.entur.io
-
-horizontalPodAutoscaler:
-  project: ent-antu-tst
 
 stopPlaceCacheRefreshQuartzTrigger: ?cron=0+0+03,14+?+*+*

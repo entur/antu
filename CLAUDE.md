@@ -15,7 +15,8 @@ Antu is a NeTEx dataset validation service built by Entur for validating public 
 - **Message Queue**: Google Cloud PubSub
 - **Cache/Coordination**: Redis (Redisson) - report-scoped caches, pipeline barriers, leader election
 - **Storage**: Google Cloud Storage
-- **Deployment**: Kubernetes with HPA
+- **Deployment**: Kubernetes with HPA, via the Entur `common` Helm chart. `helm/antu/templates/` holds only what
+  the chart cannot express: the `application.properties` ConfigMap and the auth0 ExternalSecret
 
 ### Data Flow
 1. Receives validation requests from Marduk via PubSub
@@ -87,6 +88,13 @@ gcloud beta emulators pubsub start
 java -Xmx500m -Dspring.config.location=/path/to/application.properties -jar target/antu-*.jar
 ```
 
+### Rendering the chart
+`helm/antu/charts/` is gitignored, so fetch the common chart once per clone:
+```bash
+helm dependency build helm/antu
+helm template antu helm/antu -n antu -f helm/antu/env/values-kub-ent-dev.yaml
+```
+
 ### Code Formatting
 Uses Prettier for Java:
 ```bash
@@ -127,6 +135,7 @@ Uses Prettier for Java:
   terminal statuses, and several of them were arrived at by getting it wrong first
 - `pom.xml`: Dependencies and build configuration
 - `src/test/resources/application.properties`: Local config template
+- `helm/antu/values.yaml`: chart input, JVM options, HPA behaviour
 - `helm/antu/templates/configmap.yaml`: Production config template
 - `README.md`: User-facing documentation
 
