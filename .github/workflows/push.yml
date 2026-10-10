@@ -78,19 +78,19 @@ jobs:
   docker-build:
     if: github.repository_owner == 'entur' && github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [maven-verify]
-    uses: entur/gha-docker/.github/workflows/build.yml@v1.11.0
+    uses: entur/gha-docker/.github/workflows/build.yml@v1.13.0
     with:
       build_artifact_name: artifact
       build_artifact_path: target
   docker-push:
     needs: [docker-build, docker-smoke]
-    uses: entur/gha-docker/.github/workflows/push.yml@v1.11.0
+    uses: entur/gha-docker/.github/workflows/push.yml@v1.13.0
 
   helm-lint:
     strategy:
       matrix:
         environment: [ dev, tst, prd ]
-    uses: entur/gha-helm/.github/workflows/lint.yml@v2.0.0
+    uses: entur/gha-helm/.github/workflows/lint.yml@v2.1.0
     with:
       environment: ${{ matrix.environment }}
       chart: helm/antu
@@ -129,7 +129,7 @@ jobs:
   deploy-dev:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && github.ref == 'refs/heads/main' }}
     needs: [ helm-lint, tf-plan-dev, tf-apply-dev, docker-push ]
-    uses: entur/gha-helm/.github/workflows/deploy.yml@v2.0.0
+    uses: entur/gha-helm/.github/workflows/deploy.yml@v2.1.0
     with:
       environment: dev
       image: ${{ needs.docker-push.outputs.image_name }}:${{ needs.docker-push.outputs.image_tag}}
@@ -182,7 +182,7 @@ jobs:
   deploy-tst:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && github.ref == 'refs/heads/main' }}
     needs: [ approval-tst, tf-plan-tst, tf-apply-tst, docker-push ]
-    uses: entur/gha-helm/.github/workflows/deploy.yml@v2.0.0
+    uses: entur/gha-helm/.github/workflows/deploy.yml@v2.1.0
     with:
       environment: tst
       image: ${{ needs.docker-push.outputs.image_name }}:${{ needs.docker-push.outputs.image_tag}}
@@ -235,7 +235,7 @@ jobs:
   deploy-prd:
     if: ${{ !cancelled() && !contains(needs.*.result, 'failure') && github.ref == 'refs/heads/main' }}
     needs: [ approval-prd, tf-plan-prd, tf-apply-prd, docker-push ]
-    uses: entur/gha-helm/.github/workflows/deploy.yml@v2.0.0
+    uses: entur/gha-helm/.github/workflows/deploy.yml@v2.1.0
     with:
       environment: prd
       image: ${{ needs.docker-push.outputs.image_name }}:${{ needs.docker-push.outputs.image_tag}}
