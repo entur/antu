@@ -1,6 +1,6 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.distance;
 
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
 
 /**
  * Expected distance between two consecutive stop points in journey pattern for different modes of transport.

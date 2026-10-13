@@ -11,7 +11,7 @@ import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.JAXBValidator;
-import org.rutebanken.netex.model.ServiceJourney;
+import org.entur.netex2.model.ServiceJourney;
 
 /**
  * Validates that the passing times of a service journey are non-decreasing.

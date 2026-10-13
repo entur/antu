@@ -10,13 +10,13 @@ import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.BusSubmodeEnumeration;
+import org.entur.netex2.model.CoachSubmodeEnumeration;
+import org.entur.netex2.model.Quay;
+import org.entur.netex2.model.RailSubmodeEnumeration;
+import org.entur.netex2.model.StopPlace;
 import org.jetbrains.annotations.Nullable;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.CoachSubmodeEnumeration;
-import org.rutebanken.netex.model.Quay;
-import org.rutebanken.netex.model.RailSubmodeEnumeration;
-import org.rutebanken.netex.model.StopPlace;
 
 public class TestStopPlaceRepository implements StopPlaceRepository {
 

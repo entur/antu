@@ -10,7 +10,7 @@ import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.entur.netex.validation.validator.jaxb.support.DatedServiceJourneyUtils;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
+import org.entur.netex2.model.ServiceAlterationEnumeration;
 
 /**
  * Validates that the replacement for the service alteration exists.

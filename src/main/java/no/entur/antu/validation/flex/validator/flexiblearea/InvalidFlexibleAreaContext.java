@@ -9,8 +9,8 @@ import net.opengis.gml._3.AbstractRingType;
 import net.opengis.gml._3.LinearRingType;
 import net.opengis.gml._3.PolygonType;
 import no.entur.antu.validation.utilities.GeometryUtilities;
-import org.rutebanken.netex.model.FlexibleArea;
-import org.rutebanken.netex.model.FlexibleStopPlace;
+import org.entur.netex2.model.FlexibleArea;
+import org.entur.netex2.model.FlexibleStopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

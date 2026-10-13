@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;
-import org.rutebanken.netex.model.*;
+import org.entur.netex2.model.*;
 
 /**
  * This class is mostly a copy of this class in OpenTripPlanner:

@@ -14,7 +14,7 @@ import org.entur.netex.validation.validator.model.SimpleQuay;
 import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
-import org.rutebanken.netex.model.StopPlace;
+import org.entur.netex2.model.StopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,6 +1,6 @@
 package no.entur.antu.validation.validator.servicejourney.speed;
 
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
 
 /**
  * Expected speed for different modes of transport.

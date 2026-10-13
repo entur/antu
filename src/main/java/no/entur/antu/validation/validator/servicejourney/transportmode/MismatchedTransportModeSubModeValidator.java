@@ -14,11 +14,11 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidator;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.BusSubmodeEnumeration;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
 
 /**
  * Validates that the transport mode and sub-mode of a service journey matches the quays it visits.

@@ -5,7 +5,7 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.StopPointInJourneyPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

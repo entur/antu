@@ -24,7 +24,7 @@ class ValidateSupportedNetexVersionTest {
     new ValidateSupportedNetexVersion();
 
   /**
-   * Versions netex-java-model ships a schema for, in the three-segment form the Nordic profile
+   * Versions netex2-java-model ships a schema for, in the three-segment form the Nordic profile
    * declares them in. Two are worth naming: {@code 1.04} is what a file declares for the schema the
    * enum calls {@code 1.04beta}, which is why only the numeric part of the enum name is compared,
    * and {@code 2.0} is the latest schema. The point is that the rule reports on the schemas that

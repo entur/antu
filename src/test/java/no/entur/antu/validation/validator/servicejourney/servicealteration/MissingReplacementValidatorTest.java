@@ -11,8 +11,8 @@ import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.validation.validator.ValidationReport;
 import org.entur.netex.validation.validator.ValidationReportEntry;
+import org.entur.netex2.model.ServiceAlterationEnumeration;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.ServiceAlterationEnumeration;
 
 class MissingReplacementValidatorTest extends ValidationTest {
 

@@ -10,12 +10,12 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex2.model.LinkSequenceProjection_VersionStructure;
+import org.entur.netex2.model.Projections_RelStructure;
+import org.entur.netex2.model.ScheduledStopPointRefStructure;
+import org.entur.netex2.model.ServiceLink;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 import org.locationtech.jts.geom.LineString;
-import org.rutebanken.netex.model.LinkSequenceProjection_VersionStructure;
-import org.rutebanken.netex.model.Projections_RelStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
-import org.rutebanken.netex.model.ServiceLink;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

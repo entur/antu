@@ -8,8 +8,8 @@ import no.entur.antu.common.netex.NetexTestEnvironment;
 import no.entur.antu.common.util.TestUtils;
 import no.entur.antu.validation.ValidationTest;
 import org.entur.netex.validation.validator.ValidationIssue;
+import org.entur.netex2.model.*;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.*;
 
 class NonIncreasingTimetabledPassingTimeValidatorTest extends ValidationTest {
 

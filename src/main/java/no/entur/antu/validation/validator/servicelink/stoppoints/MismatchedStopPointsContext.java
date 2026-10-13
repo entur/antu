@@ -11,7 +11,7 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.FromToScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceLinkId;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.entur.netex2.model.JourneyPattern;
 
 public record MismatchedStopPointsContext(
   String journeyPatternId,

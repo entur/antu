@@ -6,9 +6,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
+import org.entur.netex2.model.*;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.rutebanken.netex.model.*;
 
 public class ScheduledStopPointIdCollector extends NetexDataCollector {
 

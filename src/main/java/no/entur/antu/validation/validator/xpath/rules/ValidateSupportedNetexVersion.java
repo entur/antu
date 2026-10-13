@@ -12,7 +12,7 @@ import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.ValidationRule;
 import org.entur.netex.validation.validator.xpath.AbstractXPathValidationRule;
 import org.entur.netex.validation.validator.xpath.XPathRuleValidationContext;
-import org.rutebanken.netex.validation.NeTExValidator;
+import org.entur.netex2.validation.NeTExValidator;
 
 /**
  * Validate that the NeTEx schema version the PublicationDelivery declares is one there is a schema
@@ -31,7 +31,7 @@ public class ValidateSupportedNetexVersion extends AbstractXPathValidationRule {
   private static final QName VERSION_ATTRIBUTE = new QName("version");
 
   /**
-   * The NeTEx schema versions a file may declare, taken from the schemas netex-java-model ships.
+   * The NeTEx schema versions a file may declare, taken from the schemas netex2-java-model ships.
    * The enum value names the schema folder rather than the version a file declares, and the two
    * differ for the oldest one - the {@code 1.04beta} schema is declared as {@code 1.04} - so only
    * the numeric part is kept.

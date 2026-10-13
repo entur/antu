@@ -5,10 +5,10 @@ import java.util.Map;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.model.*;
+import org.entur.netex2.model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.*;
 
 class DefaultStopPlaceResourceTest {
 

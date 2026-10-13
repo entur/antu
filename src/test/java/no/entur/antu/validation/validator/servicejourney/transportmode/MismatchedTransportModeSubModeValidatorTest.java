@@ -11,17 +11,17 @@ import org.entur.netex.validation.validator.ValidationIssue;
 import org.entur.netex.validation.validator.jaxb.CommonDataRepository;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.BusSubmodeEnumeration;
+import org.entur.netex2.model.CoachSubmodeEnumeration;
+import org.entur.netex2.model.FlexibleLineTypeEnumeration;
+import org.entur.netex2.model.Line_VersionStructure;
+import org.entur.netex2.model.RailSubmodeEnumeration;
+import org.entur.netex2.model.TaxiSubmodeEnumeration;
+import org.entur.netex2.model.TransportSubmodeStructure;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.BusSubmodeEnumeration;
-import org.rutebanken.netex.model.CoachSubmodeEnumeration;
-import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
-import org.rutebanken.netex.model.Line_VersionStructure;
-import org.rutebanken.netex.model.RailSubmodeEnumeration;
-import org.rutebanken.netex.model.TaxiSubmodeEnumeration;
-import org.rutebanken.netex.model.TransportSubmodeStructure;
 
 class MismatchedTransportModeSubModeValidatorTest {
 

@@ -9,8 +9,8 @@ import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
-import org.rutebanken.netex.model.AllPublicTransportModesEnumeration;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.JourneyPattern;
 
 public record UnexpectedDistanceBetweenStopPointsContext(
   String journeyPatternRef,

@@ -24,7 +24,7 @@ import net.opengis.gml._3.ObjectFactory;
 import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
-import org.rutebanken.netex.model.*;
+import org.entur.netex2.model.*;
 
 public class NetexEntitiesTestFactory {
 
@@ -839,9 +839,7 @@ public class NetexEntitiesTestFactory {
     }
 
     public OperatingDay create() {
-      return new OperatingDay()
-        .withId(ref())
-        .withCalendarDate(calendarDate.atStartOfDay());
+      return new OperatingDay().withId(ref()).withCalendarDate(calendarDate);
     }
   }
 
@@ -898,9 +896,7 @@ public class NetexEntitiesTestFactory {
       DayTypeAssignment dayTypeAssignment = new DayTypeAssignment()
         .withId(ref());
 
-      Optional
-        .ofNullable(date)
-        .ifPresent(d -> dayTypeAssignment.withDate(d.atStartOfDay()));
+      Optional.ofNullable(date).ifPresent(dayTypeAssignment::withDate);
 
       Optional
         .ofNullable(operatingDayRef)
