@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
+import org.entur.netex2.model.*;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.rutebanken.netex.model.*;
 
 /**
  * Collects active dates in the dataset and connects them to their respective ServiceJourneys and DatedServiceJourneys.
@@ -140,6 +140,11 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
     );
   }
 
+  /*
+   * NeTEx 2.0 maps xs:date (OperatingDay.calendarDate, DayTypeAssignment.date) to LocalDate, but
+   * NetexDataRepository in netex-validator-java and the report-scoped Redis caches keep
+   * LocalDateTime, so each date is widened to midnight here, the value the 1.x model produced.
+   */
   private Map<String, LocalDateTime> getOperatingDaysFromOperatingDaysIndex(
     JAXBValidationContext jaxbValidationContext
   ) {
@@ -149,7 +154,10 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
       .getAll()
       .stream()
       .map(operatingDay ->
-        Map.entry(operatingDay.getId(), operatingDay.getCalendarDate())
+        Map.entry(
+          operatingDay.getId(),
+          operatingDay.getCalendarDate().atStartOfDay()
+        )
       )
       .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
@@ -177,7 +185,7 @@ public class ServiceJourneyActiveDatesCollector extends NetexDataCollector {
           .get(dayType.getId())
           .forEach(dayTypeAssignment -> {
             if (dayTypeAssignment.getDate() != null) {
-              dates.add(dayTypeAssignment.getDate());
+              dates.add(dayTypeAssignment.getDate().atStartOfDay());
             }
             if (dayTypeAssignment.getOperatingDayRef() != null) {
               dates.add(

@@ -1,6 +1,6 @@
 package no.entur.antu.validation.validator.servicejourney.speed;
 
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
 
 /**
  * Expected speed for different modes of transport.
@@ -25,7 +25,7 @@ public record ExpectedSpeed(long maxSpeed, long warningSpeed, long minSpeed) {
   }
 
   public static ExpectedSpeed of(
-    AllVehicleModesOfTransportEnumeration transportMode
+    AllPublicTransportModesEnumeration transportMode
   ) {
     return switch (transportMode) {
       case COACH -> of(130, 80, 10);

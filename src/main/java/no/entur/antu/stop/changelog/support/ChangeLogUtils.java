@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import javax.annotation.Nullable;
 import org.entur.netex.index.api.NetexEntitiesIndex;
-import org.rutebanken.netex.model.SiteFrame;
+import org.entur.netex2.model.SiteFrame;
 
 public class ChangeLogUtils {
 

@@ -7,9 +7,9 @@ import no.entur.antu.common.repository.TestStopPlaceRepository;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.jaxb.StopPlaceRepository;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.ServiceJourney;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.ServiceJourney;
 
 public class NetexTestEnvironment {
 

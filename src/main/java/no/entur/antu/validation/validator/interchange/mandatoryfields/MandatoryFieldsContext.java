@@ -1,8 +1,8 @@
 package no.entur.antu.validation.validator.interchange.mandatoryfields;
 
 import java.util.Optional;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
-import org.rutebanken.netex.model.VersionOfObjectRefStructure;
+import org.entur.netex2.model.ServiceJourneyInterchange;
+import org.entur.netex2.model.VersionOfObjectRefStructure;
 
 public record MandatoryFieldsContext(
   String interchangeId,

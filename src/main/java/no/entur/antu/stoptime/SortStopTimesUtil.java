@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 import no.entur.antu.validation.validator.support.NetexUtils;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.EntityStructure;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPatternRefStructure;
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.entur.netex2.model.EntityStructure;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPatternRefStructure;
+import org.entur.netex2.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

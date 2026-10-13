@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.*;
+import org.entur.netex2.model.*;
 
 public class NetexUtils {
 

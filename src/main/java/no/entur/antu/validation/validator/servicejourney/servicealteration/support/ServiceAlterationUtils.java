@@ -2,7 +2,7 @@ package no.entur.antu.validation.validator.servicejourney.servicealteration.supp
 
 import java.util.Collection;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
-import org.rutebanken.netex.model.DatedServiceJourney;
+import org.entur.netex2.model.DatedServiceJourney;
 
 public class ServiceAlterationUtils {
 

@@ -22,9 +22,9 @@ import org.entur.netex.validation.validator.model.ScheduledStopPointId;
 import org.entur.netex.validation.validator.model.ServiceJourneyId;
 import org.entur.netex.validation.validator.model.ServiceJourneyInterchangeInfo;
 import org.entur.netex.validation.validator.model.ServiceJourneyStop;
+import org.entur.netex2.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.*;
 
 class InterchangeWaitingTimeValidatorTest {
 

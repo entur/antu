@@ -1,8 +1,8 @@
 package no.entur.antu.common.netex;
 
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.ServiceJourney;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.ServiceJourney;
 
 public class NetexTestEnvironmentBuilder {
 

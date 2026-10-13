@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.DayOfWeek;
 import java.util.Set;
+import org.entur.netex2.model.DayOfWeekEnumeration;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.DayOfWeekEnumeration;
 
 class ServiceJourneyActiveDatesCollectorTest {
 

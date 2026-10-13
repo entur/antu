@@ -5,7 +5,7 @@ import no.entur.antu.validation.validator.support.NetexUtils;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.JourneyPattern;
+import org.entur.netex2.model.JourneyPattern;
 
 public record SameQuayRefContext(
   String journeyPatternId,

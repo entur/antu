@@ -14,8 +14,8 @@ import org.entur.netex.validation.validator.ValidationReportEntry;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.QuayId;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
+import org.entur.netex2.model.ScheduledStopPointRefStructure;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 
 class UnexpectedInterchangeDistanceValidatorTest extends ValidationTest {
 

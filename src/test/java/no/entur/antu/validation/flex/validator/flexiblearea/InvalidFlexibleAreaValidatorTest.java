@@ -12,10 +12,10 @@ import org.assertj.core.api.Assertions;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
 import org.entur.netex.validation.validator.ValidationReport;
+import org.entur.netex2.model.FlexibleArea;
+import org.entur.netex2.model.FlexibleStopPlace;
+import org.entur.netex2.model.FlexibleStopPlace_VersionStructure;
 import org.junit.jupiter.api.Test;
-import org.rutebanken.netex.model.FlexibleArea;
-import org.rutebanken.netex.model.FlexibleStopPlace;
-import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
 
 class InvalidFlexibleAreaValidatorTest extends ValidationTest {
 

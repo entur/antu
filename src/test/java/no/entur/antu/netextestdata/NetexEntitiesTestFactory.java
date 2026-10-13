@@ -24,13 +24,13 @@ import net.opengis.gml._3.ObjectFactory;
 import net.opengis.gml._3.PolygonType;
 import org.entur.netex.index.api.NetexEntitiesIndex;
 import org.entur.netex.index.impl.NetexEntitiesIndexImpl;
-import org.rutebanken.netex.model.*;
+import org.entur.netex2.model.*;
 
 public class NetexEntitiesTestFactory {
 
   private static final DayType EVERYDAY = new DayType()
     .withId("EVERYDAY")
-    .withName(new MultilingualString().withValue("everyday"));
+    .withName(new MultilingualString().withContent("everyday"));
 
   private CreateGenericLine<? extends Line_VersionStructure> line;
 
@@ -594,10 +594,10 @@ public class NetexEntitiesTestFactory {
   }
 
   /**
-   * Creates the new DatedServiceJourneyRefStructure with the given id
+   * Creates the new DestinationDisplayRefStructure with the given id
    *
-   * @param id the id of the DatedServiceJourney
-   * @return DatedServiceJourneyRefStructure
+   * @param id the id of the DestinationDisplay
+   * @return DestinationDisplayRefStructure
    */
   public static DestinationDisplayRefStructure createDestinationDisplayRef(
     int id
@@ -666,7 +666,7 @@ public class NetexEntitiesTestFactory {
 
       FlexibleArea flexibleArea = new FlexibleArea()
         .withId(ref())
-        .withName(new MultilingualString().withValue("FlexibleArea " + id));
+        .withName(new MultilingualString().withContent("FlexibleArea " + id));
 
       if (withNullPolygon) {
         return flexibleArea.withPolygon(null);
@@ -710,7 +710,9 @@ public class NetexEntitiesTestFactory {
     public FlexibleStopPlace create() {
       return new FlexibleStopPlace()
         .withId(ref())
-        .withName(new MultilingualString().withValue("FlexibleStopPlace " + id))
+        .withName(
+          new MultilingualString().withContent("FlexibleStopPlace " + id)
+        )
         .withAreas(
           new FlexibleStopPlace_VersionStructure.Areas()
             .withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(
@@ -837,9 +839,7 @@ public class NetexEntitiesTestFactory {
     }
 
     public OperatingDay create() {
-      return new OperatingDay()
-        .withId(ref())
-        .withCalendarDate(calendarDate.atStartOfDay());
+      return new OperatingDay().withId(ref()).withCalendarDate(calendarDate);
     }
   }
 
@@ -896,9 +896,7 @@ public class NetexEntitiesTestFactory {
       DayTypeAssignment dayTypeAssignment = new DayTypeAssignment()
         .withId(ref());
 
-      Optional
-        .ofNullable(date)
-        .ifPresent(d -> dayTypeAssignment.withDate(d.atStartOfDay()));
+      Optional.ofNullable(date).ifPresent(dayTypeAssignment::withDate);
 
       Optional
         .ofNullable(operatingDayRef)
@@ -925,7 +923,7 @@ public class NetexEntitiesTestFactory {
   >
     extends CreateEntity<T> {
 
-    protected AllVehicleModesOfTransportEnumeration transportMode;
+    protected AllPublicTransportModesEnumeration transportMode;
     protected TransportSubmodeStructure transportSubmode;
     protected OperatorRefStructure operatorRef;
 
@@ -934,7 +932,7 @@ public class NetexEntitiesTestFactory {
     }
 
     public CreateGenericLine<T> withTransportMode(
-      AllVehicleModesOfTransportEnumeration transportMode
+      AllPublicTransportModesEnumeration transportMode
     ) {
       this.transportMode = transportMode;
       return this;
@@ -964,7 +962,7 @@ public class NetexEntitiesTestFactory {
     public Line create() {
       return new Line()
         .withId(ref())
-        .withName(new MultilingualString().withValue("Line " + id))
+        .withName(new MultilingualString().withContent("Line " + id))
         .withTransportMode(transportMode)
         .withTransportSubmode(transportSubmode)
         .withOperatorRef(operatorRef);
@@ -991,7 +989,7 @@ public class NetexEntitiesTestFactory {
       return new FlexibleLine()
         .withId(ref())
         .withFlexibleLineType(flexibleLineType)
-        .withName(new MultilingualString().withValue("FlexibleLine " + id))
+        .withName(new MultilingualString().withContent("FlexibleLine " + id))
         .withTransportMode(transportMode)
         .withTransportSubmode(transportSubmode)
         .withOperatorRef(operatorRef);
@@ -1346,7 +1344,7 @@ public class NetexEntitiesTestFactory {
     private final CreateJourneyPattern journeyPattern;
     private final List<CreateTimetabledPassingTime> timetabledPassingTimes =
       new ArrayList<>();
-    private AllVehicleModesOfTransportEnumeration transportMode;
+    private AllPublicTransportModesEnumeration transportMode;
     private TransportSubmodeStructure transportSubmode;
 
     public CreateServiceJourney(
@@ -1381,7 +1379,7 @@ public class NetexEntitiesTestFactory {
     }
 
     public CreateServiceJourney withTransportMode(
-      AllVehicleModesOfTransportEnumeration transportMode
+      AllPublicTransportModesEnumeration transportMode
     ) {
       this.transportMode = transportMode;
       return this;
