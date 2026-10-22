@@ -58,6 +58,16 @@ variable "redis_zone" {
   default     = "europe-west1-d"
 }
 
+variable "anzu_service_account" {
+  description = "Email of the anzu runtime service account, granted read access to the report bucket. Empty disables the grant."
+  default     = ""
+}
+
+variable "anzu_github_service_account" {
+  description = "Email of the anzu GitHub Actions service account, granted pubsub.subscriber on AntuNetexValidationStatusQueue so its terraform can attach a subscription. Empty disables the grant."
+  default     = ""
+}
+
 
 
 
