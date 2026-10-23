@@ -53,7 +53,7 @@ vehicleRegistryUrl: https://api.entur.io/vehicles/v1
 interchangeWaitingTimeValidationEnabled: true
 alightingAndBoardingValidationEnabled: true
 interchangeServiceJourneyReferencesExistValidatorEnabled: true
-netexValidationVehiclesEnabled: false
+netexValidationVehiclesEnabled: true
 
 baba:
   service: http://baba.prd.entur.internal
