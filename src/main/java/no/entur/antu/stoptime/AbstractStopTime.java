@@ -3,7 +3,7 @@ package no.entur.antu.stoptime;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.entur.netex2.model.TimetabledPassingTime;
 
 /**
  * Wrapper around {@link TimetabledPassingTime} that provides a simpler interface for passing times

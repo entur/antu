@@ -10,23 +10,23 @@ import no.entur.antu.validation.validator.support.NetexUtils;
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.StopPointInJourneyPattern;
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.entur.netex2.model.AllPublicTransportModesEnumeration;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.ServiceJourney;
+import org.entur.netex2.model.StopPointInJourneyPattern;
+import org.entur.netex2.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public record UnexpectedSpeedContext(
   ServiceJourney serviceJourney,
-  AllVehicleModesOfTransportEnumeration transportMode,
+  AllPublicTransportModesEnumeration transportMode,
   Map<ScheduledStopPointId, QuayCoordinates> quayCoordinatesPerScheduledStopPointId,
   Distances distances
 ) {
   public UnexpectedSpeedContext(
     ServiceJourney serviceJourney,
-    AllVehicleModesOfTransportEnumeration transportMode,
+    AllPublicTransportModesEnumeration transportMode,
     Map<ScheduledStopPointId, QuayCoordinates> quayCoordinatesPerScheduledStopPointId
   ) {
     this(

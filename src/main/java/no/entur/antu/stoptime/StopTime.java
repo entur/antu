@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.Objects;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.entur.netex2.model.TimetabledPassingTime;
 
 public sealed interface StopTime permits AbstractStopTime {
   static StopTime of(

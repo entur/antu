@@ -1,8 +1,8 @@
 package no.entur.antu.validation.validator.journeypattern.stoppoint.stoppointscount;
 
 import no.entur.antu.validation.validator.support.NetexUtils;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.LinksInJourneyPattern_RelStructure;
 
 record StopPointsCountContext(
   String journeyPatternId,

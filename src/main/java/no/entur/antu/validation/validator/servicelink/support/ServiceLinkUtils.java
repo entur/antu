@@ -3,10 +3,10 @@ package no.entur.antu.validation.validator.servicelink.support;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.LinkInJourneyPattern;
-import org.rutebanken.netex.model.LinkInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.LinksInJourneyPattern_RelStructure;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.LinkInJourneyPattern;
+import org.entur.netex2.model.LinkInLinkSequence_VersionedChildStructure;
+import org.entur.netex2.model.LinksInJourneyPattern_RelStructure;
 
 public class ServiceLinkUtils {
 

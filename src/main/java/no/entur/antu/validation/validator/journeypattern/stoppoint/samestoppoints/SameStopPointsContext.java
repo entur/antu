@@ -3,8 +3,8 @@ package no.entur.antu.validation.validator.journeypattern.stoppoint.samestoppoin
 import java.util.List;
 import java.util.Objects;
 import no.entur.antu.validation.validator.support.NetexUtils;
-import org.rutebanken.netex.model.JourneyPattern;
-import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
+import org.entur.netex2.model.JourneyPattern;
+import org.entur.netex2.model.PointInLinkSequence_VersionedChildStructure;
 
 record SameStopPointsContext(String journeyPatternId, List<String> pointRefs) {
   public static SameStopPointsContext of(JourneyPattern journeyPattern) {

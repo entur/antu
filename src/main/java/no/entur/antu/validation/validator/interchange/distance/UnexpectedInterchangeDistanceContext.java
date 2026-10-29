@@ -7,7 +7,7 @@ import no.entur.antu.validation.validator.journeypattern.stoppoint.distance.Unex
 import org.entur.netex.validation.validator.jaxb.JAXBValidationContext;
 import org.entur.netex.validation.validator.model.QuayCoordinates;
 import org.entur.netex.validation.validator.model.ScheduledStopPointId;
-import org.rutebanken.netex.model.ServiceJourneyInterchange;
+import org.entur.netex2.model.ServiceJourneyInterchange;
 
 public record UnexpectedInterchangeDistanceContext(
   String interchangeId,
