@@ -15,10 +15,17 @@ jobs:
       - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
+      # setup-java's liberica distribution can't select 25.0.5.0.3+5 (it maps to the same
+      # semver as the vulnerable 25.0.5.0.2 GA build), so install the exact JDK from its tarball.
+      - name: Download Liberica JDK 25.0.5.0.3+5
+        run: |
+          curl --proto '=https' --tlsv1.2 -fsSL -o "$RUNNER_TEMP/liberica.tar.gz" "https://github.com/bell-sw/Liberica/releases/download/25.0.5.0.3+5/bellsoft-jdk25.0.5.0.3+5-linux-amd64.tar.gz"
+          echo "619c84961ce12dd1cd455719680e22d080bee63dbfe64711e2ef47243114e3ef  $RUNNER_TEMP/liberica.tar.gz" | sha256sum -c -
       - uses: actions/setup-java@v6.0.1
         with:
-          java-version: 25.0.4
-          distribution: liberica
+          distribution: jdkfile
+          jdkFile: ${{ runner.temp }}/liberica.tar.gz
+          java-version: 25.0.5
       - name: Cache Maven dependencies
         uses: actions/cache@v6.1.0
         with:
