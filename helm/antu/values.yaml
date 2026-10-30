@@ -121,7 +121,7 @@ common:
     - name: antu-init-trust-store
       # Same base image as the Dockerfile: it has sh and keytool. gha-helm cannot --set a list element,
       # so this is not the application image. Renovate bumps the tag and digest with the Dockerfile.
-      image: bellsoft/liberica-openjre-alpine:25.0.4.1@sha256:33b92304b3abdad54fb937224adcab07febad199180867d51be0fcd9da340ee4
+      image: bellsoft/liberica-openjre-alpine:25.0.5.0.3@sha256:6e37a10866f46514a2439295cecaec5666ab817bfcb961d2fc6bcb8001335b61
       imagePullPolicy: IfNotPresent
       env:
         - name: ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD
