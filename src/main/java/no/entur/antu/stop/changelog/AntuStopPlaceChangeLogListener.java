@@ -1,5 +1,6 @@
 package no.entur.antu.stop.changelog;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
@@ -49,16 +50,22 @@ public class AntuStopPlaceChangeLogListener
   }
 
   /**
-   * The stream is ignored, and deactivation is handled exactly like deletion. The payload is fetched
-   * from Tiamat after the stop place has been terminated, and antu asks for the current version only
-   * (allVersions=false), so a terminated stop place is valid at no point in time and the payload
-   * comes back carrying neither the stop place nor its quays. Antu's own cache is the only record of
-   * which quays belonged to it. Taking them from the payload instead leaves every quay behind with
-   * its parent stop place deleted, and the first lookup of that parent fails the whole validation.
+   * The payload is closed unread and deactivation handled exactly like deletion. Tiamat is asked for
+   * the current version only (allVersions=false), and asked after termination, so it returns neither
+   * the stop place nor its quays — antu's cache is their only record. Sourcing them from the payload
+   * orphans every quay, and the first lookup of its deleted parent fails the whole validation.
+   *
+   * <p>Closing it releases nothing today — it is a {@code ByteArrayInputStream} — but keeps the one
+   * path that never reads its payload from leaking if that ever changes.
    */
   @Override
   public void onStopPlaceDeactivated(String id, InputStream stopPlaceStream) {
-    deleteStopPlaceAndQuays(new StopPlaceId(id));
+    try (stopPlaceStream) {
+      deleteStopPlaceAndQuays(new StopPlaceId(id));
+    } catch (IOException e) {
+      // The delete is done; failing the event here would only redeliver it.
+      log.warn("Failed to close the deactivation payload for {}", id, e);
+    }
     log.info("Stop place deactivated: {}", id);
   }
 

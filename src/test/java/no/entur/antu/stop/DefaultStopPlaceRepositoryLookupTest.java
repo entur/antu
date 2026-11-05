@@ -12,10 +12,9 @@ import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.junit.jupiter.api.Test;
 
 /**
- * A quay can outlive its stop place. The two caches are updated by separate changelog events, so
- * between them the quay cache can hold an entry whose parent is already gone. The lookups have to
- * answer for that rather than throw: a throw here aborts the whole file with a system error, while
- * callers already treat an absent answer as a gap in the external stop register and skip the check.
+ * A quay can outlive its stop place: separate changelog events update the two caches, and a refresh
+ * replaces the stop places before the quays. The lookups must answer rather than throw — a throw
+ * aborts the whole file, while an absent answer is a gap callers already skip.
  */
 class DefaultStopPlaceRepositoryLookupTest {
 

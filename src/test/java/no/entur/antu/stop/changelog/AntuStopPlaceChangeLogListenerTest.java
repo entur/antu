@@ -163,8 +163,12 @@ class AntuStopPlaceChangeLogListenerTest {
     assertEquals(0, quayCache.size());
   }
 
+  /**
+   * Pairs with {@link #deactivateStopPlaceDeletesQuaysWhenPayloadHasNone()}: the quays come from the
+   * cache, so a full payload and an empty one reach the same result.
+   */
   @Test
-  void deactivateStopPlaceDeletesOrdinaryStopsIncludingQuays() {
+  void deactivateIgnoresThePayload() {
     byte[] xmlBytes = SITE_FRAME.getBytes(StandardCharsets.UTF_8);
     listener.onStopPlaceCreated("id", new ByteArrayInputStream(xmlBytes));
     listener.onStopPlaceDeactivated(

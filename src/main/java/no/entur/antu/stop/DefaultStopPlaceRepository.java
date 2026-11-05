@@ -202,10 +202,10 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
   }
 
   /**
-   * Empty both when the quay is unknown and when its parent stop place is not in the cache. The two
-   * caches are updated by separate changelog events, so a quay can outlive its stop place, and a
-   * lookup that dereferenced the missing parent would abort the whole file with a system error.
-   * Callers already treat the absent value as a gap in the external stop register and skip the check.
+   * Empty when the quay is unknown, and when its parent stop place is gone. A quay outlives its stop
+   * place whenever the two caches are updated apart: by separate changelog events, or by loadCache
+   * replacing the stop places before the quays. Dereferencing the missing parent would abort the
+   * whole file; callers treat the empty value as a gap in the stop register and skip the check.
    */
   private Optional<SimpleStopPlace> getStopPlaceForQuay(QuayId quayId) {
     return getQuay(quayId)
