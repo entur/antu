@@ -82,10 +82,8 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
 
   @Override
   public TransportModeAndSubMode getTransportModesForQuayId(QuayId quayId) {
-    return getQuay(quayId)
-      .map(quay ->
-        stopPlaceCache.get(quay.stopPlaceId()).transportModeAndSubMode()
-      )
+    return getStopPlaceForQuay(quayId)
+      .map(SimpleStopPlace::transportModeAndSubMode)
       .orElse(null);
   }
 
@@ -96,9 +94,7 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
 
   @Override
   public String getStopPlaceNameForQuayId(QuayId quayId) {
-    return getQuay(quayId)
-      .map(quay -> stopPlaceCache.get(quay.stopPlaceId()).name())
-      .orElse(null);
+    return getStopPlaceForQuay(quayId).map(SimpleStopPlace::name).orElse(null);
   }
 
   @Override
@@ -203,5 +199,17 @@ public class DefaultStopPlaceRepository implements StopPlaceRepositoryLoader {
       return Optional.of(quayFromCache);
     }
     return Optional.empty();
+  }
+
+  /**
+   * Empty when the quay is unknown, and when its parent stop place is gone. A quay outlives its stop
+   * place whenever the two caches are updated apart: by separate changelog events, or by loadCache
+   * replacing the stop places before the quays. Dereferencing the missing parent would abort the
+   * whole file; callers treat the empty value as a gap in the stop register and skip the check.
+   */
+  private Optional<SimpleStopPlace> getStopPlaceForQuay(QuayId quayId) {
+    return getQuay(quayId)
+      .map(SimpleQuay::stopPlaceId)
+      .map(stopPlaceCache::get);
   }
 }

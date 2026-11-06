@@ -1,8 +1,8 @@
 package no.entur.antu.stop.changelog;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
-import java.util.stream.Collectors;
 import no.entur.antu.stop.StopPlaceRepositoryLoader;
 import no.entur.antu.stop.changelog.support.ChangeLogUtils;
 import org.entur.netex.NetexParser;
@@ -14,7 +14,6 @@ import org.entur.netex.validation.validator.model.SimpleStopPlace;
 import org.entur.netex.validation.validator.model.StopPlaceId;
 import org.entur.netex.validation.validator.model.TransportModeAndSubMode;
 import org.rutebanken.helper.stopplace.changelog.StopPlaceChangelogListener;
-import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.MultilingualString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,39 +49,32 @@ public class AntuStopPlaceChangeLogListener
     createOrUpdateStopPlace(stopPlaceStream);
   }
 
+  /**
+   * The payload is closed unread and deactivation handled exactly like deletion. Tiamat is asked for
+   * the current version only (allVersions=false), and asked after termination, so it returns neither
+   * the stop place nor its quays — antu's cache is their only record. Sourcing them from the payload
+   * orphans every quay, and the first lookup of its deleted parent fails the whole validation.
+   *
+   * <p>Closing it releases nothing today — it is a {@code ByteArrayInputStream} — but keeps the one
+   * path that never reads its payload from leaking if that ever changes.
+   */
   @Override
   public void onStopPlaceDeactivated(String id, InputStream stopPlaceStream) {
-    deactivateStopPlace(new StopPlaceId(id), stopPlaceStream);
-    log.info("Stop place deactivated: {}", id);
-  }
-
-  private void deactivateStopPlace(
-    StopPlaceId stopPlaceId,
-    InputStream stopPlaceStream
-  ) {
-    NetexParser parser = new NetexParser();
-    NetexEntitiesIndex netexEntitiesIndex = parser.parse(stopPlaceStream);
-    Set<String> quaysToDelete = getQuaysIdsFromIndex(netexEntitiesIndex);
-    deleteStopPlace(stopPlaceId);
-    for (String quayId : quaysToDelete) {
-      deleteQuay(quayId, stopPlaceId);
+    try (stopPlaceStream) {
+      deleteStopPlaceAndQuays(new StopPlaceId(id));
+    } catch (IOException e) {
+      // The delete is done; failing the event here would only redeliver it.
+      log.warn("Failed to close the deactivation payload for {}", id, e);
     }
-  }
-
-  private Set<String> getQuaysIdsFromIndex(
-    NetexEntitiesIndex netexEntitiesIndex
-  ) {
-    return netexEntitiesIndex
-      .getQuayIndex()
-      .getLatestVersions()
-      .stream()
-      .map(EntityStructure::getId)
-      .collect(Collectors.toSet());
+    log.info("Stop place deactivated: {}", id);
   }
 
   @Override
   public void onStopPlaceDeleted(String id) {
-    StopPlaceId stopPlaceId = new StopPlaceId(id);
+    deleteStopPlaceAndQuays(new StopPlaceId(id));
+  }
+
+  private void deleteStopPlaceAndQuays(StopPlaceId stopPlaceId) {
     Set<String> quaysToDelete =
       stopPlaceRepositoryLoader.getQuaysForStopPlaceId(stopPlaceId);
     deleteStopPlace(stopPlaceId);

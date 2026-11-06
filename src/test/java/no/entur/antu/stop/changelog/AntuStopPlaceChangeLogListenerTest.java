@@ -65,6 +65,27 @@ class AntuStopPlaceChangeLogListenerTest {
                     </PublicationDelivery>
                     """;
 
+  /**
+   * What Tiamat answers with for a stop place that has just been deactivated. Antu asks for the
+   * current version only (allVersions=false), and a terminated stop place is valid at no point in
+   * time, so the delivery is well formed and carries neither the stop place nor its quays.
+   */
+  private static final String EMPTY_SITE_FRAME =
+    """
+                    <PublicationDelivery xmlns="http://www.netex.org.uk/netex" xmlns:ns2="http://www.opengis.net/gml/3.2" xmlns:ns3="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.12:NO-NeTEx-stops:1.4" xsi:schemaLocation="">
+                        <PublicationTimestamp>2023-06-08T12:09:20.879</PublicationTimestamp>
+                        <dataObjects>
+                            <SiteFrame modification="new" version="1" id="NSR:SiteFrame:858500319">
+                                <FrameDefaults>
+                                    <DefaultLocale>
+                                        <TimeZone>Europe/Oslo</TimeZone>
+                                    </DefaultLocale>
+                                </FrameDefaults>
+                            </SiteFrame>
+                        </dataObjects>
+                    </PublicationDelivery>
+                    """;
+
   private Map<StopPlaceId, SimpleStopPlace> stopPlaceCache;
   private Map<QuayId, SimpleQuay> quayCache;
   private StopPlaceRepositoryLoader loader;
@@ -142,8 +163,12 @@ class AntuStopPlaceChangeLogListenerTest {
     assertEquals(0, quayCache.size());
   }
 
+  /**
+   * Pairs with {@link #deactivateStopPlaceDeletesQuaysWhenPayloadHasNone()}: the quays come from the
+   * cache, so a full payload and an empty one reach the same result.
+   */
   @Test
-  void deactivateStopPlaceDeletesOrdinaryStopsIncludingQuays() {
+  void deactivateIgnoresThePayload() {
     byte[] xmlBytes = SITE_FRAME.getBytes(StandardCharsets.UTF_8);
     listener.onStopPlaceCreated("id", new ByteArrayInputStream(xmlBytes));
     listener.onStopPlaceDeactivated(
@@ -159,6 +184,28 @@ class AntuStopPlaceChangeLogListenerTest {
       expectedPublicationTimestamp,
       timestampRepository.getTimestamp()
     );
+    assertEquals(0, stopPlaceCache.size());
+    assertEquals(0, quayCache.size());
+  }
+
+  /**
+   * The payload is fetched from Tiamat after the stop place has been terminated, so in production it
+   * never contains the quays. They have to come from antu's own cache, or they are left behind
+   * pointing at a stop place that no longer exists.
+   */
+  @Test
+  void deactivateStopPlaceDeletesQuaysWhenPayloadHasNone() {
+    listener.onStopPlaceCreated(
+      "id",
+      new ByteArrayInputStream(SITE_FRAME.getBytes(StandardCharsets.UTF_8))
+    );
+    listener.onStopPlaceDeactivated(
+      "NSR:StopPlace:58586",
+      new ByteArrayInputStream(
+        EMPTY_SITE_FRAME.getBytes(StandardCharsets.UTF_8)
+      )
+    );
+
     assertEquals(0, stopPlaceCache.size());
     assertEquals(0, quayCache.size());
   }
