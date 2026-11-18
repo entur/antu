@@ -8,7 +8,6 @@ import org.entur.netex.validation.validator.jaxb.NetexDataCollector;
 import org.entur.netex.validation.validator.model.SimpleLine;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.rutebanken.netex.model.FlexibleLineTypeEnumeration;
 
 public class LineInfoCollector extends NetexDataCollector {
 
@@ -40,7 +39,7 @@ public class LineInfoCollector extends NetexDataCollector {
     // No Lines in common files
   }
 
-  public void addLineName(String validationReportId, SimpleLine lineInfo) {
+  private void addLineName(String validationReportId, SimpleLine lineInfo) {
     RLock lock = redissonClient.getLock(validationReportId);
     try {
       lock.lock();
@@ -70,12 +69,15 @@ public class LineInfoCollector extends NetexDataCollector {
         validationContext
           .flexibleLines()
           .stream()
-          .filter(f ->
-            f.getFlexibleLineType() == FlexibleLineTypeEnumeration.FIXED
-          )
           .findFirst()
           .map(line -> SimpleLine.of(line, validationContext.getFileName()))
-          .orElse(null)
+          .orElseThrow(() ->
+            new IllegalStateException(
+              "The line file " +
+              validationContext.getFileName() +
+              " contains neither a Line nor a FlexibleLine. This should have been caught by prior validation"
+            )
+          )
       );
   }
 }
