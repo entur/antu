@@ -99,6 +99,7 @@ common:
       JAVA_OPTS: >-
         -Xmx3000m -Xms128m -Xss512k -XX:ActiveProcessorCount=2
         -XX:+ExitOnOutOfMemoryError
+        -XX:-UseBASE64Intrinsics
         -XX:+IgnoreUnrecognizedVMOptions
         --enable-native-access=ALL-UNNAMED
         --sun-misc-unsafe-memory-access=allow
