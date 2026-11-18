@@ -46,6 +46,7 @@ antu:
         xmlnsUrl: http://www.rutebanken.org/ns/nog
     additionalAllowedOrganisations:
       - AAS:Authority:AAS
+      - AAS:Authority:500003
 
 gcp:
   blobstoreProjectId: en-antu-dev

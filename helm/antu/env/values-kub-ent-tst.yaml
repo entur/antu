@@ -44,6 +44,7 @@ antu:
         xmlnsUrl: http://www.rutebanken.org/ns/pen
     additionalAllowedOrganisations:
       - AAS:Authority:500004
+      - AAS:Authority:500003
 
 gcp:
   blobstoreProjectId: entur-ror-test
