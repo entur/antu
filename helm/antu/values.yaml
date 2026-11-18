@@ -94,11 +94,15 @@ common:
       # without this the pods work until a base image bump flips the default to deny, and then no pod can
       # read or write Redis at all. Verified on 25.0.4: records survive deny, plain POJOs do not.
       #
+      # UseBASE64Intrinsics: mitigates Java4Shell (CVE-2026-114938), a heap overflow in HotSpot's AVX-512
+      # Base64 decoder. The runtime image ships Liberica 25.0.5. Remove once the base image has a fixed JDK.
+      #
       # Read by the docker-smoke job in .github/workflows/push.yml, which is the only thing in CI that
       # starts the image. Keep it here rather than inline elsewhere, or that gate goes stale.
       JAVA_OPTS: >-
         -Xmx3000m -Xms128m -Xss512k -XX:ActiveProcessorCount=2
         -XX:+ExitOnOutOfMemoryError
+        -XX:-UseBASE64Intrinsics
         -XX:+IgnoreUnrecognizedVMOptions
         --enable-native-access=ALL-UNNAMED
         --sun-misc-unsafe-memory-access=allow
