@@ -99,7 +99,6 @@ common:
       JAVA_OPTS: >-
         -Xmx3000m -Xms128m -Xss512k -XX:ActiveProcessorCount=2
         -XX:+ExitOnOutOfMemoryError
-        -XX:-UseBASE64Intrinsics
         -XX:+IgnoreUnrecognizedVMOptions
         --enable-native-access=ALL-UNNAMED
         --sun-misc-unsafe-memory-access=allow
@@ -122,7 +121,7 @@ common:
     - name: antu-init-trust-store
       # Same base image as the Dockerfile: it has sh and keytool. gha-helm cannot --set a list element,
       # so this is not the application image. Renovate bumps the tag and digest with the Dockerfile.
-      image: bellsoft/liberica-openjre-alpine:25.0.5.0.3@sha256:6e37a10866f46514a2439295cecaec5666ab817bfcb961d2fc6bcb8001335b61
+      image: bellsoft/liberica-openjre-alpine:25.0.5.1@sha256:59fe4ed4c6eb5baabe8801ad19a79d01b5b3f9f6af2534b4515de3f705109eec
       imagePullPolicy: IfNotPresent
       env:
         - name: ANTU_REDIS_SERVER_TRUST_STORE_PASSWORD
