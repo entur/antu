@@ -75,6 +75,10 @@ common:
         readOnly: true
       - mountPath: /deployments/truststore
         name: truststore
+      # The JVM argument files the Dockerfile entrypoint names. See configmap.data.JAVA_OPTS.
+      - mountPath: /etc/jvm
+        name: jvm-options
+        readOnly: true
 
   # Environment for the container. A ConfigMap rather than container.env so that the env values files
   # can add keys (JAVA_OPTS_EXTRA) without repeating the list. The chart adds no checksum annotation, so
@@ -94,6 +98,10 @@ common:
       # without this the pods work until a base image bump flips the default to deny, and then no pod can
       # read or write Redis at all. Verified on 25.0.4: records survive deny, plain POJOs do not.
       #
+      # The image has no shell, so this is not expanded from the environment: deployment.volumes mounts this
+      # key and JAVA_OPTS_EXTRA as JVM argument files, which the Dockerfile entrypoint passes to java. Argument
+      # files split on whitespace and know no comments, so keep this a plain list of options.
+      #
       # Read by the docker-smoke job in .github/workflows/push.yml, which is the only thing in CI that
       # starts the image. Keep it here rather than inline elsewhere, or that gate goes stale.
       JAVA_OPTS: >-
@@ -106,7 +114,8 @@ common:
         --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
         -Dspring.config.location=/etc/application-config/application.properties
         -Dfile.encoding=UTF-8
-      # Appended after JAVA_OPTS by the Dockerfile entrypoint. Set in env/values-kub-ent-*.yaml.
+      # Appended after JAVA_OPTS by the Dockerfile entrypoint. Set in env/values-kub-ent-*.yaml. Keep the key
+      # even when empty: the volume projects it, and the JVM refuses to start on a missing argument file.
       JAVA_OPTS_EXTRA: ""
 
   # ExternalSecrets named antu-<key>, mounted with envFrom by the chart.
@@ -119,8 +128,8 @@ common:
 
   initContainers:
     - name: antu-init-trust-store
-      # Same base image as the Dockerfile: it has sh and keytool. gha-helm cannot --set a list element,
-      # so this is not the application image. Renovate bumps the tag and digest with the Dockerfile.
+      # Same image as the Dockerfile builder stage: it has sh and keytool, which the distroless application
+      # image does not. Renovate bumps the tag and digest with the Dockerfile.
       image: bellsoft/liberica-openjre-alpine:25.0.5.1@sha256:59fe4ed4c6eb5baabe8801ad19a79d01b5b3f9f6af2534b4515de3f705109eec
       imagePullPolicy: IfNotPresent
       env:
@@ -172,6 +181,17 @@ common:
           name: antu-redis-configmap
       - name: truststore
         emptyDir: { }
+      # The chart's env ConfigMap (common.configmap above), whose JVM option keys become the argument files
+      # /etc/jvm/java-opts and /etc/jvm/java-opts-extra.
+      - name: jvm-options
+        configMap:
+          defaultMode: 420
+          name: antu
+          items:
+            - key: JAVA_OPTS
+              path: java-opts
+            - key: JAVA_OPTS_EXTRA
+              path: java-opts-extra
     # The HPA scales antu down routinely, so pods are terminated mid-validation as normal operation, and
     # SIGKILL here means the in-flight files are redelivered and revalidated from scratch. Being above
     # antu.shutdown.drain.timeout.seconds is necessary but not sufficient: the subscriber close runs
