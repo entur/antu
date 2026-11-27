@@ -326,7 +326,11 @@ saved queries and the alert runbook depend on.
 `docker-smoke` job in CI reads them with `yq` and starts the image with them. That job is the only thing
 anywhere that runs the built image; without it a flag the JRE rejects, or a class file version mismatch, is
 first observed in the
-cluster. Two of the flags are load-bearing on JDK 25 and neither is obvious:
+cluster. The runtime image is distroless, with no shell to expand an environment variable, so the chart mounts
+`JAVA_OPTS` and `JAVA_OPTS_EXTRA` as JVM argument files under `/etc/jvm`, which the entrypoint passes as
+`@/etc/jvm/java-opts @/etc/jvm/java-opts-extra`. Not `JDK_JAVA_OPTIONS`: the launcher prints a `NOTE: Picked
+up` line on stderr at every start, which Cloud Logging tags ERROR. Two of the flags are load-bearing on JDK 25
+and neither is obvious:
 
 - `--sun-misc-unsafe-memory-access=allow`. Kryo's `FieldSerializer` calls `Unsafe.objectFieldOffset`, and Kryo
   is the codec for every Redis structure the pipeline runs on. JDK 25 still defaults this to `warn`, so the

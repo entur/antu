@@ -17,6 +17,9 @@ Antu is a NeTEx dataset validation service built by Entur for validating public 
 - **Storage**: Google Cloud Storage
 - **Deployment**: Kubernetes with HPA, via the Entur `common` Helm chart. `helm/antu/templates/` holds only what
   the chart cannot express: the `application.properties` ConfigMap and the auth0 ExternalSecret
+- **Runtime image**: `gcr.io/distroless/java25-debian13:nonroot` (Temurin JRE, no shell). JVM options reach it
+  as argument files mounted from the `JAVA_OPTS` and `JAVA_OPTS_EXTRA` ConfigMap keys; for a shell, use
+  `kubectl debug` with an ephemeral container or the `debug-nonroot` tag of the same base image
 
 ### Data Flow
 1. Receives validation requests from Marduk via PubSub
