@@ -22,3 +22,42 @@ resource "google_pubsub_topic_iam_member" "anzu_deploy_attach_subscription" {
   role    = "roles/pubsub.subscriber"
   member  = "serviceAccount:${var.anzu_github_service_account}"
 }
+
+# Pub/Sub grants to antu on its own topics and subscriptions.
+#
+# Until now these worked only through the team-wide folder rule in entur/tf-gcp-iam
+# (application_rules/ror-antu-<env>.yaml), which grants publisher, subscriber and objectAdmin on every team-ror
+# resource in the environment, and antu has no project-level Pub/Sub role. These grants reproduce exactly what
+# antu uses here, so that the rule can be removed by Team Plattform without breaking it.
+#
+# antu's own buckets need nothing: the project-level roles/storage.objectAdmin in ent-antu-<env> covers them.
+# The stop place export it reads from marduk-<env> is public.
+
+locals {
+  antu_service_account = "serviceAccount:application@${var.gcp_resources_project}.iam.gserviceaccount.com"
+}
+
+# antu publishes the next pipeline job and the validation status. Nothing else publishes to these.
+resource "google_pubsub_topic_iam_member" "antu_publisher" {
+  for_each = toset([
+    google_pubsub_topic.AntuJobQueue.name,
+    google_pubsub_topic.AntuNetexValidationStatusQueue.name,
+  ])
+  project = var.gcp_resources_project
+  topic   = each.value
+  role    = "roles/pubsub.publisher"
+  member  = local.antu_service_account
+}
+
+# antu consumes validation requests from marduk and its own pipeline jobs. No admin call is made at startup:
+# entur.pubsub.subscriber.autocreate is false in every deployed environment.
+resource "google_pubsub_subscription_iam_member" "antu_subscriber" {
+  for_each = toset([
+    google_pubsub_subscription.AntuNetexValidationQueue.name,
+    google_pubsub_subscription.AntuJobQueue.name,
+  ])
+  project      = var.gcp_resources_project
+  subscription = each.value
+  role         = "roles/pubsub.subscriber"
+  member       = local.antu_service_account
+}
