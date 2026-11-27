@@ -102,60 +102,6 @@ resource "google_pubsub_subscription" "AntuJobQueue" {
   }
 }
 
-# AntuReportAggregationQueue and AntuCommonFilesAggregationQueue fed the Camel aggregator that waited for a
-# dataset's files. The wait is a counter in Redis now, so this version never touches them.
-#
-# KEPT FOR THIS RELEASE, marked for deletion in the follow-up, for the same reason as rbac.yaml and the
-# quartz-era ConfigMap keys. Terraform is applied from the deploy pipeline, before the pods are replaced, so
-# deleting them here takes the topics away from the version still serving and from anything to roll back to.
-# Remove them once the new version is fully rolled out in every environment.
-resource "google_pubsub_topic" "AntuReportAggregationQueue" {
-  name    = "AntuReportAggregationQueue"
-  project = var.gcp_resources_project
-  labels  = var.labels
-}
-
-resource "google_pubsub_subscription" "AntuReportAggregationQueue" {
-  name                       = "AntuReportAggregationQueue"
-  topic                      = google_pubsub_topic.AntuReportAggregationQueue.name
-  project                    = var.gcp_resources_project
-  labels                     = var.labels
-  message_retention_duration = "3600s"
-  retry_policy {
-    minimum_backoff = "10s"
-  }
-}
-
-resource "google_pubsub_topic" "AntuCommonFilesAggregationQueue" {
-  name    = "AntuCommonFilesAggregationQueue"
-  project = var.gcp_resources_project
-  labels  = var.labels
-}
-
-resource "google_pubsub_subscription" "AntuCommonFilesAggregationQueue" {
-  name                       = "AntuCommonFilesAggregationQueue"
-  topic                      = google_pubsub_topic.AntuCommonFilesAggregationQueue.name
-  project                    = var.gcp_resources_project
-  labels                     = var.labels
-  message_retention_duration = "3600s"
-  retry_policy {
-    minimum_backoff = "10s"
-  }
-}
-
-# Roll out with no validation in flight, and none arriving: AntuJobQueue's num_undelivered_messages at zero
-# and no report in a STARTED state, for the whole rollout rather than just at the start. maxSurge 1 /
-# maxUnavailable 1 means both versions serve AntuJobQueue for minutes, and three pieces of state moved at
-# once that the two versions share none of:
-#   - a validated common file is recorded by publishing to AntuCommonFilesAggregationQueue in the old
-#     version and in a Redis arrival set in the new one;
-#   - the merged report was keyed by the first reverse-sorted file name and is now keyed "aggregated";
-#   - the VALIDATE_DATASET message carried that file name in its body and now carries none.
-# A dataset whose files are handled by both versions therefore satisfies neither version's barrier. The
-# stalled-validation sweep will report it as timeout within 30 minutes, but it has to be re-triggered.
-
-
-
 # Redis server
 resource "google_redis_instance" "antu-redis" {
   name           = "${var.labels.app}-${var.kube_namespace}"
