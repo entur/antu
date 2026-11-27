@@ -22,3 +22,23 @@ resource "google_pubsub_topic_iam_member" "anzu_deploy_attach_subscription" {
   role    = "roles/pubsub.subscriber"
   member  = "serviceAccount:${var.anzu_github_service_account}"
 }
+
+# Cross project grants to marduk.
+#
+# marduk sends its validation requests to AntuNetexValidationQueue, and copies the NeTEx datasets to
+# validate into the exchange bucket. These grants replace marduk's team-wide folder rule
+# (tf-gcp-iam application_rules/ror-marduk-<env>.yaml), so marduk keeps this access when that rule is removed.
+resource "google_pubsub_topic_iam_member" "marduk_validation_request_publisher" {
+  project = var.gcp_resources_project
+  topic   = google_pubsub_topic.AntuNetexValidationQueue.name
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:${var.marduk_service_account}"
+}
+
+# A copy may replace an existing object, which needs storage.objects.delete, so roles/storage.objectCreator
+# is not enough.
+resource "google_storage_bucket_iam_member" "marduk_exchange_object_user" {
+  bucket = google_storage_bucket.storage_bucket_exchange.name
+  role   = "roles/storage.objectUser"
+  member = "serviceAccount:${var.marduk_service_account}"
+}

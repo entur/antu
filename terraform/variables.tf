@@ -73,3 +73,7 @@ variable "anzu_github_service_account" {
 
 
 
+
+variable "marduk_service_account" {
+  description = "Email of the marduk runtime service account, granted publisher on AntuNetexValidationQueue and object access to the exchange bucket."
+}
